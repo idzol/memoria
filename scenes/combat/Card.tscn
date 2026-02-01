@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=3 uid="uid://ds43twav0dxus"]
+
+[ext_resource type="Script" path="res://scripts/ui/combat/Card.gd" id="1_k81y5"]
+[ext_resource type="Texture2D" uid="uid://ndwcsgrrly0d" path="res://scenes/back2.png" id="2_1nuix"]
+
+[node name="Card" type="TextureButton"]
+custom_minimum_size = Vector2(128, 192)
+offset_right = 128.0
+offset_bottom = 192.0
+pivot_offset = Vector2(64, 96)
+script = ExtResource("1_k81y5")
+
+[node name="Back" type="Sprite2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(64, 96)
+scale = Vector2(0.125, 0.125)
+texture = ExtResource("2_1nuix")
+
+[node name="Icon" type="Sprite2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(64, 96)
+scale = Vector2(0.125, 0.125)
+texture = ExtResource("2_1nuix")

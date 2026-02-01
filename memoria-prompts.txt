@@ -1,0 +1,94 @@
+implement basic flow from memoria 
+
+map movement 
+
+	home -> safe 
+		
+	safe -> 
+		fight 
+		shop 
+		...
+	
+	death -> revive loop 
+	
+	graphic 
+		player
+		enemy		
+		cards -> simple icons 
+		backgrounds 
+
+	stats -> armour 
+	cards -> 
+		base set 
+			attack 
+			heal 
+			armour 
+			trap 
+		
+		discover new 
+		tailor deck 
+		**always require the max(8, max_cards) in deck 
+			9 - 4
+			16 - 8 
+			25 - 12 
+
+	game -> loop
+		when no player cards remain unflipped (i.e. only debuff cards remain), reshuffle the remaining cards and start again 
+
+==
+in world map, update to create a player home, which links to the bottom centre 
+highlight the current circle that the player is on 
+allow the player to move to connected nodes 
+implement a fog of war, so that player cannot see connections of nodes not visited  
+
+==
+implement class specific functions in battle 
+	librarian
+	athlete 
+	...
+	
+== 
+in main menu, selecting full screen should apply changes immediately 
+
+=== 
+update battlescene so that top of page to a 2d, side on "environment" with your character and enemy character(s) facing each other, with HP on top of character  
+
+introduce concept of dialogue before battle, and dialog options   
+
+introduce game state variables, such that completing a room previously may change the room next time based on game state 
+
+==
+create a json structure for dialog
+create a json structure for room behaviour, based on game state 
+
+===
+create a character screen that shows player, cards in deck
+	introduce concept of player deck 
+	show all cards face up 
+	add dictionary ... 
+
+=== 
+update map to show current location with player icon 
+
+==
+add "flee" to combat 
+	track last node visited 
+	return character to last node 
+
+==
+add game progress state. eg. 
+
+	Characters
+		NPC-name
+		* interacted = true 
+		* win = 1, 2, 3 ...
+		* loss = 0, 1...
+	
+	Map 
+		map-name
+		biome-name
+		* visited = 
+
+== 
+add button to battlescene for development 
+	"win" - ie. finish combat  

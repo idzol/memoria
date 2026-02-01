@@ -1,0 +1,136 @@
+[gd_scene load_steps=3 format=3 uid="uid://c5n80tiagf37k"]
+
+[ext_resource type="Script" path="res://scripts/ui/CharacterScreen.gd" id="1_char_screen"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.08, 0.08, 0.1, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.25, 0.25, 0.3, 1)
+corner_radius_all = 8
+
+[node name="CharacterScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_char_screen")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.05, 0.07, 1)
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 40
+
+[node name="MainHBox" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 40
+
+[node name="LeftPanel" type="VBoxContainer" parent="MarginContainer/MainHBox"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="PortraitFrame" type="Panel" parent="MarginContainer/MainHBox/LeftPanel"]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="PortraitIcon" type="Label" parent="MarginContainer/MainHBox/LeftPanel/PortraitFrame"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 80
+text = "👤"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StatsPanel" type="VBoxContainer" parent="MarginContainer/MainHBox/LeftPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ClassName" type="Label" parent="MarginContainer/MainHBox/LeftPanel/StatsPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.6, 1, 1)
+theme_override_font_sizes/font_size = 32
+text = "The Archivist"
+
+[node name="HPLabel" type="Label" parent="MarginContainer/MainHBox/LeftPanel/StatsPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "HP: 100 / 100"
+
+[node name="GoldLabel" type="Label" parent="MarginContainer/MainHBox/LeftPanel/StatsPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.2, 1)
+theme_override_font_sizes/font_size = 20
+text = "Gold: 250"
+
+[node name="Control" type="Control" parent="MarginContainer/MainHBox/LeftPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="BackButton" type="Button" parent="MarginContainer/MainHBox/LeftPanel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+text = "RETURN TO MAP"
+
+[node name="RightPanel" type="VBoxContainer" parent="MarginContainer/MainHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 20
+
+[node name="DeckHeader" type="HBoxContainer" parent="MarginContainer/MainHBox/RightPanel"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="MarginContainer/MainHBox/RightPanel/DeckHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 32
+text = "DECK MANAGEMENT"
+
+[node name="DeckCount" type="Label" parent="MarginContainer/MainHBox/RightPanel/DeckHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 24
+text = "Active Pairs: 0 / 12"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/MainHBox/RightPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="CardGrid" type="GridContainer" parent="MarginContainer/MainHBox/RightPanel/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 20
+columns = 3

@@ -1,0 +1,82 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/map/WorldMapUI.gd" id="1_map_ui"]
+[ext_resource type="PackedScene" path="res://scenes/ui/CardDiscoveryPopup.tscn" id="2_discovery"]
+
+[node name="WorldMap" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_map_ui")
+
+[node name="MapBackground" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 3
+vertical_scroll_mode = 2
+
+[node name="MapContent" type="Control" parent="ScrollContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(1280, 4000)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Lines" type="Node2D" parent="ScrollContainer/MapContent"]
+unique_name_in_owner = true
+position = Vector2(640, 3800)
+
+[node name="Nodes" type="Node2D" parent="ScrollContainer/MapContent"]
+unique_name_in_owner = true
+position = Vector2(640, 3800)
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="MarginContainer" type="MarginContainer" parent="HUD"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="HUD/MarginContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="TopHBox" type="HBoxContainer" parent="HUD/MarginContainer/VBox"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="AvatarButton" type="Button" parent="HUD/MarginContainer/VBox/TopHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "👤"
+
+[node name="DiscoveryOverlay" parent="HUD" instance=ExtResource("2_discovery")]
+unique_name_in_owner = true
+visible = false

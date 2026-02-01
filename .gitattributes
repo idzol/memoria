@@ -1,0 +1,20 @@
+# Handle line endings automatically
+* text=auto
+
+# Force Godot text files to be normalized
+*.gd text
+*.tscn text
+*.tres text
+*.project.godot text
+
+# Ensure documentation and notes are text
+*.md text
+*.txt text
+
+# Keep binary assets safe from line-ending conversion
+*.png binary
+*.jpg binary
+*.svg binary
+*.wav binary
+*.ogg binary
+*.import binary

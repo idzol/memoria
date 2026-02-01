@@ -1,0 +1,47 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Memory Dungeon"
+run/main_scene="uid://c5n80tiagf37h"
+config/features=PackedStringArray("4.3", "Forward Plus")
+config/icon="res://icon.svg"
+; Set a dedicated folder for save files (SaveManager.gd)
+config/use_custom_user_dir=true
+config/custom_user_dir_name="MemoryDungeon"
+
+[autoload]
+
+SignalBus="*uid://27c0k1aans6a"
+GameManager="*uid://t7yqaikr52qk"
+SaveManager="*uid://b1h8pr7avoy1t"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/size/resizable=true
+; Allow the game to look crisp on high-resolution displays (Steam Deck/Retina)
+window/dpi/allow_hidpi=true
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[physics]
+
+3d/physics_engine="Jolt Physics"
+
+[rendering]
+
+; Forward Plus is recommended for Steam/Desktop for better post-processing
+renderer/rendering_method="forward_plus"
+rendering_device/driver.windows="d3d12"
+; Textures will look better when scaled on laptop screens
+textures/canvas_textures/default_texture_filter=2

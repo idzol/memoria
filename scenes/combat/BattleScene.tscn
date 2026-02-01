@@ -1,0 +1,174 @@
+[gd_scene format=3 uid="uid://b77asnldqt0xe"]
+
+[ext_resource type="Script" uid="uid://t5ler8jigjuj" path="res://scripts/ui/combat/BattleScene.gd" id="1_ltshs"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stage"]
+bg_color = Color(0.1, 0.1, 0.12, 1)
+border_width_bottom = 4
+border_color = Color(0.2, 0.2, 0.25, 1)
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_placeholder"]
+animations = [{
+"frames": [],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}]
+
+[node name="BattleScene" type="Node2D" unique_id=294157706]
+script = ExtResource("1_ltshs")
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=1819315207]
+
+[node name="SafeZone" type="MarginContainer" parent="UI" unique_id=2095769542]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 30
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 30
+
+[node name="MainLayout" type="VBoxContainer" parent="UI/SafeZone" unique_id=274023891]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="TopHalf_Environment" type="PanelContainer" parent="UI/SafeZone/MainLayout" unique_id=1227353947]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_stage")
+
+[node name="BackgroundAnim" type="AnimatedSprite2D" parent="UI/SafeZone/MainLayout/TopHalf_Environment" unique_id=1101555208]
+unique_name_in_owner = true
+position = Vector2(610, 160)
+sprite_frames = SubResource("SpriteFrames_placeholder")
+animation = &"idle"
+autoplay = "idle"
+
+[node name="HBox" type="HBoxContainer" parent="UI/SafeZone/MainLayout/TopHalf_Environment" unique_id=594828434]
+layout_mode = 2
+alignment = 1
+
+[node name="AlliesContainer" type="HBoxContainer" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox" unique_id=426352551]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="PlayerPortrait" type="VBoxContainer" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/AlliesContainer" unique_id=194452302]
+layout_mode = 2
+alignment = 2
+
+[node name="PlayerHP" type="Label" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/AlliesContainer/PlayerPortrait" unique_id=1338207201]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+text = "HP: 100/100"
+horizontal_alignment = 1
+
+[node name="Portrait" type="Panel" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/AlliesContainer/PlayerPortrait" unique_id=1859378568]
+custom_minimum_size = Vector2(140, 160)
+layout_mode = 2
+
+[node name="Sprite" type="AnimatedSprite2D" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/AlliesContainer/PlayerPortrait/Portrait" unique_id=37334881]
+position = Vector2(70, 80)
+sprite_frames = SubResource("SpriteFrames_placeholder")
+animation = &"idle"
+autoplay = "idle"
+
+[node name="PlayerFlash" type="ColorRect" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/AlliesContainer/PlayerPortrait/Portrait" unique_id=1249090652]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0)
+
+[node name="Spacer" type="Control" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox" unique_id=561661651]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+
+[node name="NPCContainer" type="HBoxContainer" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox" unique_id=1270903757]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="EnemyPortrait" type="VBoxContainer" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/NPCContainer" unique_id=2001602095]
+layout_mode = 2
+alignment = 2
+
+[node name="EnemyHP" type="Label" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/NPCContainer/EnemyPortrait" unique_id=250838964]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+text = "HP: 50/50"
+horizontal_alignment = 1
+
+[node name="Portrait" type="Panel" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/NPCContainer/EnemyPortrait" unique_id=315035940]
+custom_minimum_size = Vector2(140, 160)
+layout_mode = 2
+
+[node name="Sprite" type="AnimatedSprite2D" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/NPCContainer/EnemyPortrait/Portrait" unique_id=192198290]
+position = Vector2(70, 80)
+sprite_frames = SubResource("SpriteFrames_placeholder")
+animation = &"idle"
+autoplay = "idle"
+
+[node name="EnemyFlash" type="ColorRect" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/NPCContainer/EnemyPortrait/Portrait" unique_id=1484732817]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0)
+
+[node name="BottomHalf_Split" type="HBoxContainer" parent="UI/SafeZone/MainLayout" unique_id=1183711887]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+
+[node name="LogSection" type="VBoxContainer" parent="UI/SafeZone/MainLayout/BottomHalf_Split" unique_id=984709867]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="Header" type="Label" parent="UI/SafeZone/MainLayout/BottomHalf_Split/LogSection" unique_id=593749577]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+text = "BATTLE LOG"
+
+[node name="LogPanel" type="PanelContainer" parent="UI/SafeZone/MainLayout/BottomHalf_Split/LogSection" unique_id=4757734]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Scroll" type="ScrollContainer" parent="UI/SafeZone/MainLayout/BottomHalf_Split/LogSection/LogPanel" unique_id=805874401]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="LogBox" type="VBoxContainer" parent="UI/SafeZone/MainLayout/BottomHalf_Split/LogSection/LogPanel/Scroll" unique_id=1318928777]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CardSection" type="CenterContainer" parent="UI/SafeZone/MainLayout/BottomHalf_Split" unique_id=1024005279]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.5
+
+[node name="GridContainer" type="GridContainer" parent="UI/SafeZone/MainLayout/BottomHalf_Split/CardSection" unique_id=1306235840]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 15
+theme_override_constants/v_separation = 15
+columns = 3
