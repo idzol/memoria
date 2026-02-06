@@ -1,3 +1,105 @@
+1) Open VSCode -> 
+	C:\Users\pkubi\Documents\memory-dungeon> 
+
+2) Open Godot -> Memory Dungeon
+3) Continue Run (F5)
+
+
+===
+scenes 
+	backgrounds ... 
+	music ... 
+	
+
+===
+set encounter frequency by biome
+	eg. town has 10% battle
+
+update routing by biome 
+	create an "connector" image on world map 
+
+===
+
+create icons - 80x80
+
+	home
+	battle
+	shop
+	rest
+	event
+	boss
+	mystery		
+
+==
+
+create images - 180x180
+
+	forest		Overgrown, greens, woods.
+	ice_caves	Frozen, blues, crystals.
+	desert		Sandy, yellow, ruins.
+	swamp		Murky, dark greens, water.
+	abyss		Deep cave, dark purple/grey.
+	void		Cosmic, black, ethereal.
+	the_core	
+
+
+	forest_battle_0.png
+	ice_caves_shop_12.png
+	void_event_29.png
+	..
+	
+== 
+
+create character 
+
+	res://assets/character/base.png
+
+
+==
+create icons 
+
+	180x180 
+	
+	
+===
+create player / NPCs 
+	
+	10 NPCs per biome 
+	gif / image per NPC
+
+===
+
+* highlight player location - focus on player when loading map, moving 
+* map - change canvas to player  
+
+* on pressing exit, load menu 
+	in game menu, include 
+	* "save and exit" -> dialog box confirming saved 
+	* "abandon run" -> are you sure? 
+
+* on loss - restart at home. 
+* save/load - delete save 
+	
+
+scenes
+	runsummary -- wake up at home
+	wincondition -- on fighting last boss...
+	
+map 
+	show player location, focus on player centre 
+	hide nodes / paths 
+	update icons based on visibility 
+
+assets | cards 
+	improve look and feel to match memoria 
+	simple back / icons 
+	smaller viewport 
+
+improve UI for character selection etc.. 
+
+
+===== 
+
 implement basic flow from memoria 
 
 map movement 
