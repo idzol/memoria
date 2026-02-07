@@ -17,6 +17,7 @@ var player_inventory: Array = ["sword", "shield", "heart", "trap", "scroll"]
 var current_level: int = 1
 var completed_nodes: Array = []
 var current_node: Dictionary = {}
+var run_map: Dictionary = {} # Stored persistently per run
 
 # Tracking player by grid coordinates: x = column (0-4), y = layer (-1 to 19)
 # Home is at Layer -1, Column 2 (Center)
@@ -167,6 +168,9 @@ func load_run_from_data(data: Dictionary):
 	var saved_pos = data.get("grid_pos", [2, -1])
 	player_grid_pos = Vector2i(saved_pos[0], saved_pos[1])
 	
+	if data.has("run_map"):
+		run_map = data.run_map
+
 	get_tree().change_scene_to_file("res://scenes/map/WorldMap.tscn")
 
 func _on_node_selected(data):

@@ -10,13 +10,21 @@ scenes
 	backgrounds ... 
 	music ... 
 	
-
 ===
 set encounter frequency by biome
 	eg. town has 10% battle
 
 update routing by biome 
+	player is not 
 	create an "connector" image on world map 
+
+
+==
+
+update map generator and world map so that the map is only generated once, and unique per run
+make sure the player location is updated even when there is no event in the room
+
+
 
 ===
 
