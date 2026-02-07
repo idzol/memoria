@@ -23,6 +23,19 @@ const ICON_MAP = {
 	"boss": "res://assets/skull.png"
 }
 
+# Map node types: alternate method  
+func _get_type_icon(type: String) -> String:
+	match type:
+		"home": return "🏡"
+		"battle": return "⚔️"
+		"shop": return "💰"
+		"rest": return "🔥"
+		"event": return "❓"
+		"boss": return "💀"
+		"lore": return "📜"
+		"trap": return "🕸️"
+		_: return "•"
+
 func setup_advanced(data, diff_color: Color, is_revealed: bool, is_reachable: bool, is_player_here: bool):
 	node_data = data
 	
@@ -39,17 +52,24 @@ func setup_advanced(data, diff_color: Color, is_revealed: bool, is_reachable: bo
 	if !is_revealed:
 		modulate.a = 0.2
 		icon_rect.visible = false
-		_set_background("mystery")
 		border.self_modulate = Color.GRAY
+		if room_bg:
+			room_bg.texture = load("res://assets/wall.png")
+		
 	else:
 		# Revealed but maybe not reachable (dimmed)
 		modulate.a = 1.0 if (is_reachable or is_player_here) else 0.6
 		icon_rect.visible = true
 		border.self_modulate = diff_color
-		
+		# icon_label.text = _get_type_icon(data.get("type", "battle"))
+
 		# Set assets
 		_set_node_icon(data.type)
-		_set_background(data.type)
+
+		# ASSET ASSIGNMENT LOGIC:
+		# Looks for res://assets/rooms/{biome}_{room_key}.png
+		# Example: res://assets/rooms/town_t1.png
+		_update_background_texture(data)
 
 func _set_node_icon(type: String):
 	var path = ICON_MAP.get(type, "res://assets/trap.png")
@@ -58,17 +78,20 @@ func _set_node_icon(type: String):
 	else:
 		icon_rect.texture = load("res://assets/trap.png")
 
-func _set_background(type: String):
-	# Look for background in res://assets/rooms/
-	# Format: res://assets/rooms/[type].png
-	var bg_path = "res://assets/rooms/" + type + ".png"
+func _update_background_texture(data):
+
+	if not room_bg: return
 	
-	# If specific background doesn't exist, try area backgrounds (ice, sand, etc) 
-	# if provided in node_data, or fall back to default
-	if !ResourceLoader.exists(bg_path):
-		bg_path = "res://assets/wall.png" # The default fallback
-		
-	room_bg.texture = load(bg_path)
+	var biome = data.get("biome", "forest")
+	var r_key = data.get("room_key", "default")
+	var path = "res://assets/rooms/%s_%s.png" % [biome, r_key]
+	
+	if ResourceLoader.exists(path):
+		room_bg.texture = load(path)
+	else:
+		# Fallback to a generic biome wall or default wall
+		var fallback = "res://assets/wall.png"
+		room_bg.texture = load(fallback)
 
 func _on_button_pressed():
 	if node_data:

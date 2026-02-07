@@ -23,9 +23,10 @@ const VERTICAL_PADDING = 600.0
 
 func _ready():
 	# Ensure GameManager is initialized if this is the start of a run
-	if GameManager.player_grid_pos == Vector2i.ZERO:
-		# Start at the bottom (Home)
-		GameManager.player_grid_pos = Vector2i(2, -1)
+	# Use the specific uninitialized value (-99, -99) instead of Vector2i.ZERO (0, 0)
+	# This prevents valid (0,0) coordinates from being treated as "unset".
+	if GameManager.player_grid_pos == Vector2i(-99, -99):
+		GameManager.reset_to_home()
 	
 	generator = generator_script.new()
 	add_child(generator)

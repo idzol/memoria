@@ -1,69 +1,93 @@
 extends Node
 
 # res://scripts/logic/MapGenerator.gd
-# Generates a procedural map by selecting a subset of 210 unique rooms.
+# Generates a procedural campaign map by selecting from hand-crafted room pools.
 
 const MAP_LAYERS = 20
 const NODES_PER_LAYER = 5
 const VERTICAL_SPACING = 180
 const HORIZONTAL_SPACING = 180
 
-# The selected subset for the current run
-var active_room_sets = {} 
+# Mapping difficulty tiers to GameData.ROOMS keys
+const BIOME_KEYS = {
+	0: "town",
+	1: "forest",
+	2: "ice_caves",
+	3: "desert",
+	4: "swamp",
+	5: "abyss",
+	6: "void"
+}
 
 func generate_new_map() -> Dictionary:
-	if GameData.ROOM_POOL[0].is_empty():
-		var temp_gd = GameData.new()
-		temp_gd._generate_room_definitions()
-		temp_gd.queue_free()
-	
-	_select_active_rooms_for_run()
-	
 	var nodes = {}
 	
-	# 1. Create Home Node
-	var home = {
+	# 1. Create Home Node (ID 0)
+	# We treat Home as a special "town" node or unique starting point
+	nodes["0"] = {
 		"id": "0",
-		"name": "Home Base",
-		"type": "home",
+		"room_key": "home",
+		"biome": "town",
 		"layer": -1,
 		"column": 2,
+		"type": "home",
+		"name": "Home Base",
 		"difficulty": 0,
 		"pos": Vector2(0, VERTICAL_SPACING),
 		"connections": []
 	}
-	nodes[home.id] = home
 	
 	# 2. Generate Grid Layers
 	for l in range(MAP_LAYERS):
 		var diff = clampi(floor(l * 7.0 / MAP_LAYERS), 0, 6)
-		var current_set = active_room_sets[diff]
+		var biome_name = BIOME_KEYS[diff]
+		
+		# Get available hand-crafted rooms for this biome
+		var available_rooms = GameData.ROOMS.get(biome_name, {}).keys()
 		
 		for c in range(NODES_PER_LAYER):
-			var room_template = {}
-			
-			# Check if room pool is empty
-			if current_set.is_empty():
-				push_error("MapGenerator: ROOM_POOL for difficulty %d is empty! Check GameData.gd" % diff)
-				# Fallback to a generic room to prevent crash
-				room_template = {
-					"name": "Unstable Reality",
-					"type": "battle",
-					"difficulty": diff,
-					"enemy": "skeletal_sentry",
-					"loot": ["gold"]
-				}
-			else:
-				room_template = current_set[randi() % current_set.size()].duplicate()
-
 			var id = str(1 + (l * NODES_PER_LAYER) + c)
-			room_template["id"] = id
-			room_template["layer"] = l
-			room_template["column"] = c
-			room_template["pos"] = Vector2((c - 2) * HORIZONTAL_SPACING, l * -VERTICAL_SPACING)
-			room_template["connections"] = []
+			var grid_pos = Vector2i(c, l)
 			
-			nodes[id] = room_template
+			# CHECK FOR FIXED NODE OVERRIDE
+			var fixed_ref = GameManager.fixed_nodes.get(grid_pos, "")
+			
+			# Pick a random hand-crafted room key (e.g., "t1", "f5")
+			var room_key = "default"
+			var room_data = {}
+			
+			if fixed_ref != "":
+				# If fixed_ref matches a known room key in the current biome, load it
+				if GameData.ROOMS.get(biome_name, {}).has(fixed_ref):
+					room_key = fixed_ref
+					room_data = GameData.ROOMS[biome_name][room_key].duplicate()
+				else:
+					# Fallback: treat as a generic type or unique landmark
+					room_data = {"type": fixed_ref, "name": fixed_ref.capitalize().replace("_", " ")}
+
+			elif not available_rooms.is_empty():
+				room_key = available_rooms[randi() % available_rooms.size()]
+				room_data = GameData.ROOMS[biome_name][room_key].duplicate()
+			
+			# Construct final node dictionary
+			nodes[id] = {
+				"id": id,
+				"room_key": room_key,
+				"biome": biome_name,
+				"layer": l,
+				"column": c,
+				"difficulty": diff,
+				"pos": Vector2((c - 2) * HORIZONTAL_SPACING, l * -VERTICAL_SPACING),
+				"connections": []
+			}
+			
+			# Merge in data from GameData (name, type, enemy, loot, etc.)
+			for key in room_data:
+				nodes[id][key] = room_data[key]
+				
+			# Default type if missing
+			if not nodes[id].has("type"):
+				nodes[id]["type"] = _get_random_type_fallback(l)
 
 	# 3. Orthogonal Connections
 	for id in nodes:
@@ -74,6 +98,7 @@ func generate_new_map() -> Dictionary:
 			Vector2i(node.column + 1, node.layer),
 			Vector2i(node.column - 1, node.layer)
 		]
+		
 		for coord in neighbors:
 			var target = _find_node_at(nodes, coord)
 			if target:
@@ -81,18 +106,19 @@ func generate_new_map() -> Dictionary:
 	
 	return nodes
 
-func _select_active_rooms_for_run():
-	# For each difficulty (0-6), pick 20 random rooms out of the 30 available
-	for diff in range(7):
-		var full_pool = GameData.ROOM_POOL[diff].duplicate()
-		full_pool.shuffle()
-		active_room_sets[diff] = full_pool.slice(0, 20)
-
 func _find_node_at(nodes: Dictionary, coord: Vector2i):
 	for id in nodes:
 		if nodes[id].layer == coord.y and nodes[id].column == coord.x:
 			return nodes[id]
 	return null
+
+func _get_random_type_fallback(layer: int) -> String:
+	if layer == MAP_LAYERS - 1: return "boss"
+	var r = randf()
+	if r < 0.6: return "battle"
+	if r < 0.8: return "event"
+	if r < 0.9: return "shop"
+	return "rest"
 
 func get_difficulty_color(diff: int) -> Color:
 	var colors = [Color.SEA_GREEN, Color.GREEN_YELLOW, Color.GOLD, Color.DARK_ORANGE, Color.ORANGE_RED, Color.CRIMSON, Color.MEDIUM_PURPLE]
