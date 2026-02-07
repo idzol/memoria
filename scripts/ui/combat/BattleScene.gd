@@ -1,38 +1,144 @@
 extends Node2D
 
-# Paths updated to use Unique Names (%)
+# res://scripts/ui/combat/BattleScene.gd
+# Handles Dialog Flow -> Memory Match Combat -> Victory/Loss
+
+# const GameData = preload("res://scripts/data/GameData.gd")
+
 @onready var grid = %GridContainer
 @onready var player_hp_label = %PlayerHP
 @onready var enemy_hp_label = %EnemyHP
 @onready var log_box = %LogBox
 
+# Dialog UI
+@onready var dialog_overlay = %DialogOverlay
+@onready var dialog_text = %DialogText
+@onready var room_title = %RoomTitle
+@onready var option_container = %OptionContainer
+@onready var battle_ui = %UI # The main battle interface
+
+# Portraits
+@onready var enemy_portrait_sprite = %EnemyPortraitSprite
+@onready var player_portrait_sprite = %PlayerPortraitSprite
+
 var card_scene = preload("res://scenes/combat/Card.tscn")
 
-# --- Game State ---
+# --- Combat State ---
 var flipped_cards = []
-var can_flip = true # Gating for race condition protection
+var can_flip = false # Blocked during dialog
 var player_hp = 100
 var enemy_hp = 100 
 var textures = {}
 var difficulty = 0
+var current_room = {}
+var active_tree = {}
 
 func _ready():
-	difficulty = GameManager.current_node.get("difficulty", 0)
-	player_hp = GameManager.current_hp
+	# 1. Initialize Room Data
+	current_room = GameManager.current_node
+	if current_room.is_empty():
+		# Fallback for direct scene testing
+		current_room = GameManager.get_random_room_for_area("forest")
+	
+	difficulty = current_room.get("difficulty", 1)
+	player_hp = GameManager.world_state.get("current_hp", 100)
 	
 	if not grid:
 		push_error("BattleScene Error: GridContainer not found.")
 		return
-	
+
 	# PADDING: Increased separation to prevent card overlap
 	grid.add_theme_constant_override("h_separation", 35)
 	grid.add_theme_constant_override("v_separation", 35)
 	
-	setup_board()
-	update_ui()
+	# 2. Setup Debug Buttons
+	%DebugWinBtn.pressed.connect(_on_debug_win)
+	%DebugLoseBtn.pressed.connect(_on_debug_lose)
 	
+	# 3. Setup Portraits
+	_setup_portraits()
+	
+	# 4. Start Dialog Flow
+	_init_encounter()
+	update_ui()
+
+func _setup_portraits():
+	# Load Enemy Portrait from GameData ENEMIES or NPCS
+	var enemy_id = current_room.get("enemy", "")
+	var npc_id = current_room.get("npc_id", "")
+	
+	var icon_path = "res://assets/skull.png"
+	if GameData.ENEMIES.has(enemy_id):
+		icon_path = GameData.ENEMIES[enemy_id].icon
+		enemy_hp = GameData.ENEMIES[enemy_id].hp
+	elif GameData.NPCS.has(npc_id):
+		icon_path = GameData.NPCS[npc_id].icon
+		enemy_hp = GameData.NPCS[npc_id].get("stats", {}).get("hp", 50)
+	
+	enemy_portrait_sprite.texture = load(icon_path)
+
+func _init_encounter():
+	battle_ui.hide()
+	dialog_overlay.show()
+	
+	# Check for Dialog Tree
+	var tree_id = current_room.get("dialog_tree", "")
+	if GameData.DIALOG_TREES.has(tree_id):
+		active_tree = GameData.DIALOG_TREES[tree_id]
+		_display_tree_node("start")
+	else:
+		_setup_basic_dialog()
+
+func _display_tree_node(node_id: String):
+	var node = active_tree.get(node_id)
+	if !node: return
+	
+	room_title.text = current_room.get("name", "Encounter")
+	dialog_text.text = node.text
+	
+	# Clear Options
+	for child in option_container.get_children(): child.queue_free()
+	
+	for opt in node.options:
+		# Evaluate World State Conditions
+		if opt.has("condition") and !GameManager.evaluate_condition(opt.condition):
+			continue
+			
+		var btn = Button.new()
+		btn.text = opt.text
+		btn.pressed.connect(func(): _handle_dialog_choice(opt))
+		option_container.add_child(btn)
+
+func _handle_dialog_choice(opt: Dictionary):
+	if opt.has("bonus_loot"):
+		GameManager.add_item(opt.bonus_loot)
+		add_log("Received item: " + opt.bonus_loot.capitalize())
+		
+	if opt.has("next_node"):
+		_display_tree_node(opt.next_node)
+	elif opt.get("action") == "battle":
+		_start_combat()
+	elif opt.get("action") == "victory":
+		_on_debug_win()
+
+func _setup_basic_dialog():
+	room_title.text = current_room.get("name", "Encounter")
+	dialog_text.text = current_room.get("dialog", "An enemy approaches!")
+	
+	for child in option_container.get_children(): child.queue_free()
+	var btn = Button.new()
+	btn.text = "Fight!"
+	btn.pressed.connect(_start_combat)
+	option_container.add_child(btn)
+
+func _start_combat():
+	dialog_overlay.hide()
+	battle_ui.show()
+	can_flip = true
+	setup_board()
 	add_log("The memory manifests. Prepare yourself.")
 
+# --- Combat Logic (Memory Match) ---
 func setup_board():
 	for child in grid.get_children():
 		child.queue_free()
@@ -70,14 +176,6 @@ func setup_board():
 		
 		_apply_card_texture(new_card, type_name)
 
-func _apply_card_texture(card_node, type_name):
-	var img_path = "res://assets/" + type_name + ".png"
-	if not textures.has(type_name) and FileAccess.file_exists(img_path):
-		textures[type_name] = load(img_path)
-	
-	if textures.has(type_name) and card_node.has_method("set_icon_texture"):
-		card_node.set_icon_texture(textures[type_name])
-
 func _on_card_flipped(card):
 	# RACE CONDITION PROTECTION: Ignore if two cards are already being processed
 	if not can_flip or flipped_cards.size() >= 2:
@@ -88,14 +186,22 @@ func _on_card_flipped(card):
 	flipped_cards.append(card)
 	if flipped_cards.size() == 2:
 		can_flip = false # Block all further clicks
-		check_match()
+		_check_match()
 
-func check_match():
+func _apply_card_texture(card_node, type_name):
+	var img_path = "res://assets/" + type_name + ".png"
+	if not textures.has(type_name) and FileAccess.file_exists(img_path):
+		textures[type_name] = load(img_path)
+	
+	if textures.has(type_name) and card_node.has_method("set_icon_texture"):
+		card_node.set_icon_texture(textures[type_name])
+
+func _check_match():
 	var c1 = flipped_cards[0]
 	var c2 = flipped_cards[1]
 	
 	# Comparison delay
-	await get_tree().create_timer(0.7).timeout
+	await get_tree().create_timer(1.5).timeout
 	
 	if c1.card_type == c2.card_type:
 		c1.is_matched = true
@@ -113,17 +219,22 @@ func check_match():
 	else:
 		c1.flip_back()
 		c2.flip_back()
-		enemy_turn()
+		_enemy_turn()
 	
 	flipped_cards.clear()
-	
-	# RESHUFFLE LOGIC: If no matchable pairs remain (only debuffs or singletons)
-	if _should_reshuffle():
+
+	if enemy_hp <= 0:
+		_on_debug_win()
+		
+	elif _should_reshuffle():
 		add_log("No pairs remain. Reshuffling memory...")
 		await get_tree().create_timer(1.0).timeout
 		setup_board()
-	
-	can_flip = true # Allow selection again
+		can_flip = true
+
+	else:
+		can_flip = true
+
 	update_ui()
 
 func _should_reshuffle() -> bool:
@@ -149,9 +260,10 @@ func process_combat_action(type):
 		"heart", "potion": _heal_player(20)
 		"trap": _damage_player(15)
 
-func _damage_enemy(amount: int):
-	enemy_hp -= amount
-	add_log("Hit! Enemy takes %d damage." % amount)
+
+func _damage_enemy(amt):
+	enemy_hp -= amt
+	add_log("Hit! Enemy takes %d damage." % amt)
 	_flash_unit(%EnemyFlash, Color.CRIMSON)
 
 func _heal_player(amount: int):
@@ -165,7 +277,7 @@ func _damage_player(amount: int):
 	_flash_unit(%PlayerFlash, Color.CRIMSON)
 	if player_hp <= 0: SignalBus.combat_lost.emit()
 
-func enemy_turn():
+func _enemy_turn():
 	_damage_player(8 + difficulty)
 
 func _flash_unit(overlay, color):
@@ -173,6 +285,18 @@ func _flash_unit(overlay, color):
 	overlay.color = color
 	overlay.color.a = 0.5
 	create_tween().tween_property(overlay, "color:a", 0.0, 0.4)
+
+# --- Scene Transitions ---
+func _on_debug_win():
+	# 1. Update state and roll loot
+	GameManager.mark_room_cleared(current_room.id)
+	
+	# 2. Go to the IMMEDIATE victory screen, NOT the end-of-run summary
+	get_tree().change_scene_to_file("res://scenes/combat/VictoryScreen.tscn")
+
+func _on_debug_lose():
+	# Loss usually ends the run, so we might go to RunSummary or DeathScreen
+	get_tree().change_scene_to_file("res://scenes/ui/RunSummary.tscn")
 
 func update_ui():
 	if player_hp_label: player_hp_label.text = "HP: %d/%d" % [player_hp, GameManager.max_hp]

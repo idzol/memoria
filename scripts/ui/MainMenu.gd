@@ -8,10 +8,14 @@ extends Control
 @onready var save_container = %SaveListVBox
 @onready var name_input = %NameInput
 
+# Confirmation Popup for deletion
+@onready var confirm_delete_popup = %ConfirmDeletePopup
+var _pending_delete_filename: String = ""
+
 func _ready():
 	_refresh_continue_button()
 	
-	# Connect signals using Unique Names (%)
+	# Connect signals
 	%StartButton.pressed.connect(_on_new_game_clicked)
 	%ConfirmNameBtn.pressed.connect(_on_name_confirmed)
 	%CancelNameBtn.pressed.connect(func(): name_entry_popup.visible = false)
@@ -19,9 +23,14 @@ func _ready():
 	%SettingsButton.pressed.connect(_on_settings_pressed)
 	%ExitButton.pressed.connect(_on_exit_pressed)
 	
-	# Hide overlays by default
+	# Delete Confirmation connections
+	%ConfirmDeleteBtn.pressed.connect(_on_delete_confirmed)
+	%CancelDeleteBtn.pressed.connect(func(): confirm_delete_popup.visible = false)
+	
+	# Hide overlays
 	name_entry_popup.visible = false
 	save_list_popup.visible = false
+	confirm_delete_popup.visible = false
 	if has_node("%SettingsOverlay"):
 		%SettingsOverlay.visible = false
 
@@ -46,12 +55,8 @@ func _on_new_game_clicked():
 
 func _on_name_confirmed():
 	var p_name = name_input.text.strip_edges()
-	
-	# Requirement 1: Minimum length
-	if p_name.length() < 2:
-		return
+	if p_name.length() < 2: return
 		
-	# Requirement 2: Unique Name Validation
 	var existing_saves = SaveManager.get_save_list()
 	for save in existing_saves:
 		if save.get("player_name", "").to_lower() == p_name.to_lower():
@@ -73,16 +78,38 @@ func _populate_save_list():
 		
 	var saves = SaveManager.get_save_list()
 	for data in saves:
+		var hbox = HBoxContainer.new()
+		save_container.add_child(hbox)
+		
+		# Load Button
 		var btn = Button.new()
 		var icon = _get_class_icon(data.get("player_class", "Archivist"))
 		var p_name = data.get("player_name", "Unknown")
-		var level = data.get("current_level", 1)
-		var date = data.get("save_date_text", "Unknown Date")
-		
-		btn.text = "%s %s | Floor %d | %s" % [icon, p_name, level, date]
-		btn.custom_minimum_size.y = 60
+		var floor_num = data.get("current_level", 1)
+		btn.text = "%s %s | Floor %d" % [icon, p_name, floor_num]
+		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		btn.custom_minimum_size.y = 50
 		btn.pressed.connect(_load_specific_run.bind(data))
-		save_container.add_child(btn)
+		hbox.add_child(btn)
+		
+		# Delete Button
+		var del_btn = Button.new()
+		del_btn.text = " X "
+		del_btn.modulate = Color.INDIAN_RED
+		del_btn.pressed.connect(_on_delete_request.bind(data.filename))
+		hbox.add_child(del_btn)
+
+func _on_delete_request(filename: String):
+	_pending_delete_filename = filename
+	confirm_delete_popup.visible = true
+
+func _on_delete_confirmed():
+	if _pending_delete_filename != "":
+		SaveManager.delete_run(_pending_delete_filename)
+		_pending_delete_filename = ""
+		confirm_delete_popup.visible = false
+		_populate_save_list()
+		_refresh_continue_button()
 
 func _get_class_icon(c_name: String) -> String:
 	match c_name:
