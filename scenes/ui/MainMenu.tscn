@@ -1,6 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://c5n80tiagf37h"]
+[gd_scene format=3 uid="uid://c5n80tiagf37h"]
 
-[ext_resource type="Script" path="res://scripts/ui/MainMenu.gd" id="1_menu_script"]
+[ext_resource type="Script" uid="uid://drj4t8y13pwkt" path="res://scripts/ui/MainMenu.gd" id="1_menu_script"]
 [ext_resource type="PackedScene" uid="uid://dm5v8f6r7p2m5" path="res://scenes/ui/SettingsOverlay.tscn" id="2_settings"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_opaque_modal"]
@@ -10,11 +10,10 @@ border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
 border_color = Color(0.3, 0.3, 0.4, 1)
-corner_radius_all = 12
 shadow_size = 8
 shadow_offset = Vector2(0, 4)
 
-[node name="MainMenu" type="Control"]
+[node name="MainMenu" type="Control" unique_id=1716573332]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -23,7 +22,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_menu_script")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="." unique_id=755907738]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -32,7 +31,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.07, 0.08, 0.1, 1)
 
-[node name="CenterContainer" type="CenterContainer" parent="."]
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1151731611]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -40,41 +39,41 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=549201759]
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="Title" type="Label" parent="CenterContainer/VBoxContainer"]
+[node name="Title" type="Label" parent="CenterContainer/VBoxContainer" unique_id=1558900383]
 layout_mode = 2
 theme_override_font_sizes/font_size = 72
 text = "MEMORIA"
 horizontal_alignment = 1
 
-[node name="ContinueButton" type="Button" parent="CenterContainer/VBoxContainer"]
+[node name="ContinueButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=252402043]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 60)
 layout_mode = 2
 text = "CONTINUE RUN"
 
-[node name="StartButton" type="Button" parent="CenterContainer/VBoxContainer"]
+[node name="StartButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=616082724]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 60)
 layout_mode = 2
 text = "START NEW RUN"
 
-[node name="SettingsButton" type="Button" parent="CenterContainer/VBoxContainer"]
+[node name="SettingsButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=495069224]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 50)
 layout_mode = 2
 text = "SETTINGS"
 
-[node name="ExitButton" type="Button" parent="CenterContainer/VBoxContainer"]
+[node name="ExitButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=519075769]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 50)
 layout_mode = 2
 text = "EXIT"
 
-[node name="NameEntryPopup" type="Panel" parent="."]
+[node name="NameEntryPopup" type="Panel" parent="." unique_id=1786543553]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(400, 250)
@@ -88,7 +87,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_opaque_modal")
 
-[node name="VBox" type="VBoxContainer" parent="NameEntryPopup"]
+[node name="VBox" type="VBoxContainer" parent="NameEntryPopup" unique_id=1328468189]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -98,12 +97,12 @@ grow_vertical = 2
 theme_override_constants/separation = 20
 alignment = 1
 
-[node name="Label" type="Label" parent="NameEntryPopup/VBox"]
+[node name="Label" type="Label" parent="NameEntryPopup/VBox" unique_id=1563893187]
 layout_mode = 2
 text = "Enter Your Name"
 horizontal_alignment = 1
 
-[node name="NameInput" type="LineEdit" parent="NameEntryPopup/VBox"]
+[node name="NameInput" type="LineEdit" parent="NameEntryPopup/VBox" unique_id=216289779]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
@@ -111,24 +110,24 @@ size_flags_horizontal = 4
 placeholder_text = "Hero Name..."
 alignment = 1
 
-[node name="HBox" type="HBoxContainer" parent="NameEntryPopup/VBox"]
+[node name="HBox" type="HBoxContainer" parent="NameEntryPopup/VBox" unique_id=530057369]
 layout_mode = 2
 theme_override_constants/separation = 20
 alignment = 1
 
-[node name="ConfirmNameBtn" type="Button" parent="NameEntryPopup/VBox/HBox"]
+[node name="ConfirmNameBtn" type="Button" parent="NameEntryPopup/VBox/HBox" unique_id=1466563212]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 40)
 layout_mode = 2
 text = "START"
 
-[node name="CancelNameBtn" type="Button" parent="NameEntryPopup/VBox/HBox"]
+[node name="CancelNameBtn" type="Button" parent="NameEntryPopup/VBox/HBox" unique_id=1136864777]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 40)
 layout_mode = 2
 text = "CANCEL"
 
-[node name="SaveListPopup" type="Panel" parent="."]
+[node name="SaveListPopup" type="Panel" parent="." unique_id=1113500575]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(600, 500)
@@ -142,42 +141,38 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_opaque_modal")
 
-[node name="VBox" type="VBoxContainer" parent="SaveListPopup"]
+[node name="VBox" type="VBoxContainer" parent="SaveListPopup" unique_id=1928484586]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 20
 
-[node name="Title" type="Label" parent="SaveListPopup/VBox"]
+[node name="Title" type="Label" parent="SaveListPopup/VBox" unique_id=872572816]
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "SELECT A MEMORY"
 horizontal_alignment = 1
 
-[node name="ScrollContainer" type="ScrollContainer" parent="SaveListPopup/VBox"]
+[node name="ScrollContainer" type="ScrollContainer" parent="SaveListPopup/VBox" unique_id=239661740]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="SaveListVBox" type="VBoxContainer" parent="SaveListPopup/VBox/ScrollContainer"]
+[node name="SaveListVBox" type="VBoxContainer" parent="SaveListPopup/VBox/ScrollContainer" unique_id=455122287]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="CloseSavesBtn" type="Button" parent="SaveListPopup/VBox"]
+[node name="CloseSavesBtn" type="Button" parent="SaveListPopup/VBox" unique_id=67787611]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 40)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "CLOSE"
 
-[node name="ConfirmDeletePopup" type="Panel" parent="."]
+[node name="ConfirmDeletePopup" type="Panel" parent="." unique_id=1379172302]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(400, 200)
@@ -191,45 +186,41 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_opaque_modal")
 
-[node name="VBox" type="VBoxContainer" parent="ConfirmDeletePopup"]
+[node name="VBox" type="VBoxContainer" parent="ConfirmDeletePopup" unique_id=1698528950]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 20
 theme_override_constants/separation = 20
 alignment = 1
 
-[node name="Label" type="Label" parent="ConfirmDeletePopup/VBox"]
+[node name="Label" type="Label" parent="ConfirmDeletePopup/VBox" unique_id=2145703976]
 layout_mode = 2
 text = "Are you sure you want to delete this memory?"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="HBox" type="HBoxContainer" parent="ConfirmDeletePopup/VBox"]
+[node name="HBox" type="HBoxContainer" parent="ConfirmDeletePopup/VBox" unique_id=295303779]
 layout_mode = 2
 theme_override_constants/separation = 30
 alignment = 1
 
-[node name="ConfirmDeleteBtn" type="Button" parent="ConfirmDeletePopup/VBox/HBox"]
+[node name="ConfirmDeleteBtn" type="Button" parent="ConfirmDeletePopup/VBox/HBox" unique_id=2102478692]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 45)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.3, 0.3, 1)
 text = "DELETE"
 
-[node name="CancelDeleteBtn" type="Button" parent="ConfirmDeletePopup/VBox/HBox"]
+[node name="CancelDeleteBtn" type="Button" parent="ConfirmDeletePopup/VBox/HBox" unique_id=1832467054]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 45)
 layout_mode = 2
 text = "CANCEL"
 
-[node name="SettingsOverlay" parent="." instance=ExtResource("2_settings")]
+[node name="SettingsOverlay" parent="." unique_id=89381519 instance=ExtResource("2_settings")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1

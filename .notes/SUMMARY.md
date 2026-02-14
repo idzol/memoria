@@ -40,6 +40,7 @@ Generated automatically for AI context and debugging.
     🖼️ trap.png.import
     🖼️ wall.png
     🖼️ wall.png.import
+    📂 cards/
     📂 character/
         📂 archivist/
             🖼️ attack.png
@@ -55,6 +56,7 @@ Generated automatically for AI context and debugging.
         🖼️ ice.png.import
         🖼️ sand.png
         🖼️ sand.png.import
+    📂 npcs/
     📂 rooms/
 ```
 
@@ -63,10 +65,13 @@ Generated automatically for AI context and debugging.
     📂 combat/
         🎬 BattleScene.tscn
         🎬 Card.tscn
+        🎬 VictoryScreen.tscn
     📂 encounters/
         🎬 EventScene.tscn
+        🎬 LoreScene.tscn
         🎬 RestScene.tscn
         🎬 ShopScene.tscn
+        🎬 TrapsScene.tscn
     📂 map/
         🎬 MapNode.tscn
         🎬 WorldMap.tscn
@@ -75,6 +80,7 @@ Generated automatically for AI context and debugging.
         🎬 CharacterScreen.tscn
         🎬 CharacterSelect.tscn
         🎬 DeathScreen.tscn
+        🎬 InGameMenu.tscn
         🎬 MainMenu.tscn
         🎬 RunSummary.tscn
         🎬 SettingsOverlay.tscn
@@ -86,6 +92,8 @@ Generated automatically for AI context and debugging.
         📜 GameManager.gd
         📜 SaveManager.gd
         📜 SignalBus.gd
+    📂 data/
+        📜 GameData.gd
     📂 logic/
         📜 CombatManager.gd
         📜 MapGenerator.gd
@@ -94,17 +102,20 @@ Generated automatically for AI context and debugging.
         📜 CharacterScreen.gd
         📜 CharacterSelect.gd
         📜 DeathScreen.gd
+        📜 InGameMenu.gd
         📜 MainMenu.gd
-        📜 MapNode.gd
         📜 RunSummary.gd
         📜 Settings.gd
         📂 combat/
             📜 BattleScene.gd
             📜 Card.gd
+            📜 VictoryScreen.gd
         📂 encounters/
             📜 EventScene.gd
+            📜 LoreScene.gd
             📜 RestScene.gd
             📜 ShopScene.gd
+            📜 TrapScene.gd
         📂 map/
             📜 MapNode.gd
             📜 WorldMapUI.gd
@@ -115,15 +126,19 @@ Generated automatically for AI context and debugging.
 | :--- | :--- | :--- |
 | BattleScene.tscn | /scripts/ui/combat/BattleScene.gd | Auto-detected |
 | Card.tscn | /scripts/ui/combat/Card.gd | Auto-detected |
-| EventScene.tscn | /scripts/ui/encounters/EventScene.gd | Auto-detected |
+| VictoryScreen.tscn | /scripts/ui/combat/VictoryScreen.gd | Auto-detected |
+| EventScene.tscn | N/A | Auto-detected |
+| LoreScene.tscn | /scripts/ui/encounters/LoreScene.gd | Auto-detected |
 | RestScene.tscn | /scripts/ui/encounters/RestScene.gd | Auto-detected |
 | ShopScene.tscn | /scripts/ui/encounters/ShopScene.gd | Auto-detected |
-| MapNode.tscn | /scripts/ui/MapNode.gd | Auto-detected |
+| TrapsScene.tscn | /scripts/ui/encounters/TrapScene.gd | Auto-detected |
+| MapNode.tscn | /scripts/ui/map/MapNode.gd | Auto-detected |
 | WorldMap.tscn | /scripts/ui/map/WorldMapUI.gd | Auto-detected |
 | CardDiscoveryPopup.tscn | /scripts/ui/CardDiscoveryPopup.gd | Auto-detected |
 | CharacterScreen.tscn | /scripts/ui/CharacterScreen.gd | Auto-detected |
 | CharacterSelect.tscn | /scripts/ui/CharacterSelect.gd | Auto-detected |
 | DeathScreen.tscn | /scripts/ui/DeathScreen.gd | Auto-detected |
+| InGameMenu.tscn | /scripts/ui/InGameMenu.gd | Auto-detected |
 | MainMenu.tscn | /scripts/ui/MainMenu.gd | Auto-detected |
 | RunSummary.tscn | /scripts/ui/RunSummary.gd | Auto-detected |
 | SettingsOverlay.tscn | /scripts/ui/Settings.gd | Auto-detected |

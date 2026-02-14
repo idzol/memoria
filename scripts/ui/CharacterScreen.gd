@@ -1,6 +1,10 @@
 extends Control
 
 # res://scripts/ui/CharacterScreen.gd
+# Handles inventory management, deck building, and player stats.
+
+# IMPORT: Centralized card data
+const CardDatabase = preload("res://scripts/core/CardDatabase.gd")
 
 @onready var card_grid = %CardGrid
 @onready var deck_count_label = %DeckCount
@@ -8,21 +12,6 @@ extends Control
 @onready var hp_label = %HPLabel
 @onready var gold_label = %GoldLabel
 @onready var back_button = %BackButton
-
-const CARD_DATA = {
-	"sword": {"name": "Blade of Memory", "desc": "Deals 15 damage to the enemy."},
-	"shield": {"name": "Ego Barrier", "desc": "Prevents the next 10 damage taken."},
-	"heart": {"name": "Vital Spark", "desc": "Heals 20 HP instantly."},
-	"frost": {"name": "Freeze Frame", "desc": "Freezes 2 cards face-up for 1 turn."},
-	"scroll": {"name": "Ancient Text", "desc": "Reveals 3 random cards for 1 second."},
-	"trap": {"name": "Dread Mimic", "desc": "Deals 15 damage to YOU when matched."},
-	"axe": {"name": "Heavy Cleaver", "desc": "Deals 25 damage but breaks a match."},
-	"potion": {"name": "Mist Tonic", "desc": "Heals 10 HP and grants 1 Peek Charge."},
-	"bomb": {"name": "Chain Blast", "desc": "Damages enemy and reveals neighbors."},
-	"lightning": {"name": "Storm Surge", "desc": "Deals 20 damage to all enemies."},
-	"bandage": {"name": "Quick Fix", "desc": "Heals 12 HP. Cheap but effective."},
-	"dagger": {"name": "Hidden Spike", "desc": "Deals 10 damage. High crit chance."}
-}
 
 func _ready():
 	_update_stats_ui()
@@ -33,11 +22,16 @@ func _ready():
 		back_button.pressed.connect(_on_back_pressed)
 
 func _update_stats_ui():
-	# In GDScript 4, Object.get() only takes 1 argument. 
-	# We use a ternary or check for null to provide a default.
+	# Display Character Class and Level
 	if class_label: 
 		var p_class = GameManager.get("player_class")
-		class_label.text = p_class if p_class != null else "Hero"
+		var p_lvl = GameManager.get("player_level")
+		if p_lvl == null: p_lvl = 1 # Fallback for new runs
+		
+		class_label.text = "%s (Lvl %d)" % [
+			p_class if p_class != null else "Hero",
+			p_lvl
+		]
 		
 	if hp_label: 
 		var cur_hp = GameManager.get("current_hp")
@@ -52,81 +46,91 @@ func _update_stats_ui():
 		gold_label.text = "Gold: " + str(g if g != null else 0)
 
 func _populate_inventory():
-	if not card_grid: return
-	
-	for child in card_grid.get_children():
+	# Clear the grid for a fresh render to update "greyed out" states
+	for child in card_grid.get_children(): 
 		child.queue_free()
 	
-	# Safety check: Get property and fallback to empty array if null
-	var inventory = GameManager.get("player_inventory")
-	if inventory == null: inventory = []
-	
-	if inventory.is_empty() and OS.is_debug_build():
-		push_warning("GameManager.player_inventory is empty or missing. Check GameManager.gd variables.")
-	
-	# Only show discovered cards
-	for card_id in inventory:
-		if CARD_DATA.has(card_id):
-			var card_ui = _create_card_ui(card_id)
+	# Only loops through cards found in player_inventory (hiding undiscovered cards)
+	for card_id in GameManager.player_inventory:
+		var card_data = CardDatabase.get_card(card_id)
+		if card_data:
+			var card_ui = _create_card_ui(card_id, card_data)
 			card_grid.add_child(card_ui)
 
-func _create_card_ui(id: String) -> PanelContainer:
+func _create_card_ui(id: String, data: Dictionary) -> PanelContainer:
 	var panel = PanelContainer.new()
-	panel.custom_minimum_size = Vector2(250, 140)
+	panel.custom_minimum_size = Vector2(280, 160)
 	
 	var style = StyleBoxFlat.new()
-	style.bg_color = Color(0.15, 0.15, 0.18)
+	style.bg_color = Color(0.12, 0.12, 0.15)
 	style.set_border_width_all(2)
 	style.border_color = Color(0.3, 0.3, 0.35)
-	style.set_corner_radius_all(4)
+	style.set_corner_radius_all(6)
 	panel.add_theme_stylebox_override("panel", style)
 	
 	var margin = MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 10)
-	margin.add_theme_constant_override("margin_right", 10)
-	margin.add_theme_constant_override("margin_top", 10)
-	margin.add_theme_constant_override("margin_bottom", 10)
+	margin.add_theme_constant_override("margin_left", 10); margin.add_theme_constant_override("margin_right", 10)
+	margin.add_theme_constant_override("margin_top", 10); margin.add_theme_constant_override("margin_bottom", 10)
 	panel.add_child(margin)
 	
-	var vbox = VBoxContainer.new()
-	margin.add_child(vbox)
+	var hbox_main = HBoxContainer.new()
+	hbox_main.add_theme_constant_override("separation", 15)
+	margin.add_child(hbox_main)
 	
-	var hbox = HBoxContainer.new()
-	vbox.add_child(hbox)
+	var tex_rect = TextureRect.new()
+	tex_rect.custom_minimum_size = Vector2(80, 120)
+	tex_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	tex_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	tex_rect.texture = load(data.image)
+	hbox_main.add_child(tex_rect)
+	
+	var vbox_text = VBoxContainer.new()
+	vbox_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hbox_main.add_child(vbox_text)
+	
+	var name_hbox = HBoxContainer.new()
+	vbox_text.add_child(name_hbox)
 	
 	var name_lbl = Label.new()
-	name_lbl.text = CARD_DATA[id].name
+	name_lbl.text = data.name
 	name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	name_lbl.add_theme_font_size_override("font_size", 18)
-	hbox.add_child(name_lbl)
+	name_hbox.add_child(name_lbl)
 	
 	var check = CheckBox.new()
 	var active_deck = GameManager.get("active_deck")
-	if active_deck == null: active_deck = []
+	var is_in_deck = id in active_deck
+	check.button_pressed = is_in_deck
 	
-	check.button_pressed = id in active_deck
-	check.toggled.connect(_on_card_toggled.bind(id, style))
-	hbox.add_child(check)
+	# GREY OUT LOGIC: 
+	# If we are at the minimum of 3 pairs, disable the check-boxes of cards currently in the deck.
+	if active_deck.size() <= 3 and is_in_deck:
+		check.disabled = true
+		check.modulate.a = 0.5 # Visible "greyed out" effect
+	
+	# bind(style, id) results in call: _on_card_toggled(bool, StyleBoxFlat, String)
+	check.toggled.connect(_on_card_toggled.bind(style, id))
+	name_hbox.add_child(check)
+	
+	var desc_lbl = Label.new()
+	desc_lbl.text = data.description
+	desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	desc_lbl.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+	vbox_text.add_child(desc_lbl)
 	
 	if check.button_pressed:
 		style.border_color = Color(0.4, 0.8, 1.0)
-		style.bg_color = Color(0.1, 0.2, 0.3)
-	
-	var desc_lbl = Label.new()
-	desc_lbl.text = CARD_DATA[id].desc
-	desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	desc_lbl.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
-	vbox.add_child(desc_lbl)
+		style.bg_color = Color(0.1, 0.15, 0.25)
 	
 	return panel
 
 func _on_card_toggled(is_active: bool, style: StyleBoxFlat, id: String):
 	var active_deck = GameManager.get("active_deck")
-	if active_deck == null: return # Should not happen if initialized
+	if active_deck == null: return
 	
 	if is_active:
+		# Max limit check
 		if active_deck.size() >= 12:
-			# Safety check: Refresh to uncheck if over limit
 			_populate_inventory()
 			return
 			
@@ -135,11 +139,17 @@ func _on_card_toggled(is_active: bool, style: StyleBoxFlat, id: String):
 			style.border_color = Color(0.4, 0.8, 1.0)
 			style.bg_color = Color(0.1, 0.2, 0.3)
 	else:
+		# MINIMUM REQUIREMENT CHECK
+		if active_deck.size() <= 3:
+			_populate_inventory()
+			return
+			
 		active_deck.erase(id)
 		style.border_color = Color(0.3, 0.3, 0.35)
 		style.bg_color = Color(0.15, 0.15, 0.18)
 		
 	_update_deck_counter()
+	_populate_inventory() # Refresh to update "greyed out" states of all other cards
 	SaveManager.save_mid_run_state()
 
 func _update_deck_counter():
@@ -147,7 +157,19 @@ func _update_deck_counter():
 	var active_deck = GameManager.get("active_deck")
 	var count = active_deck.size() if active_deck != null else 0
 	deck_count_label.text = "Active Pairs: %d / 12" % count
-	deck_count_label.modulate = Color.GREEN if count == 12 else Color.GOLD
+	
+	# Visual feedback for minimum and maximum requirements
+	if count <= 3:
+		deck_count_label.modulate = Color.GOLD
+	elif count == 12:
+		deck_count_label.modulate = Color.GREEN
+	else:
+		deck_count_label.modulate = Color.SKY_BLUE
 
 func _on_back_pressed():
+	# Prevent leaving if the deck is too small (safety check)
+	if GameManager.active_deck.size() < 3:
+		deck_count_label.text = "MIN 3 PAIRS REQUIRED!"
+		return
+		
 	get_tree().change_scene_to_file("res://scenes/map/WorldMap.tscn")

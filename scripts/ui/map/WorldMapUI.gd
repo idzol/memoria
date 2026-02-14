@@ -23,8 +23,6 @@ const VERTICAL_PADDING = 600.0
 
 func _ready():
 	# Ensure GameManager is initialized if this is the start of a run
-	# Use the specific uninitialized value (-99, -99) instead of Vector2i.ZERO (0, 0)
-	# This prevents valid (0,0) coordinates from being treated as "unset".
 	if GameManager.player_grid_pos == Vector2i(-99, -99):
 		GameManager.reset_to_home()
 	
@@ -68,7 +66,6 @@ func _generate_and_draw():
 	
 	map_data = generator.generate_new_map()
 	var player_pos = GameManager.player_grid_pos
-	# Using GameManager's tracked room states
 	var completed = GameManager.world_state.rooms
 	
 	# 1. Draw Lines (Connectivity)
@@ -108,13 +105,26 @@ func _create_node_instance(data, player_pos: Vector2i, completed: Dictionary):
 	if n.has_method("setup_advanced"):
 		n.setup_advanced(
 			data, 
-			generator.get_difficulty_color(data.difficulty),
+			_get_difficulty_color(data.difficulty), # FIXED: Now uses local helper
 			is_revealed,
 			is_reachable,
 			is_player_here
 		)
 	
 	n.node_clicked.connect(func(): _on_node_selected(data))
+
+func _get_difficulty_color(diff: int) -> Color:
+	# Difficulty colors: Green -> Yellow -> Gold -> Orange -> Red -> Purple (Boss)
+	var colors = [
+		Color.SEA_GREEN,    # 0
+		Color.GREEN_YELLOW, # 1
+		Color.GOLD,         # 2
+		Color.DARK_ORANGE,  # 3
+		Color.ORANGE_RED,   # 4
+		Color.CRIMSON,      # 5
+		Color.MEDIUM_PURPLE # 6
+	]
+	return colors[clampi(diff, 0, colors.size() - 1)]
 
 func _try_move(dir: Vector2i):
 	var target_coord = GameManager.player_grid_pos + dir
@@ -134,32 +144,23 @@ func _on_node_selected(data):
 			"battle": get_tree().change_scene_to_file("res://scenes/combat/BattleScene.tscn")
 			"shop": get_tree().change_scene_to_file("res://scenes/encounters/ShopScene.tscn")
 			"rest": get_tree().change_scene_to_file("res://scenes/encounters/RestScene.tscn")
-			"lore": get_tree().change_scene_to_file("res://scenes/encounters/LoreScene.tscn") # New route
-			"trap": get_tree().change_scene_to_file("res://scenes/encounters/TrapScene.tscn") # New route
+			"lore": get_tree().change_scene_to_file("res://scenes/encounters/LoreScene.tscn")
+			"trap": get_tree().change_scene_to_file("res://scenes/encounters/TrapScene.tscn")
 			_: get_tree().change_scene_to_file("res://scenes/encounters/EventScene.tscn")
 			
 func _scroll_to_player(is_first_load: bool = false):
-	# Wait for layout to finalize
 	await get_tree().process_frame
 	
-	# Player position, accounting for view centre 
 	var player_y_pos = (GameManager.player_grid_pos.y) * -180 + 3300
-	# var view_center = scroll_container.size.y / 2
 	var target_scroll = int(player_y_pos)
 	
 	if is_first_load:
-		# 1. Force scroll to the very bottom immediately
 		var scroll_bar = scroll_container.get_v_scroll_bar()
 		scroll_container.scroll_vertical = int(scroll_bar.max_value)
-		
-		# 2. Wait a moment so the player sees the "Home" starting point
 		await get_tree().create_timer(0.2).timeout
-		
-		# 3. Smoothly scroll UP to where the player actually is
 		var tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		tween.tween_property(scroll_container, "scroll_vertical", target_scroll, 1.2)
 	else:
-		# Normal movement scroll
 		var tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 		tween.tween_property(scroll_container, "scroll_vertical", target_scroll, 0.6)
 

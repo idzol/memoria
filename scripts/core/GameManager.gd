@@ -8,6 +8,9 @@ extends Node
 # --- Character State ---
 var player_name: String = ""
 var player_class: String = "Archivist"
+var player_level: int = 1
+var player_xp: int = 0
+
 var current_hp: int = 100
 var max_hp: int = 100
 var gold: int = 50
@@ -158,7 +161,9 @@ func start_actual_run():
 	fixed_nodes[Vector2i(2, 0)] = "town_square"
 	
 	SaveManager.save_mid_run_state()
-	get_tree().change_scene_to_file("res://scenes/map/WorldMap.tscn")
+	
+	# Transition to Intro Cinematic instead of WorldMap directly
+	get_tree().change_scene_to_file("res://scenes/ui/IntroCinematic.tscn")
 
 func reset_to_home():
 	# Standard Home location: Layer -1, Column 2
@@ -167,6 +172,8 @@ func reset_to_home():
 func load_run_from_data(data: Dictionary):
 	player_name = data.get("player_name", "Unknown")
 	player_class = data.get("player_class", "Archivist")
+	player_level = data.get("player_level", 1)
+
 	current_hp = data.get("hp", 100)
 	max_hp = data.get("max_hp", 100)
 	gold = data.get("gold", 0)

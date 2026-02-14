@@ -1,9 +1,12 @@
 extends Control
 
 # res://scripts/ui/MapNode.gd
-# Handles individual map node visuals, including dynamic backgrounds and icons.
+# Handles individual map node visuals, using a centralized room database for assets and metadata.
 
 signal node_clicked(data)
+
+# IMPORT: Centralized room and enemy data from GameData.gd
+const GameData = preload("res://scripts/data/GameData.gd")
 
 @onready var room_bg = %RoomBackground
 @onready var icon_rect = %Icon
@@ -12,29 +15,6 @@ signal node_clicked(data)
 @onready var button = $Button
 
 var node_data = null
-
-# Map node types to their specific asset paths
-const ICON_MAP = {
-	"home": "res://assets/maps/home.png",
-	"battle": "res://assets/sword.png",
-	"shop": "res://assets/key.png",
-	"rest": "res://assets/heart.png",
-	"event": "res://assets/scroll.png",
-	"boss": "res://assets/skull.png"
-}
-
-# Map node types: alternate method  
-func _get_type_icon(type: String) -> String:
-	match type:
-		"home": return "🏡"
-		"battle": return "⚔️"
-		"shop": return "💰"
-		"rest": return "🔥"
-		"event": return "❓"
-		"boss": return "💀"
-		"lore": return "📜"
-		"trap": return "🕸️"
-		_: return "•"
 
 func setup_advanced(data, diff_color: Color, is_revealed: bool, is_reachable: bool, is_player_here: bool):
 	node_data = data
@@ -51,47 +31,71 @@ func setup_advanced(data, diff_color: Color, is_revealed: bool, is_reachable: bo
 	# 3. Handle Visibility and Fog of War
 	if !is_revealed:
 		modulate.a = 0.2
-		icon_rect.visible = false
-		border.self_modulate = Color.GRAY
+		if icon_rect: icon_rect.visible = false
+		if border: border.self_modulate = Color.GRAY
 		if room_bg:
-			room_bg.texture = load("res://assets/wall.png")
-		
+			room_bg.texture = load("res://assets/maps/default.png")
 	else:
 		# Revealed but maybe not reachable (dimmed)
 		modulate.a = 1.0 if (is_reachable or is_player_here) else 0.6
-		icon_rect.visible = true
-		border.self_modulate = diff_color
-		# icon_label.text = _get_type_icon(data.get("type", "battle"))
+		if icon_rect: icon_rect.visible = true
+		if border: border.self_modulate = diff_color
+		
+		# Fetch specific room data from the database
+		var room_info = _get_room_info(data)
+		_apply_room_visuals(data, room_info)
 
-		# Set assets
-		_set_node_icon(data.type)
-
-		# ASSET ASSIGNMENT LOGIC:
-		# Looks for res://assets/rooms/{biome}_{room_key}.png
-		# Example: res://assets/rooms/town_t1.png
-		_update_background_texture(data)
-
-func _set_node_icon(type: String):
-	var path = ICON_MAP.get(type, "res://assets/trap.png")
-	if ResourceLoader.exists(path):
-		icon_rect.texture = load(path)
-	else:
-		icon_rect.texture = load("res://assets/trap.png")
-
-func _update_background_texture(data):
-
-	if not room_bg: return
-	
-	var biome = data.get("biome", "forest")
+func _get_room_info(data: Dictionary) -> Dictionary:
+	var biome = data.get("biome", "town")
 	var r_key = data.get("room_key", "default")
-	var path = "res://assets/rooms/%s_%s.png" % [biome, r_key]
 	
-	if ResourceLoader.exists(path):
-		room_bg.texture = load(path)
-	else:
-		# Fallback to a generic biome wall or default wall
-		var fallback = "res://assets/wall.png"
-		room_bg.texture = load(fallback)
+	# Reference GameData.ROOMS organized by Biome -> Room ID
+	if GameData.ROOMS.has(biome):
+		if GameData.ROOMS[biome].has(r_key):
+			return GameData.ROOMS[biome][r_key]
+		return GameData.ROOMS[biome].get("default", {})
+	
+	return {}
+
+func _apply_room_visuals(data: Dictionary, info: Dictionary):
+	var biome = data.get("biome", "town")
+	var r_key = data.get("room_key", "default")
+	
+	# --- DYNAMIC ASSET RESOLUTION ---
+	# Priority 1: Naming Convention (biome_id_world.png)
+	# Priority 2: Database Override (info.icon)
+	# Priority 3: Type-based Fallback
+	
+	var convention_path = "res://assets/map/%s_%s_world.png" % [biome, r_key]
+	
+	if icon_rect:
+		if ResourceLoader.exists(convention_path):
+			icon_rect.texture = load(convention_path)
+		elif info.has("icon") and ResourceLoader.exists(info.icon):
+			icon_rect.texture = load(info.icon)
+		else:
+			# Absolute fallback based on room type
+			icon_rect.texture = _get_fallback_icon(data.get("type", "battle"))
+			
+	# Apply Background (The "Mini-View" on the map node)
+	var bg_convention = "res://assets/rooms/%s_%s_bg.png" % [biome, r_key]
+	if room_bg:
+		if ResourceLoader.exists(bg_convention):
+			room_bg.texture = load(bg_convention)
+		elif info.has("bg") and ResourceLoader.exists(info.bg):
+			room_bg.texture = load(info.bg)
+		else:
+			room_bg.texture = load("res://assets/maps/default.png")
+
+func _get_fallback_icon(type: String) -> Texture2D:
+	match type:
+		"home": return load("res://assets/maps/home.png")
+		"battle": return load("res://assets/sword.png")
+		"shop": return load("res://assets/key.png")
+		"rest": return load("res://assets/heart.png")
+		"event": return load("res://assets/scroll.png")
+		"boss": return load("res://assets/skull.png")
+	return load("res://assets/trap.png")
 
 func _on_button_pressed():
 	if node_data:

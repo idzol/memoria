@@ -47,14 +47,24 @@ func get_save_list() -> Array:
 func save_mid_run_state():
 	if GameManager.player_name == "": return
 	
+	# AUTHENTICATED PROFILE DATA
 	var run_data = {
 		"player_name": GameManager.player_name,
 		"player_class": GameManager.player_class,
+		"player_level": GameManager.player_level,
+		"player_xp": GameManager.player_xp,
+
 		"hp": GameManager.current_hp,
 		"max_hp": GameManager.max_hp,
 		"gold": GameManager.gold,
+		
+		"inventory": GameManager.player_inventory,
+		"active_deck": GameManager.active_deck,
+		
 		"current_level": GameManager.current_level,
 		"completed_nodes": GameManager.completed_nodes,
+		"grid_pos": [GameManager.player_grid_pos.x, GameManager.player_grid_pos.y],
+		
 		"last_saved": Time.get_unix_time_from_system(),
 		"save_date_text": Time.get_datetime_string_from_system(false, true)
 	}

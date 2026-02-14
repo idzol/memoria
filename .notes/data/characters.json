@@ -1,0 +1,226 @@
+[
+  {
+    "id": "char_001",
+    "display_name": "Fisher",
+    "real_name": "Perseus",
+    "description": "A quiet, physically capable man living on the shores of Seriphos. He feels a constant 'static' in his mind that clears only when he holds divine artifacts.",
+    "relationship": "Protagonist",
+    "story_progression": {
+      "chapter_1": "Lives in ignorance as a fisherman; finds the Harpe and begins to see flashes of a 'Golden Rain'.",
+      "chapter_2": "Saves a spectral woman (Andromeda) from a shadow-beast, reclaiming his instinct to protect.",
+      "chapter_3": "Deceives the Graeae; remembers his cunning and the feeling of outsmarting the ancient world.",
+      "chapter_4": "Receives the Talaria; begins to feel comfortable in the air, shedding his mortal weight.",
+      "chapter_5": "Beholds his own reflection in the volcanic glass; accepts the 'Monster' within himself to regain his combat mastery.",
+      "chapter_6": "Returns to the memory of his palace; remembers his mother, Danae, turning his amnesia into focused rage.",
+      "chapter_7": "Climbs the Sky-Pillar; recognizes the burden Atlas carries as a consequence of his own past actions.",
+      "chapter_8": "Drinks from the Well of Mnemosyne; fully integrates 'Fisher' and 'Hero' to slay the Titaness."
+    }
+  },
+  {
+    "id": "char_002",
+    "display_name": "The Weaver",
+    "real_name": "Mnemosyne",
+    "description": "An ethereal figure draped in silver silk. She speaks in multiple voices—some from the past, some from the future.",
+    "relationship": "Main Antagonist",
+    "story_progression": {
+      "chapter_1": "Appears as a voice in the wind, urging Perseus to stay in his peaceful life.",
+      "chapter_3": "Tries to blind Perseus in the caverns to prevent him from seeing the 'True Eye'.",
+      "chapter_5": "Manifests as a false version of Medusa to break Perseus's spirit through guilt.",
+      "chapter_8": "Reveals her plan to un-make the gods; defeated when Perseus uses his restored memory as a shield against her lies."
+    }
+  },
+  {
+    "id": "char_003",
+    "display_name": "The Echo",
+    "real_name": "Andromeda",
+    "description": "A shimmering, translucent woman who follows Perseus. She grows more physically solid as he recovers his memories of her.",
+    "relationship": "Love Interest & Moral Compass",
+    "story_progression": {
+      "chapter_2": "Rescued in the Whispering Woods; she becomes a passive guide for the player.",
+      "chapter_6": "Becomes fully solid and vocal; warns Perseus about the traps of Vengeance vs Justice.",
+      "chapter_8": "Acts as a tether to reality while Perseus battles Mnemosyne in the mind-scape."
+    }
+  },
+  {
+    "id": "char_004",
+    "display_name": "The Vagabond",
+    "real_name": "Hermes",
+    "description": "A scruffy, fast-talking traveler with a travel-worn cloak and a mischievous grin. He 'accidentally' leaves items behind for Perseus.",
+    "relationship": "Mentor & Ally",
+    "story_progression": {
+      "chapter_1": "Drops the 'Fisherman's Hook' into the sea for Perseus to find.",
+      "chapter_4": "Guides Perseus to the Hesperides, joking about the 'lost luggage' he left there.",
+      "chapter_7": "Provides the 'Pegasus Call' to help Perseus reach the Sky-Pillar."
+    }
+  },
+  {
+    "id": "char_005",
+    "display_name": "The Sky-Bearer",
+    "real_name": "Atlas",
+    "description": "A mountain-sized entity that exists as both a landscape and a conscious threat. His presence is felt through tremors and gravitational shifts.",
+    "relationship": "Supporting Antagonist",
+    "story_progression": {
+      "chapter_1": "His shifting weight causes the first cracks in Perseus's amnesia.",
+      "chapter_7": "Speaks directly to Perseus, attempting to crush him with the weight of the sky as revenge for his petrification."
+    }
+  },
+  {
+    "id": "char_006",
+    "display_name": "The Grey-Eyed Woman",
+    "real_name": "Athena",
+    "description": "A tall, armored woman whose face is always partially obscured by shadow or a helmet. She appears in reflections.",
+    "relationship": "Divine Patron",
+    "story_progression": {
+      "chapter_2": "Leaves the 'Mirror-Polished Lid' for Perseus.",
+      "chapter_5": "Her voice guides Perseus through the volcanic glass mirrors, teaching him the 'Reflected Strike'.",
+      "chapter_8": "Appears in full glory to bless the Aegis for the final blow."
+    }
+  },
+  {
+    "id": "char_007",
+    "display_name": "The Net-Maker",
+    "real_name": "Dictys",
+    "description": "An old, kind fisherman who took Perseus in. He is the only character who knows the 'Fisher' identity is a lie but fears the truth.",
+    "relationship": "Adoptive Father",
+    "story_progression": {
+      "chapter_1": "Gives Perseus his starting gear; warns him not to look into the 'bronze chest'.",
+      "chapter_8": "Remains in the Hub World; represents the mortal life Perseus must leave behind to fulfill his destiny."
+    }
+  },
+  {
+    "id": "char_008",
+    "display_name": "The Reflection",
+    "real_name": "Medusa",
+    "description": "A tragic, monstrous entity made of smoke and stone. She represents Perseus's greatest victory and his greatest trauma.",
+    "relationship": "Psychological Shadow",
+    "story_progression": {
+      "chapter_5": "The boss of the Gorgon's Peak. She doesn't fight to kill, but to force Perseus to remember the horror of what he did."
+    }
+  },
+  {
+    "id": "char_009",
+    "display_name": "The Hags",
+    "real_name": "The Graeae",
+    "description": "Three ancient sisters sharing one eye and one tooth. They speak in riddles and nursery rhymes.",
+    "relationship": "Information Brokers",
+    "story_progression": {
+      "chapter_3": "The primary obstacle of the Caverns; they try to trade Perseus's memories for their stolen eye."
+    }
+  },
+  {
+    "id": "char_010",
+    "display_name": "The Prisoner",
+    "real_name": "Danae",
+    "description": "A woman trapped in a tower of gold and memory. Her voice is the primary motivator for Perseus's return to power.",
+    "relationship": "Mother",
+    "story_progression": {
+      "chapter_1": "Heard as a lullaby during the 'Chest' memory.",
+      "chapter_6": "Found at the center of the Hall of the Petrified King; her rescue marks the transition into the endgame."
+    }
+  },
+  {
+    "id": "char_011",
+    "display_name": "The Stone King",
+    "real_name": "Polydectes",
+    "description": "A cold, arrogant man whose statue sits at the head of a silent banquet table. His presence radiates a sense of entitled cruelty.",
+    "relationship": "Human Antagonist",
+    "story_progression": {
+      "chapter_1": "Appears in nightmares as a shadow chasing Perseus's mother.",
+      "chapter_6": "The final encounter of the Hall; Perseus must decide whether to shatter his statue or let the memory of his hatred go."
+    }
+  },
+  {
+    "id": "char_012",
+    "display_name": "The Fearful Elder",
+    "real_name": "Acrisius",
+    "description": "An old man constantly checking his shadow, terrified of a prophecy that hasn't happened yet in this memory-scape.",
+    "relationship": "Ancestral Shadow (Grandfather)",
+    "story_progression": {
+      "chapter_1": "His voice is heard screaming during the 'Ark' memory, cursing the golden child.",
+      "chapter_6": "Appears as a spirit in the Hall, begging for forgiveness before being erased by Mnemosyne."
+    }
+  },
+  {
+    "id": "char_013",
+    "display_name": "The Garden Tenders",
+    "real_name": "The Hesperides",
+    "description": "Three maidens who glow with the light of a perpetual sunset. They tend to trees of gold and speak in harmony.",
+    "relationship": "Gatekeepers of Power",
+    "story_progression": {
+      "chapter_4": "They test Perseus's worthiness; only if he shows humility (the 'Fisher' trait) do they grant him the Kibisis."
+    }
+  },
+  {
+    "id": "char_014",
+    "display_name": "The Winged Phantom",
+    "real_name": "Pegasus",
+    "description": "A stallion of pure white light. He doesn't gallop; he glides, leaving trails of stardust in the air.",
+    "relationship": "Loyal Companion / Mount",
+    "story_progression": {
+      "chapter_5": "Born from the 'Death' of the Medusa memory; represents the rebirth of the hero.",
+      "chapter_7": "Allows Perseus to reach the peaks of the Sky-Pillar where the air is too thin for mortals."
+    }
+  },
+  {
+    "id": "char_015",
+    "display_name": "The Golden Rain",
+    "real_name": "Zeus",
+    "description": "Not a person, but a flickering atmospheric presence. A scent of ozone and the sound of distant thunder.",
+    "relationship": "Divine Father",
+    "story_progression": {
+      "chapter_1": "A faint golden light that guides Perseus to his first weapon.",
+      "chapter_8": "Provides the final 'spark' to relight the Harpe when Mnemosyne tries to extinguish Perseus's soul."
+    }
+  },
+  {
+    "id": "char_016",
+    "display_name": "The Devourer",
+    "real_name": "Cetus",
+    "description": "A leviathan of teeth and scales. Its body is so large it forms the tectonic plates of the Whispering Woods biome.",
+    "relationship": "Legendary Beast (Boss)",
+    "story_progression": {
+      "chapter_2": "The primary boss; defeating it restores Perseus's memory of being a 'Protector' rather than just a 'Survivor'."
+    }
+  },
+  {
+    "id": "char_017",
+    "display_name": "The Vain Shadow",
+    "real_name": "Cassiopeia",
+    "description": "A queen draped in jewels that have turned to lead. She constantly asks if she is still beautiful.",
+    "relationship": "Andromeda's Burden (Mother)",
+    "story_progression": {
+      "chapter_2": "She is the 'anchor' that keeps Andromeda trapped in the woods; Perseus must free the daughter from the mother's narcissism."
+    }
+  },
+  {
+    "id": "char_018",
+    "display_name": "The Rival",
+    "real_name": "Phineus",
+    "description": "A warrior in dark armor who claims he is the 'True Hero'. He fights with a spear that mimics Perseus's own moves.",
+    "relationship": "Jealous Adversary",
+    "story_progression": {
+      "chapter_6": "Acts as a mini-boss; he represents the 'false path' of the hero—the one who fights for glory instead of duty."
+    }
+  },
+  {
+    "id": "char_019",
+    "display_name": "The Apprentice",
+    "real_name": "Glaucus",
+    "description": "A small boy on the Seriphos docks who follows 'Fisher' around, wanting to learn how to tie knots.",
+    "relationship": "Mortal Anchor",
+    "story_progression": {
+      "chapter_1": "Gives Perseus the 'Carved Wooden Bird'.",
+      "chapter_8": "His voice is the last thing Perseus hears before entering the Well, reminding him that even gods were once children."
+    }
+  },
+  {
+    "id": "char_020",
+    "display_name": "The North Wind",
+    "real_name": "Boreas",
+    "description": "An old man with a beard made of frost who blows through the Hesperides. He is cranky but fair.",
+    "relationship": "Grudging Ally",
+    "story_progression": {
+      "chapter_4": "Challenges Perseus to a race through the treetops to prove his 'Talaria' speed."
+    }
+  }
+]

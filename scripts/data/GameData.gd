@@ -42,7 +42,7 @@ static func _get_enemy_for_diff(diff: int) -> String:
 
 const ROOMS = {
 	"town": {
-		"t1": {"name": "Village Gate", "dialog": "The heavy oak gates stand open, welcoming weary travelers.", "npc_id": "gate_guard", "loot": ["map"]},
+		"t1": {"name": "Village Gate", "dialog": "The heavy oak gates stand open, welcoming weary travelers.", "npc_id": "gate_guard", "event_id": "whispering_well", "loot": ["map"]},
 		"t2": {"name": "The Rusty Tankard", "dialog_tree": "t2_tavern", "npc_id": "innkeeper", "loot": ["ale"]},
 		"t3": {"name": "Blacksmith's Forge", "dialog_tree": "t3_forge", "npc_id": "blacksmith", "loot": ["whetstone"]},
 		"t4": {"name": "Apothecary Shop", "dialog": "The air smells of dried herbs and bubbling tonics.", "npc_id": "alchemist", "loot": ["potion"]},
@@ -219,6 +219,36 @@ const ROOMS = {
 	}
 }
 
+const EVENTS = {
+	"whispering_well": {
+		"title": "The Whispering Well",
+		"icon": "🕳️",
+		"text": "A faint whisper promises power in exchange for a drop of life essence.",
+		"choices": [
+			{"text": "Offer Blood (-15 HP, +40 Gold)", "effect": "blood"},
+			{"text": "Walk Away", "effect": "leave"}
+		]
+	},
+	"traveling_merchant": {
+		"title": "A Traveling Merchant",
+		"icon": "🐫",
+		"text": "A shady figure offers you a 'miracle tonic' for a few coins.",
+		"choices": [
+			{"text": "Buy Tonic (-30 Gold, +25 HP)", "effect": "buy_tonic"},
+			{"text": "Refuse", "effect": "leave"}
+		]
+	},
+	"abandoned_shrine": {
+		"title": "Abandoned Shrine",
+		"icon": "⛩️",
+		"text": "An old shrine to a forgotten memory god. It feels heavy with static electricity.",
+		"choices": [
+			{"text": "Pray (Become 'Charged')", "effect": "charge"},
+			{"text": "Scavenge (+15 Gold)", "effect": "scavenge"}
+		]
+	}
+}
+
 # --- ENEMIES ---
 # Centralized stats and loot for combat rewards.
 const ENEMIES = {
@@ -227,18 +257,22 @@ const ENEMIES = {
 		"name": "Pickpocket",
 		"hp": 12, "attack": 3, "biome": "town",
 		"icon": "res://assets/dagger.png",
+		# Probability Array: [Attack, Critical, Debuff, Pass]
+		"probabilities": [0.5, 0.2, 0.2, 0.1], 
 		"loot": [{"id": "gold", "min": 5, "max": 15}]
 	},
 	"training_dummy": {
 		"name": "Training Dummy",
 		"hp": 50, "attack": 0, "armor": 2, "biome": "town",
 		"icon": "res://assets/trap.png",
+		"probabilities": [0.0, 0.0, 0.0, 1.0], 
 		"loot": ["wood_splinter"]
 	},
 	"giant_rat": {
 		"name": "Giant Rat",
 		"hp": 10, "attack": 4, "biome": "town",
 		"icon": "res://assets/skull.png",
+		"probabilities": [1.0, 0.0, 0.0, 0.0], 
 		"loot": ["tail", {"id": "gold", "min": 1, "max": 3}]
 	},
 	"drunk_patron": {

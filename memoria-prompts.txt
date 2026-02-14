@@ -4,7 +4,6 @@
 2) Open Godot -> Memory Dungeon
 3) Continue Run (F5)
 
-
 ===
 scenes 
 	backgrounds ... 
