@@ -1,0 +1,85 @@
+[gd_scene format=3 uid="uid://dm5v8f6r7p2m2"]
+
+[ext_resource type="Script" uid="uid://b1pp5g2rl8qxq" path="res://features/encounters/EventScene.gd" id="1_event_script"]
+[ext_resource type="Theme" uid="uid://cy1tv88ir10yq" path="res://assets/themes/Greek.theme" id="1_fs1st"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
+bg_color = Color(0.1, 0.1, 0.12, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.3, 0.35, 1)
+
+[node name="EventScene" type="Control" unique_id=1310593266]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_fs1st")
+script = ExtResource("1_event_script")
+
+[node name="Background" type="ColorRect" parent="." unique_id=954732445]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.05, 0.07, 1)
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1754035522]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 100
+theme_override_constants/margin_top = 50
+theme_override_constants/margin_right = 100
+theme_override_constants/margin_bottom = 50
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=1830665893]
+layout_mode = 2
+theme_override_constants/separation = 30
+alignment = 1
+
+[node name="Title" type="Label" parent="MarginContainer/VBoxContainer" unique_id=643816015]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Event Title"
+horizontal_alignment = 1
+
+[node name="Illustration" type="Panel" parent="MarginContainer/VBoxContainer" unique_id=1530071171]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_bg")
+
+[node name="Icon" type="Label" parent="MarginContainer/VBoxContainer/Illustration" unique_id=538252382]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 80
+text = "❓"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Description" type="Label" parent="MarginContainer/VBoxContainer" unique_id=735414749]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 22
+text = "Something interesting happens here. You must make a choice that will affect your journey through the memory dungeon."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Choices" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1881479149]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 15

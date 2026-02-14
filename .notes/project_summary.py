@@ -1,15 +1,15 @@
-# Generates a structured summary of the project directory,
+# Generates a structured summary of the project directory based on the feature-based refactor.
 # Usage: 
 # ```
-# cd /mnt/c/Documents and Settings/pkubi/My Documents/memory-dungeon
-# python3 .notes/project_summary.py
+# python3 project_summary.py
 # ```
 
 import os
+import re
 
 def generate_summary():
-    # Define project directories
-    target_dirs = ["assets", "scenes", "scripts"]
+    # Define new project directories based on the refactor plan
+    target_dirs = ["core", "data", "features", "assets"]
     output_file = ".notes/SUMMARY.md"
     
     # Ensure .notes directory exists
@@ -28,44 +28,53 @@ def generate_summary():
             f.write("```text\n")
             
             for root, dirs, files in os.walk(target):
+                # Calculate indentation level based on subfolder depth
                 level = root.replace(target, '').count(os.sep)
                 indent = ' ' * 4 * level
                 folder_name = os.path.basename(root)
+                
                 if folder_name != target:
                     f.write(f"{indent}📂 {folder_name}/\n")
                 
                 sub_indent = ' ' * 4 * (level + 1)
                 for file in sorted(files):
-                    if file.endswith(('.tscn', '.gd', '.png', '.import')):
-                        icon = "🎬 " if file.endswith(".tscn") else "📜 " if file.endswith(".gd") else "🖼️ "
+                    # Filter for relevant Godot file types including the new .tres resources
+                    if file.endswith(('.tscn', '.gd', '.png', '.import', '.tres')):
+                        icon = "🎬 " if file.endswith(".tscn") \
+                               else "📜 " if file.endswith(".gd") \
+                               else "💎 " if file.endswith(".tres") \
+                               else "🖼️ "
                         f.write(f"{sub_indent}{icon}{file}\n")
             
             f.write("```\n\n")
 
         # Logical Mapping (Scenes to Scripts)
         f.write("## 🔗 Scene-to-Script Mapping\n")
-        f.write("| Scene (.tscn) | Script (.gd) | Description |\n")
+        f.write("| Scene (.tscn) | Script (.gd) | Location |\n")
         f.write("| :--- | :--- | :--- |\n")
         
-        # Walk through scenes to find script references
-        for root, _, files in os.walk("scenes"):
-            for file in files:
-                if file.endswith(".tscn"):
-                    scene_path = os.path.join(root, file)
-                    script_path = "N/A"
-                    
-                    try:
-                        with open(scene_path, 'r') as scene_file:
-                            content = scene_file.read()
-                            # Basic parser for Godot ext_resource paths
-                            if 'res://scripts/' in content:
-                                start = content.find('res://scripts/')
-                                end = content.find('"', start)
-                                script_path = content[start:end]
-                    except Exception:
-                        pass
+        # Search through the 'features' and 'ui' folders for scene-script pairings
+        search_roots = ["features", "core"]
+        for s_root in search_roots:
+            if not os.path.exists(s_root): continue
+            
+            for root, _, files in os.walk(s_root):
+                for file in files:
+                    if file.endswith(".tscn"):
+                        scene_path = os.path.join(root, file)
+                        script_path = "N/A"
                         
-                    f.write(f"| {file} | {script_path.replace('res://', '/')} | Auto-detected |\n")
+                        try:
+                            with open(scene_path, 'r') as scene_file:
+                                content = scene_file.read()
+                                # Robust regex to find any GDScript path referenced as an external resource
+                                match = re.search(r'path="res://([^"]+\.gd)"', content)
+                                if match:
+                                    script_path = "/" + match.group(1)
+                        except Exception:
+                            pass
+                            
+                        f.write(f"| {file} | {script_path} | {root} |\n")
 
     print(f"Summary successfully written to {output_file}")
 

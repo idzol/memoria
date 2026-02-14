@@ -1,0 +1,85 @@
+[gd_scene format=3 uid="uid://cgrp3t6npnm06"]
+
+[ext_resource type="Script" uid="uid://c3gvyjlxqmttx" path="res://features/ui/CardDiscoveryPopup.gd" id="1_disc_script"]
+[ext_resource type="Theme" uid="uid://cy1tv88ir10yq" path="res://assets/themes/Greek.theme" id="1_kjm6f"]
+
+[node name="CardDiscoveryPopup" type="Control" unique_id=1539901599]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_kjm6f")
+script = ExtResource("1_disc_script")
+
+[node name="Dimmer" type="ColorRect" parent="." unique_id=1751733148]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.8)
+
+[node name="Center" type="CenterContainer" parent="." unique_id=1359396960]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Center" unique_id=719143533]
+custom_minimum_size = Vector2(400, 500)
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="Center/Panel" unique_id=647541147]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Title" type="Label" parent="Center/Panel/VBox" unique_id=180178541]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "NEW CARD FOUND!"
+horizontal_alignment = 1
+
+[node name="CardFrame" type="ColorRect" parent="Center/Panel/VBox" unique_id=1023861611]
+custom_minimum_size = Vector2(200, 280)
+layout_mode = 2
+size_flags_horizontal = 4
+color = Color(0.15, 0.15, 0.2, 1)
+
+[node name="CardName" type="Label" parent="Center/Panel/VBox/CardFrame" unique_id=460456699]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 20.0
+offset_bottom = 23.0
+grow_horizontal = 2
+text = "Blade of Memory"
+horizontal_alignment = 1
+
+[node name="CardDesc" type="Label" parent="Center/Panel/VBox/CardFrame" unique_id=665926161]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -23.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Deals 15 damage."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="ClaimButton" type="Button" parent="Center/Panel/VBox" unique_id=116665902]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "CLAIM"

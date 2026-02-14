@@ -40,7 +40,43 @@ Generated automatically for AI context and debugging.
     🖼️ trap.png.import
     🖼️ wall.png
     🖼️ wall.png.import
-    📂 cards/
+    📂 card/
+        🖼️ axe.png
+        🖼️ axe.png.import
+        🖼️ bandage.png
+        🖼️ bandage.png.import
+        🖼️ block.png
+        🖼️ block.png.import
+        🖼️ bomb.png
+        🖼️ bomb.png.import
+        🖼️ dagger.png
+        🖼️ dagger.png.import
+        🖼️ fireball.png
+        🖼️ fireball.png.import
+        🖼️ fist.png
+        🖼️ fist.png.import
+        🖼️ frost.png
+        🖼️ frost.png.import
+        🖼️ heart.png
+        🖼️ heart.png.import
+        🖼️ kick.png
+        🖼️ kick.png.import
+        🖼️ potion.png
+        🖼️ potion.png.import
+        🖼️ scroll.png
+        🖼️ scroll.png.import
+        🖼️ shield.png
+        🖼️ shield.png.import
+        🖼️ shield_gold.png
+        🖼️ shield_gold.png.import
+        🖼️ sword.png
+        🖼️ sword.png.import
+        🖼️ sword_gold.png
+        🖼️ sword_gold.png.import
+        🖼️ trap.png
+        🖼️ trap.png.import
+        🖼️ trap_spike.png
+        🖼️ trap_spike.png.import
     📂 character/
         📂 archivist/
             🖼️ attack.png
@@ -50,6 +86,16 @@ Generated automatically for AI context and debugging.
             🖼️ damage.png
             🖼️ damage.png.import
     📂 maps/
+        🖼️ default.png
+        🖼️ default.png.import
+        🖼️ forest_0.png
+        🖼️ forest_0.png.import
+        🖼️ forest_1.png
+        🖼️ forest_1.png.import
+        🖼️ forest_2.png
+        🖼️ forest_2.png.import
+        🖼️ forest_3.png
+        🖼️ forest_3.png.import
         🖼️ home.png
         🖼️ home.png.import
         🖼️ ice.png
@@ -58,6 +104,7 @@ Generated automatically for AI context and debugging.
         🖼️ sand.png.import
     📂 npcs/
     📂 rooms/
+    📂 video/
 ```
 
 ## /scenes
@@ -81,6 +128,7 @@ Generated automatically for AI context and debugging.
         🎬 CharacterSelect.tscn
         🎬 DeathScreen.tscn
         🎬 InGameMenu.tscn
+        🎬 IntroCinematic.tscn
         🎬 MainMenu.tscn
         🎬 RunSummary.tscn
         🎬 SettingsOverlay.tscn
@@ -89,6 +137,7 @@ Generated automatically for AI context and debugging.
 ## /scripts
 ```text
     📂 core/
+        📜 CardDatabase.gd
         📜 GameManager.gd
         📜 SaveManager.gd
         📜 SignalBus.gd
@@ -103,6 +152,7 @@ Generated automatically for AI context and debugging.
         📜 CharacterSelect.gd
         📜 DeathScreen.gd
         📜 InGameMenu.gd
+        📜 IntroCinematic.gd
         📜 MainMenu.gd
         📜 RunSummary.gd
         📜 Settings.gd
@@ -139,6 +189,7 @@ Generated automatically for AI context and debugging.
 | CharacterSelect.tscn | /scripts/ui/CharacterSelect.gd | Auto-detected |
 | DeathScreen.tscn | /scripts/ui/DeathScreen.gd | Auto-detected |
 | InGameMenu.tscn | /scripts/ui/InGameMenu.gd | Auto-detected |
+| IntroCinematic.tscn | /scripts/ui/IntroCinematic.gd | Auto-detected |
 | MainMenu.tscn | /scripts/ui/MainMenu.gd | Auto-detected |
 | RunSummary.tscn | /scripts/ui/RunSummary.gd | Auto-detected |
 | SettingsOverlay.tscn | /scripts/ui/Settings.gd | Auto-detected |
