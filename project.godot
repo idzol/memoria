@@ -16,10 +16,11 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 
 config/name="Memory Dungeon"
 run/main_scene="uid://c5n80tiagf37h"
-config/use_custom_user_dir=true
-config/custom_user_dir_name="MemoryDungeon"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
+; Set a dedicated folder for save files (SaveManager.gd)
+config/use_custom_user_dir=true
+config/custom_user_dir_name="MemoryDungeon"
 
 [audio]
 
@@ -36,8 +37,12 @@ GameData="uid://ci1lydkwmaebc"
 
 window/size/viewport_width=1280
 window/size/viewport_height=720
+window/size/resizable=true
+; Allow the game to look crisp on high-resolution displays (Steam Deck/Retina)
+window/dpi/allow_hidpi=true
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+
 
 [physics]
 
@@ -45,5 +50,22 @@ window/stretch/aspect="expand"
 
 [rendering]
 
+; Switched to 'mobile' (Vulkan). Forward Plus often causes silent 
+; crashes on UI-heavy scenes due to driver-specific memory buffer issues.
+; renderer/rendering_method="mobile"
+; Switched to 'gl_compatibility'. 
+; Vulkan/Mobile (Forward Mobile) is causing a Signal 11 crash on your RTX 5070.
+; OpenGL 3.3 (Compatibility) is much more stable for 2D projects.
+rendering_device/driver.windows="vulkan"
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+; Textures will look better when scaled on laptop screens
 textures/canvas_textures/default_texture_filter=2
-rendering_device/driver.windows="d3d12"
+
+[xr]
+
+; Explicitly disabled the startup check. This prevents Godot from 
+; attempting to initialize VR runtimes (OpenXR) which causes the Signal 11 crash.
+openxr/enabled=false
+openxr/startup_check=false
+shaders/enabled=false

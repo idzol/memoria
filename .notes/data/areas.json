@@ -1,0 +1,644 @@
+{
+  "areas": [
+    {
+      "id": "area_1_1",
+      "display_name": "Fisherman's Cove",
+      "description": "A small, sandy inlet littered with sea-glass and bleached driftwood. The starting point for 'Fisher'.",
+      "story_progression": "Introduces basic movement and the 'Fisher' identity. The player meets Dictys and completes a tutorial on net-casting.",
+      "characters": ["char_007", "char_019"],
+      "items": ["item_020"]
+    },
+    {
+      "id": "area_1_2",
+      "display_name": "The Jagged Reefs",
+      "description": "Sharp volcanic rocks that jut from the surf like teeth. Dangerous for ships and memories alike.",
+      "story_progression": "First combat zone. Fisher hunts 'Memory Predators' and finds the 'Fisherman's Hook' (Harpe) wedged in a sunken hull.",
+      "characters": [],
+      "items": ["item_001"]
+    },
+    {
+      "id": "area_1_3",
+      "display_name": "Dictys' Humble Hut",
+      "description": "A cozy, salt-encrusted shack where Perseus sleeps. It contains fragments of a life he doesn't remember.",
+      "story_progression": "The primary narrative hub for Chapter 1. Here, Perseus hears the first lullaby and finds the Locket of Braided Hair.",
+      "characters": ["char_007"],
+      "items": ["item_010"]
+    },
+    {
+      "id": "area_1_4",
+      "display_name": "The Shifting Tidepool",
+      "description": "A swirling pool that reveals ancient treasures only when the tide is exactly right.",
+      "story_progression": "The chapter climax. The Ark of Danae is revealed here, triggering the first major memory flashback and 'cleansing' the Harpe's name.",
+      "characters": ["char_015"],
+      "items": ["item_005"]
+    },
+    {
+      "id": "area_1_5",
+      "display_name": "The Sunken Pier",
+      "description": "A decayed wooden structure half-submerged in the turquoise water. Barnacles cover every pillar.",
+      "story_progression": "Perseus practices his combat skills against minor aquatic husks. He begins to feel his 'Titan-strength' returning as he lifts heavy debris.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_1_6",
+      "display_name": "The Salt-Marshes",
+      "description": "A labyrinth of tall sea-grass and shallow, briny pools where the air is thick with the scent of salt.",
+      "story_progression": "A stealth tutorial. Perseus must hide from a memory phantom that resembles his grandfather, Acrisius.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_1_7",
+      "display_name": "The Lighthouse of Whispers",
+      "description": "An abandoned stone tower whose beam flickers with a ghostly blue light instead of fire.",
+      "story_progression": "Climbing challenge. At the top, Perseus sees a vision of the Gorgon's Lair, signaling that his journey must leave Seriphos.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_1_8",
+      "display_name": "The Net-Mender's Yard",
+      "description": "A workspace filled with large wooden looms and mountains of coarse hemp netting.",
+      "story_progression": "Dictys reveals that he knew Perseus was a prince all along, but kept it secret to protect him from the Titan's gaze.",
+      "characters": ["char_007"],
+      "items": []
+    },
+    {
+      "id": "area_1_9",
+      "display_name": "The Grotto of Danae",
+      "description": "A hidden cave behind a waterfall where a soft golden glow emanates from the damp stone walls.",
+      "story_progression": "Narrative beat where Perseus finds a discarded gold leaf, triggering a memory of his mother’s voice describing his father, Zeus.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_1_10",
+      "display_name": "The Smuggler's Run",
+      "description": "A narrow cliffside path used by those who wish to avoid the main roads of the island.",
+      "story_progression": "The exit from Chapter 1. Perseus uses the Harpe to cut through a wall of memory-mist, revealing the path to the Whispering Woods.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_2_1",
+      "display_name": "The Shadow Grove",
+      "description": "A twisted thicket where light is consumed by the canopy. Phantoms of petrified victims wander the paths.",
+      "story_progression": "Perseus follows 'The Echo' (Andromeda) through stealth sections. He must use the Aegis as a signal tool.",
+      "characters": ["char_003"],
+      "items": []
+    },
+    {
+      "id": "area_2_2",
+      "display_name": "The Shore of Sacrifice",
+      "description": "A bleak, rocky beach where the sound of the ocean is drowned out by a low, rhythmic breathing.",
+      "story_progression": "Boss Arena. Perseus fights the shadow of Cetus. Defeating the beast makes Andromeda physically visible.",
+      "characters": ["char_016", "char_003"],
+      "items": ["item_014", "item_017"]
+    },
+    {
+      "id": "area_2_3",
+      "display_name": "Cassiopeia's Mirror Pond",
+      "description": "A stagnant pond that reflects a distorted, vain version of whoever looks into it.",
+      "story_progression": "Narrative beat where Perseus meets Cassiopeia and learns of the 'Original Sin' of the family.",
+      "characters": ["char_017", "char_006"],
+      "items": ["item_002"]
+    },
+    {
+      "id": "area_2_4",
+      "display_name": "The Thicket of Reach",
+      "description": "Trees here have branches that behave like grasping fingers, snaring anyone who moves too quickly.",
+      "story_progression": "Traversal puzzle. Perseus must time his movement to avoid being rooted in place by the forest.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_2_5",
+      "display_name": "The Howling Canopy",
+      "description": "The upper layer of the forest where the wind whistles through hollow bark like a thousand screaming voices.",
+      "story_progression": "Vertical platforming. Perseus begins to suspect the forest itself is a memory of the screams of the petrified.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_2_6",
+      "display_name": "The Altar of the Sea-Beast",
+      "description": "A crumbling stone platform overlooking the dark ocean, stained with ancient brine.",
+      "story_progression": "Perseus finds a shard of an old trident, sensing the influence of Poseidon in his amnesia.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_2_7",
+      "display_name": "The Roots of Hubris",
+      "description": "Massive subterranean roots that pulse with a sickly purple light.",
+      "story_progression": "Combat gauntlet. Perseus must destroy 'Root Cores' that are feeding on his lost memories of Andromeda.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_2_8",
+      "display_name": "The Petal-Storm Clearing",
+      "description": "A rare open space where white petals fall constantly, masking the presence of predators.",
+      "story_progression": "Andromeda speaks her first words to Perseus, reminding him that he saved her once before.",
+      "characters": ["char_003"],
+      "items": []
+    },
+    {
+      "id": "area_2_9",
+      "display_name": "The Ancient Wayfarer's Path",
+      "description": "A paved stone road half-swallowed by the forest, leading toward the underground.",
+      "story_progression": "Hermes leaves a trail of feathers that lead Perseus away from a Titan ambush.",
+      "characters": ["char_004"],
+      "items": []
+    },
+    {
+      "id": "area_2_10",
+      "display_name": "The Brackish Bog",
+      "description": "A swampy transition zone where the forest sinks into the earth. The air is freezing.",
+      "story_progression": "Perseus finds a tunnel entrance. He realizes the Graeae are waiting for him below.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_3_1",
+      "display_name": "The Hall of Whispers",
+      "description": "A corridor of sheer stone where every footstep echoes as a different person's voice.",
+      "story_progression": "Introduction to the 'Sound Navigation' mechanic. Mnemosyne's voice tries to lead the player into pitfalls.",
+      "characters": ["char_002"],
+      "items": []
+    },
+    {
+      "id": "area_3_2",
+      "display_name": "The Chamber of the Single Eye",
+      "description": "A circular room filled with ancient dust and the smell of copper.",
+      "story_progression": "Puzzle Boss fight with the Graeae. Perseus must steal the eye to light up the caverns.",
+      "characters": ["char_009"],
+      "items": ["item_006", "item_016"]
+    },
+    {
+      "id": "area_3_3",
+      "display_name": "The Styx Tributary",
+      "description": "A cold underground river that flows toward the underworld.",
+      "story_progression": "A stealth section using the newly found Helm of Darkness to pass through a gate of ghosts.",
+      "characters": [],
+      "items": ["item_011"]
+    },
+    {
+      "id": "area_3_4",
+      "display_name": "The Labyrinth of Echoes",
+      "description": "A maze where the sound of Perseus's own heartbeat becomes a deafening drum.",
+      "story_progression": "Perseus must maintain his 'Sanity Gauge' as Mnemosyne tries to convince him his quest is futile.",
+      "characters": ["char_002"],
+      "items": []
+    },
+    {
+      "id": "area_3_5",
+      "display_name": "The Fissure of Silence",
+      "description": "A deep crack in the earth where all sound is instantly absorbed.",
+      "story_progression": "Platforming challenge. Without sound cues, the player must rely purely on visual timing.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_3_6",
+      "display_name": "The Three Sisters' Hearth",
+      "description": "A grotesque 'living room' filled with piles of discarded memories from other heroes.",
+      "story_progression": "Narrative beat. Perseus discovers he isn't the first hero Mnemosyne has 'erased'.",
+      "characters": ["char_009"],
+      "items": []
+    },
+    {
+      "id": "area_3_7",
+      "display_name": "The Vein of Obsidian",
+      "description": "A tunnel walls lined with sharp, volcanic glass that hums with energy.",
+      "story_progression": "Perseus uses the Harpe to mine 'Identity Shards' needed to open the way to the Gardens.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_3_8",
+      "display_name": "The Grotto of Blindness",
+      "description": "A room filled with thick, magical smoke that blinds even the 'True Eye'.",
+      "story_progression": "Perseus must trust his instincts and 'Echo's' voice to find the exit.",
+      "characters": ["char_003"],
+      "items": []
+    },
+    {
+      "id": "area_3_9",
+      "display_name": "The Tunnel of Lost Names",
+      "description": "The walls here are etched with thousands of names that have been forgotten by history.",
+      "story_progression": "Perseus finds his own name scratched out. Re-etching it with the Harpe boosts his Identity Gauge.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_3_10",
+      "display_name": "The Vault of the Unseen",
+      "description": "A massive door made of pure shadow that leads back to the surface.",
+      "story_progression": "The exit from the caverns. Perseus uses the stolen eye to 'burn' the shadow door away.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_4_1",
+      "display_name": "The Golden Orchard",
+      "description": "A lush, high-altitude garden where every apple glows with internal fire.",
+      "story_progression": "Perseus must prove his worth to the Hesperides. Failing to show humility causes the apples to burn him.",
+      "characters": ["char_013"],
+      "items": ["item_004"]
+    },
+    {
+      "id": "area_4_2",
+      "display_name": "The Zephyr Cliffs",
+      "description": "Sheer drops where the wind is strong enough to push a man off his feet.",
+      "story_progression": "Combat/Traversal challenge. Hermes challenges Perseus to a race. Winning restores the Talaria.",
+      "characters": ["char_004", "char_020"],
+      "items": ["item_003"]
+    },
+    {
+      "id": "area_4_3",
+      "display_name": "The Tree of Eternal Twilight",
+      "description": "A massive, silver-barked tree at the edge of the world.",
+      "story_progression": "Narrative conclusion of the chapter. Perseus receives the Caduceus Fragment and prepares for the Gorgon fight.",
+      "characters": ["char_004"],
+      "items": ["item_013"]
+    },
+    {
+      "id": "area_4_4",
+      "display_name": "The Nymphs' Spring",
+      "description": "A fountain of liquid light that restores both health and memory clarity.",
+      "story_progression": "Perseus bathes in the spring, clearing the final 'Fisher' fog from his vision of the Gorgon's Lair.",
+      "characters": ["char_013"],
+      "items": []
+    },
+    {
+      "id": "area_4_5",
+      "display_name": "The Meadow of Sunset",
+      "description": "An endless field of orange flowers that never wilt. The sun stays on the horizon forever.",
+      "story_progression": "Andromeda and Perseus share a moment of peace, realizing their journey is almost half over.",
+      "characters": ["char_003"],
+      "items": []
+    },
+    {
+      "id": "area_4_6",
+      "display_name": "The Breezeway Pillars",
+      "description": "Floating marble pillars that drift through the clouds. A test of speed and agility.",
+      "story_progression": "Using the restored Talaria, Perseus learns the 'Sky-Step' ability to reach the upper Gardens.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_4_7",
+      "display_name": "The Sky-Watch Tower",
+      "description": "An observatory that looks down on the world of mortals. Everything below looks like a dollhouse.",
+      "story_progression": "Perseus sees Seriphos in the distance and realizes the village is being swallowed by Titan shadows.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_4_8",
+      "display_name": "The Floating Lily-Pads",
+      "description": "Giant, buoyant leaves floating on a sea of clouds. They sink if stood upon for too long.",
+      "story_progression": "High-speed traversal section where stopping means falling into the 'Void of Forgetfulness'.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_4_9",
+      "display_name": "The Cloud-Bridge Path",
+      "description": "A path made of condensed mist that solidifies only when Hermes speaks.",
+      "story_progression": "Hermes explains the Titan's grudge against Zeus, contextualizing why Perseus was targeted.",
+      "characters": ["char_004"],
+      "items": []
+    },
+    {
+      "id": "area_4_10",
+      "display_name": "The Gate of the West",
+      "description": "A massive portal flanked by statues of the Four Winds.",
+      "story_progression": "The transition point to the Gorgon's Peak. Perseus must face Boreas in a final duel of winds.",
+      "characters": ["char_020"],
+      "items": []
+    },
+    {
+      "id": "area_5_1",
+      "display_name": "The Glass Stair",
+      "description": "A spiraling path of obsidian that cuts into the clouds.",
+      "story_progression": "A gauntlet of 'Reflected Enemies' that can only be hit by looking into the Aegis.",
+      "characters": ["char_006"],
+      "items": []
+    },
+    {
+      "id": "area_5_2",
+      "display_name": "The Mirror Lair",
+      "description": "A cave lined with volcanic glass. Every surface shows a different version of Perseus's life.",
+      "story_progression": "The encounter with Medusa. It is a parry-focused fight that ends when Perseus refuses to strike the final blow to an image of a woman.",
+      "characters": ["char_008"],
+      "items": ["item_012", "item_007"]
+    },
+    {
+      "id": "area_5_3",
+      "display_name": "The Peak of Rebirth",
+      "description": "The highest point of the mountain, where the air smells of stardust.",
+      "story_progression": "Pegasus is born. Perseus gains the ability to fly between previously cleared biomes.",
+      "characters": ["char_014"],
+      "items": ["item_018"]
+    },
+    {
+      "id": "area_5_4",
+      "display_name": "The Caldera of Guilt",
+      "description": "The mouth of the volcano, where the 'lava' is actually liquefied regrets.",
+      "story_progression": "Perseus must retrieve a memory shard from the center of the heat, proving his resolve.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_5_5",
+      "display_name": "The Obsidian Shards",
+      "description": "A field of razor-sharp stone that requires the Helm of Darkness to navigate safely.",
+      "story_progression": "Perseus learns that stealth can be a weapon, bypassing guardians that are too strong to fight head-on.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_5_6",
+      "display_name": "The Reflection Flats",
+      "description": "A flat plain of polished obsidian that acts as a perfect mirror of the sky.",
+      "story_progression": "Athena appears in the reflection, testing Perseus's tactical mind with a holographic combat challenge.",
+      "characters": ["char_006"],
+      "items": []
+    },
+    {
+      "id": "area_5_7",
+      "display_name": "The Smoke-Pipe Vents",
+      "description": "Natural stone pipes that blast hot air upward. Useful for gliding with the Talaria.",
+      "story_progression": "Advanced aerial combat tutorial using the vents to stay aloft while fighting flying husks.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_5_8",
+      "display_name": "The Serpent's Shed Skin",
+      "description": "Massive, petrified snakeskins that form tunnels through the mountain.",
+      "story_progression": "Perseus finds the physical remnants of Medusa’s past, humanizing his victim.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_5_9",
+      "display_name": "The Crag of the Fallen",
+      "description": "A jagged cliff where the statues of failed heroes are piled high.",
+      "story_progression": "Perseus realizes the Titaness wants him to be just another statue in her collection.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_5_10",
+      "display_name": "The Lava-Fall Grotto",
+      "description": "A hidden chamber behind a curtain of fire and obsidian.",
+      "story_progression": "Perseus finds 'Medusa’s Petrified Tear' (item_007), which unlocks the final upgrade for the Aegis.",
+      "characters": [],
+      "items": ["item_007"]
+    },
+    {
+      "id": "area_6_1",
+      "display_name": "The Silent Banquet",
+      "description": "A grand dining hall where everyone has been turned to stone in the middle of a laugh.",
+      "story_progression": "Perseus explores his old home. He finds the statue of Phineus and realizes his own violent past.",
+      "characters": ["char_018"],
+      "items": []
+    },
+    {
+      "id": "area_6_2",
+      "display_name": "The Gallery of Statues",
+      "description": "A hall showcasing the 'victories' of Polydectes.",
+      "story_progression": "A mini-boss rush of spectral rivals. Perseus regains his strategic mind (item_015).",
+      "characters": ["char_011", "char_012"],
+      "items": ["item_015"]
+    },
+    {
+      "id": "area_6_3",
+      "display_name": "The Tower of Danae",
+      "description": "A high spire overlooking the city of Argos, locked by golden chains.",
+      "story_progression": "Rescue of Danae. This act of love breaks the Titan's hold on Perseus's empathy.",
+      "characters": ["char_010"],
+      "items": ["item_009"]
+    },
+    {
+      "id": "area_6_4",
+      "display_name": "The Throne Room of Stone",
+      "description": "The center of power in Argos, now cold and lifeless.",
+      "story_progression": "Boss fight with a stone-construct version of Polydectes. Perseus reclaims his right to the throne.",
+      "characters": ["char_011"],
+      "items": []
+    },
+    {
+      "id": "area_6_5",
+      "display_name": "The Courtyard of Regret",
+      "description": "A garden where the flowers have turned to iron and the fountain flows with ink.",
+      "story_progression": "Perseus confronts the ghost of Acrisius, finally forgiving him for casting him into the sea.",
+      "characters": ["char_012"],
+      "items": []
+    },
+    {
+      "id": "area_6_6",
+      "display_name": "The Royal Armory",
+      "description": "A room filled with legendary weapons that 'Fisher' is now strong enough to lift.",
+      "story_progression": "Combat training. The player unlocks the full potential of the Harpe’s true damage stats.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_6_7",
+      "display_name": "The Prince's Bedchamber",
+      "description": "A room filled with childhood toys and a small wooden cradle.",
+      "story_progression": "Narrative beat. Perseus remembers his childhood before the exile, restoring his Identity Gauge to near-full.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_6_8",
+      "display_name": "The Dungeon of Shadows",
+      "description": "The deepest part of the palace where Mnemosyne’s influence is strongest.",
+      "story_progression": "Perseus must find the 'Key of Truth' to open the way to the Sky-Pillar.",
+      "characters": ["char_002"],
+      "items": []
+    },
+    {
+      "id": "area_6_9",
+      "display_name": "The Grand Balcony",
+      "description": "An overlook where Perseus can see the Atlas Mountains in the distance.",
+      "story_progression": "Pegasus arrives to take Perseus to the final climb. Andromeda joins him on the journey.",
+      "characters": ["char_014", "char_003"],
+      "items": []
+    },
+    {
+      "id": "area_6_10",
+      "display_name": "The Kitchen of Famine",
+      "description": "A room where the food has turned to ash, symbolizing the Titan’s curse on the land.",
+      "story_progression": "Perseus uses the Kibisis to 'feed' the hungry phantoms, gaining their blessing for the final battle.",
+      "characters": [],
+      "items": ["item_004"]
+    },
+    {
+      "id": "area_7_1",
+      "display_name": "The Gravity Siphon",
+      "description": "An area where the ground falls upward into the sky.",
+      "story_progression": "Platforming challenge using the Fragment of Atlas to manipulate local gravity.",
+      "characters": [],
+      "items": ["item_019"]
+    },
+    {
+      "id": "area_7_2",
+      "display_name": "The Shoulder of the Giant",
+      "description": "A plateau that is actually the muscular ridge of the Titan Atlas.",
+      "story_progression": "Dialogue with Atlas. Perseus must prove he understands the weight of consequence.",
+      "characters": ["char_005"],
+      "items": []
+    },
+    {
+      "id": "area_7_3",
+      "display_name": "The Astral Bridge",
+      "description": "A path of light that only exists as long as Perseus believes it does.",
+      "story_progression": "The final test of will. If the Identity Gauge is too low, the bridge shatters.",
+      "characters": ["char_004", "char_014"],
+      "items": []
+    },
+    {
+      "id": "area_7_4",
+      "display_name": "The Thin-Air Pass",
+      "description": "A narrow ledge where the player's stamina drains twice as fast.",
+      "story_progression": "Survival challenge. Perseus must manage his movement efficiently to reach the next safe zone.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_7_5",
+      "display_name": "The Weightless Ravine",
+      "description": "A canyon where gravity is completely zero. Everything floats aimlessly.",
+      "story_progression": "Perseus uses the Talaria to navigate the 3D space, fighting 'Sky Husks' in a zero-G dogfight.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_7_6",
+      "display_name": "The Titan's Knuckle",
+      "description": "A rocky outcrop that resembles a massive fist. It shakes periodically.",
+      "story_progression": "Mini-boss fight against the 'Echo of Atlas', a manifestation of his physical rage.",
+      "characters": ["char_005"],
+      "items": []
+    },
+    {
+      "id": "area_7_7",
+      "display_name": "The Star-Gazer's Ledge",
+      "description": "A point so high that the stars appear as massive, burning orbs close by.",
+      "story_progression": "Narrative beat. Hermes points out the constellations of Perseus and Andromeda, already written in the stars.",
+      "characters": ["char_004", "char_003"],
+      "items": []
+    },
+    {
+      "id": "area_7_8",
+      "display_name": "The Frost-Bite Ridge",
+      "description": "A path covered in magical ice that freezes the player on contact.",
+      "story_progression": "Perseus must use the Thunderbolt Shard (item_019) to generate heat and melt the path forward.",
+      "characters": [],
+      "items": ["item_019"]
+    },
+    {
+      "id": "area_7_9",
+      "display_name": "The Cloud-Piercing Spire",
+      "description": "The literal top of the world. The curvature of the earth is visible.",
+      "story_progression": "Perseus confronts his fear of godhood. He realizes he can choose to be a man OR a god.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_7_10",
+      "display_name": "The Gate of Tartarus",
+      "description": "A massive rift in the sky that leads to the Titaness's mental sanctuary.",
+      "story_progression": "Perseus and Pegasus dive into the rift. Transition to the final chapter.",
+      "characters": ["char_014"],
+      "items": []
+    },
+    {
+      "id": "area_8_1",
+      "display_name": "The Silver Conflux",
+      "description": "The center of the mind-labyrinth where all memories flow.",
+      "story_progression": "Perseus fights hordes of 'Forgotten Gods' while Mnemosyne narrates his failures.",
+      "characters": ["char_002"],
+      "items": []
+    },
+    {
+      "id": "area_8_2",
+      "display_name": "The Repository of Lost Ages",
+      "description": "A library of stone tablets containing the history of the world.",
+      "story_progression": "Narrative reveal of the Titans' plan. Perseus meets the ghost of Glaucus.",
+      "characters": ["char_019"],
+      "items": ["item_001"]
+    },
+    {
+      "id": "area_8_3",
+      "display_name": "The Heart of the Weaver",
+      "description": "The absolute core of memory, a white void pulsing with silver light.",
+      "story_progression": "Final Boss Phase 3. Perseus integrates his divine and mortal selves to end the Titan reign.",
+      "characters": ["char_001", "char_002", "char_003", "char_015"],
+      "items": []
+    },
+    {
+      "id": "area_8_4",
+      "display_name": "The Corridor of Childhood",
+      "description": "A tunnel made of shifting scenes from Perseus’s early days in Seriphos.",
+      "story_progression": "Perseus accepts his 'Fisher' self as just as important as his 'Hero' self.",
+      "characters": ["char_019", "char_007"],
+      "items": []
+    },
+    {
+      "id": "area_8_5",
+      "display_name": "The Battlefield of Echoes",
+      "description": "A recreation of every fight Perseus has ever won, but with himself as the enemy.",
+      "story_progression": "Perseus must 'defeat' his own ego to unlock the True stats of his items.",
+      "characters": [],
+      "items": []
+    },
+    {
+      "id": "area_8_6",
+      "display_name": "The Void of Unspoken Words",
+      "description": "A silent area where thoughts appear as floating text in the air.",
+      "story_progression": "Mnemosyne’s true motive is revealed: she wanted to be remembered more than any god.",
+      "characters": ["char_002"],
+      "items": []
+    },
+    {
+      "id": "area_8_7",
+      "display_name": "The Mirror of Pure Soul",
+      "description": "A single mirror that reflects Perseus as a god of light.",
+      "story_progression": "The player chooses the final 'Ascension' buff for the boss fight.",
+      "characters": ["char_006", "char_015"],
+      "items": []
+    },
+    {
+      "id": "area_8_8",
+      "display_name": "The River of Mnemos",
+      "description": "A river of silver liquid that flows through the void. It is the blood of memory.",
+      "story_progression": "Perseus bathes the Harpe in the river, making it powerful enough to kill a Titaness.",
+      "characters": [],
+      "items": ["item_001"]
+    },
+    {
+      "id": "area_8_9",
+      "display_name": "The Shattered Timeline",
+      "description": "An area where different versions of history overlap (e.g., Medusa as a human).",
+      "story_progression": "Perseus sees the world he could have had if he never forgot. He rejects it to return to reality.",
+      "characters": ["char_008"],
+      "items": []
+    },
+    {
+      "id": "area_8_10",
+      "display_name": "The Portal to the Waking World",
+      "description": "A bright golden light at the end of the void. The final exit.",
+      "story_progression": "The game’s ending. Perseus returns to Seriphos, no longer amnesiac, but no longer just 'Fisher'.",
+      "characters": ["char_001", "char_003"],
+      "items": []
+    }
+  ]
+}

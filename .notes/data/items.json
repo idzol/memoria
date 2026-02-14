@@ -1,0 +1,322 @@
+[
+  {
+    "id": "item_001",
+    "display_name": "Fisherman's Hook",
+    "hidden_name": "The Harpe of Cronus",
+    "description": "A curved, notched blade that looks like a tool for gutting large fish.",
+    "story": "Perseus found this wedged in the hull of an old wreck. He uses it to scale fish, but the blade never seems to dull.",
+    "image_description": "A sickle-sword with a crescent blade and salt-stained leather wrapping.",
+    "back_story": "The adamantine scythe used by Cronus, gifted to Perseus by Hermes to decapitate Medusa.",
+    "stats": {
+      "hidden_stats": { "damage": 12, "speed": 1.5, "crit_multiplier": 1.1 },
+      "true_stats": { "damage": 85, "speed": 2.2, "crit_multiplier": 3.5, "ignore_armor": true },
+      "abilities": [
+        { "name": "Ichor Slice", "effect": "Deals massive damage to Immortal-type enemies." }
+      ]
+    }
+  },
+  {
+    "id": "item_002",
+    "display_name": "Mirror-Polished Lid",
+    "hidden_name": "The Aegis of Athena",
+    "description": "A circular piece of bronze, once used as a cover for a grain barrel.",
+    "story": "Fisher uses this to signal other boats. He avoids looking directly into it at night.",
+    "image_description": "A shimmering bronze shield. A smoky face of a woman with snakes for hair ripples under the surface.",
+    "back_story": "Athena's personal shield. It reflects the inner darkness of those who look at it.",
+    "stats": {
+      "hidden_stats": { "defense": 8, "weight": 15, "reflect_chance": "5%" },
+      "true_stats": { "defense": 95, "weight": 5, "reflect_chance": "100%" },
+      "abilities": [
+        { "name": "Gorgon's Gaze", "effect": "Chance to petrify enemies on successful block." }
+      ]
+    }
+  },
+  {
+    "id": "item_003",
+    "display_name": "Tattered Courier Sandals",
+    "hidden_name": "The Talaria of Hermes",
+    "description": "Old leather sandals with small, molting feathers stitched into the heels.",
+    "story": "Fisher often finds himself jumping much further than a mortal man should be able to.",
+    "image_description": "Classic sandals with three wings on each heel that flutter with golden light.",
+    "back_story": "The winged boots of the Messenger God, clipped by Mnemosyne's curse.",
+    "stats": {
+      "hidden_stats": { "move_speed": 1.1, "jump_height": 1.2, "stamina_drain": 1.0 },
+      "true_stats": { "move_speed": 2.5, "jump_height": 5.0, "stamina_drain": 0.2 },
+      "abilities": [
+        { "name": "Sky-Step", "effect": "Allows for infinite double-jumps and brief flight." }
+      ]
+    }
+  },
+  {
+    "id": "item_004",
+    "display_name": "Burlap Scavenger Bag",
+    "hidden_name": "The Kibisis of the Nymphs",
+    "description": "A simple, stained sack used for carrying bait. It never seems to get full.",
+    "story": "Fisher once fit a whole shark inside it and the bag stayed light as a feather.",
+    "image_description": "A burlap sack with gold embroidery in the pattern of an Ouroboros.",
+    "back_story": "A magical wallet designed to contain things that cannot be held by mortal hands.",
+    "stats": {
+      "hidden_stats": { "inventory_slots": 20, "carry_weight_reduction": "10%" },
+      "true_stats": { "inventory_slots": 999, "carry_weight_reduction": "100%" },
+      "abilities": [
+        { "name": "Void Storage", "effect": "Can 'capture' and store enemy projectiles to fire back later." }
+      ]
+    }
+  },
+  {
+    "id": "item_005",
+    "display_name": "Rotting Pine Coffin",
+    "hidden_name": "The Ark of Danae",
+    "description": "A waterlogged wooden chest with rusted iron bands.",
+    "story": "Perseus feels a strange sense of safety when sleeping inside this old box.",
+    "image_description": "A cedar chest showing carvings of Zeus's golden rain when cleaned.",
+    "back_story": "The chest that protected Perseus and his mother during their exile at sea.",
+    "stats": {
+      "hidden_stats": { "health_regen": 1.2, "status_resistance": "5%" },
+      "true_stats": { "health_regen": 10.0, "status_resistance": "100%" },
+      "abilities": [
+        { "name": "Cradle of the Storm", "effect": "Become invulnerable for 5 seconds when health drops below 10%." }
+      ]
+    }
+  },
+  {
+    "id": "item_006",
+    "display_name": "Milky Quartz Stone",
+    "hidden_name": "The Eye of the Graeae",
+    "description": "A smooth, semi-translucent stone that feels warm to the touch.",
+    "story": "Fisher found this inside an oyster. He uses it to see through the morning fog.",
+    "image_description": "A cataract-clouded glass orb that projects a beam of pure white light.",
+    "back_story": "The single eye of the Three Gray Sisters, stolen to force their secrets.",
+    "stats": {
+      "hidden_stats": { "fog_visibility": "25%", "trap_detection_range": 5 },
+      "true_stats": { "fog_visibility": "100%", "trap_detection_range": 50 },
+      "abilities": [
+        { "name": "Foresight", "effect": "Slows time briefly to highlight enemy weak points." }
+      ]
+    }
+  },
+  {
+    "id": "item_007",
+    "display_name": "Stained Sea Chart",
+    "hidden_name": "The Map of Mnemosyne's Veil",
+    "description": "A piece of parchment that appears blank or salt-stained.",
+    "story": "Fisher uses it to navigate reefs that aren't on any other sailor's charts.",
+    "image_description": "Ancient parchment with flowing liquid silver ink that moves like clouds.",
+    "back_story": "A tool created by the Titaness to keep Perseus lost in his own mind.",
+    "stats": {
+      "hidden_stats": { "map_reveal_radius": 50, "fast_travel": false },
+      "true_stats": { "map_reveal_radius": 500, "fast_travel": true },
+      "abilities": [
+        { "name": "Labyrinth Walk", "effect": "Instantly teleport to any previously visited memory shrine." }
+      ]
+    }
+  },
+  {
+    "id": "item_008",
+    "display_name": "Carved Wooden Bird",
+    "hidden_name": "The Token of Glaucus",
+    "description": "A small, hand-carved owl. Crude and simple.",
+    "story": "A gift from an orphan. Sometimes Fisher hears it hooting warnings.",
+    "image_description": "A wooden owl that transforms into a mechanical golden sentinel.",
+    "back_story": "A hidden avatar of Athena's wisdom sent to watch over the amnesiac hero.",
+    "stats": {
+      "hidden_stats": { "nearby_loot_ping": true, "stealth_bonus": 2 },
+      "true_stats": { "combat_assistance": true, "stealth_bonus": 20 },
+      "abilities": [
+        { "name": "Owl's Wisdom", "effect": "Highlights the solution to environmental puzzles." }
+      ]
+    }
+  },
+  {
+    "id": "item_009",
+    "display_name": "Heavy Mountain Stone",
+    "hidden_name": "The Fragment of Atlas",
+    "description": "A jagged piece of black granite. Incredibly heavy.",
+    "story": "Fisher uses this as a boat anchor. Only he is strong enough to lift it.",
+    "image_description": "Dark granite pulsing with a low, gravitational hum.",
+    "back_story": "A physical manifestation of the grudge Atlas holds against the hero.",
+    "stats": {
+      "hidden_stats": { "strength_req": 50, "knockback_resistance": "20%" },
+      "true_stats": { "strength_req": 10, "knockback_resistance": "90%" },
+      "abilities": [
+        { "name": "World-Weight", "effect": "Slam the ground to create a gravity well that pulls enemies in." }
+      ]
+    }
+  },
+  {
+    "id": "item_010",
+    "display_name": "Locket of Braided Hair",
+    "hidden_name": "The Anchor of Danae",
+    "description": "A small bronze locket containing a braid of golden hair.",
+    "story": "The only thing Fisher has from before his 'accident.' It smells of jasmine.",
+    "image_description": "Heart-shaped bronze locket that glows softly when near danger.",
+    "back_story": "A lock of hair from his mother, representing his tie to his humanity.",
+    "stats": {
+      "hidden_stats": { "sanity_regen": 1.5, "luck": 10 },
+      "true_stats": { "sanity_regen": 15.0, "luck": 50 },
+      "abilities": [
+        { "name": "Motherly Embrace", "effect": "Consumable: Fully restores health and resets all cooldowns." }
+      ]
+    }
+  },
+  {
+    "id": "item_011",
+    "display_name": "Old Felt Cap",
+    "hidden_name": "The Helm of Darkness",
+    "description": "A heavy, dark wool cap that covers the eyes. It feels cold.",
+    "story": "Fisher wears this to block out the harsh sun, but noticed that people tend to ignore him when he has it on.",
+    "image_description": "An obsidian-black helmet with a faceplate like a skull, shimmering with shadowy smoke.",
+    "back_story": "Hades' own helmet, lent to Perseus to infiltrate the Gorgon's lair.",
+    "stats": {
+      "hidden_stats": { "stealth": 15, "threat_reduction": "20%" },
+      "true_stats": { "stealth": 100, "threat_reduction": "95%", "invisibility": true },
+      "abilities": [
+        { "name": "Shadow Walk", "effect": "Become completely invisible and silent for 10 seconds." }
+      ]
+    }
+  },
+  {
+    "id": "item_012",
+    "display_name": "Heavy Stone Bust",
+    "hidden_name": "The Severed Head of Medusa",
+    "description": "A burlap-wrapped object that is terrifyingly heavy and smells of sulfur.",
+    "story": "Fisher found this in a cave. He keeps it wrapped because just touching the bundle makes his skin feel like it's turning to chalk.",
+    "image_description": "A decapitated head with writhing serpents for hair, eyes glowing with a sickly green light.",
+    "back_story": "The ultimate trophy. Even in death, the Gorgon's gaze is a weapon of mass destruction.",
+    "stats": {
+      "hidden_stats": { "movement_penalty": "-30%", "fear_aura": 5 },
+      "true_stats": { "instant_kill_chance": "15%", "stun_duration": 5.0 },
+      "abilities": [
+        { "name": "Petrifying Scream", "effect": "Unwrap the head to instantly turn all low-level enemies in front of you to stone." }
+      ]
+    }
+  },
+  {
+    "id": "item_013",
+    "display_name": "Walking Stick",
+    "hidden_name": "The Caduceus Fragment",
+    "description": "A gnarled olive wood staff with two vines entwined around it.",
+    "story": "A traveler left this behind. It seems to help Fisher walk for miles without tiring.",
+    "image_description": "A golden staff with two silver serpents coiled around a central wing motif.",
+    "back_story": "A shard of Hermes' staff. It bridges the gap between the living world and the world of memories.",
+    "stats": {
+      "hidden_stats": { "stamina_regen": 1.2, "healing_received": "+10%" },
+      "true_stats": { "stamina_regen": 4.0, "healing_received": "+50%", "magic_damage": 40 },
+      "abilities": [
+        { "name": "Messenger's Status", "effect": "Cures all debuffs and grants a brief speed boost." }
+      ]
+    }
+  },
+  {
+    "id": "item_014",
+    "display_name": "Rusted Harpoon",
+    "hidden_name": "The Trident's Point",
+    "description": "A three-pronged fishing spear, heavily corroded by sea salt.",
+    "story": "The most effective tool Fisher owns. It seems to pull the water toward it when thrown.",
+    "image_description": "A massive, gleaming celestial bronze trident head attached to a new shaft.",
+    "back_story": "A gift from Poseidon to his nephew, intended to help him tame the sea monster Cetus.",
+    "stats": {
+      "hidden_stats": { "throwing_damage": 25, "underwater_speed": 1.1 },
+      "true_stats": { "throwing_damage": 120, "underwater_speed": 3.0, "shockwave_radius": 10 },
+      "abilities": [
+        { "name": "Tidal Surge", "effect": "Call a wave of water to knock back and drown enemies." }
+      ]
+    }
+  },
+  {
+    "id": "item_015",
+    "display_name": "Cracked Owl Mask",
+    "hidden_name": "Visage of the Strategist",
+    "description": "A ceramic mask shaped like an owl's face, split down the middle.",
+    "story": "Fisher wears this during festivals. It makes him feel like he can see things before they happen.",
+    "image_description": "A regal marble mask that glows with blue intellectual energy when worn.",
+    "back_story": "An artifact used by Athena's priests to commune with her tactical mind.",
+    "stats": {
+      "hidden_stats": { "crit_chance": "+5%", "experience_gain": "+10%" },
+      "true_stats": { "crit_chance": "+25%", "experience_gain": "+50%", "mana_regen": 2.0 },
+      "abilities": [
+        { "name": "Tactical Analysis", "effect": "Pauses combat to allow the player to see enemy HP, weaknesses, and next moves." }
+      ]
+    }
+  },
+  {
+    "id": "item_016",
+    "display_name": "Yellowed Ivory Stake",
+    "hidden_name": "The Fang of Knowledge",
+    "description": "A sharp, curved tooth from an unknown beast.",
+    "story": "Fisher found this in the belly of a shark. He uses it as a dagger when his net fails.",
+    "image_description": "A foot-long tooth from a Gray Sister, dripping with purple mnemonic ink.",
+    "back_story": "A tooth from the Graeae, containing the memories of a thousand years of history.",
+    "stats": {
+      "hidden_stats": { "bleed_damage": 5, "poison_chance": "10%" },
+      "true_stats": { "bleed_damage": 40, "poison_chance": "50%", "memory_drop_rate": "+30%" },
+      "abilities": [
+        { "name": "Sunder Mind", "effect": "Stabbing an enemy forces them to drop extra Memory Shards." }
+      ]
+    }
+  },
+  {
+    "id": "item_017",
+    "display_name": "Salt-Crusted Shackles",
+    "hidden_name": "The Chains of Sacrifice",
+    "description": "Heavy iron manacles that feel like they are still holding someone's weight.",
+    "story": "Found at the base of a cliff. Fisher uses the chain to pull his boat onto the shore.",
+    "image_description": "Glowing silver chains that extend and retract as if alive.",
+    "back_story": "The chains that bound Andromeda to the rock. They represent the hero's duty to protect the innocent.",
+    "stats": {
+      "hidden_stats": { "stun_chance": "5%", "grapple_range": 5 },
+      "true_stats": { "stun_chance": "40%", "grapple_range": 25, "binding_strength": 80 },
+      "abilities": [
+        { "name": "Hero's Rescue", "effect": "Throw the chain to pull a distant ally to safety or a distant enemy into melee range." }
+      ]
+    }
+  },
+  {
+    "id": "item_018",
+    "display_name": "Greasy Sea-Bird Feather",
+    "hidden_name": "The Quill of the High Flyer",
+    "description": "A large, stiff feather that shimmers with an oily rainbow sheen.",
+    "story": "Fisher found this on the docks. He wears it in his hat for good luck during storms.",
+    "image_description": "A pure white, glowing primary feather from the wing of Pegasus.",
+    "back_story": "A remnant of the divine stallion born from the blood of Medusa.",
+    "stats": {
+      "hidden_stats": { "fall_damage_reduction": "20%", "air_control": 1.1 },
+      "true_stats": { "fall_damage_reduction": "100%", "air_control": 5.0 },
+      "abilities": [
+        { "name": "Pegasus Call", "effect": "Summon a spectral mount for fast travel across the memory biomes." }
+      ]
+    }
+  },
+  {
+    "id": "item_019",
+    "display_name": "Petrified Wood Branch",
+    "hidden_name": "The Thunderbolt Shard",
+    "description": "A blackened branch that smells of ozone and burnt air.",
+    "story": "Fisher found this in a tree struck by lightning. It gives him a shock whenever he touches it.",
+    "image_description": "A jagged, crystalline shard of pure electricity that crackles constantly.",
+    "back_story": "A fragment of a thunderbolt thrown by Zeus to mark his son's victory.",
+    "stats": {
+      "hidden_stats": { "electric_damage": 5, "paralyze_chance": "2%" },
+      "true_stats": { "electric_damage": 60, "paralyze_chance": "25%", "aoe_range": 15 },
+      "abilities": [
+        { "name": "Heaven's Wrath", "effect": "Channel the shard to call down a lightning strike on your current location." }
+      ]
+    }
+  },
+  {
+    "id": "item_020",
+    "display_name": "Weighted Trawl Net",
+    "hidden_name": "The Savior's Snare",
+    "description": "A masterfully woven fishing net with lead weights. Very sturdy.",
+    "story": "The primary tool of the Fisherman life. It has never let a catch go.",
+    "image_description": "A golden-threaded net that expands to cover massive areas.",
+    "back_story": "The net used by Dictys to pull Perseus from the sea. It represents the strength of the humble man.",
+    "stats": {
+      "hidden_stats": { "capture_chance": "50%", "slow_effect": "20%" },
+      "true_stats": { "capture_chance": "90%", "slow_effect": "80%", "capture_bosses": true },
+      "abilities": [
+        { "name": "Dictys' Kindness", "effect": "Non-lethally captures enemies, converting them into Memory Shards without a fight." }
+      ]
+    }
+  }
+]

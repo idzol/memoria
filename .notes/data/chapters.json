@@ -1,0 +1,212 @@
+[
+  {
+    "chapter_id": 1,
+    "area_name": "The Shallows of Seriphos",
+    "description": "A quiet, misty coastline where time seems to stand still. The water is unnaturally calm, reflecting only the present moment.",
+    "subareas": [
+      "area_1_1",
+      "area_1_2",
+      "area_1_3",
+      "area_1_4",
+      "area_1_5",
+      "area_1_6",
+      "area_1_7",
+      "area_1_8",
+      "area_1_9",
+      "area_1_10"
+    ],
+    "storyline": "Perseus lives as 'Fisher'. After finding a rusted hook in a wreck, he begins to experience auditory hallucinations of a woman's lullaby, leading him to discover the chest of his exile.",
+    "mapping": {
+      "characters": ["char_001", "char_007", "char_019", "char_015"],
+      "items": ["item_001", "item_005", "item_010", "item_020"],
+      "visibility_conditions": {
+        "items": "The 'Hidden Names' remain encrypted until Perseus touches the Ark of Danae.",
+        "characters": "Zeus (char_015) appears only as ambient 'Golden Rain' particles until Chapter 8.",
+        "environmental": "The path to the Reefs is blocked by 'Memory Fog' until the Fisherman's Hook is equipped."
+      }
+    }
+  },
+  {
+    "chapter_id": 2,
+    "area_name": "The Whispering Woods of Ethiops",
+    "description": "A dense, dark forest where the trees are petrified in poses of agony. The air smells of salt and old decay.",
+    "subareas": [
+      "area_2_1",
+      "area_2_2",
+      "area_2_3",
+      "area_2_4",
+      "area_2_5",
+      "area_2_6",
+      "area_2_7",
+      "area_2_8",
+      "area_2_9",
+      "area_2_10"
+    ],
+    "storyline": "Perseus follows 'The Echo' to a coastal clearing. He must defeat the shadow of Cetus to prove he is more than a survivor, reclaiming his role as a protector.",
+    "mapping": {
+      "characters": ["char_003", "char_016", "char_017", "char_006"],
+      "items": ["item_002", "item_014", "item_017"],
+      "visibility_conditions": {
+        "characters": "Andromeda (char_003) is semi-transparent and silent until Cetus is defeated.",
+        "items": "The Aegis (item_002) is seen only as a 'Dull Lid' until the boss fight begins.",
+        "environmental": "Hidden murals of Andromeda's sacrifice appear only when using the 'Mirror-Polished Lid' reflection."
+      }
+    }
+  },
+  {
+    "chapter_id": 3,
+    "area_name": "The Caverns of the Graeae",
+    "description": "A subterranean network where light does not exist. The walls echo with the overlapping voices of the past.",
+    "subareas": [
+      "area_3_1",
+      "area_3_2",
+      "area_3_3",
+      "area_3_4",
+      "area_3_5",
+      "area_3_6",
+      "area_3_7",
+      "area_3_8",
+      "area_3_9",
+      "area_3_10"
+    ],
+    "storyline": "Perseus must navigate total darkness using sound. He tricks the three sisters to steal their eye, gaining the 'True Sight' needed to find the Gorgons.",
+    "mapping": {
+      "characters": ["char_009", "char_002"],
+      "items": ["item_006", "item_011", "item_016"],
+      "visibility_conditions": {
+        "environmental": "All subareas are pitch black until the 'Milky Quartz Stone' (item_006) is obtained.",
+        "characters": "The Weaver (char_002) is visible only in the peripheral vision of the player as a blur of silver."
+      }
+    }
+  },
+  {
+    "chapter_id": 4,
+    "area_name": "The Gardens of the Hesperides",
+    "description": "A floating orchard bathed in a perpetual sunset. The gravity is weak, and the flora glows with divine ichor.",
+    "subareas": [
+      "area_4_1",
+      "area_4_2",
+      "area_4_3",
+      "area_4_4",
+      "area_4_5",
+      "area_4_6",
+      "area_4_7",
+      "area_4_8",
+      "area_4_9",
+      "area_4_10"
+    ],
+    "storyline": "Perseus must prove his humility to the maidens. Hermes appears to test his speed against the North Wind, rewarding him with the tools of flight.",
+    "mapping": {
+      "characters": ["char_013", "char_004", "char_020"],
+      "items": ["item_003", "item_004", "item_013"],
+      "visibility_conditions": {
+        "items": "The Talaria (item_003) remain 'Tattered Sandals' until the player wins the race against Boreas.",
+        "environmental": "The Golden Apples are invisible to those who harbor greed (Identity Gauge must be below 50%)."
+      }
+    }
+  },
+  {
+    "chapter_id": 5,
+    "area_name": "The Gorgon’s Peak",
+    "description": "A volcanic mountain of obsidian and glass. Every surface is a mirror, forcing the hero to look at his own soul.",
+    "subareas": [
+      "area_5_1",
+      "area_5_2",
+      "area_5_3",
+      "area_5_4",
+      "area_5_5",
+      "area_5_6",
+      "area_5_7",
+      "area_5_8",
+      "area_5_9",
+      "area_5_10"
+    ],
+    "storyline": "The psychological climax. Perseus fights a manifestation of Medusa. Victory is not through killing, but through the acceptance of his past trauma, leading to the birth of Pegasus.",
+    "mapping": {
+      "characters": ["char_008", "char_014", "char_006"],
+      "items": ["item_007", "item_012", "item_018"],
+      "visibility_conditions": {
+        "characters": "Pegasus (char_014) is invisible until the 'Medusa' boss phase 2.",
+        "items": "The Severed Head (item_012) stays wrapped in burlap; opening it causes a 'Game Over' unless the Aegis is equipped."
+      }
+    }
+  },
+  {
+    "chapter_id": 6,
+    "area_name": "The Hall of the Petrified King",
+    "description": "A frozen palace in Argos. Hundreds of statues of the court remain in mid-motion, expressions of terror fixed in stone.",
+    "subareas": [
+      "area_6_1",
+      "area_6_2",
+      "area_6_3",
+      "area_6_4",
+      "area_6_5",
+      "area_6_6",
+      "area_6_7",
+      "area_6_8",
+      "area_6_9",
+      "area_6_10"
+    ],
+    "storyline": "Perseus returns home to find his mother imprisoned by a memory of Polydectes. He must reclaim his title as Prince and confront the ghost of his grandfather.",
+    "mapping": {
+      "characters": ["char_010", "char_011", "char_012", "char_018"],
+      "items": ["item_015", "item_009"],
+      "visibility_conditions": {
+        "characters": "Danae (char_010) is hidden inside a 'Statue of Gold' until Polydectes (char_011) is defeated.",
+        "environmental": "The Hall appears as a ruins until the 'Visage of the Strategist' (item_015) is worn."
+      }
+    }
+  },
+  {
+    "chapter_id": 7,
+    "area_name": "The Sky-Pillar Plateau",
+    "description": "A desolate peak where the sky meets the earth. The air is thin, and the stars are bright enough to burn.",
+    "subareas": [
+      "area_7_1",
+      "area_7_2",
+      "area_7_3",
+      "area_7_4",
+      "area_7_5",
+      "area_7_6",
+      "area_7_7",
+      "area_7_8",
+      "area_7_9",
+      "area_7_10"
+    ],
+    "storyline": "Perseus climbs the Atlas Mountains. He realizes the 'Mountain' is a being he once cursed. He must offer a 'Memory of Mercy' to Atlas to pass the veil into the Titaness's realm.",
+    "mapping": {
+      "characters": ["char_005", "char_014", "char_004"],
+      "items": ["item_009", "item_019"],
+      "visibility_conditions": {
+        "characters": "Atlas (char_005) is only visible as a face in the rock until the player reaches the summit.",
+        "environmental": "The 'Astral Bridge' only appears if Perseus's 'Identity Gauge' is at 100%."
+      }
+    }
+  },
+  {
+    "chapter_id": 8,
+    "area_name": "The Well of Mnemosyne",
+    "description": "A void of liquid silver and floating memories. The physics of the world are broken here.",
+    "subareas": [
+      "area_8_1",
+      "area_8_2",
+      "area_8_3",
+      "area_8_4",
+      "area_8_5",
+      "area_8_6",
+      "area_8_7",
+      "area_8_8",
+      "area_8_9",
+      "area_8_10"
+    ],
+    "storyline": "The final battle. Mnemosyne attempts to dissolve Perseus into a nameless ghost. He uses the full weight of his recovered life to anchor himself and shatter the Titaness's control over time.",
+    "mapping": {
+      "characters": ["char_002", "char_001", "char_003", "char_015", "char_019"],
+      "items": ["item_019", "item_012", "item_001"],
+      "visibility_conditions": {
+        "all_assets": "All 'Hidden Names' and 'Hidden Stats' are permanently revealed and maximized in this area.",
+        "characters": "Glaucus (char_019) appears as a spectral child to provide the final healing 'Motherly Embrace'."
+      }
+    }
+  }
+]

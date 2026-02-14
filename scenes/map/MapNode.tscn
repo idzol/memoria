@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://dm5v8f6r7p2m1"]
 
 [ext_resource type="Script" path="res://scripts/ui/map/MapNode.gd" id="1_node_script"]
-[ext_resource type="Texture2D" uid="uid://wall_id" path="res://assets/wall.png" id="2_default_bg"]
+[ext_resource type="Texture2D" uid="uid://default_id" path="res://assets/maps/default.png" id="2_default_bg"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_node"]
 draw_center = false

@@ -52,8 +52,8 @@ func _ready():
 	grid.add_theme_constant_override("v_separation", 35)
 	
 	# 2. Setup Debug Buttons
-	%DebugWinBtn.pressed.connect(_on_debug_win)
-	%DebugLoseBtn.pressed.connect(_on_debug_lose)
+	%DebugWinBtn.pressed.connect(_on_win)
+	%DebugLoseBtn.pressed.connect(_on_lose)
 	
 	# 3. Setup Portraits
 	_setup_portraits()
@@ -119,7 +119,7 @@ func _handle_dialog_choice(opt: Dictionary):
 	elif opt.get("action") == "battle":
 		_start_combat()
 	elif opt.get("action") == "victory":
-		_on_debug_win()
+		_on_win()
 
 func _setup_basic_dialog():
 	room_title.text = current_room.get("name", "Encounter")
@@ -224,7 +224,7 @@ func _check_match():
 	flipped_cards.clear()
 
 	if enemy_hp <= 0:
-		_on_debug_win()
+		_on_win()
 		
 	elif _should_reshuffle():
 		add_log("No pairs remain. Reshuffling memory...")
@@ -286,15 +286,14 @@ func _flash_unit(overlay, color):
 	overlay.color.a = 0.5
 	create_tween().tween_property(overlay, "color:a", 0.0, 0.4)
 
-# --- Scene Transitions ---
-func _on_debug_win():
+func _on_win():
 	# 1. Update state and roll loot
 	GameManager.mark_room_cleared(current_room.id)
 	
-	# 2. Go to the IMMEDIATE victory screen, NOT the end-of-run summary
+	# 2. Go to the IMMEDIATE victory screen
 	get_tree().change_scene_to_file("res://scenes/combat/VictoryScreen.tscn")
 
-func _on_debug_lose():
+func _on_lose():
 	# Loss usually ends the run, so we might go to RunSummary or DeathScreen
 	get_tree().change_scene_to_file("res://scenes/ui/RunSummary.tscn")
 

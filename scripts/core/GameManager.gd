@@ -8,6 +8,9 @@ extends Node
 # --- Character State ---
 var player_name: String = ""
 var player_class: String = "Archivist"
+var player_level: int = 1
+var player_xp: int = 0
+
 var current_hp: int = 100
 var max_hp: int = 100
 var gold: int = 50
@@ -16,12 +19,16 @@ var player_inventory: Array = ["sword", "shield", "heart", "trap", "scroll"]
 # --- Run Progression ---
 var current_level: int = 1
 var completed_nodes: Array = []
+
 var current_node: Dictionary = {}
 var run_map: Dictionary = {} # Stored persistently per run
 
 # Tracking player by grid coordinates: x = column (0-4), y = layer (-1 to 19)
 # Home is at Layer -1, Column 2 (Center)
-var player_grid_pos: Vector2i = Vector2i(2, -1) 
+# var player_grid_pos: Vector2i = Vector2i(2, -1) 
+
+# Default to uninitialized to avoid (0,0) collision bugs
+var player_grid_pos: Vector2i = Vector2i(-99, -99)
 var active_deck: Array = []
 
 var pending_loot: Array = []   # Loot from the JUST finished battle
@@ -143,7 +150,10 @@ func start_actual_run():
 	completed_nodes = []
 	player_grid_pos = Vector2i(2, -1) # Ensure player starts at Home
 	active_deck = ["sword", "shield", "heart", "frost", "scroll", "trap"]
-	
+
+	# Set player location 	
+	reset_to_home()
+
 	# INITIALIZE FIXED NODES:
 	# Certain squares become "fixed" over time or are guaranteed by the map design
 	fixed_nodes.clear()
@@ -151,11 +161,19 @@ func start_actual_run():
 	fixed_nodes[Vector2i(2, 0)] = "town_square"
 	
 	SaveManager.save_mid_run_state()
-	get_tree().change_scene_to_file("res://scenes/map/WorldMap.tscn")
+	
+	# Transition to Intro Cinematic instead of WorldMap directly
+	get_tree().change_scene_to_file("res://scenes/ui/IntroCinematic.tscn")
+
+func reset_to_home():
+	# Standard Home location: Layer -1, Column 2
+	player_grid_pos = Vector2i(2, -1)
 
 func load_run_from_data(data: Dictionary):
 	player_name = data.get("player_name", "Unknown")
 	player_class = data.get("player_class", "Archivist")
+	player_level = data.get("player_level", 1)
+
 	current_hp = data.get("hp", 100)
 	max_hp = data.get("max_hp", 100)
 	gold = data.get("gold", 0)
@@ -163,7 +181,8 @@ func load_run_from_data(data: Dictionary):
 	completed_nodes = data.get("completed_nodes", [])
 	
 	# Restore fixed node data
-	fixed_nodes = data.get("fixed_nodes", {})
+	# fixed_nodes = data.get("fixed_nodes", {})
+	fixed_nodes = data.get("fixed_nodes", {Vector2i(2, 0): "town_square"})
 	
 	var saved_pos = data.get("grid_pos", [2, -1])
 	player_grid_pos = Vector2i(saved_pos[0], saved_pos[1])
