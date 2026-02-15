@@ -7,6 +7,8 @@ extends Control
 @onready var save_list_popup = %SaveListPopup
 @onready var save_container = %SaveListVBox
 @onready var name_input = %NameInput
+@onready var music_player = %MenuMusic
+@export var ambient_loop = preload("res://assets/music/amb_100.ogg")
 
 # Confirmation Popup for deletion
 @onready var confirm_delete_popup = %ConfirmDeletePopup
@@ -21,6 +23,8 @@ func _ready():
 	%CancelNameBtn.pressed.connect(func(): name_entry_popup.visible = false)
 	%CloseSavesBtn.pressed.connect(func(): save_list_popup.visible = false)
 	%SettingsButton.pressed.connect(_on_settings_pressed)
+	%ControlsBtn.pressed.connect(_on_controls_pressed) # New Connection
+	%CreditsBtn.pressed.connect(_on_credits_pressed)
 	%ExitButton.pressed.connect(_on_exit_pressed)
 	
 	# Delete Confirmation connections
@@ -34,7 +38,15 @@ func _ready():
 	if has_node("%SettingsOverlay"):
 		%SettingsOverlay.visible = false
 
+	# Connect the finished signal to play the loop
+	music_player.finished.connect(_on_intro_finished)
+
+func _on_intro_finished():
+	music_player.stream = ambient_loop
+	music_player.play()
+
 func _refresh_continue_button():
+	# Note: Assumes SaveManager singleton exists
 	var saves = SaveManager.get_save_list()
 	if saves.is_empty():
 		continue_button.disabled = true
@@ -81,7 +93,6 @@ func _populate_save_list():
 		var hbox = HBoxContainer.new()
 		save_container.add_child(hbox)
 		
-		# Load Button
 		var btn = Button.new()
 		var icon = _get_class_icon(data.get("player_class", "Archivist"))
 		var p_name = data.get("player_name", "Unknown")
@@ -92,7 +103,6 @@ func _populate_save_list():
 		btn.pressed.connect(_load_specific_run.bind(data))
 		hbox.add_child(btn)
 		
-		# Delete Button
 		var del_btn = Button.new()
 		del_btn.text = " X "
 		del_btn.modulate = Color.INDIAN_RED
@@ -124,6 +134,12 @@ func _load_specific_run(data: Dictionary):
 func _on_settings_pressed():
 	if has_node("%SettingsOverlay"):
 		%SettingsOverlay.visible = true
+
+func _on_controls_pressed():
+	get_tree().change_scene_to_file("res://features/ui/ControlsMenu.tscn")
+
+func _on_credits_pressed():
+	get_tree().change_scene_to_file("res://features/ui/Credits.tscn")
 
 func _on_exit_pressed():
 	get_tree().quit()

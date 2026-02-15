@@ -1,0 +1,58 @@
+[gd_scene format=3 uid="uid://bpvbmh8lr1rgt"]
+
+[ext_resource type="Script" uid="uid://d18nf2h3qx3x4" path="res://features/ui/Credits.gd" id="1_gdscript"]
+[ext_resource type="Theme" uid="uid://cy1tv88ir10yq" path="res://assets/themes/Greek.theme" id="1_wsgqi"]
+
+[node name="Credits" type="Control" unique_id=135983133]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_wsgqi")
+script = ExtResource("1_gdscript")
+
+[node name="Background" type="ColorRect" parent="." unique_id=2010253614]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0196078, 0.0196078, 0.0196078, 1)
+
+[node name="Scroll" type="ScrollContainer" parent="." unique_id=798147012]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
+
+[node name="CreditsList" type="VBoxContainer" parent="Scroll" unique_id=461879242]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="EscapeHint" type="Label" parent="." unique_id=1697505187]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -180.0
+offset_top = -50.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 18
+text = "[ESC] TO ESCAPE"
+horizontal_alignment = 2
+vertical_alignment = 1
