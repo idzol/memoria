@@ -1,7 +1,8 @@
 extends TextureButton
 
 # res://features/combat/Card.gd
-# Handles individual card flipping and automatic icon normalization.
+# Handles individual card flipping and automatic icon normalization for square layouts.
+# Now supports cropping non-square source images to centered squares.
 
 signal card_flipped(card_node)
 
@@ -27,8 +28,13 @@ func _ready():
 	# Subtle 5% hover pop
 	mouse_entered.connect(_on_hover.bind(true))
 	mouse_exited.connect(_on_hover.bind(false))
+	
+	# Apply initial cropping/scaling to back sprite if it exists
+	if back_sprite and back_sprite.texture:
+		_apply_sprite_crop_and_scale(back_sprite, back_sprite.texture)
 
 func _update_pivot():
+	# Pivot must be at the center of the square card (e.g., 50, 50)
 	pivot_offset = size / 2
 	if icon_sprite: icon_sprite.position = size / 2
 	if back_sprite: back_sprite.position = size / 2
@@ -36,6 +42,8 @@ func _update_pivot():
 	# Re-apply scaling whenever the card is resized by the GridContainer
 	if _cached_tex:
 		_apply_icon_scaling(_cached_tex)
+	if back_sprite and back_sprite.texture:
+		_apply_sprite_crop_and_scale(back_sprite, back_sprite.texture)
 
 func set_icon_texture(tex: Texture2D):
 	if not icon_sprite: return
@@ -44,17 +52,34 @@ func set_icon_texture(tex: Texture2D):
 	_apply_icon_scaling(tex)
 
 func _apply_icon_scaling(tex: Texture2D):
+	_apply_sprite_crop_and_scale(icon_sprite, tex)
+
+## Helper to crop a sprite to a centered square and scale it to fit the card
+func _apply_sprite_crop_and_scale(sprite: Sprite2D, tex: Texture2D):
+	if not sprite or not tex: return
+	
+	var tex_size = tex.get_size()
+	var side = min(tex_size.x, tex_size.y)
+	
+	# 1. CROP: Enable region to treat the texture as a centered square
+	sprite.region_enabled = true
+	sprite.region_rect = Rect2(
+		(tex_size.x - side) / 2.0,
+		(tex_size.y - side) / 2.0,
+		side,
+		side
+	)
+	
+	# 2. SCALE: Fit the cropped square into the card
 	var current_card_size = size
 	if current_card_size.x == 0: current_card_size = custom_minimum_size
 	
-	var target_dim = min(current_card_size.x, current_card_size.y) * 1.6
+	# Target the icon to occupy ~80% of the card's dimensions
+	var target_dim = min(current_card_size.x, current_card_size.y) * 0.8
 	
-	var tex_size = tex.get_size()
-	var max_tex_dim = max(tex_size.x, tex_size.y)
-	
-	# Calculate the scale required to bring the largest side down to our target
-	var scale_factor = target_dim / max_tex_dim
-	icon_sprite.scale = Vector2(scale_factor, scale_factor)
+	# Calculate scale factor based on the square region width (side)
+	var scale_factor = target_dim / side
+	sprite.scale = Vector2(scale_factor, scale_factor)
 
 func _on_hover(is_hovering: bool):
 	if is_matched or is_face_up: 

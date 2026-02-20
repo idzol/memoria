@@ -20,29 +20,19 @@ var current_scroll_f: float = 0.0 # Track scroll as float to avoid integer trunc
 
 var credits_data = {
 	"title": "MEMORIA CREDITS",
-	"dedication": "Dedicated to the dreamers who remember the forgotten paths and the stories left untold.",
+	"dedication": "To Katrina, the love and witness of my life. Without you, life is black and white.",
 	"sections": [
-		{ "header": "Executive Leadership", "names": ["The Architect", "Strategy Weaver"] },
-		{ "header": "Game Direction", "names": ["Visionary Prime", "Assistant Muse"] },
-		{ "header": "Production", "names": ["The Chronos Coordinator", "Task Alchemist"] },
-		{ "header": "Engine Development", "names": ["Core Architect", "System Pulse", "Binary Shaper"] },
-		{ "header": "Lead Programming", "names": ["Logic Sentinel"] },
-		{ "header": "Gameplay Programming", "names": ["Interaction Smith", "Flow Mechanic"] },
-		{ "header": "Technical Art", "names": ["Shader Mystic", "Pipeline Guardian"] },
-		{ "header": "Concept Art", "names": ["Silhouette Dreamer", "Color Theorist"] },
-		{ "header": "Environment Art", "names": ["Temple Architect", "World Gardener", "Prop Carver"] },
-		{ "header": "Character Art", "names": ["Anatomical Sculptor", "Texture Weaver"] },
-		{ "header": "Animation", "names": ["Life Breather", "Motion Crafter"] },
-		{ "header": "UI/UX Design", "names": ["Interface Oracle", "User Empath"] },
-		{ "header": "Narrative Design", "names": ["Lure Master", "Mythos Scribe"] },
-		{ "header": "Music Composition", "names": ["Ancient Bard", "Melodic Ghost"] },
-		{ "header": "Sound Design", "names": ["Atmosphere Sculptor", "Frequency Shifter"] },
-		{ "header": "SFX Production", "names": ["Impact Artist", "Foley Sorcerer"] },
-		{ "header": "Quality Assurance", "names": ["Glitch Hunter", "Edge-Case Seeker", "The Infinite Tester"] },
-		{ "header": "Localization", "names": ["Polyglot Bridge", "Cultural Translator"] },
-		{ "header": "Community & Social", "names": ["Voice of the People", "Hype Catalyst"] },
-		{ "header": "Legal & Finance", "names": ["Contract Sentinel", "Gold Keeper"] },
-		{ "header": "Special Thanks", "names": ["The Olympians", "Early Testers", "Coffee & Late Nights", "You, for playing"] }
+		{ "header": "Producer", "names": ["Paul Kubik"] },
+		
+		{ "header": "Storyline", "names": ["Paul Kubik"] },
+		{ "header": "Development", "names": ["Paul Kubik"] },
+		{ "header": "Design", "names": ["Paul Kubik"] },
+		
+		{ "header": "Engine", "names": ["Godot"] },
+
+		{ "header": "Guest Voices", "names": ["Katrina Fernandez"] },
+
+		{ "header": "Special Thanks", "names": ["Crepes", "Ursus", "Katmariedez"] }
 	]
 }
 

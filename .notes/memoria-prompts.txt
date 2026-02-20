@@ -1,8 +1,187 @@
-1) Open VSCode -> 
-	C:\Users\pkubi\Documents\memory-dungeon> 
 
-2) Open Godot -> Memory Dungeon
-3) Continue Run (F5)
+
+		
+=== 
+
+	Nurse - lets get care (LGC) 
+		Finances 
+	
+	LGC .. 
+		three carers 
+
+===
+
+cd C:\Users\pkubi\ComfyUI
+
+.\.venv\Scripts\activate
+.\run_nvidia.bat
+
+.\.venv\Scripts\python.exe main.py --gpu-only
+
+
+wan2.1_i2v_480p_14B_fp16
+umt5_xxl_fp8_e4m3fn_scaled
+wan_2.1_vae
+clip_vision_h
+
+ComfyUI-WanVideoWrapper
+ComfyUI-VideoHelperSuite
+
+
+character generation 
+
+	png for each character 
+		spritesheet for each .. 		
+		+quality
+		+symmetrical / boomerang  
+		
+			A static game character standing in an idle pose, subtle rhythmic breathing, hair swaying slightly, high quality, 4k.
+			morphing, flickering, distorted face, messy hair, extra limbs.
+
+===
+
+MEMORIA WORKFLOW 
+
+	GEMINI 
+		code - https://gemini.google.com/app/d751e14b7a44ee30
+		story - https://gemini.google.com/app/1bd8a1cf3c51f148
+		rooms - https://gemini.google.com/app/1558580f74329c5a
+		buttons - https://gemini.google.com/app/8cd3ca9d2d3f6603 
+		
+	SUNO 
+		music / sfx - https://suno.com/
+		
+	GODOT (code & program)
+	
+		1) Open VSCode 
+			-> C:\Users\pkubi\Documents\memory-dungeon> 
+
+		2) Open Godot (Open as Administrator) 
+			-> "Memory Dungeon"
+			-> Continue Run (F5)
+
+	ASSETS (images) - WSL / Ubuntu
+	
+		cd /mnt/c/Users/pkubi/production/memoria/assets/
+		source env/bin/activate 
+		python3 
+		...
+
+	ASSETS (music/sfx) - Windows PowerShell 
+		
+		cd C:\Users\pkubi\production\memoria\sound>python mp3_ogg.py
+		./env/Scripts/Activate 
+		python mp3_ogg.py
+		...
+
+	ASSETS (video) - tbc
+	
+
+
+		ComfyUI-WanVideoWrapper
+
+
+	COMFYUI
+
+		Characters 
+			young male, focused expression, tattered clothes, cartoon aesthetic, 32 bit colour 
+			2d, side profile, looking to the right, simple colour scheme, white background
+			remove black outlines 
+
+===
+
+update run summary with one of three backgrounds 
+	res://assets/ui/end_day_1.png
+	res://assets/ui/end_day_2.png
+	res://assets/ui/end_day_3.png
+
+update victory screen with xx background 
+
+update world ui with xx background 
+
+update character screen with xx background 
+
+==
+
+save global settings for 
+	volume 
+	screen size 
+	key mapping ..
+		update controls page to allow "remap" and 
+
+== 
+
+battlescene background 
+	confirm how map generator selects *.tres files for each biome 
+	confirm *tres file contains background 
+		confirm asset path ...
+	create ~20 *.tres files for debug 
+	
+	change routing (1-3 rooms)
+	introduce "tutorial" biome 
+		set path (ie. t1->t2->t3...)
+
+== 
+
+update / confirm asset audit to looks for missing *.ogv files 
+
+==
+
+update map generator to get *.tres files for rooms based on   
+	/biome/t1_{custom name}.tres
+
+ignore custom name, used for file identification only 
+
+===
+
+
+=== 
+
+create a library of 
+
+update in game menu to include a 
+
+* library of all cards discovered 
+* library of all characters met 
+
+use card library of cards discovered 
+
+===
+
+map 
+	fight start dialog 
+
+	determine starting player 
+	
+	card layout 
+		2x2 for level 0
+		3x3 for level 1
+		...
+		
+	card icons 
+		simplified icons 
+	
+	combat loop
+		attack 
+		defend 
+			armor - block 
+		...
+	
+map 
+	trigger new events on enter 
+	default fog of war is no image 
+	line between map squares 
+	fill in squares as they become unlocked  
+
+
+character
+	one type 
+	images .. 
+	
+	character screen
+		3 cards 
+		select boxes .. 
+		fisher net 
 
 ===
 scenes 

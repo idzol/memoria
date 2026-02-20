@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bpvbmh8lr1rgt"]
 
-[ext_resource type="Script" uid="uid://d18nf2h3qx3x4" path="res://features/ui/Credits.gd" id="1_gdscript"]
+[ext_resource type="Script" uid="uid://bki0oa13gbra3" path="res://features/ui/Credits.gd" id="1_gdscript"]
 [ext_resource type="Theme" uid="uid://cy1tv88ir10yq" path="res://assets/themes/Greek.theme" id="1_wsgqi"]
 
 [node name="Credits" type="Control" unique_id=135983133]

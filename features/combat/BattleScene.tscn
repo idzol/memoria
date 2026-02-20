@@ -1,30 +1,41 @@
 [gd_scene format=3 uid="uid://b77asnldqt0xe"]
 
 [ext_resource type="Script" uid="uid://t5ler8jigjuj" path="res://features/combat/BattleScene.gd" id="1_ltshs"]
+[ext_resource type="VideoStream" uid="uid://co1deam7f2rip" path="res://assets/player/idle.ogv" id="2_051qw"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stage"]
-bg_color = Color(0.1, 0.1, 0.12, 1)
-border_width_bottom = 4
-border_color = Color(0.2, 0.2, 0.25, 1)
-corner_radius_bottom_right = 20
-corner_radius_bottom_left = 20
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_arena"]
+bg_color = Color(0.08, 0.08, 0.1, 0.85)
+border_color = Color(0.25, 0.25, 0.3, 1)
+shadow_size = 10
 
-[node name="BattleScene" type="Node2D" unique_id=1848990603]
+[node name="BattleScene" type="Node2D" unique_id=307861286]
 script = ExtResource("1_ltshs")
 
-[node name="DialogOverlay" type="CanvasLayer" parent="." unique_id=7364978]
+[node name="Background" type="TextureRect" parent="." unique_id=1490348551]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1280.0
+offset_bottom = 720.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="DialogOverlay" type="CanvasLayer" parent="." unique_id=787703425]
 unique_name_in_owner = true
 visible = false
 
-[node name="BG" type="ColorRect" parent="DialogOverlay" unique_id=1376638159]
+[node name="BG" type="ColorRect" parent="DialogOverlay" unique_id=258773024]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.05, 0.05, 0.07, 0.95)
+color = Color(0.05, 0.05, 0.07, 0.9)
 
-[node name="VBox" type="VBoxContainer" parent="DialogOverlay" unique_id=1859561171]
+[node name="VBox" type="VBoxContainer" parent="DialogOverlay" unique_id=1267159909]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -38,79 +49,70 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 20
 
-[node name="RoomTitle" type="Label" parent="DialogOverlay/VBox" unique_id=803203163]
+[node name="RoomTitle" type="Label" parent="DialogOverlay/VBox" unique_id=1357434659]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "Room Name"
 horizontal_alignment = 1
 
-[node name="DialogText" type="Label" parent="DialogOverlay/VBox" unique_id=1399807055]
+[node name="DialogText" type="Label" parent="DialogOverlay/VBox" unique_id=1247982655]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/line_spacing = 5
-text = "The sentry rattles its bones..."
+text = "Encounter Text..."
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="OptionContainer" type="VBoxContainer" parent="DialogOverlay/VBox" unique_id=1894202129]
+[node name="OptionContainer" type="VBoxContainer" parent="DialogOverlay/VBox" unique_id=1021780253]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="UI" type="CanvasLayer" parent="." unique_id=466550305]
+[node name="UI" type="CanvasLayer" parent="." unique_id=1179212491]
 unique_name_in_owner = true
 
-[node name="SafeZone" type="MarginContainer" parent="UI" unique_id=937639326]
+[node name="SafeZone" type="MarginContainer" parent="UI" unique_id=236448235]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 30
-theme_override_constants/margin_top = 30
-theme_override_constants/margin_right = 30
-theme_override_constants/margin_bottom = 30
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 40
 
-[node name="MainLayout" type="VBoxContainer" parent="UI/SafeZone" unique_id=1252650404]
+[node name="StageLayout" type="HBoxContainer" parent="UI/SafeZone" unique_id=786028175]
 layout_mode = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 40
 
-[node name="TopHalf_Environment" type="PanelContainer" parent="UI/SafeZone/MainLayout" unique_id=141276974]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_stage")
-
-[node name="HBox" type="HBoxContainer" parent="UI/SafeZone/MainLayout/TopHalf_Environment" unique_id=1815738529]
+[node name="PlayerColumn" type="VBoxContainer" parent="UI/SafeZone/StageLayout" unique_id=1572994890]
+custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 alignment = 1
 
-[node name="PlayerPortrait" type="VBoxContainer" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox" unique_id=1474958583]
+[node name="PlayerSlot_1" type="VBoxContainer" parent="UI/SafeZone/StageLayout/PlayerColumn" unique_id=1776931384]
 layout_mode = 2
-alignment = 2
 
-[node name="PlayerHP" type="Label" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/PlayerPortrait" unique_id=1652913902]
+[node name="PlayerHP" type="Label" parent="UI/SafeZone/StageLayout/PlayerColumn/PlayerSlot_1" unique_id=1042766924]
 unique_name_in_owner = true
 layout_mode = 2
-text = "HP: 100/100"
+text = "100/100"
 horizontal_alignment = 1
 
-[node name="Box" type="Panel" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/PlayerPortrait" unique_id=392689561]
+[node name="Box" type="Panel" parent="UI/SafeZone/StageLayout/PlayerColumn/PlayerSlot_1" unique_id=1168736790]
 custom_minimum_size = Vector2(140, 160)
 layout_mode = 2
 
-[node name="PlayerPortraitSprite" type="TextureRect" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/PlayerPortrait/Box" unique_id=540377510]
+[node name="PlayerSprite" type="Sprite2D" parent="UI/SafeZone/StageLayout/PlayerColumn/PlayerSlot_1/Box"]
 unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-expand_mode = 1
-stretch_mode = 5
+position = Vector2(70, 80)
+scale = Vector2(0.44, 0.44)
+hframes = 6
+vframes = 6
 
-[node name="PlayerFlash" type="ColorRect" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/PlayerPortrait/Box" unique_id=1463095712]
+[node name="PlayerFlash" type="ColorRect" parent="UI/SafeZone/StageLayout/PlayerColumn/PlayerSlot_1/Box" unique_id=1288287434]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -120,21 +122,68 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(1, 1, 1, 0)
 
-[node name="EnemyPortrait" type="VBoxContainer" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox" unique_id=1055045463]
+[node name="PlayerSlot_2" type="Control" parent="UI/SafeZone/StageLayout/PlayerColumn" unique_id=1045163861]
+custom_minimum_size = Vector2(140, 140)
 layout_mode = 2
-alignment = 2
 
-[node name="EnemyHP" type="Label" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/EnemyPortrait" unique_id=1212711733]
+[node name="PlayerSlot_3" type="Control" parent="UI/SafeZone/StageLayout/PlayerColumn" unique_id=1176511806]
+custom_minimum_size = Vector2(140, 140)
+layout_mode = 2
+
+[node name="ArenaCenter" type="PanelContainer" parent="UI/SafeZone/StageLayout" unique_id=202223600]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(550, 550)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_arena")
+
+[node name="GridContainer" type="GridContainer" parent="UI/SafeZone/StageLayout/ArenaCenter" unique_id=1075179061]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/h_separation = 15
+theme_override_constants/v_separation = 15
+columns = 4
+
+[node name="LogDisplay" type="ScrollContainer" parent="UI/SafeZone/StageLayout/ArenaCenter" unique_id=1250829411]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="UI/SafeZone/StageLayout/ArenaCenter/LogDisplay" unique_id=2070893838]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="LogBox" type="VBoxContainer" parent="UI/SafeZone/StageLayout/ArenaCenter/LogDisplay/Margin" unique_id=1949342696]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="EnemyColumn" type="VBoxContainer" parent="UI/SafeZone/StageLayout" unique_id=1659315681]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+alignment = 1
+
+[node name="EnemySlot_1" type="VBoxContainer" parent="UI/SafeZone/StageLayout/EnemyColumn" unique_id=1361315372]
+layout_mode = 2
+
+[node name="EnemyHP" type="Label" parent="UI/SafeZone/StageLayout/EnemyColumn/EnemySlot_1" unique_id=1395570292]
 unique_name_in_owner = true
 layout_mode = 2
 text = "HP: 50"
 horizontal_alignment = 1
 
-[node name="Box" type="Panel" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/EnemyPortrait" unique_id=1637921638]
+[node name="Box" type="Panel" parent="UI/SafeZone/StageLayout/EnemyColumn/EnemySlot_1" unique_id=1852124961]
 custom_minimum_size = Vector2(140, 160)
 layout_mode = 2
 
-[node name="EnemyPortraitSprite" type="TextureRect" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/EnemyPortrait/Box" unique_id=2098443075]
+[node name="EnemyPortraitSprite" type="TextureRect" parent="UI/SafeZone/StageLayout/EnemyColumn/EnemySlot_1/Box" unique_id=1562618391]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -145,7 +194,7 @@ grow_vertical = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="EnemyFlash" type="ColorRect" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/EnemyPortrait/Box" unique_id=1910571017]
+[node name="EnemyFlash" type="ColorRect" parent="UI/SafeZone/StageLayout/EnemyColumn/EnemySlot_1/Box" unique_id=453321376]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -155,41 +204,42 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(1, 1, 1, 0)
 
-[node name="BottomHalf_Split" type="HBoxContainer" parent="UI/SafeZone/MainLayout" unique_id=673347500]
+[node name="EnemySlot_2" type="Control" parent="UI/SafeZone/StageLayout/EnemyColumn" unique_id=1353179740]
+custom_minimum_size = Vector2(140, 140)
 layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 20
 
-[node name="LogSection" type="VBoxContainer" parent="UI/SafeZone/MainLayout/BottomHalf_Split" unique_id=1283612838]
+[node name="EnemySlot_3" type="Control" parent="UI/SafeZone/StageLayout/EnemyColumn" unique_id=1323149469]
+custom_minimum_size = Vector2(140, 140)
 layout_mode = 2
-size_flags_horizontal = 3
 
-[node name="LogBox" type="VBoxContainer" parent="UI/SafeZone/MainLayout/BottomHalf_Split/LogSection" unique_id=1950669089]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="GridContainer" type="GridContainer" parent="UI/SafeZone/MainLayout/BottomHalf_Split" unique_id=1314790226]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_stretch_ratio = 1.5
-columns = 3
-
-[node name="DebugControls" type="HBoxContainer" parent="UI" unique_id=276951100]
+[node name="TopRightControls" type="HBoxContainer" parent="UI" unique_id=1916100684]
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -200.0
-offset_bottom = 40.0
+offset_left = -320.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = 50.0
 grow_horizontal = 0
+theme_override_constants/separation = 15
+alignment = 2
 
-[node name="DebugWinBtn" type="Button" parent="UI/DebugControls" unique_id=29743870]
+[node name="ToggleLogBtn" type="Button" parent="UI/TopRightControls" unique_id=2121474798]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Toggle Log/Cards"
+
+[node name="DebugWinBtn" type="Button" parent="UI/TopRightControls" unique_id=873381396]
 unique_name_in_owner = true
 layout_mode = 2
 text = "WIN"
 
-[node name="DebugLoseBtn" type="Button" parent="UI/DebugControls" unique_id=1756364576]
+[node name="DebugLoseBtn" type="Button" parent="UI/TopRightControls" unique_id=2130898261]
 unique_name_in_owner = true
 layout_mode = 2
 text = "LOSE"
+
+[node name="IdleTimer" type="Timer" parent="." unique_id=678621587]
+unique_name_in_owner = true
+wait_time = 5.0
+autostart = true

@@ -26,6 +26,7 @@ func generate_new_map() -> Dictionary:
 	nodes["0"] = {
 		"id": "0",
 		"room_key": "home",
+		"room_resource_path": "res://data/rooms/town/home.tres",
 		"biome": "town",
 		"layer": -1,
 		"column": 2,
@@ -60,20 +61,30 @@ func generate_new_map() -> Dictionary:
 				room_key = available_rooms[randi() % available_rooms.size()]
 				room_data = GameData.ROOMS[biome_name][room_key].duplicate()
 			
+			# CONSTRUCT RESOURCE PATH
+			var resource_path = "res://data/rooms/%s/%s.tres" % [biome_name, room_key]
+
+			# Ensure the file actually exists before assigning it
+			if not FileAccess.file_exists(resource_path):
+				resource_path = "res://data/rooms/forest/default_battle.tres" # Safety fallback
+
 			nodes[id] = {
 				"id": id,
 				"room_key": room_key,
+				"room_resource_path": resource_path, # THIS is the key reference
 				"biome": biome_name,
 				"layer": l,
 				"column": c,
 				"difficulty": diff,
 				"pos": Vector2((c - 2) * HORIZONTAL_SPACING, l * -VERTICAL_SPACING),
-				"connections": []
+				"connections": [],
+				"type": room_data.get("type", "battle")
 			}
 			
-			# Merge room data (type, dialog, npc, enemies)
+			# Merge remaining room data (dialog, npc, enemies, etc.)
 			for key in room_data:
-				nodes[id][key] = room_data[key]
+				if key != "type": # Already set in the constructor above
+					nodes[id][key] = room_data[key]
 				
 			if not nodes[id].has("type"):
 				nodes[id]["type"] = "battle"

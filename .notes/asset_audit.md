@@ -1,11 +1,11 @@
 # Asset & Resource Audit Report
-Generated on: 2026-02-16 08:17:56
+Generated on: 2026-02-20 01:11:44
 
 **Project Root:** `C:\Users\pkubi\Documents\memory-dungeon`
 **GameData Path:** `C:\Users\pkubi\Documents\memory-dungeon\core\GameData.gd`
 
 ## Summary
-- **Unique static asset references found:** 100
+- **Unique static asset references found:** 102
 - **Missing static assets (PNGs, etc):** 59
 - **Required Room Resources (.tres):** 160
 - **Missing Room Resources (.tres):** 158

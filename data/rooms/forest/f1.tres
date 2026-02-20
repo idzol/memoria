@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="RoomData" format=3 uid="uid://b8m6hdmwqw2o3"]
+
+[ext_resource type="Script" uid="uid://0462uig137av" path="res://data/resources/RoomData.gd" id="1_room"]
+
+[resource]
+script = ExtResource("1_room")
+room_name = "Shadowed Thicket"
+initial_dialog = "The leaves crunch behind you. You aren't alone."
+enemy_id = "slime"
+difficulty_override = 2

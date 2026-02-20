@@ -5,8 +5,9 @@ extends Control
 
 signal node_clicked(data)
 
-# IMPORT: Centralized room and enemy data from GameData.gd
-const GameData = preload("res://core/GameData.gd")
+# Centralized room and enemy data from GameData.gd
+# Todo: move to *.tres files 
+# const GameData = preload("res://core/GameData.gd")
 
 @onready var room_bg = %RoomBackground
 @onready var icon_rect = %Icon

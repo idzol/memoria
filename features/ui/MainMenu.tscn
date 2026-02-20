@@ -3,9 +3,8 @@
 [ext_resource type="Script" uid="uid://drj4t8y13pwkt" path="res://features/ui/MainMenu.gd" id="1_menu_script"]
 [ext_resource type="Theme" uid="uid://kw6gdo1dshed" path="res://assets/themes/Minotaur.theme" id="1_uhfsk"]
 [ext_resource type="PackedScene" uid="uid://dm5v8f6r7p2m5" path="res://features/ui/SettingsOverlay.tscn" id="2_settings"]
-[ext_resource type="Texture2D" uid="uid://bg_placeholder_id" path="res://assets/ui/main_background.png" id="3_bg_texture"]
-[ext_resource type="AudioStream" uid="uid://intro_music_id" path="res://assets/music/mus_100.ogg" id="4_intro_music"]
-[ext_resource type="AudioStream" uid="uid://ambient_loop_id" path="res://assets/music/amb_100.ogg" id="5_ambient_loop"]
+[ext_resource type="Texture2D" uid="uid://ki802i37gyb4" path="res://assets/ui/main_background.png" id="3_bg_texture"]
+[ext_resource type="AudioStream" uid="uid://bhee2hj88v4h0" path="res://assets/music/mus_100.ogg" id="4_intro_music"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_opaque_modal"]
 bg_color = Color(0.1, 0.1, 0.12, 1)
@@ -74,13 +73,13 @@ custom_minimum_size = Vector2(300, 50)
 layout_mode = 2
 text = "SETTINGS"
 
-[node name="ControlsBtn" type="Button" parent="CenterContainer/VBoxContainer"]
+[node name="ControlsBtn" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1784081616]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 45)
 layout_mode = 2
 text = "CONTROLS"
 
-[node name="CreditsBtn" type="Button" parent="CenterContainer/VBoxContainer"]
+[node name="CreditsBtn" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1171003150]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 45)
 layout_mode = 2
@@ -244,8 +243,7 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 1
 
-[node name="MenuMusic" type="AudioStreamPlayer" parent="."]
+[node name="MenuMusic" type="AudioStreamPlayer" parent="." unique_id=1462439773]
 unique_name_in_owner = true
 stream = ExtResource("4_intro_music")
 autoplay = true
-bus = &"Music"

@@ -8,10 +8,6 @@
 
 config_version=5
 
-[animation]
-
-compatibility/default_parent_skeleton_in_mesh_instance_3d=true
-
 [application]
 
 config/name="Memory Dungeon"
@@ -38,6 +34,21 @@ window/size/viewport_width=1280
 window/size/viewport_height=720
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gut/plugin.cfg")
+
+[gut]
+
+exclude_addons=true
+show_empty_folders=false
+font_size=16
+double_strategy=1
+settings/exclude_addons=true
+settings/show_empty_folders=false
+settings/font_size=16
+settings/double_strategy=1
 
 [physics]
 

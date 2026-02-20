@@ -1,23 +1,23 @@
-[gd_scene load_steps=3 format=3 uid="uid://ds43twav0dxus"]
+[gd_scene format=3 uid="uid://ds43twav0dxus"]
 
-[ext_resource type="Script" path="res://features/combat/Card.gd" id="1_k81y5"]
+[ext_resource type="Script" uid="uid://csn80tiagf37g" path="res://features/combat/Card.gd" id="1_k81y5"]
 [ext_resource type="Texture2D" uid="uid://ndwcsgrrly0d" path="res://assets/card/back2.png" id="2_1nuix"]
 
-[node name="Card" type="TextureButton"]
-custom_minimum_size = Vector2(128, 192)
-offset_right = 128.0
-offset_bottom = 192.0
-pivot_offset = Vector2(64, 96)
+[node name="Card" type="TextureButton" unique_id=1088095668]
+custom_minimum_size = Vector2(100, 100)
+offset_right = 100.0
+offset_bottom = 100.0
+pivot_offset = Vector2(50, 50)
 script = ExtResource("1_k81y5")
 
-[node name="Back" type="Sprite2D" parent="."]
+[node name="Back" type="Sprite2D" parent="." unique_id=738520551]
 unique_name_in_owner = true
-position = Vector2(64, 96)
+position = Vector2(50, 50)
 scale = Vector2(0.125, 0.125)
 texture = ExtResource("2_1nuix")
 
-[node name="Icon" type="Sprite2D" parent="."]
+[node name="Icon" type="Sprite2D" parent="." unique_id=306189642]
 unique_name_in_owner = true
-position = Vector2(64, 96)
+position = Vector2(50, 50)
 scale = Vector2(0.125, 0.125)
 texture = ExtResource("2_1nuix")

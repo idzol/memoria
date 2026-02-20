@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://b8y7g6h5j4k3"]
 
-[ext_resource type="Script" path="res://features/ui/InGameMenu.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://tfhpf6d8mrtm" path="res://features/ui/InGameMenu.gd" id="1_script"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_modal"]
 bg_color = Color(0.08, 0.08, 0.1, 0.95)
@@ -9,14 +9,13 @@ border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
 border_color = Color(0.2, 0.2, 0.25, 1)
-corner_radius_all = 8
 
-[node name="InGameMenu" type="CanvasLayer"]
+[node name="InGameMenu" type="CanvasLayer" unique_id=1939436613]
 process_mode = 3
 layer = 10
 script = ExtResource("1_script")
 
-[node name="Dimmer" type="ColorRect" parent="."]
+[node name="Dimmer" type="ColorRect" parent="." unique_id=1572653156]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -24,7 +23,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.4)
 
-[node name="MenuPanel" type="Panel" parent="."]
+[node name="MenuPanel" type="Panel" parent="." unique_id=2038476898]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 400)
 anchors_preset = 8
@@ -36,7 +35,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_modal")
 
-[node name="VBox" type="VBoxContainer" parent="MenuPanel"]
+[node name="VBox" type="VBoxContainer" parent="MenuPanel" unique_id=248576344]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -46,31 +45,31 @@ grow_vertical = 2
 theme_override_constants/separation = 15
 alignment = 1
 
-[node name="Title" type="Label" parent="MenuPanel/VBox"]
+[node name="Title" type="Label" parent="MenuPanel/VBox" unique_id=93054403]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "PAUSED"
 horizontal_alignment = 1
 
-[node name="HSeparator" type="HSeparator" parent="MenuPanel/VBox"]
+[node name="HSeparator" type="HSeparator" parent="MenuPanel/VBox" unique_id=1973499784]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="ResumeBtn" type="Button" parent="MenuPanel/VBox"]
+[node name="ResumeBtn" type="Button" parent="MenuPanel/VBox" unique_id=1696894751]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 50)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "RESUME"
 
-[node name="SaveExitBtn" type="Button" parent="MenuPanel/VBox"]
+[node name="SaveExitBtn" type="Button" parent="MenuPanel/VBox" unique_id=29076870]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 50)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "SAVE AND EXIT"
 
-[node name="AbandonBtn" type="Button" parent="MenuPanel/VBox"]
+[node name="AbandonBtn" type="Button" parent="MenuPanel/VBox" unique_id=1468724680]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 50)
 layout_mode = 2
@@ -78,7 +77,7 @@ size_flags_horizontal = 4
 theme_override_colors/font_color = Color(0.9, 0.3, 0.3, 1)
 text = "ABANDON RUN"
 
-[node name="ConfirmationDialog" type="Panel" parent="."]
+[node name="ConfirmationDialog" type="Panel" parent="." unique_id=1489547077]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(350, 200)
@@ -91,7 +90,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_modal")
 
-[node name="VBox" type="VBoxContainer" parent="ConfirmationDialog"]
+[node name="VBox" type="VBoxContainer" parent="ConfirmationDialog" unique_id=881984111]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -101,25 +100,25 @@ grow_vertical = 2
 theme_override_constants/separation = 20
 alignment = 1
 
-[node name="ConfirmLabel" type="Label" parent="ConfirmationDialog/VBox"]
+[node name="ConfirmLabel" type="Label" parent="ConfirmationDialog/VBox" unique_id=1977437797]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Are you sure?"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="HBox" type="HBoxContainer" parent="ConfirmationDialog/VBox"]
+[node name="HBox" type="HBoxContainer" parent="ConfirmationDialog/VBox" unique_id=9741480]
 layout_mode = 2
 theme_override_constants/separation = 30
 alignment = 1
 
-[node name="YesBtn" type="Button" parent="ConfirmationDialog/VBox/HBox"]
+[node name="YesBtn" type="Button" parent="ConfirmationDialog/VBox/HBox" unique_id=599967782]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 40)
 layout_mode = 2
 text = "YES"
 
-[node name="NoBtn" type="Button" parent="ConfirmationDialog/VBox/HBox"]
+[node name="NoBtn" type="Button" parent="ConfirmationDialog/VBox/HBox" unique_id=908198161]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(100, 40)
 layout_mode = 2
