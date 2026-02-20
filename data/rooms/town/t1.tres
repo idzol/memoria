@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="RoomData" format=3 uid="uid://dxilcubj24s8k"]
+
+[ext_resource type="Script" uid="uid://0462uig137av" path="res://data/resources/RoomData.gd" id="1_room"]
+
+[resource]
+script = ExtResource("1_room")
+room_name = "Village Gate"
+initial_dialog = "A guard blocks your path, eyes glowing with a faint, corrupted light."
+dialog_tree_id = "gate_confrontation"
+difficulty_override = 1

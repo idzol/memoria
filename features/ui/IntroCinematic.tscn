@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://5dbhx0eew0m0"]
+
+[ext_resource type="Script" uid="uid://dsd5a5wd4ds76" path="res://features/ui/IntroCinematic.gd" id="1_intro_script"]
+[ext_resource type="Theme" uid="uid://kw6gdo1dshed" path="res://assets/themes/Minotaur.theme" id="1_urvd6"]
+
+[node name="IntroCinematic" type="Control" unique_id=531925656]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_urvd6")
+script = ExtResource("1_intro_script")
+
+[node name="BG" type="ColorRect" parent="." unique_id=930179466]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="VideoPlayer" type="VideoStreamPlayer" parent="." unique_id=1580675470]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand = true
+
+[node name="SkipPrompt" type="Label" parent="." unique_id=1011198735]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -320.0
+offset_top = -60.0
+offset_right = -30.0
+offset_bottom = -30.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+text = "[SPACE] TO SKIP"
+horizontal_alignment = 2

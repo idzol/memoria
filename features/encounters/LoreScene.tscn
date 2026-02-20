@@ -1,0 +1,162 @@
+[gd_scene format=3 uid="uid://c8r2e1v0l5k7j"]
+
+[ext_resource type="Script" uid="uid://d1pp65d13y3dw" path="res://features/encounters/LoreScene.gd" id="1_lore_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stage"]
+bg_color = Color(0.1, 0.1, 0.12, 1)
+border_width_bottom = 4
+border_color = Color(0.2, 0.2, 0.25, 1)
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dialog_area"]
+bg_color = Color(0.05, 0.05, 0.07, 0.8)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.3, 0.35, 1)
+expand_margin_left = 10.0
+expand_margin_top = 10.0
+expand_margin_right = 10.0
+expand_margin_bottom = 10.0
+
+[node name="LoreScene" type="Node2D" unique_id=243924591]
+script = ExtResource("1_lore_script")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1410758589]
+offset_right = 1152.0
+offset_bottom = 648.0
+color = Color(0.03, 0.03, 0.05, 1)
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=1482217429]
+
+[node name="SafeZone" type="MarginContainer" parent="UI" unique_id=285667967]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 30
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 30
+
+[node name="MainLayout" type="VBoxContainer" parent="UI/SafeZone" unique_id=1066944197]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="TopHalf_Environment" type="PanelContainer" parent="UI/SafeZone/MainLayout" unique_id=1860784819]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_stage")
+
+[node name="HBox" type="HBoxContainer" parent="UI/SafeZone/MainLayout/TopHalf_Environment" unique_id=1723268845]
+layout_mode = 2
+alignment = 1
+
+[node name="PlayerPortrait" type="VBoxContainer" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox" unique_id=2099812867]
+layout_mode = 2
+alignment = 2
+
+[node name="PlayerHP" type="Label" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/PlayerPortrait" unique_id=1719986250]
+unique_name_in_owner = true
+layout_mode = 2
+text = "HP: 100/100"
+horizontal_alignment = 1
+
+[node name="Box" type="Panel" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/PlayerPortrait" unique_id=138801809]
+custom_minimum_size = Vector2(140, 160)
+layout_mode = 2
+
+[node name="PlayerPortraitSprite" type="TextureRect" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/PlayerPortrait/Box" unique_id=514189580]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PlayerFlash" type="ColorRect" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/PlayerPortrait/Box" unique_id=553103970]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 1, 1, 0)
+
+[node name="EnemyPortrait" type="VBoxContainer" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox" unique_id=1005066073]
+layout_mode = 2
+alignment = 2
+
+[node name="EnemyHP" type="Label" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/EnemyPortrait" unique_id=1727846892]
+unique_name_in_owner = true
+layout_mode = 2
+text = "NPC"
+horizontal_alignment = 1
+
+[node name="Box" type="Panel" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/EnemyPortrait" unique_id=1741740899]
+custom_minimum_size = Vector2(140, 160)
+layout_mode = 2
+
+[node name="EnemyPortraitSprite" type="TextureRect" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/EnemyPortrait/Box" unique_id=1964747371]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="EnemyFlash" type="ColorRect" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/EnemyPortrait/Box" unique_id=699223039]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 1, 1, 0)
+
+[node name="BottomHalf_Lore" type="PanelContainer" parent="UI/SafeZone/MainLayout" unique_id=1465186493]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_dialog_area")
+
+[node name="VBox" type="VBoxContainer" parent="UI/SafeZone/MainLayout/BottomHalf_Lore" unique_id=1347350604]
+layout_mode = 2
+theme_override_constants/separation = 15
+alignment = 1
+
+[node name="RoomTitle" type="Label" parent="UI/SafeZone/MainLayout/BottomHalf_Lore/VBox" unique_id=1173312753]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Meeting Point"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="UI/SafeZone/MainLayout/BottomHalf_Lore/VBox" unique_id=988760445]
+layout_mode = 2
+
+[node name="DialogText" type="Label" parent="UI/SafeZone/MainLayout/BottomHalf_Lore/VBox" unique_id=1719857977]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(600, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 20
+text = "The air here feels heavy with unsaid words..."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="OptionContainer" type="VBoxContainer" parent="UI/SafeZone/MainLayout/BottomHalf_Lore/VBox" unique_id=289399389]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 10

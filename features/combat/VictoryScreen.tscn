@@ -1,0 +1,62 @@
+[gd_scene format=3 uid="uid://b5a0xj2ul16pu"]
+
+[ext_resource type="Theme" uid="uid://cy1tv88ir10yq" path="res://assets/themes/Greek.theme" id="1_j5glx"]
+[ext_resource type="Script" uid="uid://c57vccx8hy237" path="res://features/combat/VictoryScreen.gd" id="1_script"]
+
+[node name="VictoryScreen" type="Control" unique_id=1469019555]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_j5glx")
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="." unique_id=69646661]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0705882, 0.0784314, 0.101961, 0.862745)
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1053678914]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=2085729624]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Title" type="Label" parent="CenterContainer/VBoxContainer" unique_id=1026657045]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "VICTORY"
+horizontal_alignment = 1
+
+[node name="LootScroll" type="ScrollContainer" parent="CenterContainer/VBoxContainer" unique_id=1295611549]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="LootContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer/LootScroll" unique_id=109128835]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/VBoxContainer" unique_id=2135801952]
+layout_mode = 2
+
+[node name="ContinueButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1303864979]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+text = "RETURN TO MAP"

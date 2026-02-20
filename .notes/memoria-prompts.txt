@@ -1,0 +1,382 @@
+
+
+		
+=== 
+
+	Nurse - lets get care (LGC) 
+		Finances 
+	
+	LGC .. 
+		three carers 
+
+===
+
+cd C:\Users\pkubi\ComfyUI
+
+.\.venv\Scripts\activate
+.\run_nvidia.bat
+
+.\.venv\Scripts\python.exe main.py --gpu-only
+
+
+wan2.1_i2v_480p_14B_fp16
+umt5_xxl_fp8_e4m3fn_scaled
+wan_2.1_vae
+clip_vision_h
+
+ComfyUI-WanVideoWrapper
+ComfyUI-VideoHelperSuite
+
+
+character generation 
+
+	png for each character 
+		spritesheet for each .. 		
+		+quality
+		+symmetrical / boomerang  
+		
+			A static game character standing in an idle pose, subtle rhythmic breathing, hair swaying slightly, high quality, 4k.
+			morphing, flickering, distorted face, messy hair, extra limbs.
+
+===
+
+MEMORIA WORKFLOW 
+
+	GEMINI 
+		code - https://gemini.google.com/app/d751e14b7a44ee30
+		story - https://gemini.google.com/app/1bd8a1cf3c51f148
+		rooms - https://gemini.google.com/app/1558580f74329c5a
+		buttons - https://gemini.google.com/app/8cd3ca9d2d3f6603 
+		
+	SUNO 
+		music / sfx - https://suno.com/
+		
+	GODOT (code & program)
+	
+		1) Open VSCode 
+			-> C:\Users\pkubi\Documents\memory-dungeon> 
+
+		2) Open Godot (Open as Administrator) 
+			-> "Memory Dungeon"
+			-> Continue Run (F5)
+
+	ASSETS (images) - WSL / Ubuntu
+	
+		cd /mnt/c/Users/pkubi/production/memoria/assets/
+		source env/bin/activate 
+		python3 
+		...
+
+	ASSETS (music/sfx) - Windows PowerShell 
+		
+		cd C:\Users\pkubi\production\memoria\sound>python mp3_ogg.py
+		./env/Scripts/Activate 
+		python mp3_ogg.py
+		...
+
+	ASSETS (video) - tbc
+	
+
+
+		ComfyUI-WanVideoWrapper
+
+
+	COMFYUI
+
+		Characters 
+			young male, focused expression, tattered clothes, cartoon aesthetic, 32 bit colour 
+			2d, side profile, looking to the right, simple colour scheme, white background
+			remove black outlines 
+
+===
+
+update run summary with one of three backgrounds 
+	res://assets/ui/end_day_1.png
+	res://assets/ui/end_day_2.png
+	res://assets/ui/end_day_3.png
+
+update victory screen with xx background 
+
+update world ui with xx background 
+
+update character screen with xx background 
+
+==
+
+save global settings for 
+	volume 
+	screen size 
+	key mapping ..
+		update controls page to allow "remap" and 
+
+== 
+
+battlescene background 
+	confirm how map generator selects *.tres files for each biome 
+	confirm *tres file contains background 
+		confirm asset path ...
+	create ~20 *.tres files for debug 
+	
+	change routing (1-3 rooms)
+	introduce "tutorial" biome 
+		set path (ie. t1->t2->t3...)
+
+== 
+
+update / confirm asset audit to looks for missing *.ogv files 
+
+==
+
+update map generator to get *.tres files for rooms based on   
+	/biome/t1_{custom name}.tres
+
+ignore custom name, used for file identification only 
+
+===
+
+
+=== 
+
+create a library of 
+
+update in game menu to include a 
+
+* library of all cards discovered 
+* library of all characters met 
+
+use card library of cards discovered 
+
+===
+
+map 
+	fight start dialog 
+
+	determine starting player 
+	
+	card layout 
+		2x2 for level 0
+		3x3 for level 1
+		...
+		
+	card icons 
+		simplified icons 
+	
+	combat loop
+		attack 
+		defend 
+			armor - block 
+		...
+	
+map 
+	trigger new events on enter 
+	default fog of war is no image 
+	line between map squares 
+	fill in squares as they become unlocked  
+
+
+character
+	one type 
+	images .. 
+	
+	character screen
+		3 cards 
+		select boxes .. 
+		fisher net 
+
+===
+scenes 
+	backgrounds ... 
+	music ... 
+	
+===
+set encounter frequency by biome
+	eg. town has 10% battle
+
+update routing by biome 
+	player is not 
+	create an "connector" image on world map 
+
+
+==
+
+update map generator and world map so that the map is only generated once, and unique per run
+make sure the player location is updated even when there is no event in the room
+
+
+
+===
+
+create icons - 80x80
+
+	home
+	battle
+	shop
+	rest
+	event
+	boss
+	mystery		
+
+==
+
+create images - 180x180
+
+	forest		Overgrown, greens, woods.
+	ice_caves	Frozen, blues, crystals.
+	desert		Sandy, yellow, ruins.
+	swamp		Murky, dark greens, water.
+	abyss		Deep cave, dark purple/grey.
+	void		Cosmic, black, ethereal.
+	the_core	
+
+
+	forest_battle_0.png
+	ice_caves_shop_12.png
+	void_event_29.png
+	..
+	
+== 
+
+create character 
+
+	res://assets/character/base.png
+
+
+==
+create icons 
+
+	180x180 
+	
+	
+===
+create player / NPCs 
+	
+	10 NPCs per biome 
+	gif / image per NPC
+
+===
+
+* highlight player location - focus on player when loading map, moving 
+* map - change canvas to player  
+
+* on pressing exit, load menu 
+	in game menu, include 
+	* "save and exit" -> dialog box confirming saved 
+	* "abandon run" -> are you sure? 
+
+* on loss - restart at home. 
+* save/load - delete save 
+	
+
+scenes
+	runsummary -- wake up at home
+	wincondition -- on fighting last boss...
+	
+map 
+	show player location, focus on player centre 
+	hide nodes / paths 
+	update icons based on visibility 
+
+assets | cards 
+	improve look and feel to match memoria 
+	simple back / icons 
+	smaller viewport 
+
+improve UI for character selection etc.. 
+
+
+===== 
+
+implement basic flow from memoria 
+
+map movement 
+
+	home -> safe 
+		
+	safe -> 
+		fight 
+		shop 
+		...
+	
+	death -> revive loop 
+	
+	graphic 
+		player
+		enemy		
+		cards -> simple icons 
+		backgrounds 
+
+	stats -> armour 
+	cards -> 
+		base set 
+			attack 
+			heal 
+			armour 
+			trap 
+		
+		discover new 
+		tailor deck 
+		**always require the max(8, max_cards) in deck 
+			9 - 4
+			16 - 8 
+			25 - 12 
+
+	game -> loop
+		when no player cards remain unflipped (i.e. only debuff cards remain), reshuffle the remaining cards and start again 
+
+==
+in world map, update to create a player home, which links to the bottom centre 
+highlight the current circle that the player is on 
+allow the player to move to connected nodes 
+implement a fog of war, so that player cannot see connections of nodes not visited  
+
+==
+implement class specific functions in battle 
+	librarian
+	athlete 
+	...
+	
+== 
+in main menu, selecting full screen should apply changes immediately 
+
+=== 
+update battlescene so that top of page to a 2d, side on "environment" with your character and enemy character(s) facing each other, with HP on top of character  
+
+introduce concept of dialogue before battle, and dialog options   
+
+introduce game state variables, such that completing a room previously may change the room next time based on game state 
+
+==
+create a json structure for dialog
+create a json structure for room behaviour, based on game state 
+
+===
+create a character screen that shows player, cards in deck
+	introduce concept of player deck 
+	show all cards face up 
+	add dictionary ... 
+
+=== 
+update map to show current location with player icon 
+
+==
+add "flee" to combat 
+	track last node visited 
+	return character to last node 
+
+==
+add game progress state. eg. 
+
+	Characters
+		NPC-name
+		* interacted = true 
+		* win = 1, 2, 3 ...
+		* loss = 0, 1...
+	
+	Map 
+		map-name
+		biome-name
+		* visited = 
+
+== 
+add button to battlescene for development 
+	"win" - ie. finish combat  

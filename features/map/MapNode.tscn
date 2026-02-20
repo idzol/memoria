@@ -1,0 +1,110 @@
+[gd_scene format=3 uid="uid://dm5v8f6r7p2m1"]
+
+[ext_resource type="Theme" uid="uid://cy1tv88ir10yq" path="res://assets/themes/Greek.theme" id="1_0mxky"]
+[ext_resource type="Script" uid="uid://bvvqa1rwvgp66" path="res://features/map/MapNode.gd" id="1_node_script"]
+[ext_resource type="Texture2D" uid="uid://jmx1v3gsoay3" path="res://assets/maps/default.png" id="2_default_bg"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_node"]
+draw_center = false
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.08)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_player"]
+bg_color = Color(0.4, 0.8, 1, 1)
+shadow_size = 4
+
+[node name="MapNode" type="Control" unique_id=1823068739]
+custom_minimum_size = Vector2(180, 180)
+layout_mode = 3
+anchors_preset = 0
+offset_left = -90.0
+offset_top = -90.0
+offset_right = 90.0
+offset_bottom = 90.0
+theme = ExtResource("1_0mxky")
+script = ExtResource("1_node_script")
+
+[node name="RoomBackground" type="TextureRect" parent="." unique_id=436098552]
+unique_name_in_owner = true
+clip_children = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_default_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Icon" type="TextureRect" parent="RoomBackground" unique_id=587746993]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -40.0
+offset_top = -40.0
+offset_right = 40.0
+offset_bottom = 40.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Border" type="Panel" parent="." unique_id=812506486]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_node")
+
+[node name="Button" type="Button" parent="." unique_id=405668311]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+flat = true
+
+[node name="PlayerIcon" type="Panel" parent="." unique_id=1674657408]
+unique_name_in_owner = true
+visible = false
+z_index = 5
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -40.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = 40.0
+grow_horizontal = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_player")
+
+[node name="Label" type="Label" parent="PlayerIcon" unique_id=1234457914]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 16
+text = "P"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

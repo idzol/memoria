@@ -1,0 +1,102 @@
+[gd_scene format=3 uid="uid://dm5v8f6r7p2m7"]
+
+[ext_resource type="Script" uid="uid://cm6tt42v0cuyj" path="res://features/ui/CharacterSelect.gd" id="1_char_script"]
+[ext_resource type="Theme" uid="uid://cy1tv88ir10yq" path="res://assets/themes/Greek.theme" id="1_ry8kw"]
+
+[node name="CharacterSelect" type="Control" unique_id=1895431058]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_ry8kw")
+script = ExtResource("1_char_script")
+
+[node name="BG" type="ColorRect" parent="." unique_id=2086975984]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.05, 0.07, 1)
+
+[node name="VBox" type="VBoxContainer" parent="." unique_id=31710173]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="Title" type="Label" parent="VBox" unique_id=2132393660]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "SELECT YOUR MEMORY"
+horizontal_alignment = 1
+
+[node name="HBox" type="HBoxContainer" parent="VBox" unique_id=407307275]
+layout_mode = 2
+theme_override_constants/separation = 50
+alignment = 1
+
+[node name="Archivist" type="VBoxContainer" parent="VBox/HBox" unique_id=801182517]
+layout_mode = 2
+
+[node name="ArchivistBtn" type="Button" parent="VBox/HBox/Archivist" unique_id=1866548950]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+text = "📜
+ARCHIVIST"
+
+[node name="Desc" type="Label" parent="VBox/HBox/Archivist" unique_id=1762892482]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "Passively remembers the last 4 cards flipped."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Berserker" type="VBoxContainer" parent="VBox/HBox" unique_id=587049678]
+layout_mode = 2
+
+[node name="BerserkerBtn" type="Button" parent="VBox/HBox/Berserker" unique_id=902637578]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+text = "🪓
+BERSERKER"
+
+[node name="Desc" type="Label" parent="VBox/HBox/Berserker" unique_id=1717599408]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "Matches 'crack' adjacent cards, partially revealing them."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Illusionist" type="VBoxContainer" parent="VBox/HBox" unique_id=1344010620]
+layout_mode = 2
+
+[node name="IllusionistBtn" type="Button" parent="VBox/HBox/Illusionist" unique_id=1494849695]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+text = "🎭
+ILLUSIONIST"
+
+[node name="Desc" type="Label" parent="VBox/HBox/Illusionist" unique_id=1282510652]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "Swaps card positions to confuse and conquer."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="BackBtn" type="Button" parent="VBox" unique_id=181385995]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "BACK"

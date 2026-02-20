@@ -1,0 +1,84 @@
+[gd_scene format=3 uid="uid://ojufy0fup6hb"]
+
+[ext_resource type="Theme" uid="uid://cy1tv88ir10yq" path="res://assets/themes/Greek.theme" id="1_ecjwd"]
+[ext_resource type="Script" uid="uid://dbrsx3v5qfpl3" path="res://features/map/WorldMapUI.gd" id="1_map_ui"]
+[ext_resource type="PackedScene" uid="uid://cgrp3t6npnm06" path="res://features/ui/CardDiscoveryPopup.tscn" id="2_discovery"]
+
+[node name="WorldMap" type="Control" unique_id=1276611377]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_ecjwd")
+script = ExtResource("1_map_ui")
+
+[node name="MapBackground" type="TextureRect" parent="." unique_id=1570674147]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="ScrollContainer" type="ScrollContainer" parent="." unique_id=1828626332]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 3
+vertical_scroll_mode = 2
+
+[node name="MapContent" type="Control" parent="ScrollContainer" unique_id=156022919]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(1280, 4000)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Lines" type="Node2D" parent="ScrollContainer/MapContent" unique_id=953077382]
+unique_name_in_owner = true
+position = Vector2(640, 3800)
+
+[node name="Nodes" type="Node2D" parent="ScrollContainer/MapContent" unique_id=700428005]
+unique_name_in_owner = true
+position = Vector2(640, 3800)
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=418913051]
+
+[node name="MarginContainer" type="MarginContainer" parent="HUD" unique_id=870140885]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="HUD/MarginContainer" unique_id=1698175815]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="TopHBox" type="HBoxContainer" parent="HUD/MarginContainer/VBox" unique_id=1720321095]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="AvatarButton" type="Button" parent="HUD/MarginContainer/VBox/TopHBox" unique_id=333596579]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "👤"
+
+[node name="DiscoveryOverlay" parent="HUD" unique_id=529656252 instance=ExtResource("2_discovery")]
+unique_name_in_owner = true
+visible = false

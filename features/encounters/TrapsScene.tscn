@@ -1,0 +1,123 @@
+[gd_scene format=3 uid="uid://d3y2p5l8q1laj"]
+
+[ext_resource type="Script" uid="uid://bs2bkxdpwl2jl" path="res://features/encounters/TrapScene.gd" id="1_trap_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stage"]
+bg_color = Color(0.1, 0.08, 0.08, 1)
+border_width_bottom = 4
+border_color = Color(0.3, 0.15, 0.15, 1)
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[node name="TrapScene" type="Node2D" unique_id=614421700]
+script = ExtResource("1_trap_script")
+
+[node name="Background" type="ColorRect" parent="." unique_id=2030645382]
+offset_right = 1152.0
+offset_bottom = 648.0
+color = Color(0.05, 0.02, 0.02, 1)
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=1903272393]
+
+[node name="SafeZone" type="MarginContainer" parent="UI" unique_id=508048733]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 30
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 30
+
+[node name="MainLayout" type="VBoxContainer" parent="UI/SafeZone" unique_id=1775623678]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="TopHalf_Environment" type="PanelContainer" parent="UI/SafeZone/MainLayout" unique_id=2128749275]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_stage")
+
+[node name="HBox" type="HBoxContainer" parent="UI/SafeZone/MainLayout/TopHalf_Environment" unique_id=809979877]
+layout_mode = 2
+alignment = 1
+
+[node name="PlayerPortrait" type="VBoxContainer" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox" unique_id=1513866057]
+layout_mode = 2
+alignment = 2
+
+[node name="PlayerHP" type="Label" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/PlayerPortrait" unique_id=1454661514]
+unique_name_in_owner = true
+layout_mode = 2
+text = "HP: 100/100"
+horizontal_alignment = 1
+
+[node name="Box" type="Panel" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/PlayerPortrait" unique_id=1930028594]
+custom_minimum_size = Vector2(140, 160)
+layout_mode = 2
+
+[node name="PlayerPortraitSprite" type="TextureRect" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/PlayerPortrait/Box" unique_id=21274028]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PlayerFlash" type="ColorRect" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/PlayerPortrait/Box" unique_id=99940670]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 1, 1, 0)
+
+[node name="TrapStatus" type="VBoxContainer" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox" unique_id=2031761925]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+alignment = 1
+
+[node name="StatusLabel" type="Label" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/TrapStatus" unique_id=44815934]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
+text = "DANGER LEVEL: HIGH"
+horizontal_alignment = 1
+
+[node name="ProgressLabel" type="Label" parent="UI/SafeZone/MainLayout/TopHalf_Environment/HBox/TrapStatus" unique_id=1373704715]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Escapes Found: 0/2"
+horizontal_alignment = 1
+
+[node name="BottomHalf_Split" type="HBoxContainer" parent="UI/SafeZone/MainLayout" unique_id=73549179]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 1.5
+theme_override_constants/separation = 20
+
+[node name="LogSection" type="VBoxContainer" parent="UI/SafeZone/MainLayout/BottomHalf_Split" unique_id=1700030798]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LogBoxScroll" type="ScrollContainer" parent="UI/SafeZone/MainLayout/BottomHalf_Split/LogSection" unique_id=959660349]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LogBox" type="VBoxContainer" parent="UI/SafeZone/MainLayout/BottomHalf_Split/LogSection/LogBoxScroll" unique_id=1928076905]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="GridContainer" type="GridContainer" parent="UI/SafeZone/MainLayout/BottomHalf_Split" unique_id=402414568]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+columns = 2
