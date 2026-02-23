@@ -1,14 +1,63 @@
 
+comfyui workflow 
+	random increment 
 
+assets 
+	complete / audit all
+	use csv format ..
+		group by type [enemy / NPC]
+			talk
+			interact 
 		
-=== 
+	autosort to processed_{type}
+	select best ... 
 
-	Nurse - lets get care (LGC) 
-		Finances 
+
+scene selector 
+	1x combat - make sure combat scene is loading the correct enemy and default 
+	1x event - make sure event is loading correct NPC ...
+
+debugmap
+	show all map icons 
+	click on map to enter scene drilldown, with relevant information 
 	
-	LGC .. 
-		three carers 
+debugscene 
+	show all scene icons 
+	click on scene to test scene with default character 
 
+debugcards 
+	show call cards 
+	click .. 
+
+mapgenerator 
+	set fixed path 
+	set random path 
+
+===
+
+cd 
+
+
+	high quality 2d image to add idle motion, output a sprite sheet
+
+	Run 
+	
+	for *png in C:\Users\pkubi\production\memoria\image\NPC
+	
+	create video with prompt 
+		localhost:8188 
+		
+		{action} 
+			"idle" 
+			"attack"
+			"defend" 
+
+		{positive_prompt} 
+		
+		
+	export 
+		{name}_{action} 
+	
 ===
 
 cd C:\Users\pkubi\ComfyUI

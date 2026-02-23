@@ -1,0 +1,29 @@
+{
+	"hp": 100,
+	"gold": 50,
+	"level": 1,
+	"class": "Archivist",
+	"inventory": [
+		"sword",
+		"shield",
+		"heart",
+		"trap",
+		"scroll"
+	],
+	"world_state": {
+		"global": {
+			"tutorial_completed": false,
+			"difficulty_modifier": 1.0,
+			"game_version": "0.1.0-alpha"
+		},
+		"quests": {
+			"mayor_intro_met": false,
+			"slime_menace_count": 0
+		},
+		"unlocks": {
+			"infinite_mode": false,
+			"secret_biome_discovered": false
+		},
+		"rooms": {}
+	}
+}
