@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://data/resources/ItemData.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/items/full/the_ark_of_danae.png" id="2_image"]
+[ext_resource type="Texture2D" path="res://assets/items/icons/the_ark_of_danae.png" id="3_icon"]
+
+[resource]
+script = ExtResource("1_script")
+item_id = "the_ark_of_danae"
+name = "The Ark of Danae"
+type = "Utility"
+level = 7
+hp = 20
+attack = 0
+armour = 10
+effect = "Protect"
+description = "A weathered cedar chest with rusted iron bands."
+ai_prompt = "Cinematic dark fantasy: Weathered cedar chest, rusted iron bands, carvings of golden rain revealed beneath layers of rot."
+item_image = ExtResource("2_image")
+item_icon = ExtResource("3_icon")

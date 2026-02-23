@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://i3k1cgpo8xyb"]
+
+[ext_resource type="Script" uid="uid://bptlby27602wu" path="res://test/DebugPlayer.gd" id="1_logic"]
+
+[node name="DebugCharacter" type="Control" unique_id=309980120]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_logic")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=538045856]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.05, 0.07, 1)
+
+[node name="Scroll" type="ScrollContainer" parent="." unique_id=510595883]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PlayerList" type="VBoxContainer" parent="Scroll" unique_id=1174742983]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 40

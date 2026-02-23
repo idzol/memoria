@@ -17,6 +17,15 @@ scene selector
 	1x combat - make sure combat scene is loading the correct enemy and default 
 	1x event - make sure event is loading correct NPC ...
 
+
+debugcharacter
+	show all character 
+	click on character to see in character scene
+
+debugitems	
+	show all items 
+	...
+
 debugmap
 	show all map icons 
 	click on map to enter scene drilldown, with relevant information 
@@ -26,8 +35,8 @@ debugscene
 	click on scene to test scene with default character 
 
 debugcards 
-	show call cards 
-	click .. 
+	show all cards | icons | sounds 
+	click on card  
 
 mapgenerator 
 	set fixed path 

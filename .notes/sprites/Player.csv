@@ -1,0 +1,6 @@
+ID,Type,Class,Stage,Description
+archivist_base,PLAYER,Archivist,base,Simple traveler's robes. Limited memory outlines.
+archivist_leather,PLAYER,Archivist,leather,Reinforced bindings. 2nd Ghost outline unlocked.
+archivist_armour,PLAYER,Archivist,armour,Inscribed plate. All ghost outlines are permanent.
+archivist_gold,PLAYER,Archivist,gold,Gilded relic armor. Icons pulse when matched.
+archivist_final,PLAYER,Archivist,final,Transcended Form. Seeing the future... and the past.

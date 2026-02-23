@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="RoomData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://data/resources/RoomData.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/room/desert/desert_abandoned_bazaar_map.png" id="2_icon"]
+[ext_resource type="Texture2D" path="res://assets/room/desert/desert_abandoned_bazaar_scene.png" id="3_bg"]
+
+[resource]
+script = ExtResource("1_script")
+room_name = "Abandoned Bazaar"
+type = "battle"
+biome = "desert"
+initial_dialog = "Tattered silks flap in the dry wind."
+dialog_tree_id = ""
+enemy_id = "thief_shade"
+npc_id = ""
+difficulty_override = -1
+loot_list = ["coin"]
+map_icon = ExtResource("2_icon")
+background_texture = ExtResource("3_bg")
+music_track = "battle_theme"

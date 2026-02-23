@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://data/resources/ItemData.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/items/full/void_essence.png" id="2_image"]
+[ext_resource type="Texture2D" path="res://assets/items/icons/void_essence.png" id="3_icon"]
+
+[resource]
+script = ExtResource("1_script")
+item_id = "void_essence"
+name = "Void Essence"
+type = "Material"
+level = 5
+hp = 0
+attack = 28
+armour = 0
+effect = "Curse"
+description = "Pure darkness from the abyss."
+ai_prompt = "Cinematic dark fantasy: A floating orb of crackling violet energy and shadow."
+item_image = ExtResource("2_image")
+item_icon = ExtResource("3_icon")

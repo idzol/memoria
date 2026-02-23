@@ -1,0 +1,157 @@
+ID,UID,Name,Type,Level,HP,Attack,Armour,Effect,Description,AI_Image_Prompt
+wood_splinter,item_101,Wood Splinter,Material,1,0,1,0,None,A tiny sharp fragment of wood.,Cinematic dark fantasy: A jagged splinter of dark wood on a stone surface.
+mug_of_ale,item_102,Mug of Ale,Consumable,1,5,0,0,Tipsy,A frothy mug of village ale.,Cinematic dark fantasy: A wooden mug overflowing with amber ale in a dimly lit tavern.
+iron_scrap,item_103,Iron Scrap,Material,1,0,0,2,None,Rusted bits of discarded iron.,Cinematic dark fantasy: A pile of rusted iron shards and bent nails.
+lockpick,item_104,Lockpick,Utility,1,0,0,0,Open,A set of slender tools for bypassing locks.,Cinematic dark fantasy: A leather roll containing various slim iron picks and a tension wrench.
+vine,item_105,Vine,Utility,1,0,2,0,Binds,"A length of sturdy, thorny forest vine.","Cinematic dark fantasy: A coil of green vine with long, sharp black thorns."
+ash_pile,item_106,Ash Pile,Material,1,0,0,0,Dust,The remains of a forgotten sacrifice.,"Cinematic dark fantasy: A grey heap of ash containing small, charred bone fragments."
+wooden_flute,item_107,Wooden Flute,Utility,1,0,0,0,Calm,A simple instrument for lonely nights.,Cinematic dark fantasy: A polished dark wood pipe with small silver rings.
+clover,item_108,Clover,Utility,1,0,0,0,Fortune,A rare four-leafed plant.,Cinematic dark fantasy: A single green plant pressed inside a tiny glass frame.
+firewood,item_109,Firewood,Utility,1,0,0,0,Warmth,Logs ready for a campfire.,"Cinematic dark fantasy: A bundle of dry, split timber tied with a hemp rope."
+chisel,item_110,Chisel,Weapon,1,0,5,0,Precision,A tool for carving stone or bone.,"Cinematic dark fantasy: A short iron rod with a flat, razor-sharp edge."
+stolen_lunch,item_111,Stolen Lunch,Consumable,2,15,0,0,Heal,A wrapped bundle of cheese and bread.,Cinematic dark fantasy: A cloth-wrapped bundle of rustic food.
+heavy_boots,item_112,Heavy Boots,Armour,2,0,2,8,Weight,Thick leather boots with iron soles.,Cinematic dark fantasy: Rugged mud-stained leather boots with heavy metal reinforcements.
+tax_form,item_113,Tax Form,Trap,2,0,0,0,Drain,A heavy parchment filled with bureaucratic demands.,Cinematic dark fantasy: A weathered scroll with official red wax seals and endless ink scribbles.
+skull,item_114,Skull,Material,2,0,4,0,Terror,A bleached human skull etched with runes.,"Cinematic dark fantasy: A hollow white skull sitting on dark velvet, eye sockets glowing faintly."
+honey,item_115,Honey,Consumable,2,10,0,0,Stick,"Thick, golden honey from wild hives.","Cinematic dark fantasy: A clay jar dripping with viscous, glowing amber honey."
+ember,item_116,Ember,Material,2,0,5,0,Ignite,A glowing coal that never fades.,Cinematic dark fantasy: A single red spark hovering inside a protective iron cage.
+blanket,item_117,Blanket,Utility,2,5,0,0,Rest,A thick wool cover for sleeping.,"Cinematic dark fantasy: A heavy, grey fabric roll stained with dirt and travel."
+shadow_essence,item_118,Shadow Essence,Material,3,0,12,0,Fear,A swirling cloud of dark energy.,Cinematic dark fantasy: A glass vial containing a swirling black mist that seems to consume light.
+emerald_seed,item_119,Emerald Seed,Material,3,0,0,0,Growth,A gem that pulses with nature.,Cinematic dark fantasy: A vibrant green seed-shaped emerald glowing with vine-like patterns.
+oak_staff,item_120,Oak Staff,Weapon,3,0,14,2,Magic,A sturdy branch of ancient oak.,Cinematic dark fantasy: A gnarled oak staff topped with a dim blue crystal.
+emerald_seed,item_121,Emerald Seed,Material,3,0,0,0,Regen,A pulsing green gem that feels alive.,"Cinematic dark fantasy: A faceted emerald in the shape of a seed, emitting a soft green aura."
+pearl,item_122,Pearl,Material,3,0,0,0,Focus,A lustrous sea pearl containing deep echoes.,"Cinematic dark fantasy: A giant white pearl resting inside a jagged, salt-encrusted oyster shell."
+silk,item_123,Silk,Material,3,0,0,5,Soft,"Strong, shimmering threads from a giant spider.",Cinematic dark fantasy: A spool of silver-white silk that catches the light like liquid metal.
+frost,item_124,Frost,Material,3,0,10,0,Freeze,A crystal of permanent ice that never melts.,Cinematic dark fantasy: A jagged shard of blue ice surrounded by a constant mist of cold.
+ancient_coin,item_125,Ancient Coin,Treasure,3,0,0,0,Luck,A tarnished gold coin from a fallen empire.,"Cinematic dark fantasy: A heavy coin with a hole in the center, depicting a faceless king."
+trap,item_126,Trap,Trap,3,0,15,0,Damage,A concealed pressure plate with rusted spikes.,"Cinematic dark fantasy: A stone slab slightly raised from the floor, hiding mechanical iron jaws."
+ore,item_127,Ore,Material,3,0,0,10,Tough,Raw iron ore flecked with strange minerals.,Cinematic dark fantasy: A chunk of dark rock with veins of glowing orange metal.
+poison_gland,item_128,Poison Gland,Material,3,0,15,0,Toxin,A swollen organ harvested from a venomous creature.,"Cinematic dark fantasy: A pulsating, translucent sac filled with bright green fluid."
+golden_bandage,item_129,Golden Bandage,Consumable,3,40,0,0,Mend,A silk bandage woven with gold threads.,Cinematic dark fantasy: A roll of fine white fabric shimmering with gold embroidery.
+sand_glass,item_130,Sand Glass,Utility,3,0,0,0,Slow,An hourglass filled with shifting desert sand.,Cinematic dark fantasy: An ornate brass hourglass where the sand flows upwards.
+carapace,item_131,Carapace,Armour,3,0,0,12,Hard,The outer shell of a giant desert beetle.,"Cinematic dark fantasy: A curved plate of iridescent black chitin, incredibly light but strong."
+rotten_flesh,item_132,Rotten Flesh,Trap,3,0,0,0,Sickness,Decaying meat that attracts flies and disease.,"Cinematic dark fantasy: A pile of grey, dripping meat crawling with necro-parasites."
+salt_crystal,item_133,Salt Crystal,Material,3,0,0,5,Pure,A large cube of translucent rock salt.,Cinematic dark fantasy: A jagged white crystal that hums with a faint purifying energy.
+glass_shard,item_134,Glass Shard,Weapon,3,0,12,0,Bleed,A jagged piece of volcanic glass.,"Cinematic dark fantasy: A long, razor-sharp sliver of obsidian reflecting a blood-red light."
+peat,item_135,Peat,Material,3,0,0,0,Fuel,Dried swamp earth that burns slowly.,"Cinematic dark fantasy: A dense, dark brick of compressed moss and soil."
+light_dust,item_136,Light Dust,Material,3,0,0,0,Blind,Sparkling powder from a light-sprite.,Cinematic dark fantasy: A small pouch leaking brilliant white particles that float upwards.
+vapor,item_137,Vapor,Material,3,0,0,0,Mist,A bottled cloud of ethereal gas.,Cinematic dark fantasy: A glass orb filled with swirling violet smoke.
+blood_vial,item_138,Blood Vial,Material,3,0,5,0,Sanguine,A vial of concentrated essence.,"Cinematic dark fantasy: A crystal vial filled with thick, dark red liquid that never settles."
+rusty_nail,item_139,Rusty Nail,Weapon,3,0,6,0,Infection,"A long, bent iron nail covered in grime.",Cinematic dark fantasy: A corroded iron spike resting on a bed of old bandages.
+slime,item_140,Slime,Material,3,0,0,0,Sticky,Gooey residue from a dungeon crawler.,Cinematic dark fantasy: A dollop of neon green sludge that slowly dissolves wood.
+proboscis,item_141,Proboscis,Weapon,3,0,10,0,Drain,The hollow needle-beak of a giant mosquito.,"Cinematic dark fantasy: A long, serrated chitinous tube dripping with dark fluid."
+venom_vial,item_142,Venom Vial,Consumable,4,0,18,0,Poison,Potent toxin from a forest beast.,Cinematic dark fantasy: A small vial filled with viscous glowing purple liquid.
+scimitar,item_143,Scimitar,Weapon,4,0,22,0,Quick,A curved blade from the dunes.,Cinematic dark fantasy: A sharp curved scimitar with an obsidian hilt and gold filigree.
+brass_helmet,item_144,Brass Helmet,Armour,4,0,0,15,Protect,A shining brass headpiece.,Cinematic dark fantasy: A polished brass helmet with a red horsehair crest.
+heavy_iron,item_145,Heavy Iron,Armour,4,0,0,20,Sturdy,Unrefined blocks of dense metal.,"Cinematic dark fantasy: Overlapping plates of crude, dark iron hammered together."
+neon_ink,item_146,Neon Ink,Material,4,0,0,0,Glow,Glowing fluid extracted from deep-sea creatures.,Cinematic dark fantasy: A jar of ink that illuminates the shadows with a ghostly blue light.
+gold_doubloon,item_147,Gold Doubloon,Treasure,4,0,0,0,Greed,A heavy gold coin with a pirate's curse.,Cinematic dark fantasy: A scratched gold coin showing a skull wearing a crown.
+whale_oil,item_148,Whale Oil,Utility,4,0,0,0,Burn,"Refined fat that burns with a hot, blue flame.","Cinematic dark fantasy: A sealed ceramic jug with a wick, smelling of the deep sea."
+sulfur,item_149,Sulfur,Material,4,0,8,0,Explode,Yellow mineral that smells of brimstone.,Cinematic dark fantasy: A pile of bright yellow powder with small crackling embers.
+echo_essence,item_150,Echo Essence,Material,4,0,0,0,Recall,The captured sound of a dying shout.,Cinematic dark fantasy: A swirling blue mist inside a bottle that vibrates constantly.
+biolamp,item_151,Biolamp,Utility,4,0,0,0,Vision,A living lantern containing glowing moss.,Cinematic dark fantasy: A glass cage with a cluster of luminescent green mushrooms.
+electric_gel,item_152,Electric Gel,Material,4,0,15,0,Shock,Pulsing jelly from an abyssal eel.,Cinematic dark fantasy: A glob of translucent blue slime with visible lightning arcs.
+trident_tip,item_153,Trident Tip,Weapon,4,0,18,0,Pierce,The broken prong of a sea-god's weapon.,Cinematic dark fantasy: A jagged bronze spike covered in barnacles and sea-salt.
+ocean_tear,item_154,Ocean Tear,Treasure,4,0,0,0,Depth,A sapphire that contains the weight of the sea.,Cinematic dark fantasy: A deep blue gemstone that drips water even when dry.
+sulfur_dust,item_155,Sulfur Dust,Material,4,0,12,0,Boom,Highly reactive yellow powder.,Cinematic dark fantasy: A spilled pouch of yellow dust with small puffs of smoke.
+sharpened_blades,item_156,Sharpened Blades,Utility,4,0,10,0,Slay,A kit for maintaining weapon edges.,"Cinematic dark fantasy: A leather roll with whetstones, oil, and various polishing cloths."
+town_seal,item_157,Town Seal,Utility,4,0,0,0,Authority,A wax stamp used for official business.,Cinematic dark fantasy: A heavy gold signet with a crest depicting a walled city.
+holy_water,item_158,Holy Water,Consumable,4,30,0,0,Purify,Water blessed by a high priest.,"Cinematic dark fantasy: A crystal flask containing glowing, silver-flecked liquid."
+old_map,item_159,Old Map,Utility,4,0,0,0,Guide,A parchment showing hidden dungeon paths.,Cinematic dark fantasy: A yellowed scroll with hand-drawn ink and blood stains.
+iron_shield,item_160,Iron Shield,Shield,4,0,0,15,Block,A standard-issue soldier's shield.,Cinematic dark fantasy: A heavy rectangular shield with a central iron boss.
+strange_coin,item_161,Strange Coin,Treasure,4,0,0,0,Mystery,A coin with symbols from no known nation.,Cinematic dark fantasy: A black metal coin that feels warm to the touch.
+moon_essence,item_162,Moon Essence,Material,4,0,0,0,Night,Captured light from a full moon.,Cinematic dark fantasy: A bottle filled with liquid silver that glows softly.
+healing_herb,item_163,Healing Herb,Consumable,4,20,0,0,Heal,Wild leaves with medicinal properties.,Cinematic dark fantasy: A bundle of dried green leaves tied with a leather cord.
+poison_ivy,item_164,Poison Ivy,Trap,4,0,0,0,Itch,Vines that cause painful rashes and fever.,"Cinematic dark fantasy: A cluster of shiny green leaves with red, pulsating veins."
+hand_axe,item_165,Hand Axe,Weapon,4,0,15,0,Cleave,"A small, balanced axe for throwing or chopping.","Cinematic dark fantasy: A short wooden handle with a heavy, crescent-shaped iron blade."
+arrow_bundle,item_166,Arrow Bundle,Weapon,4,0,12,0,Ranged,"A quiver of sharp, fletched arrows.",Cinematic dark fantasy: A leather quiver filled with arrows tipped in obsidian.
+lucky_rabbit_foot,item_167,Lucky Rabbit Foot,Utility,4,0,0,0,Luck,A charm that wards off misfortune.,"Cinematic dark fantasy: A small, soft white paw on a silver chain."
+fairy_dust,item_168,Fairy Dust,Material,4,0,0,0,Magic,Sparkling powder from the fey wild.,Cinematic dark fantasy: A glowing pouch that leaks rainbow-colored light.
+dried_meat,item_169,Dried Meat,Consumable,4,15,0,0,Restore,Salty rations for long journeys.,"Cinematic dark fantasy: Strips of dark, cured meat wrapped in parchment."
+old_compass,item_170,Old Compass,Utility,4,0,0,0,Path,A navigation tool that flickers in magic fields.,Cinematic dark fantasy: A brass pocket-watch case containing a spinning needle.
+giant_club,item_171,Giant Club,Weapon,4,0,25,0,Smash,A massive tree limb used as a bludgeon.,Cinematic dark fantasy: A gnarled wood trunk studded with rusted iron spikes.
+ice_shard,item_172,Ice Shard,Weapon,4,0,18,0,Chill,A projectile made of eternal frost.,Cinematic dark fantasy: A floating icicle that radiates a constant freezing aura.
+climbing_pick,item_173,Climbing Pick,Utility,4,0,8,0,Scale,A tool for ascending steep rock faces.,"Cinematic dark fantasy: A small iron hammer with a curved, sharp beak."
+silver_ore,item_174,Silver Ore,Material,4,0,0,5,Purity,Rare metal that harms the undead.,Cinematic dark fantasy: A rock with shining silver veins that pulse with white light.
+waterskin,item_175,Waterskin,Consumable,4,10,0,0,Hydrate,A leather bag for carrying fresh water.,Cinematic dark fantasy: A swollen animal-hide bag with a wooden stopper.
+magnifying_glass,item_176,Magnifying Glass,Utility,4,0,0,0,Search,A lens for inspecting fine details.,Cinematic dark fantasy: A thick glass circle held in an ornate bronze frame.
+silk_sail,item_177,Silk Sail,Utility,4,0,0,0,Swift,Lightweight fabric for fast travel.,Cinematic dark fantasy: A massive sheet of shimmering white silk catching the wind.
+jar_of_teeth,item_178,Jar of Teeth,Material,4,0,12,0,Bite,A collection of fangs from various monsters.,Cinematic dark fantasy: A glass jar filled with yellowed teeth that occasionally rattle.
+witch_brew,item_179,Witch Brew,Consumable,4,25,0,0,Random,A bubbling cauldron of unknown effects.,"Cinematic dark fantasy: A wooden bowl filled with a thick, purple soup emitting green sparks."
+catfish,item_180,Catfish,Consumable,4,8,0,0,Slippery,A muddy fish found in dungeon ponds.,"Cinematic dark fantasy: A large, grey fish covered in thick, iridescent slime."
+lily_pad_shield,item_181,Lily Pad Shield,Shield,4,0,0,8,Float,A dried plant that is surprisingly tough.,"Cinematic dark fantasy: A massive, circular green leaf reinforced with leather straps."
+moss_cloak,item_182,Moss Cloak,Armour,4,0,0,10,Camouflage,A mantle woven from living forest moss.,Cinematic dark fantasy: A green-and-brown cloak that seems to blend into the shadows.
+banjo,item_183,Banjo,Utility,4,0,0,0,Music,A stringed instrument for upbeat tunes.,Cinematic dark fantasy: A circular wooden body with a stretched skin and five strings.
+rusty_medal,item_184,Rusty Medal,Treasure,4,0,0,5,Honor,A decoration for a long-dead soldier.,Cinematic dark fantasy: A star-shaped bronze medal hanging from a tattered red ribbon.
+gas_bomb,item_185,Gas Bomb,Weapon,4,0,20,0,Choke,A ceramic pot filled with noxious gas.,Cinematic dark fantasy: A round clay vessel with a lit fuse leaking green smoke.
+sea_shell,item_186,Sea Shell,Treasure,4,0,0,0,Echo,A beautiful spiral from the deep ocean.,Cinematic dark fantasy: A giant pink conch shell that hums with the sound of waves.
+trident,item_187,Trident,Weapon,4,0,22,0,Pierce,A three-pronged spear for fishing or war.,Cinematic dark fantasy: A long wooden shaft topped with a polished steel trident.
+black_pearl,item_188,Black Pearl,Treasure,4,0,0,0,Wealth,A rare gem found only in the deepest trenches.,Cinematic dark fantasy: A perfect black sphere that reflects no light.
+wrench,item_189,Wrench,Utility,4,0,10,0,Fix,A heavy tool for mechanical repairs.,Cinematic dark fantasy: A massive iron tool with adjustable jaws and a long handle.
+kelp_potion,item_190,Kelp Potion,Consumable,4,12,0,0,Amphibian,A brew that allows breathing underwater.,"Cinematic dark fantasy: A green, salty liquid filled with small pieces of seaweed."
+wet_journal,item_191,Wet Journal,Utility,4,0,0,0,History,A book salvaged from a sunken wreck.,Cinematic dark fantasy: A leather-bound volume dripping with salt-water and ink.
+glow_gel,item_192,Glow Gel,Material,4,0,0,0,Luminescent,"A jar of thick, glowing jelly.",Cinematic dark fantasy: A glass jar filled with neon blue goo that lights up the dark.
+void_essence,item_193,Void Essence,Material,5,0,28,0,Curse,Pure darkness from the abyss.,Cinematic dark fantasy: A floating orb of crackling violet energy and shadow.
+naga_scale,item_194,Naga Scale,Material,5,5,0,18,Water,A shimmering iridescent scale.,Cinematic dark fantasy: A large sapphire-colored scale with a pearlescent sheen.
+echo_blade,item_195,Echo Blade,Weapon,5,0,26,0,Double,A sword that vibrates when swung.,Cinematic dark fantasy: A translucent blue blade that leaves after-images behind it.
+void_scroll,item_196,Void Scroll,Material,5,0,25,0,Erase,Parchment that consumes any ink written on it.,Cinematic dark fantasy: A roll of black paper that seems to absorb all nearby light.
+mind_essence,item_197,Mind Essence,Material,5,0,0,0,Focus,The psychic residue of a scholar.,Cinematic dark fantasy: A floating pink nebula contained within a silver headpiece.
+master_key,item_198,Master Key,Utility,5,0,0,0,Universal,A key that shifts its shape to fit any lock.,Cinematic dark fantasy: A liquid metal key that writhes in the user's hand.
+dark_mirror,item_199,Dark Mirror,Utility,5,0,0,0,Reflect,A glass that shows the viewer's darkest fears.,Cinematic dark fantasy: A black hand-mirror with a frame made of twisted bone.
+corrupt_data,item_200,Corrupt Data,Trap,5,0,20,0,Glitch,A fragment of reality that has begun to unravel.,Cinematic dark fantasy: A floating geometric shape that flickers and distorts the air.
+void_shard,item_201,Void Shard,Weapon,5,0,30,0,Annihilate,A sliver of the nothingness between worlds.,Cinematic dark fantasy: A jagged black crystal that leaves a trail of static in the air.
+muffled_tongue,item_202,Muffled Tongue,Utility,5,0,0,0,Silence,A dried tongue that prevents any sound from being made.,"Cinematic dark fantasy: A shriveled grey tongue resting in a small, velvet-lined box."
+fire_shard,item_203,Fire Shard,Material,5,0,20,0,Burn,A stone that remains perpetually on fire.,Cinematic dark fantasy: A glowing red ember that never turns to ash.
+cloud_essence,item_204,Cloud Essence,Material,5,0,0,5,Light,Weightless gas from the highest peaks.,"Cinematic dark fantasy: A glass jar containing a miniature, lightning-filled storm cloud."
+pure_iron,item_205,Pure Iron,Material,5,0,0,25,Unbreakable,Metal refined to its absolute limit.,Cinematic dark fantasy: A bar of silver-white iron that rings like a bell when struck.
+burning_pelt,item_206,Burning Pelt,Armour,5,0,5,15,Heat,A fur cloak that radiates intense warmth.,Cinematic dark fantasy: A thick wolf-skin cloak with embers smoldering at the edges.
+reptile_scale,item_207,Reptile Scale,Material,5,0,0,15,Durable,A single plate from a massive lizard.,"Cinematic dark fantasy: A thick, green-and-black scale as large as a man's head."
+memory_fragment,item_208,Memory Fragment,Utility,5,0,0,0,Past,A shimmering shard of a forgotten thought.,Cinematic dark fantasy: A floating crystalline sliver that shows a different face to everyone.
+broken_watch,item_209,Broken Watch,Treasure,5,0,0,0,Time,A mechanical timepiece that has stopped.,Cinematic dark fantasy: A silver pocket watch with a cracked glass and rusted gears.
+obsidian_plate,item_210,Obsidian Plate,Armour,6,0,0,28,Fireproof,Armour forged from volcanic glass.,Cinematic dark fantasy: A heavy chestplate made of overlapping plates of black volcanic glass.
+singularity,item_211,Singularity,Utility,6,0,100,0,Void,A tiny point of infinite gravity.,Cinematic dark fantasy: A swirling black hole contained within a golden mechanical sphere.
+final_tear,item_212,Final Tear,Consumable,6,100,0,0,Life,The last drop of a dying god.,Cinematic dark fantasy: A single golden droplet hovering in mid-air radiating immense light.
+titan_hammer,item_213,Titan Hammer,Weapon,6,0,45,0,Stun,A hammer far too large for mortals.,Cinematic dark fantasy: A colossal stone hammer engraved with lightning bolts and giant runes.
+molten_core,item_214,Molten Core,Material,6,0,25,0,Burn,The beating heart of a volcano.,Cinematic dark fantasy: A glowing sphere of liquid magma held together by magnetic stones.
+ancient_heart,item_215,Ancient Heart,Material,6,50,0,10,Aura,A heart that still beats after eons.,Cinematic dark fantasy: A massive stone-encrusted heart pulsing with deep red light.
+diamond,item_216,Diamond,Treasure,6,0,0,0,Wealth,A flawless gemstone of immense value.,"Cinematic dark fantasy: A massive, clear diamond that refracts light into rainbows."
+power_cell,item_217,Power Cell,Utility,6,0,0,0,Charge,An ancient device humming with lost energy.,Cinematic dark fantasy: A cylindrical metal tube with glowing blue lines and brass fittings.
+ancient_wisdom,item_218,Ancient Wisdom,Material,6,0,0,0,Mind,Forbidden knowledge from the first age.,Cinematic dark fantasy: A floating brain-like organ made of pure golden light.
+magic_lamp,item_219,Magic Lamp,Utility,6,0,0,0,Wish,A vessel containing a trapped spirit.,Cinematic dark fantasy: An oil lamp made of blackened bronze that hums with power.
+solar_disc,item_220,Solar Disc,Utility,6,0,20,0,Sunlight,A gold plate that reflects the sun's power.,Cinematic dark fantasy: A perfectly circular gold disc that blinds anyone who looks at it.
+royal_signet,item_221,Royal Signet,Treasure,6,0,0,10,Command,A ring that signifies noble blood.,"Cinematic dark fantasy: A heavy gold ring set with a massive, blood-red ruby."
+leech_vial,item_222,Leech Vial,Utility,6,0,10,0,Drain,Medical tools for removing bad blood.,"Cinematic dark fantasy: A glass jar containing several fat, black leeches."
+gold_bar,item_223,Gold Bar,Treasure,6,0,0,0,Fortune,"A solid brick of pure, heavy gold.",Cinematic dark fantasy: A rectangular ingot of gold stamped with a royal seal.
+stardust,item_224,Stardust,Material,6,0,0,0,Celestial,Powdered remains of a fallen star.,Cinematic dark fantasy: A velvet pouch containing sparkling gold and blue sand.
+binary_key,item_225,Binary Key,Utility,6,0,0,0,Digital,A strange artifact with shifting patterns.,Cinematic dark fantasy: A metal cube that pulses with green light and clicking sounds.
+dark_tome,item_226,Dark Tome,Weapon,6,0,35,0,Curse,A book of spells that corrupts the reader.,Cinematic dark fantasy: A heavy volume bound in human skin and locked with iron chains.
+stolen_memory,item_227,Stolen Memory,Utility,6,0,0,0,Secret,A jar containing a voice that isn't yours.,"Cinematic dark fantasy: A glass jar where a faint, ghostly face can be seen whispering."
+lab_notes,item_228,Lab Notes,Utility,6,0,0,0,Experiment,Detailed records of forbidden science.,Cinematic dark fantasy: A stack of papers filled with sketches of monsters and strange formulas.
+magma_ore,item_229,Magma Ore,Material,6,0,0,20,Heat,Rock that contains liquid fire.,"Cinematic dark fantasy: A jagged black stone with veins of glowing, liquid magma."
+steam_gauge,item_230,Steam Gauge,Utility,6,0,0,0,Pressure,A dial for monitoring boiler systems.,Cinematic dark fantasy: A circular brass face with a needle and red warning zones.
+fire_totem,item_231,Fire Totem,Utility,6,0,25,0,Flame,A wooden carving that summons fire.,Cinematic dark fantasy: A charred wooden figure of a phoenix with glowing amber eyes.
+heat_map,item_232,Heat Map,Utility,6,0,0,0,Survey,A parchment that shows thermal signatures.,Cinematic dark fantasy: A glowing orange map with shifting blobs of red and yellow.
+obsidian_statue,item_233,Obsidian Statue,Treasure,6,0,0,25,Heavy,A heavy figure carved from volcanic glass.,Cinematic dark fantasy: A detailed carving of a dragon made of jet-black obsidian.
+heat-wrench,item_234,Heat-Wrench,Utility,6,0,15,0,Forge,A tool designed for high-temperature work.,Cinematic dark fantasy: A glowing red metal tool with an insulated leather handle.
+burning_fan,item_235,Burning Fan,Weapon,6,0,18,0,Wind,A folding fan that throws waves of heat.,Cinematic dark fantasy: An ornate fan made of bronze slats that glow with fire.
+sulfur_gem,item_236,Sulfur Gem,Treasure,6,0,0,0,Boom,A yellow gemstone that is highly unstable.,Cinematic dark fantasy: A faceted yellow crystal that smokes when exposed to air.
+overseer_whip,item_237,Overseer Whip,Weapon,6,0,30,0,Pain,"A long, barbed whip used for control.",Cinematic dark fantasy: A leather whip braided with silver wire and jagged metal hooks.
+the_harpe,item_301,The Harpe,Weapon,7,0,35,0,Bleed,"A curved adamantine sickle-sword, notched and rusted.","Cinematic dark fantasy: A curved adamantine sickle-sword, notched and rusted, leather-wrapped hilt, faint glowing Greek runes."
+the_aegis,item_302,The Aegis,Shield,7,10,0,30,Reflect,A shimmering bronze shield with Medusa's face.,"Cinematic dark fantasy: Polished bronze circular shield, a smoky face of a woman with snakes for hair rippling under the surface."
+the_talaria,item_303,The Talaria,Utility,7,0,0,5,Haste,Winged sandals with golden light.,"Cinematic dark fantasy: Classic Greek sandals with three small wings on each heel, bursting with golden light sparks."
+the_kibisis,item_304,The Kibisis,Utility,7,0,0,0,Infinite,A burlap bag with infinite storage.,"Cinematic dark fantasy: A simple burlap bag embroidered with gold threads in an Ouroboros pattern, glowing purple interior."
+the_ark_of_danae,item_305,The Ark of Danae,Utility,7,20,0,10,Protect,A weathered cedar chest with rusted iron bands.,"Cinematic dark fantasy: Weathered cedar chest, rusted iron bands, carvings of golden rain revealed beneath layers of rot."
+eye_of_the_graeae,item_306,Eye of the Graeae,Utility,7,0,5,0,Reveal,A translucent stone that projects light.,"Cinematic dark fantasy: A cataract-clouded glass orb that projects a beam of pure white light, held in a bronze hand-mount."
+medusa's_tear,item_307,Medusa's Tear,Material,7,0,20,0,Petrify,A teardrop-emerald in petrified skin.,"Cinematic dark fantasy: A teardrop-shaped emerald gemstone encased in petrified snakeskin, pulsing with green light."
+fragment_of_atlas,item_309,Fragment of Atlas,Material,7,0,40,0,Gravity,A jagged piece of black granite.,"Cinematic dark fantasy: A heavy jagged piece of black granite, humming with gravity, creating a small crater in the ground."
+anchor_of_danae,item_310,Anchor of Danae,Utility,7,50,0,0,Regen,A bronze locket containing a braid of hair.,"Cinematic dark fantasy: Small bronze heart locket, containing a braid of golden hair, radiating soft warmth."
+helm_of_darkness,item_311,Helm of Darkness,Armour,7,0,0,25,Stealth,An obsidian-black helmet shimmering with smoke.,"Cinematic dark fantasy: Sleek obsidian helmet with a skull faceplate, edges of the helmet blurred as if phasing out of reality."
+medusa's_head,item_312,Medusa's Head,Weapon,7,0,50,0,Stun,Decapitated head with writhing serpents.,Cinematic dark fantasy: A burlap bundle that shows a glowing green eye and a writhing snake through a small tear.
+caduceus_fragment,item_313,Caduceus Fragment,Material,7,30,0,0,Heal,A golden staff fragment with silver serpents.,"Cinematic dark fantasy: A piece of a golden staff with two silver serpents coiled around it, glowing with healing energy."
+trident's_point,item_314,Trident's Point,Weapon,7,0,30,0,Pierce,A three-pronged spear corroded by salt.,"Cinematic dark fantasy: Massive gleaming celestial bronze trident head attached to a new shaft, dripping with sea water."
+owl_mask,item_315,Owl Mask,Armour,7,0,10,10,Intellect,A marble mask with blue intellectual energy.,"Cinematic dark fantasy: A regal white marble mask of an owl, eyes glowing with bright blue light when worn."
+fang_of_knowledge,item_316,Fang of Knowledge,Weapon,7,0,25,0,Poison,"A sharp, curved tooth dripping with ink.","Cinematic dark fantasy: A foot-long yellowed ivory tooth from a sea monster, dripping with glowing purple ink."
+chains_of_sacrifice,item_317,Chains of Sacrifice,Utility,7,0,15,15,Bind,Glowing silver chains that extend as if alive.,"Cinematic dark fantasy: Heavy silver chains that glow with an ethereal light, pulsating as if they have a heartbeat."
+pegasus_quill,item_318,Pegasus Quill,Material,7,0,0,0,Fly,A glowing white primary feather.,"Cinematic dark fantasy: A large, stiff white feather that glows with stardust, shimmering with a rainbow oily sheen."
+thunderbolt_shard,item_319,Thunderbolt Shard,Weapon,7,0,45,0,Shock,A jagged crystalline shard of electricity.,"Cinematic dark fantasy: A jagged shard of pure electricity, crackling with white and blue sparks, glowing intensely."
+savior's_snare,item_320,Savior's Snare,Utility,7,0,10,5,Trap,A sturdy net reinforced with lead weights.,"Cinematic dark fantasy: Heavy fishing net, lead weights shaped like fish, golden threads woven into coarse hemp."

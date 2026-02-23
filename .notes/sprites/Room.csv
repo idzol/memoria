@@ -1,0 +1,161 @@
+Region,ID,UID,Name,Dialog,Dialog Tree,NPC ID,Enemy,Event ID,Loot
+town,town_village_gate,t1,Village Gate,"The heavy oak gates stand open, welcoming weary travelers.",,gate_guard,,whispering_well,map
+town,town_the_rusty_tankard,t2,The Rusty Tankard,,t2_tavern,innkeeper,,,ale
+town,town_blacksmiths_forge,t3,Blacksmith's Forge,,t3_forge,blacksmith,,,whetstone
+town,town_apothecary_shop,t4,Apothecary Shop,The air smells of dried herbs and bubbling tonics.,,alchemist,,,potion
+town,town_town_square,t5,Town Square,A bustling hub of activity. A stone fountain sits at the center.,,town_crier,,,coin
+town,town_general_store,t6,General Store,,t6_store,merchant,,,backpack
+town,town_dimly_lit_alley,t7,Dimly Lit Alley,It's quieter here. Someone is watching from the shadows.,,,pickpocket,,gold
+town,town_old_library,t8,Old Library,Dust motes dance in the light filtering through stained glass.,,librarian,,,scroll
+town,town_the_town_well,t9,The Town Well,The water is cool and clear. Pennies glitter at the bottom.,,,,,luck_charm
+town,town_guard_barracks,t10,Guard Barracks,Soldiers practice their drills in the courtyard.,,captain,training_dummy,,shield
+town,town_village_stables,t11,Village Stables,The smell of hay and horses is comforting.,,stablehand,,,apple
+town,town_small_chapel,t12,Small Chapel,A place of quiet contemplation and healing.,,priest,,,holy_water
+town,town_bakers_hearth,t13,Baker's Hearth,The scent of fresh bread is nearly overwhelming.,,baker,,,bread
+town,town_graveyard_path,t14,Graveyard Path,The iron fence creaks. It's surprisingly well-kept.,,gravedigger,,,flower
+town,town_mayors_manor,t15,Mayor's Manor,,t15_mayor,mayor,,,letter
+town,town_hidden_cellar,t16,Hidden Cellar,You find a stash hidden beneath the floorboards of an old house.,,,giant_rat,,rusty_key
+town,town_training_grounds,t17,Training Grounds,Local militia train here to protect the village.,,instructor,,,wooden_sword
+town,town_clock_tower,t18,Clock Tower,"The gears turn with a rhythmic, grounding thrum.",,,,,pocket_watch
+town,town_beggars_corner,t19,Beggar's Corner,,t19_beggar,old_man,,,riddle
+town,town_the_elders_hall,t20,The Elder's Hall,The leaders of the town gather here to discuss the future.,,village_elder,,,medal
+forest,forest_overgrown_path,f1,Overgrown Path,,f1_encounter,,skeletal_sentry,,bandage
+forest,forest_old_shrine,f2,Old Shrine,,f2_shrine,,cultist,,scroll
+forest,forest_the_wanderer,f3,The Wanderer,,f3_merchant,merchant,,,gold
+forest,forest_buzzing_hollow,f4,Buzzing Hollow,The trees here are hollowed out by giant insects.,,,giant_bee,,heart
+forest,forest_shadow_grove,f5,Shadow Grove,,f5_shadows,,shadow_wraith,,frost
+forest,forest_elder_oak,f6,Elder Oak,A tree so massive its canopy blots out the sun.,,,dryad_corruptor,,wood_charm
+forest,forest_thistle_thicket,f7,Thistle Thicket,Thorns pull at your cloak like desperate fingers.,,,briar_beast,,herb
+forest,forest_moonlit_glade,f8,Moonlit Glade,"A peaceful clearing, though the silence is unsettling.",,,,,elixir
+forest,forest_hunters_blind,f9,Hunter's Blind,Discarded bows and old leather rot in the humidity.,,,feral_hound,,arrow
+forest,forest_mushroom_circle,f10,Mushroom Circle,"Spores drift through the air, causing mild hallucinations.",,,spore_servant,,mushroom
+forest,forest_creek_bed,f11,Creek Bed,The water is black and moves against the current.,,,river_lurker,,pearl
+forest,forest_spiders_web,f12,Spider's Web,Sticky silk coats every surface.,,,brood_mother,,silk
+forest,forest_logging_camp,f13,Logging Camp,Ruined wagons suggest a hasty departure.,,,forest_troll,,axe
+forest,forest_ruined_aviary,f14,Ruined Aviary,Feathers and broken glass litter the mossy floor.,,,harpy,,feather
+forest,forest_the_great_root,f15,The Great Root,A massive root forms a natural bridge over a ravine.,,,root_horror,,sap
+forest,forest_hidden_burrow,f16,Hidden Burrow,,f16_rabbit,strange_rabbit,,,clover
+forest,forest_stags_rest,f17,Stag's Rest,Bones of great beasts are piled neatly in the center.,,,bone_shaman,,antler
+forest,forest_watchtower,f18,Watchtower,The stairs are precarious but the view is strategic.,,,bandit_archer,,spyglass
+forest,forest_willow_weep,f19,Willow Weep,The tree seems to be sobbing in the wind.,,,willow_wisp,,tear
+forest,forest_forest_heart,f20,Forest Heart,,f20_boss,,forest_guardian,,emerald_seed
+ice_caves,ice_caves_frost_bridge,i1,Frost Bridge,,i1_bridge,,ice_golem,,frost
+ice_caves,ice_caves_crystal_chasm,i2,Crystal Chasm,"The walls hum with a resonant, freezing energy.",,,frost_wisp,,lightning
+ice_caves,ice_caves_frozen_tomb,i3,Frozen Tomb,,i3_tomb,,tomb_wight,,skull
+ice_caves,ice_caves_echo_chamber,i4,Echo Chamber,Your footsteps sound like a battalion following you.,,,mimic,,trap
+ice_caves,ice_caves_blizzard_peak,i5,Blizzard Peak,Visibility is near zero; the wind howls like a dying beast.,,,yeti,,axe
+ice_caves,ice_caves_icicle_gallery,i6,Icicle Gallery,Sharp spikes hang precariously from the ceiling.,,,ice_bat,,shard
+ice_caves,ice_caves_glacial_rift,i7,Glacial Rift,The ice here is ancient and blue.,,,snow_stalker,,claw
+ice_caves,ice_caves_aurora_hall,i8,Aurora Hall,Strange lights dance on the frozen ceiling.,,,,,stardust
+ice_caves,ice_caves_sub-zero_spring,i9,Sub-Zero Spring,"The water is liquid, but burns like fire.",,,water_elemental,,vial
+ice_caves,ice_caves_frozen_library,i10,Frozen Library,Pages of books are trapped in sheets of ice.,,,ghost_scholar,,tome
+ice_caves,ice_caves_sleeping_giant,i11,Sleeping Giant,,i11_giant,ice_giant,,,club
+ice_caves,ice_caves_permafrost_mine,i12,Permafrost Mine,Pickaxes are still embedded in the walls.,,,kobold_miner,,ore
+ice_caves,ice_caves_snowdrift,i13,Snowdrift,You sink waist-deep in the powder.,,,snow_leopard,,pelt
+ice_caves,ice_caves_the_cold_forge,i14,The Cold Forge,An anvil that freezes everything it touches.,,,ice_smith,,hammer
+ice_caves,ice_caves_whiteout_tunnel,i15,Whiteout Tunnel,The wind is a physical wall pushing you back.,,,blizzard_wraith,,essence
+ice_caves,ice_caves_crystal_garden,i16,Crystal Garden,Plants made of glass grow in the dark.,,,shard_shifter,,crystal
+ice_caves,ice_caves_mammoth_graveyard,i17,Mammoth Graveyard,Tusks larger than trees rise from the snow.,,,necro_mammoth,,ivory
+ice_caves,ice_caves_hidden_grotto,i18,Hidden Grotto,,i18_hermit,frost_hermit,,,soup
+ice_caves,ice_caves_ice_throne,i19,Ice Throne,A seat carved for someone twenty feet tall.,,,ice_lich,,crown
+ice_caves,ice_caves_the_glacier_heart,i20,The Glacier Heart,,i20_boss,,cryo_phoenix,,eternal_ice
+desert,desert_sun-bleached_dunes,d1,Sun-Bleached Dunes,The heat is a physical weight pushing you down.,,,giant_scorpion,,heart
+desert,desert_mirage_oasis,d2,Mirage Oasis,,d2_oasis,,sand_spirit,,potion
+desert,desert_ruined_outpost,d3,Ruined Outpost,Soldiers died here long ago. Their armor is rusted to the bone.,,,skeleton_soldier,,sword
+desert,desert_obsidian_pillar,d4,Obsidian Pillar,A black spire that seems to drink the sunlight.,,,fire_imp,,bomb
+desert,desert_valley_of_kings,d5,Valley of Kings,,d5_kings,,mummy_king,,bandage
+desert,desert_sandstorm_eye,d6,Sandstorm Eye,The center of the storm is eerily quiet.,,,dust_devil,,sand_glass
+desert,desert_beetle_burrow,d7,Beetle Burrow,Clicking sounds echo from beneath the sand.,,,scarab_swarm,,shell
+desert,desert_dried_well,d8,Dried Well,Hope died here a long time ago.,,,ghoul,,bucket
+desert,desert_salt_flats,d9,Salt Flats,The ground is white and cracked like broken pottery.,,,salt_golem,,salt
+desert,desert_nomad_camp,d10,Nomad Camp,,d10_camp,sheik,,,cloth
+desert,desert_cactus_forest,d11,Cactus Forest,Prickly giants loom over the path.,,,needle_fiend,,fruit
+desert,desert_glass_canyon,d12,Glass Canyon,Heat has fused the sand into jagged glass.,,,shard_beast,,glass
+desert,desert_abandoned_bazaar,d13,Abandoned Bazaar,Tattered silks flap in the dry wind.,,,thief_shade,,coin
+desert,desert_sun_temple,d14,Sun Temple,Gold mirrors reflect blinding beams of light.,,,solar_priest,,gold_bar
+desert,desert_quick_sand,d15,Quick Sand,Every step requires careful planning.,,,sand_kraken,,tentacle
+desert,desert_sphinx_gate,d16,Sphinx Gate,,d16_riddle,,guardian_sphinx,,feather
+desert,desert_the_red_mesa,d17,The Red Mesa,The rock is the color of dried blood.,,,canyon_harpy,,ruby
+desert,desert_dusty_vault,d18,Dusty Vault,A heavy door keeps the secrets of the sand.,,,mimic_chest,,relic
+desert,desert_searing_overlook,d19,Searing Overlook,"From here, the desert looks like an endless ocean.",,,vulture_lord,,eye
+desert,desert_pharaohs_sanctum,d20,Pharaoh's Sanctum,,d20_boss,,god_king_ra,,sun_stone
+swamp,swamp_peat_bog,s1,Peat Bog,The ground bubbles with methane and decay.,,,mud_walker,,peat
+swamp,swamp_sunken_hut,s2,Sunken Hut,,s2_witch,swamp_hag,,,brew
+swamp,swamp_willow_weep,s3,Willow Weep,Moss hangs like curtains from the rotting trees.,,,bog_horror,,moss
+swamp,swamp_firefly_marsh,s4,Firefly Marsh,Tiny lights offer a deceptive sense of safety.,,,willow_wisp,,light_dust
+swamp,swamp_crocodile_creek,s5,Crocodile Creek,Logs in the water suddenly sprout eyes.,,,giant_croc,,leather
+swamp,swamp_mist_veil,s6,Mist Veil,You can't see your hand in front of your face.,,,mist_stalker,,vapor
+swamp,swamp_leech_pool,s7,Leech Pool,The water is thick and dark.,,,leech_swarm,,blood
+swamp,swamp_rusting_ferry,s8,Rusting Ferry,A boat sits half-submerged in the muck.,,,drowned_sailor,,nail
+swamp,swamp_tangled_mangroves,s9,Tangled Mangroves,The roots are a natural cage.,,,vine_strangler,,vine
+swamp,swamp_bubbling_mire,s10,Bubbling Mire,The smell of sulfur is overwhelming.,,,ooze_cube,,slime
+swamp,swamp_deadwood_bridge,s11,Deadwood Bridge,The planks groan with every movement.,,,bridge_troll,,wood
+swamp,swamp_mosquito_hive,s12,Mosquito Hive,A constant drone fills your ears.,,,blood_flyer,,proboscis
+swamp,swamp_shrunken_head_totem,s13,Shrunken Head Totem,The trophies seem to watch you.,,,witch_doctor,,mask
+swamp,swamp_sunken_altar,s14,Sunken Altar,An ancient god is being reclaimed by the mud.,,,naga_siren,,scale
+swamp,swamp_blackwater_dock,s15,Blackwater Dock,Old fishing nets are filled with bones.,,,crab_monstrosity,,shell
+swamp,swamp_foggy_meadow,s16,Foggy Meadow,The grass is razor sharp.,,,swamp_cat,,claw
+swamp,swamp_blighted_orchard,s17,Blighted Orchard,Fruit here is black and dripping with bile.,,,rot_spirit,,spore
+swamp,swamp_hermits_stump,s18,Hermit's Stump,,s18_hermit,old_man_bog,,,pipe
+swamp,swamp_grave_of_giants,s19,Grave of Giants,Ribcages rise from the swamp like arches.,,,undead_giant,,bone
+swamp,swamp_the_heart_of_decay,s20,The Heart of Decay,,s20_boss,,the_hydra,,hydra_scale
+abyss,abyss_crushing_trench,a1,Crushing Trench,The pressure here makes your bones ache.,,,deep_lurker,,iron
+abyss,abyss_bioluminescent_reef,a2,Bioluminescent Reef,Strange corals glow with a sickly neon light.,,,glow_eel,,neon_ink
+abyss,abyss_sunken_galleon,a3,Sunken Galleon,Gold glitters among the rotted wood.,,,drowned_captain,,doubloon
+abyss,abyss_pressure_chamber,a4,Pressure Chamber,A pocket of air in the deep sea.,,diver,,,oxygen
+abyss,abyss_whale_fall,a5,Whale Fall,A massive skeleton sustains a small ecosystem.,,,bone_picker,,oil
+abyss,abyss_thermal_vent,a6,Thermal Vent,Scalding water shoots from the sea floor.,,,heat_crab,,sulfur
+abyss,abyss_silent_cathedral,a7,Silent Cathedral,A massive underwater cave where sound dies.,,,void_ray,,echo
+abyss,abyss_the_maw,a8,The Maw,A cave entrance that looks like a row of teeth.,,,angler_fiend,,lamp
+abyss,abyss_jellyfish_forest,a9,Jellyfish Forest,Stinging tentacles hang like vines.,,,shock_jelly,,gel
+abyss,abyss_coral_throne,a10,Coral Throne,The ruler of the deep sat here once.,,,merrow_king,,trident
+abyss,abyss_dark_current,a11,Dark Current,A fast moving stream of freezing water.,,,current_wraith,,water_essence
+abyss,abyss_lost_city_gates,a12,Lost City Gates,Architecture that defies human logic.,,,stone_guardian,,glyph
+abyss,abyss_octopus_den,a13,Octopus Den,Ink clouds the water at the slightest movement.,,,mimic_octopus,,ink
+abyss,abyss_the_abyss_wall,a14,The Abyss Wall,A cliff that drops into infinite darkness.,,,climbing_horror,,hook
+abyss,abyss_sunken_library,a15,Sunken Library,The books are made of etched stone.,,,archive_spirit,,slate
+abyss,abyss_obsidian_ridge,a16,Obsidian Ridge,Sharp volcanic rock cuts through your boots.,,,lava_fish,,magma_stone
+abyss,abyss_pearl_grotto,a17,Pearl Grotto,,a17_pearl,clam_god,,,giant_pearl
+abyss,abyss_kelp_tangle,a18,Kelp Tangle,The seaweed seems to move on its own.,,,kelp_fiend,,fiber
+abyss,abyss_deep_forge,a19,Deep Forge,Forging weapons using the heat of the earth.,,,abyssal_smith,,dark_steel
+abyss,abyss_leviathans_bed,a20,Leviathan's Bed,,a20_boss,,the_leviathan,,ocean_heart
+void,void_void_gate,v1,Void Gate,,v1_gate,,void_stalker,,scroll
+void,void_mind_maze,v2,Mind Maze,,v2_mirror,,brain_eater,,lightning
+void,void_blood_fountain,v3,Blood Fountain,A metallic scent fills the air; the liquid is warm.,,,vampire_lord,,heart
+void,void_obsidian_forge,v4,Obsidian Forge,"The hammers never stop, even with no one at the anvils.",,,forge_automaton,,shield
+void,void_final_descent,v5,Final Descent,This is the end of the line. The air is still.,,,the_keeper,,key
+void,void_event_horizon,v6,Event Horizon,Light stretches and breaks in this place.,,,gravity_well,,singularity
+void,void_fractal_edge,v7,Fractal Edge,The walls repeat infinitely into the distance.,,,echo_shade,,mirror
+void,void_null_space,v8,Null Space,"There is no color here, only static.",,,glitch_horror,,binary_code
+void,void_the_rift,v9,The Rift,A tear in reality leaking purple energy.,,,rift_walker,,void_energy
+void,void_memory_fragment,v10,Memory Fragment,,v10_memory,past_self,,,tear
+void,void_echoing_silence,v11,Echoing Silence,The lack of sound is deafening.,,,silent_one,,muffled_bell
+void,void_gravity_flip,v12,Gravity Flip,"Up is down, and you feel nauseous.",,,inverse_specter,,magnet
+void,void_star_nursery,v13,Star Nursery,Gases swirl to create new suns.,,,nebula_beast,,stardust
+void,void_the_unmaking,v14,The Unmaking,Things here are slowly dissolving into nothing.,,,entropy_fiend,,dust
+void,void_glass_ceiling,v15,Glass Ceiling,You can see other worlds through the floor.,,,watcher,,glass_eye
+void,void_void_market,v16,Void Market,,v16_market,void_trader,,,strange_coin
+void,void_clockwork_void,v17,Clockwork Void,Massive gears turn without purpose.,,,time_keeper,,gear
+void,void_shadow_theatre,v18,Shadow Theatre,Shadows act out your greatest fears.,,,fear_phantom,,mask
+void,void_last_outpost,v19,Last Outpost,A small shack holding back the nothingness.,,survivor,,,hope
+void,void_the_singularity,v20,The Singularity,,v20_boss,,void_emperor,,universe_core
+the_core,the_core_magma_river,c1,Magma River,A flow of molten rock cuts through the chamber.,,,lava_slug,,fire_shard
+the_core,the_core_steam_vent,c2,Steam Vent,High-pressure steam screams through the cracks.,,,steam_mephit,,vapor
+the_core,the_core_iron_foundry,c3,Iron Foundry,The sound of clashing metal is constant.,,,iron_golem,,iron_bar
+the_core,the_core_basalt_bridge,c4,Basalt Bridge,A narrow path over a lake of fire.,,,fire_bat,,coal
+the_core,the_core_sulfur_pit,c5,Sulfur Pit,Yellow fumes choke your breath.,,,sulfur_spirit,,sulfur
+the_core,the_core_the_great_smelter,c6,The Great Smelter,Heat so intense it melts your armor.,,,smelter_demon,,molten_core
+the_core,the_core_diamond_crag,c7,Diamond Crag,Pressure has turned the coal into hard gems.,,,rock_spider,,diamond
+the_core,the_core_geothermal_well,c8,Geothermal Well,Natural energy pulses from the ground.,,,,,battery
+the_core,the_core_ash_plain,c9,Ash Plain,Walking here leaves deep tracks in the soot.,,,ash_wraith,,urn
+the_core,the_core_machinery_hall,c10,Machinery Hall,Pistons move with rhythmic precision.,,,automaton_scout,,spring
+the_core,the_core_cinder_grove,c11,Cinder Grove,Trees made of charcoal still burn with heat.,,,cinder_cat,,charcoal
+the_core,the_core_the_boiler,c12,The Boiler,The humidity is 100% and it's boiling.,,,pressure_fiend,,valve
+the_core,the_core_molten_waterfall,c13,Molten Waterfall,Liquid gold falls from the ceiling.,,,gold_elemental,,gold_nugget
+the_core,the_core_obsidian_lab,c14,Obsidian Lab,Dark stones used for magical experiments.,,,fire_mage,,wand
+the_core,the_core_ventilation_shaft,c15,Ventilation Shaft,A cool breeze comes from somewhere above.,,,harpy_scout,,fan
+the_core,the_core_the_great_engine,c16,The Great Engine,This machine powers the entire world.,,,engine_master,,power_cell
+the_core,the_core_crystal_furnace,c17,Crystal Furnace,,c17_furnace,the_smith,,,fire_sword
+the_core,the_core_red_rock_vault,c18,Red Rock Vault,The stones here hum with heat.,,,mimic_safe,,relic
+the_core,the_core_scorched_path,c19,Scorched Path,Everything here has been burned to a crisp.,,,phoenix_hatchling,,feather
+the_core,the_core_the_heart_of_the_world,c20,The Heart of the World,,c20_boss,,magma_titan,,core_essence

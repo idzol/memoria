@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="RoomData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://data/resources/RoomData.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/room/abyss/abyss_pearl_grotto_map.png" id="2_icon"]
+[ext_resource type="Texture2D" path="res://assets/room/abyss/abyss_pearl_grotto_scene.png" id="3_bg"]
+
+[resource]
+script = ExtResource("1_script")
+room_name = "Pearl Grotto"
+type = "event"
+biome = "abyss"
+initial_dialog = ""
+dialog_tree_id = "a17_pearl"
+enemy_id = ""
+npc_id = "clam_god"
+difficulty_override = -1
+loot_list = ["giant_pearl"]
+map_icon = ExtResource("2_icon")
+background_texture = ExtResource("3_bg")
+music_track = "battle_theme"

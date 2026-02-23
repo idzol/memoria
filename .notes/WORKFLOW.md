@@ -55,7 +55,8 @@ python ./.notes/NPC/csv_to_resources.py
 
 # Assets - Video 
 
-# Assets - NPC / Character movement  
+# Assets - Character  
+# Assets - NPC / Enemy  
 
 Image to sprite map (png), using reference image and comfyUI to generate 8x1 image maps for idle, attack, defend 
 
@@ -72,7 +73,7 @@ http://127.0.0.1:8188/
 
 Win powershell
 ```
-cd C:\Users\pkubi\production\memoria\image\NPC
+cd C:\Users\pkubi\production\memoria\image\spritemap
 python .\sprite_workflow_api.py
 ```
 
@@ -80,12 +81,12 @@ python .\sprite_workflow_api.py
 
 Move 
 From    C:\ComfyUI_windows_portable\Comfy\output
-To      C:\Users\pkubi\production\memoria\images\NPC
+To      C:\Users\pkubi\production\memoria\images\spritemap
 
 
 ## Post processing 
 
 ```
-cd C:\Users\pkubi\production\memoria\images\NPC
+cd C:\Users\pkubi\production\memoria\images\spritemap
 python .\sprite_processing.py --execute
 ```

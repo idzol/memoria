@@ -2,9 +2,7 @@ extends Control
 
 # res://features/ui/CharacterScreen.gd
 # Handles inventory management, deck building, and player stats.
-
-# IMPORT: Centralized card data
-const CardDatabase = preload("res://core/CardDatabase.gd")
+const CardData = preload("res://data/resources/CardData.gd")
 
 @onready var card_grid = %CardGrid
 @onready var deck_count_label = %DeckCount
@@ -12,6 +10,8 @@ const CardDatabase = preload("res://core/CardDatabase.gd")
 @onready var hp_label = %HPLabel
 @onready var gold_label = %GoldLabel
 @onready var back_button = %BackButton
+
+const CARDS_ROOT = "res://data/cards/"
 
 func _ready():
 	_update_stats_ui()
@@ -46,18 +46,23 @@ func _update_stats_ui():
 		gold_label.text = "Gold: " + str(g if g != null else 0)
 
 func _populate_inventory():
-	# Clear the grid for a fresh render to update "greyed out" states
+	# Clear the grid for a fresh render to update states
 	for child in card_grid.get_children(): 
 		child.queue_free()
 	
-	# Only loops through cards found in player_inventory (hiding undiscovered cards)
+	# Iterate through the strings in GameManager.player_inventory
 	for card_id in GameManager.player_inventory:
-		var card_data = CardDatabase.get_card(card_id)
-		if card_data:
-			var card_ui = _create_card_ui(card_id, card_data)
-			card_grid.add_child(card_ui)
+		var path = CARDS_ROOT + card_id + ".tres"
+		
+		if ResourceLoader.exists(path):
+			var res = load(path)
+			if res is CardData:
+				var card_ui = _create_card_ui(card_id, res)
+				card_grid.add_child(card_ui)
+		else:
+			push_warning("CharacterScreen: Missing card resource at: " + path)
 
-func _create_card_ui(id: String, data: Dictionary) -> PanelContainer:
+func _create_card_ui(id: String, data: CardData) -> PanelContainer:
 	var panel = PanelContainer.new()
 	panel.custom_minimum_size = Vector2(280, 160)
 	
@@ -69,19 +74,29 @@ func _create_card_ui(id: String, data: Dictionary) -> PanelContainer:
 	panel.add_theme_stylebox_override("panel", style)
 	
 	var margin = MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 10); margin.add_theme_constant_override("margin_right", 10)
-	margin.add_theme_constant_override("margin_top", 10); margin.add_theme_constant_override("margin_bottom", 10)
+	margin.add_theme_constant_override("margin_left", 10)
+	margin.add_theme_constant_override("margin_right", 10)
+	margin.add_theme_constant_override("margin_top", 10)
+	margin.add_theme_constant_override("margin_bottom", 10)
 	panel.add_child(margin)
 	
 	var hbox_main = HBoxContainer.new()
 	hbox_main.add_theme_constant_override("separation", 15)
 	margin.add_child(hbox_main)
 	
+	# Preview: Use the High-Res Card Image
 	var tex_rect = TextureRect.new()
 	tex_rect.custom_minimum_size = Vector2(80, 120)
 	tex_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	tex_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	tex_rect.texture = load(data.image)
+	
+	if data.card_image:
+		tex_rect.texture = data.card_image
+	else:
+		# Fallback to icon or placeholder
+		tex_rect.texture = data.card_icon if data.card_icon else load("res://icon.svg")
+		tex_rect.modulate = Color(1, 0.2, 0.2, 0.4) if !data.card_image else Color.WHITE
+
 	hbox_main.add_child(tex_rect)
 	
 	var vbox_text = VBoxContainer.new()
@@ -98,17 +113,14 @@ func _create_card_ui(id: String, data: Dictionary) -> PanelContainer:
 	name_hbox.add_child(name_lbl)
 	
 	var check = CheckBox.new()
-	var active_deck = GameManager.get("active_deck")
-	var is_in_deck = id in active_deck
+	var is_in_deck = id in GameManager.active_deck
 	check.button_pressed = is_in_deck
 	
-	# GREY OUT LOGIC: 
-	# If we are at the minimum of 3 pairs, disable the check-boxes of cards currently in the deck.
-	if active_deck.size() <= 3 and is_in_deck:
+	# Minimum requirement check (Prevent deselecting below 3 pairs)
+	if GameManager.active_deck.size() <= 3 and is_in_deck:
 		check.disabled = true
-		check.modulate.a = 0.5 # Visible "greyed out" effect
+		check.modulate.a = 0.5
 	
-	# bind(style, id) results in call: _on_card_toggled(bool, StyleBoxFlat, String)
 	check.toggled.connect(_on_card_toggled.bind(style, id))
 	name_hbox.add_child(check)
 	
@@ -118,7 +130,7 @@ func _create_card_ui(id: String, data: Dictionary) -> PanelContainer:
 	desc_lbl.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
 	vbox_text.add_child(desc_lbl)
 	
-	if check.button_pressed:
+	if is_in_deck:
 		style.border_color = Color(0.4, 0.8, 1.0)
 		style.bg_color = Color(0.1, 0.15, 0.25)
 	
