@@ -3,7 +3,7 @@ import os
 
 # --- CONFIGURATION ---
 # Specialized for Player Progression (Base -> Final)
-CSV_FILE = ".notes/sprites/Player.csv" 
+CSV_FILE = "scripts/sprites/Player.csv" 
 OUTPUT_ROOT = "data/player"
 PLAYER_SCRIPT_PATH = "res://data/resources/PlayerData.gd"
 PLAYER_ASSET_ROOT = "res://assets/player"

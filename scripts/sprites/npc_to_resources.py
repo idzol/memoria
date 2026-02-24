@@ -5,7 +5,7 @@ import json
 
 # --- CONFIGURATION ---
 # The script expects this file to be in the directory where you RUN the command (Project Root)
-CSV_FILE = "./.notes/sprites/NPC.csv"
+CSV_FILE = "scripts/sprites/NPC.csv"
 OUTPUT_DIR_ENEMIES = "data/enemies"
 OUTPUT_DIR_NPCS = "data/npcs"
 

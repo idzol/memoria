@@ -1,3 +1,13 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# Python venv
+.venv
+
+*.tmp                  # Temporary files
+export_presets.cfg     # Only ignore if you want to keep your export paths private
+
+# System ignores
+.DS_Store
+Thumbs.db

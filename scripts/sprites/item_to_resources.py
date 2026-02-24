@@ -3,7 +3,7 @@ import os
 
 # --- CONFIGURATION ---
 # Target: Item.csv (Columns: ID, UID, Name, Type, Level, HP, Attack, Armour, Effect, Description, AI_Image_Prompt)
-CSV_FILE = "./.notes/sprites/Item.csv" 
+CSV_FILE = "scripts/sprites/Item.csv" 
 OUTPUT_ROOT = "data/items"
 ITEM_SCRIPT_PATH = "res://data/resources/ItemData.gd"
 

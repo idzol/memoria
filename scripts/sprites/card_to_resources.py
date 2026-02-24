@@ -2,7 +2,7 @@ import csv
 import os
 
 # --- CONFIGURATION ---
-CSV_FILE = "./.notes/sprites/Card.csv" 
+CSV_FILE = "scripts/sprites/Card.csv" 
 OUTPUT_ROOT = "data/cards"
 CARD_SCRIPT_PATH = "res://data/resources/CardData.gd"
 
