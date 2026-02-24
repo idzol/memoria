@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="NPCData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://data/resources/NPCData.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/npcs/bog_doctor_idle.png" id="2_idle"]
+[ext_resource type="Texture2D" path="res://assets/npcs/bog_doctor_talk.png" id="3_talk"]
+
+[resource]
+script = ExtResource("1_script")
+name = "Dr._Quack"
+biome = "swamp"
+hp = 55
+hframes = 8
+vframes = 1
+total_frames = 8
+frame_speed = 0.1
+idle_sheet = ExtResource("2_idle")
+talk_sheet = ExtResource("3_talk")
+role = "Villager"
+initial_greeting = "Hello."
+dialog_tree_id = ""
+is_merchant = false
+wares = {}
+persistence_key = "met_bog_doctor"

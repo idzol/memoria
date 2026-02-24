@@ -16,7 +16,7 @@ extends Node2D
 @onready var battle_ui = %UI 
 
 # Portraits & Background
-@onready var enemy_portrait_sprite = %EnemyPortraitSprite
+@onready var enemy_sprite = %EnemyPortraitSprite 
 @onready var player_sprite = %PlayerSprite
 @onready var idle_timer = %IdleTimer
 @onready var background = get_node_or_null("%Background")
@@ -29,7 +29,6 @@ var current_anim_frame: int = 0
 const TOTAL_ANIM_FRAMES = 18
 const FRAME_STEP_TIME = 0.08 # Approx 12 FPS for the blink/idle
 
-
 # --- Combat State ---
 var flipped_cards = []
 var can_flip = false 
@@ -38,8 +37,13 @@ var enemy_hp = 100
 var textures = {}
 var difficulty = 0
 var current_enemy_id: String = ""
+
 var current_room_res: RoomData = null
+var current_enemy_res: EnemyData = null
+var current_player_res: PlayerData = null
+
 var active_tree = {}
+
 
 func _ready():
 	# 1. LOAD RESOURCE DATA
@@ -49,8 +53,8 @@ func _ready():
 		current_room_res = load(node_data.room_resource_path) as RoomData
 		_apply_room_data(current_room_res)
 	else:
-		# Fallback for manual scene testing (Ensure this path exists)
-		var fallback_path = "res://data/rooms/default_battle.tres"
+		# Fallback for manual scene testing
+		var fallback_path = "res://data/rooms/town/town_village_gate.tres"
 		if FileAccess.file_exists(fallback_path):
 			current_room_res = load(fallback_path) as RoomData
 			_apply_room_data(current_room_res)
@@ -68,33 +72,50 @@ func _ready():
 	grid.add_theme_constant_override("h_separation", 35)
 	grid.add_theme_constant_override("v_separation", 35)
 	
-	# Debug win / lose 
-	%DebugWinBtn.pressed.connect(_on_win)
-	%DebugLoseBtn.pressed.connect(_on_lose)
+	# Debug win / lose connections
+	if has_node("%DebugWinBtn"): %DebugWinBtn.pressed.connect(_on_win)
+	if has_node("%DebugLoseBtn"): %DebugLoseBtn.pressed.connect(_on_lose)
 	
 	# 3. SETUP ENCOUNTER
 	_setup_player_spritesheet()
-	_setup_portraits()
 
-	# 4. Start Flow		
+	if not _setup_portraits():
+		_handle_initialization_error("The guardian of this area has vanished into the void. Proceed to claim your rewards.")
+		return
+
+	# 4. START FLOW		
 	_init_encounter()
 	update_ui()
 
-
+# --- SETUP METHODS ---
 func _setup_player_spritesheet():
-	# CONFIG: 6 Columns, 34 Frames total. Cells are 240x360.
-	var sheet_path = "res://assets/player/idle.png"
-	if ResourceLoader.exists(sheet_path):
-		player_sprite.texture = load(sheet_path)
-		player_sprite.hframes = 6
-		player_sprite.vframes = 6   
-		player_sprite.frame = 0
-		
-		# Connect the 30s trigger timer
-		if not idle_timer.timeout.is_connected(_play_idle_animation):
-			idle_timer.timeout.connect(_play_idle_animation)
+	# Identify the correct PlayerData resource based on class and stage
+	# Format: res://data/players/[class]/[class]_[stage].tres
+	var p_class = GameManager.player_class.to_lower()
+	var p_stage = "base" # Logic here to determine stage based on progress/items
+	
+	var p_path = "res://data/players/%s/%s_%s.tres" % [p_class, p_class, p_stage]
+	
+	if ResourceLoader.exists(p_path):
+		current_player_res = load(p_path) as PlayerData
+		_apply_unit_visuals(player_sprite, current_player_res)
 	else:
-		push_warning("BattleScene: Player spritesheet missing at: " + sheet_path)
+		push_warning("BattleScene: Player Resource missing: " + p_path)
+
+func _setup_portraits() -> bool:
+	# Returns true if enemy loaded successfully, false otherwise.
+	if current_room_res and current_room_res.enemy_id != "":
+		var e_path = "res://data/enemies/%s.tres" % current_room_res.enemy_id
+		if ResourceLoader.exists(e_path):
+			current_enemy_res = load(e_path) as EnemyData
+			if current_enemy_res:
+				# SAFE ACCESS: Property only accessed after we verify resource is not Nil
+				enemy_hp = current_enemy_res.hp + (difficulty * 15)
+				_apply_unit_visuals(enemy_sprite, current_enemy_res)
+				return true
+
+	push_error("BattleScene: Failed to load Enemy Resource.")
+	return false
 
 func _play_idle_animation():
 	if is_animating_idle: return
@@ -117,25 +138,60 @@ func _cycle_frame():
 
 func _apply_room_data(res: RoomData):
 	if not res: return
-	room_title.text = res.room_name
-	dialog_text.text = res.initial_dialog
-	current_enemy_id = res.enemy_id
+	if current_enemy_id: current_enemy_id = res.enemy_id
+	if room_title: room_title.text = res.room_name
+	if dialog_text: dialog_text.text = res.initial_dialog
 	
-	if background and res.background_texture:
-		background.texture = res.background_texture
+	if background:
+		if res.background_texture:
+			background.texture = res.background_texture
+		else:
+			# Graceful fallback for missing room background
+			background.texture = null
+			background.modulate = Color(0.1, 0.1, 0.1) # Darken the empty space
 
-func _setup_portraits():
-	# Load Enemy Portrait/Stats from GameData using ID from the Resource
-	var icon_path = "res://assets/card/trap.png"
+func _handle_initialization_error(message: String):
+	# Forces the scene into a non-crashing state and offers a way out
+	battle_ui.visible = false
+	dialog_overlay.visible = true
+	dialog_text.text = message
 	
-	if GameData.ENEMIES.has(current_enemy_id):
-		var data = GameData.ENEMIES[current_enemy_id]
-		icon_path = data.icon
-		enemy_hp = data.hp + (difficulty * 15)
+	for child in option_container.get_children(): child.queue_free()
+	var btn = Button.new()
+	btn.text = "Claim Victory & Loot"
+	btn.custom_minimum_size.y = 60
+	btn.pressed.connect(_on_win)
+	option_container.add_child(btn)
+
+
+func _apply_unit_visuals(sprite: Node, res: Resource):
+	if not sprite: return
+
+	var sheet = res.get("idle_sheet") if res else null
 	
-	# Enemy default
-	enemy_portrait_sprite.texture = load(icon_path)
-	# player_portrait_sprite.texture = load("res://assets/enemy/base.png")
+	if sprite is Sprite2D:
+		if sheet:
+			sprite.texture = sheet
+			sprite.hframes = res.get("hframes")
+			sprite.vframes = res.get("vframes")
+			_animate_unit(sprite, res.get("total_frames"), res.get("frame_speed"))
+		else:
+			# Visual placeholder for missing data
+			sprite.texture = load("res://icon.svg")
+			sprite.modulate = Color(1, 0, 0, 0.4)
+			sprite.hframes = 1
+			sprite.vframes = 1
+
+func _animate_unit(sprite: Sprite2D, total: int, speed: float):
+	var frame = 0
+	var dir = 1
+	while sprite and is_inside_tree():
+		sprite.frame = frame
+		if total > 1:
+			if frame >= total - 1: dir = -1
+			elif frame <= 0: dir = 1
+			frame += dir
+		await get_tree().create_timer(speed).timeout
 
 func _init_encounter():
 	battle_ui.hide()
@@ -143,7 +199,8 @@ func _init_encounter():
 	
 	# Check if the resource specified a custom narrative branching tree
 	var tree_id = ""
-	if current_room_res: tree_id = current_room_res.dialog_tree_id
+	if current_room_res: 
+		tree_id = current_room_res.dialog_tree_id
 	
 	if tree_id != "" and GameData.DIALOG_TREES.has(tree_id):
 		active_tree = GameData.DIALOG_TREES[tree_id]

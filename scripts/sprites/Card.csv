@@ -1,0 +1,159 @@
+ID,Name,Type,Value,Description,Special Effect
+sword,Iron Sword,attack,8,Slash damage,
+shield,Shield,armor,5,Block damage,
+heart,Health,heal,15,Restore HP,
+bandage,Bandage,heal,8,Small Heal,
+dagger,Dagger,attack,6,Quick Stab,
+frost,Frost,attack_ice,8,Ice Dmg + Slow,Slow
+scroll,Magic Scroll,attack_magic,12,Magic Damage,
+trap,Spike Trap,trap,15,Self Damage,
+axe,Battle Axe,attack,14,Heavy Damage,
+potion,Potion,heal_large,30,Big Heal,
+wall,Stone Wall,armor,12,Heavy Block,
+fire,Fireball,attack_fire,30,High Damage,Burn
+bomb,Bomb,trap,25,Huge Self Dmg,
+charge,Overcharge,charge,0,Double Next Hit,Charge
+ale,Mug of Ale,heal,5,A bit of liquid courage,
+bread,Fresh Bread,heal,10,Filling and warm,
+holy_water,Holy Water,heal,20,Purifies the soul,
+apple,Red Apple,heal,4,Crunchy and sweet,
+iron_shield,Iron Shield,armor,10,Heavy metal defense,
+moon_essence,Moon Essence,charge,0,Glowing celestial energy,Charge
+healing_herb,Healing Herb,heal,12,Natural forest remedy,
+poison_ivy,Poison Ivy,trap,10,Itches and burns,Poison
+hand_axe,Hand Axe,attack,10,Chops wood and foes,
+arrow_bundle,Arrow Bundle,attack,12,A volley of sharp tips,
+leather_scraps,Leather Scraps,armor,3,Basic protection bits,
+oak_staff,Oak Staff,attack_magic,15,Focuses magical intent,
+fairy_dust,Fairy Dust,heal,25,Sparkling recovery,Purify
+pelt,Thick Pelt,armor,6,Animal hide for warmth,
+dried_meat,Dried Meat,heal,15,Salty dungeon rations,
+frozen_berries,Frozen Berries,heal,6,A chilling snack,Chill
+giant_club,Giant Club,attack,18,Crushing weight,Stun
+ice_shard,Ice Shard,attack_ice,10,Frozen projectile,Slow
+climbing_pick,Climbing Pick,attack,9,Sharp and hooked,
+blanket,Wool Blanket,heal,5,Rest more effectively,
+chisel,Stone Chisel,attack,5,Fine precision tool,
+heavy_boots,Heavy Boots,armor,4,Protects against floor traps,
+white_fur,White Fur,armor,7,Elegant and warm,
+scimitar,Curved Scimitar,attack,11,Swift slashing weapon,
+waterskin,Waterskin,heal,8,Refreshing water,
+ancient_wisdom,Ancient Wisdom,charge,0,Unlocks potential,Charge
+spice_pouch,Spice Pouch,heal,2,Adds a little kick,
+venom_vial,Venom Vial,attack,15,Apply to your blade,Poison
+solar_disc,Solar Disc,attack_fire,20,Radiates pure heat,Burn
+jar_of_teeth,Jar of Teeth,trap,12,Spooky and sharp,
+witch_brew,Witch Brew,heal,20,Tastes like swamp water,Random
+leech_vial,Leech Vial,heal,10,Medicinal bloodletting,Lifesteal
+oar,Wooden Oar,attack,7,Blunt rowing tool,
+catfish,Slime Catfish,heal,5,"Hard to hold, easy to eat",
+lily_shield,Lily Pad Shield,armor,4,Lightweight nature block,
+moss_cloak,Moss Cloak,armor,5,Blends into the swamp,
+reptile_scale,Reptile Scale,armor,8,Hardened protection,
+gas_bomb,Gas Bomb,trap,20,Noxious fumes,Poison
+brass_helmet,Brass Helmet,armor,9,Protects the noggin,
+trident,Sea Trident,attack,16,Lord of the waves,Pierce
+naga_scale,Naga Scale,armor,12,Legendary serpent skin,
+wrench,Heavy Wrench,attack,10,Mechanical force,
+kelp_potion,Kelp Potion,heal,12,Salty and restorative,
+glow_gel,Glow Gel,charge,0,Luminescent slime,Glow
+void_essence,Void Essence,attack_magic,25,Power from the abyss,Weaken
+stardust,Stardust,charge,0,Power from the stars,Charge
+echo_blade,Echo Blade,attack,14,A resonating strike,Double Strike
+dark_tome,Dark Tome,attack_magic,22,Forbidden knowledge,Curse
+final_tear,Final Tear,heal,50,Supreme restoration,
+titan_hammer,Titan Hammer,attack,40,God-like strength,Stun
+fire_totem,Fire Totem,attack_fire,25,A pillar of flame,Burn
+resistant_wrench,Heat-Wrench,attack,12,Forged in the core,
+burning_fan,Burning Fan,attack_fire,15,Waves of heat,Burn
+overseer_whip,Overseer Whip,attack,18,Lashes out fiercely,Bleed
+wood_splinter,Wood Splinter,trap,2,Small but annoying,
+tax_form,Tax Form,trap,5,Financial burden,
+stolen_lunch,Stolen Lunch,heal,12,Deliciously criminal,
+honey,Jar of Honey,heal,18,Natural sweetness,
+shadow_essence,Shadow Essence,attack_magic,18,Cloaked in darkness,Blind
+tangled_vine,Tangled Vine,trap,8,Trips the unwary,Root
+glowing_mushroom,Mushroom,heal,7,Bioluminescent snack,
+venom_gland,Venom Gland,attack,13,Raw natural toxin,Poison
+carapace,Beetle Carapace,armor,11,Chitinous armor,
+rotten_flesh,Rotten Flesh,trap,12,Smells of decay,Sickness
+glass_shard,Glass Shard,attack,9,Don't cut yourself,Bleed
+light_dust,Light Dust,charge,0,Sparkles with energy,Charge
+rusty_nail,Rusty Nail,attack,4,Watch for tetanus,Bleed
+green_slime,Green Slime,trap,5,Sticky and gross,Slow
+mosquito_proboscis,Proboscis,attack,6,Drains life,Lifesteal
+heavy_iron,Heavy Iron,armor,15,Unbreakable plate,
+echo_essence,Echo Essence,charge,0,Repeating energy,Echo
+electric_gel,Electric Gel,attack_magic,16,A shocking surprise,Stun
+trident_tip,Trident Tip,attack,12,Still sharp enough,
+void_scroll,Void Scroll,attack_magic,28,Erasure magic,Erase
+mind_essence,Mind Essence,charge,0,Focuses the psyche,Focus
+ancient_heart,Ancient Heart,heal,100,Beating for eternity,
+obsidian_plate,Obsidian Plate,armor,18,Toughest volcanic defense,
+singularity,Singularity,trap,100,The end of all things,Annihilate
+corrupt_data,Corrupt Data,trap,30,Digital static,Glitch
+void_shard,Void Shard,attack_magic,15,Fractured space,
+pure_iron,Pure Iron,armor,14,Refined protection,
+dying_ember,Ember,attack_fire,5,A final flicker,Burn
+molten_core,Molten Core,charge,0,Pulsing heat,Charge
+power_cell,Power Cell,charge,0,Battery energized,Charge
+burning_pelt,Burning Pelt,armor,10,Fiery animal hide,Burn
+resistant_wrench,Heat-Wrench,attack,12,Forged in the core.,
+burning_fan,Burning Fan,attack_fire,15,Waves of heat.,
+sulfur_gem,Sulfur Gem,treasure,45,Smells like eggs.,
+overseer_whip,Overseer Whip,attack,18,Lashes out fiercely.,
+wood_splinter,Wood Splinter,trap,2,Small but annoying.,
+lizard_tail,Lizard Tail,treasure,3,Still wiggling.,
+gold_coins,Gold Coins,treasure,10,A small pile.,
+spare_change,Spare Change,treasure,2,Better than nothing.,
+lockpick,Lockpick,utility,0,For the sticky locks.,
+tax_form,Tax Form,trap,5,Financial burden.,
+iron_scrap,Iron Scrap,treasure,8,Can be smelted.,
+stolen_lunch,Stolen Lunch,heal,12,Deliciously criminal.,
+honey,Jar of Honey,heal,18,Natural sweetness.,
+shadow_essence,Shadow Essence,attack_magic,18,Cloaked in darkness.,
+emerald_seed,Emerald Seed,treasure,60,Grows into wealth.,
+tangled_vine,Tangled Vine,trap,8,Trips the unwary.,
+glowing_mushroom,Mushroom,heal,7,Bioluminescent snack.,
+pearl,White Pearl,treasure,100,Perfectly spherical.,
+spider_silk,Spider Silk,utility,0,Stronger than steel.,
+venom_gland,Venom Gland,attack,13,Raw natural toxin.,
+frozen_tear,Frozen Tear,treasure,40,Cold sorrow.,
+carapace,Beetle Carapace,armor,11,Chitinous armor.,
+rotten_flesh,Rotten Flesh,trap,12,Smells of decay.,
+salt_crystal,Salt Crystal,utility,2,Purifying properties.,
+glass_shard,Glass Shard,attack,9,Don't cut yourself.,
+peat_brick,Peat Brick,utility,0,Good fuel source.,
+light_dust,Light Dust,charge,0,Sparkles with energy.,
+ethereal_vapor,Ethereal Vapor,utility,0,Hard to grasp.,
+blood_vial,Blood Vial,utility,0,Sanguine fluid.,
+rusty_nail,Rusty Nail,attack,4,Watch for tetanus.,
+green_slime,Green Slime,trap,5,Sticky and gross.,
+mosquito_proboscis,Proboscis,attack,6,Drains life.,
+heavy_iron,Heavy Iron,armor,15,Unbreakable plate.,
+neon_ink,Neon Ink,treasure,35,Glows in the dark.,
+gold_doubloon,Gold Doubloon,treasure,30,Pirate's treasure.,
+whale_oil,Whale Oil,utility,0,Burns for hours.,
+raw_sulfur,Raw Sulfur,utility,0,Pungent mineral.,
+echo_essence,Echo Essence,charge,0,Repeating energy.,
+biolamp,Biolamp,utility,0,A living lantern.,
+electric_gel,Electric Gel,attack_magic,16,A shocking surprise.,
+trident_tip,Trident Tip,attack,12,Still sharp enough.,
+ocean_tear,Ocean Tear,treasure,85,Gem from the deep.,
+void_scroll,Void Scroll,attack_magic,28,Erasure magic.,
+mind_essence,Mind Essence,charge,0,Focuses the psyche.,
+ancient_heart,Ancient Heart,heal,100,Beating for eternity.,
+obsidian_plate,Obsidian Plate,armor,18,Toughest volcanic defense.,
+master_key,Master Key,utility,0,Opens any lock.,
+singularity,Singularity,trap,100,The end of all things.,
+dark_mirror,Dark Mirror,utility,0,Reflects the void.,
+corrupt_data,Corrupt Data,trap,30,Digital static.,
+void_shard,Void Shard,attack_magic,15,Fractured space.,
+muffled_tongue,Muffled Tongue,utility,0,Silences the room.,
+cloud_essence,Cloud Essence,utility,0,Lighter than air.,
+pure_iron,Pure Iron,armor,14,Refined protection.,
+dying_ember,Ember,attack_fire,5,A final flicker.,
+sulfur_dust,Sulfur Dust,utility,0,Highly explosive.,
+molten_core,Molten Core,charge,0,Pulsing heat.,
+power_cell,Power Cell,charge,0,Battery energized.,
+burning_pelt,Burning Pelt,armor,10,Fiery animal hide.,

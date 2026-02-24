@@ -1,0 +1,89 @@
+[gd_scene format=3 uid="uid://ivrw74yl0q5y"]
+
+[ext_resource type="Script" uid="uid://dkpbn3bp173yw" path="res://test/DebugGallery.gd" id="1_logic"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dark"]
+bg_color = Color(0.05, 0.05, 0.07, 1)
+
+[node name="DebugGallery" type="Control" unique_id=1188528922]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_logic")
+
+[node name="BG" type="Panel" parent="." unique_id=1490339843]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_dark")
+
+[node name="VBox" type="VBoxContainer" parent="." unique_id=981900586]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="StateManipulator" type="HBoxContainer" parent="VBox" unique_id=1863528732]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="HP" type="HBoxContainer" parent="VBox/StateManipulator" unique_id=1020448853]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBox/StateManipulator/HP" unique_id=1176031790]
+layout_mode = 2
+text = "PLAYER HP: "
+
+[node name="HPSpin" type="SpinBox" parent="VBox/StateManipulator/HP" unique_id=195760717]
+layout_mode = 2
+value = 100.0
+
+[node name="Gold" type="HBoxContainer" parent="VBox/StateManipulator" unique_id=136088281]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBox/StateManipulator/Gold" unique_id=153334026]
+layout_mode = 2
+text = "GOLD: "
+
+[node name="GoldSpin" type="SpinBox" parent="VBox/StateManipulator/Gold" unique_id=1197427165]
+layout_mode = 2
+max_value = 9999.0
+value = 50.0
+
+[node name="Tabs" type="TabContainer" parent="VBox" unique_id=1713627506]
+layout_mode = 2
+size_flags_vertical = 3
+current_tab = 0
+
+[node name="Enemies" type="ScrollContainer" parent="VBox/Tabs" unique_id=628934768]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="EnemyList" type="VBoxContainer" parent="VBox/Tabs/Enemies" unique_id=163853791]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 5
+
+[node name="NPCs" type="ScrollContainer" parent="VBox/Tabs" unique_id=2041137606]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="NPCList" type="VBoxContainer" parent="VBox/Tabs/NPCs" unique_id=589505754]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 5

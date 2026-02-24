@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://4oksnbi8wcek"
+
+[deps]
+
+files=["res://scripts/sprites/Player.Type.translation", "res://scripts/sprites/Player.Class.translation", "res://scripts/sprites/Player.Stage.translation", "res://scripts/sprites/Player.Description.translation"]
+
+source_file="res://scripts/sprites/Player.csv"
+dest_files=["res://scripts/sprites/Player.Type.translation", "res://scripts/sprites/Player.Class.translation", "res://scripts/sprites/Player.Stage.translation", "res://scripts/sprites/Player.Description.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

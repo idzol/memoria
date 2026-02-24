@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="PlayerData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://data/resources/PlayerData.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/player/gold_idle.png" id="2_idle"]
+[ext_resource type="Texture2D" path="res://assets/player/gold_attack.png" id="3_atk"]
+[ext_resource type="Texture2D" path="res://assets/player/gold_defend.png" id="4_def"]
+
+[resource]
+script = ExtResource("1_script")
+player_class = "Archivist"
+stage = "gold"
+description = "Gilded relic armor. Icons pulse when matched."
+idle_sheet = ExtResource("2_idle")
+attack_sheet = ExtResource("3_atk")
+defend_sheet = ExtResource("4_def")
+hframes = 8
+vframes = 1
+total_frames = 8
+frame_speed = 0.1

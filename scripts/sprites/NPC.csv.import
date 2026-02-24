@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://do0r4uq6qyxty"
+
+[deps]
+
+files=["res://scripts/sprites/NPC.Name.translation", "res://scripts/sprites/NPC.Type.translation", "res://scripts/sprites/NPC.Biome.translation", "res://scripts/sprites/NPC.HP.translation", "res://scripts/sprites/NPC.Attack.translation", "res://scripts/sprites/NPC.Armor.translation", "res://scripts/sprites/NPC.Loot.translation", "res://scripts/sprites/NPC.AI.translation"]
+
+source_file="res://scripts/sprites/NPC.csv"
+dest_files=["res://scripts/sprites/NPC.Name.translation", "res://scripts/sprites/NPC.Type.translation", "res://scripts/sprites/NPC.Biome.translation", "res://scripts/sprites/NPC.HP.translation", "res://scripts/sprites/NPC.Attack.translation", "res://scripts/sprites/NPC.Armor.translation", "res://scripts/sprites/NPC.Loot.translation", "res://scripts/sprites/NPC.AI.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

@@ -49,7 +49,7 @@ func _ready():
 		avatar_button.pressed.connect(_on_avatar_pressed)
 	
 	# Trigger the "From Bottom to Player" animation on start
-	_scroll_to_player(true)
+	_scroll_to_player.call_deferred(true)
 
 
 func _setup_dialogs():
@@ -155,10 +155,9 @@ func _on_node_selected(data: Dictionary):
 	var dist = abs(data.layer - player_pos.y) + abs(data.column - player_pos.x)
 
 	if is_here:
-		# 1. ACTION: DRILL IN (Transition to room)
-		_enter_node_scene(data)
+		# GameManager handles the Resource loading during transition
+		SignalBus.node_selected.emit(data)
 	elif dist == 1:
-		# 2. ACTION: CONFIRM TRAVEL
 		_prompt_travel(data)
 	else:
 		# Optional: Feedback for unreachable nodes
@@ -186,16 +185,10 @@ func _prompt_travel(data: Dictionary):
 	)
 	travel_dialog.popup_centered()
 
-func _enter_node_scene(data: Dictionary):
-	match data.get("type", "battle"):
-		"battle": get_tree().change_scene_to_file("res://features/combat/BattleScene.tscn")
-		"shop": get_tree().change_scene_to_file("res://features/encounters/ShopScene.tscn")
-		"rest": get_tree().change_scene_to_file("res://features/encounters/RestScene.tscn")
-		"lore": get_tree().change_scene_to_file("res://featuresscenes/encounters/LoreScene.tscn")
-		"trap": get_tree().change_scene_to_file("res://features/encounters/TrapScene.tscn")
-		_: get_tree().change_scene_to_file("res://features/encounters/EventScene.tscn")
-
 func _scroll_to_player(is_first_load: bool = false):
+	# Added safety check to prevent "null instance" error
+	if not is_inside_tree(): return
+	
 	await get_tree().process_frame
 	
 	var player_y_pos = (GameManager.player_grid_pos.y) * -180 + 3600

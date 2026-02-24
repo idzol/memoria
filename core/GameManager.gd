@@ -3,8 +3,6 @@ extends Node
 # res://core/GameManager.gd
 # Central state management for character and run progression.
 
-# const GameData = preload("res://core/GameData.gd")
-
 # --- Character State ---
 var player_name: String = ""
 var player_class: String = "Archivist"
@@ -45,7 +43,7 @@ var world_state = {
 	"rooms": {}, # Format: "f1": {"visited": true, "unlocked": true, "cleared": false}
 	"npcs": {},  # Format: "blacksmith": {"wins": 0, "defeats": 0, "relationship": 10, "met": true}
 	"cards": {
-		"owned": ["strike", "block"], # List of IDs
+		"owned": [], # List of IDs
 		"upgraded": [] # List of unique instances
 	},
 	"items": {
@@ -67,19 +65,6 @@ func _ready():
 	SignalBus.combat_won.connect(_on_combat_won)
 	SignalBus.combat_lost.connect(_on_combat_lost)
 
-	# Pre-populate world_state 
-	_initialize_state_trackers()
-
-# Pre-populate world_state based on registry to avoid null checks
-func _initialize_state_trackers():
-	# Initialize Room trackers
-	for area in GameData.ROOMS:
-		for room_id in GameData.ROOMS[area]:
-			world_state.rooms[room_id] = {"visited": false, "unlocked": true, "cleared": false}
-	
-	# Initialize NPC trackers
-	for npc_id in GameData.NPCS:
-		world_state.npcs[npc_id] = {"wins": 0, "defeats": 0, "met": false, "flags": []}
 
 # Checks a condition dictionary against world_state
 func evaluate_condition(condition: Dictionary) -> bool:
@@ -97,15 +82,28 @@ func evaluate_condition(condition: Dictionary) -> bool:
 	return true
 
 # --- ROOM LOGIC ---
-func get_random_room_for_area(area_key: String) -> Dictionary:
-	if GameData.ROOMS.has(area_key):
-		var area_rooms = GameData.ROOMS[area_key]
-		var keys = area_rooms.keys()
-		var random_id = keys[randi() % keys.size()]
-		var data = area_rooms[random_id].duplicate()
-		data["id"] = random_id
-		return data
-	return {"id": "default", "name": "Unknown"}
+## Scans the file system for a random .tres file in the requested biome folder.
+func get_random_room_resource(area_key: String) -> RoomData:
+	var path = "res://data/rooms/%s/" % area_key
+	if not DirAccess.dir_exists_absolute(path):
+		push_warning("GameManager: Biome directory missing -> %s" % path)
+		return null
+	
+	var files = []
+	var dir = DirAccess.open(path)
+	if dir:
+		dir.list_dir_begin()
+		var file_name = dir.get_next()
+		while file_name != "":
+			if file_name.ends_with(".tres"):
+				files.append(file_name)
+			file_name = dir.get_next()
+	
+	if files.is_empty():
+		return null
+		
+	var random_file = files[randi() % files.size()]
+	return load(path + random_file) as RoomData
 
 # --- STATE ACCESSORS ---
 func mark_room_visited(room_id):
@@ -124,9 +122,19 @@ func record_npc_interaction(npc_id: String, won: bool):
 		if won: world_state.npcs[npc_id].wins += 1
 		else: world_state.npcs[npc_id].defeats += 1
 
-func add_card_to_deck(card_id: String):
-	if GameData.CARDS.has(card_id):
-		world_state.cards.owned.append(card_id)
+## Note: previously `add_card_to_deck` 
+func add_card_to_collection(card_id: String):
+	var path = "res://data/cards/%s.tres" % card_id
+	if ResourceLoader.exists(path):
+		if not card_id in world_state.cards.owned:
+			world_state.cards.owned.append(card_id)
+			# Sync with player_inventory for UI compatibility
+			if not card_id in player_inventory:
+				player_inventory.append(card_id)
+			print("GameManager: Card verified and added to owned collection: ", card_id)
+	else:
+		push_warning("GameManager: Failed to add card. Resource not found at: " + path)
+
 
 func add_item(item_id: String):
 	if !world_state.items.owned.has(item_id):
@@ -192,69 +200,113 @@ func load_run_from_data(data: Dictionary):
 
 	get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
 
-func _on_node_selected(data):
-	# Flexible handler to avoid Object-to-Dictionary conversion errors.
-	# We force the ID to a String to ensure dictionary lookups remain consistent.
-	if data is Dictionary:
-		current_node = data
-		if current_node.has("id"):
-			current_node["id"] = str(current_node["id"])
-	else:
-		# Object.get() only takes 1 argument. We handle defaults manually.
-		current_node = {
-			"id": str(data.get("id")) if data.get("id") != null else "unk",
-			"name": data.get("name") if data.get("name") != null else "Unknown Room",
-			"type": data.get("type") if data.get("type") != null else "battle",
-			"layer": data.get("layer") if data.get("layer") != null else 0,
-			"column": data.get("column") if data.get("column") != null else 0,
-			"difficulty": data.get("difficulty") if data.get("difficulty") != null else 1,
-			"enemy": data.get("enemy") if data.get("enemy") != null else ""
-		}
+
+func _on_node_selected(node_data: Dictionary):
+	current_node = node_data
 	
-	# Update the world state tracking
-	if world_state.rooms.has(current_node.id):
-		world_state.rooms[current_node.id].visited = true
+	# UPDATED: Loading external room resource if path is provided
+	var res_path = node_data.get("room_resource_path", "")
+	var room_res: RoomData = null
+	
+	if res_path != "" and ResourceLoader.exists(res_path):
+		room_res = load(res_path) as RoomData
+	
+	SaveManager.save_mid_run_state()
+	
+	# Priority: Use Resource Type, Fallback to Dictionary Type
+	var type = room_res.type if room_res else node_data.get("type", "battle")
+	
+	match type:
+		"battle", "boss":
+			get_tree().change_scene_to_file("res://features/combat/BattleScene.tscn")
+		"shop":
+			get_tree().change_scene_to_file("res://features/encounters/ShopScene.tscn")
+		"rest":
+			get_tree().change_scene_to_file("res://features/encounters/RestScene.tscn")
+		_:
+			get_tree().change_scene_to_file("res://features/encounters/EventScene.tscn")
+
 
 # --- LOOT LOGIC ---
-func prepare_victory_loot(source_data: Dictionary):
+func prepare_victory_loot(node_data: Dictionary):
 	pending_loot.clear()
 	
-	# Determine enemy loot if applicable
-	var enemy_id = source_data.get("enemy", "")
+	var room_loot_pool = []
 	var enemy_loot_pool = []
-	if GameData.ENEMIES.has(enemy_id):
-		enemy_loot_pool = GameData.ENEMIES[enemy_id].get("loot", [])
-
-	# Combine room/NPC loot with enemy loot
-	var master_pool = source_data.get("loot", []) + enemy_loot_pool
+	
+	var res_path = node_data.get("room_resource_path", "")
+	if res_path != "" and ResourceLoader.exists(res_path):
+		var room_res = load(res_path) as RoomData
+		
+		# Defensive check for room_res
+		if room_res:
+			room_loot_pool = room_res.loot_list
+			
+			if room_res.enemy_id != "":
+				var enemy_path = "res://data/enemies/%s.tres" % room_res.enemy_id
+				if ResourceLoader.exists(enemy_path):
+					var enemy_res = load(enemy_path) as EnemyData
+					
+					# FIXED: Handle Nil enemy_res to prevent property access crash
+					if enemy_res:
+						enemy_loot_pool += enemy_res.item_drops
+						enemy_loot_pool.append({
+							"id": "gold", 
+							"min": enemy_res.gold_min, 
+							"max": enemy_res.gold_max
+						})
+					else:
+						push_warning("GameManager: Enemy resource found but failed to load: " + enemy_path)
+	
+	var master_pool = room_loot_pool + enemy_loot_pool
 	
 	for item_def in master_pool:
 		var reward = {}
 		if item_def is String:
-			reward = {"id": item_def, "amount": 1, "name": item_def.capitalize()}
-			add_item(item_def)
+			reward = {"id": item_def, "amount": 1, "name": item_def.replace("_", " ").capitalize()}
+			
+			# Integrated Check: If the item exists in cards/ path, handle as a card discovery
+			var card_path = "res://data/cards/%s.tres" % item_def
+			if ResourceLoader.exists(card_path):
+				add_card_to_collection(item_def)
+			else:
+				add_item(item_def)
+				
 		elif item_def is Dictionary:
 			var amount = randi_range(item_def.get("min", 1), item_def.get("max", 1))
 			var item_id = item_def.get("id", "gold")
-			reward = {"id": item_id, "amount": amount, "name": str(amount) + " " + item_id.capitalize()}
+			reward = {
+				"id": item_id, 
+				"amount": amount, 
+				"name": str(amount) + " " + item_id.replace("_", " ").capitalize()
+			}
 			
 			if item_id == "gold":
-				world_state.global.gold += amount
+				gold += amount
+				world_state.global.gold = gold
 			else:
 				add_item(item_id)
 		
 		pending_loot.append(reward)
-		run_loot.append(reward) # Track for the final Run Summary
+		run_loot.append(reward)
+
 
 func _on_combat_won():
-	gold += 25
+	prepare_victory_loot(current_node)
+	
 	if current_node.has("id"):
 		completed_nodes.append(current_node.id)
-		# Update grid position on victory
 		player_grid_pos = Vector2i(current_node.column, current_node.layer)
 		
+		if world_state.rooms.has(current_node.id):
+			world_state.rooms[current_node.id].cleared = true
+		
 	SaveManager.save_mid_run_state()
-	get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+	
+	if not pending_loot.is_empty():
+		get_tree().change_scene_to_file("res://features/ui/LootScene.tscn")
+	else:
+		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
 
 func _on_combat_lost():
 	get_tree().call_deferred("change_scene_to_file", "res://features/ui/DeathScreen.tscn")

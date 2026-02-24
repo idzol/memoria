@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://data/resources/ItemData.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/items/full/ember.png" id="2_image"]
+[ext_resource type="Texture2D" path="res://assets/items/icons/ember.png" id="3_icon"]
+
+[resource]
+script = ExtResource("1_script")
+item_id = "ember"
+name = "Ember"
+type = "Material"
+level = 2
+hp = 0
+attack = 5
+armour = 0
+effect = "Ignite"
+description = "A glowing coal that never fades."
+ai_prompt = "Cinematic dark fantasy: A single red spark hovering inside a protective iron cage."
+item_image = ExtResource("2_image")
+item_icon = ExtResource("3_icon")

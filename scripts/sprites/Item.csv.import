@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://bptfd4eolhjw5"
+
+[deps]
+
+files=["res://scripts/sprites/Item.UID.translation", "res://scripts/sprites/Item.Name.translation", "res://scripts/sprites/Item.Type.translation", "res://scripts/sprites/Item.Level.translation", "res://scripts/sprites/Item.HP.translation", "res://scripts/sprites/Item.Attack.translation", "res://scripts/sprites/Item.Armour.translation", "res://scripts/sprites/Item.Effect.translation", "res://scripts/sprites/Item.Description.translation", "res://scripts/sprites/Item.AI.translation"]
+
+source_file="res://scripts/sprites/Item.csv"
+dest_files=["res://scripts/sprites/Item.UID.translation", "res://scripts/sprites/Item.Name.translation", "res://scripts/sprites/Item.Type.translation", "res://scripts/sprites/Item.Level.translation", "res://scripts/sprites/Item.HP.translation", "res://scripts/sprites/Item.Attack.translation", "res://scripts/sprites/Item.Armour.translation", "res://scripts/sprites/Item.Effect.translation", "res://scripts/sprites/Item.Description.translation", "res://scripts/sprites/Item.AI.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

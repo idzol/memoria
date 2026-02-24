@@ -1,0 +1,186 @@
+extends Control
+
+# res://features/ui/DebugGallery.gd
+# Visual testing hub for all Enemies and NPCs.
+# Matches BattleScene container dimensions (160px height).
+# UPDATED: Implements Ping-Pong animation loops and corrected NPC directory handling.
+
+@onready var enemy_list = get_node_or_null("%EnemyList")
+@onready var npc_list = get_node_or_null("%NPCList")
+
+# CONFIGURATION: Ensure these match your actual folder structure
+const ENEMY_PATH = "res://data/enemies/"
+const NPC_PATH = "res://data/npcs/"
+const BATTLE_PORTRAIT_HEIGHT = 160.0 
+
+func _ready():
+	# Directory Pre-flight check
+	_check_directories()
+	_refresh_galleries()
+	_setup_state_manipulator()
+
+func _check_directories():
+	for path in [ENEMY_PATH, NPC_PATH]:
+		if not DirAccess.dir_exists_absolute(path):
+			push_warning("DebugGallery: Directory missing: %s. Please ensure it exists." % path)
+
+func _refresh_galleries():
+	if enemy_list: _populate_list(ENEMY_PATH, enemy_list, "Enemy")
+	if npc_list: _populate_list(NPC_PATH, npc_list, "NPC")
+
+func _populate_list(dir_path: String, container: VBoxContainer, type: String):
+	if not container: return
+	for child in container.get_children(): child.queue_free()
+	
+	container.add_child(_create_row_ui(null, true, type))
+	
+	if not DirAccess.dir_exists_absolute(dir_path):
+		var lbl = Label.new()
+		lbl.text = "DIR NOT FOUND: " + dir_path
+		lbl.modulate = Color.RED
+		container.add_child(lbl)
+		return
+
+	var dir = DirAccess.open(dir_path)
+	if dir:
+		dir.list_dir_begin()
+		var file_name = dir.get_next()
+		while file_name != "":
+			if file_name.ends_with(".tres"):
+				# Suppression of console spam by checking file existence before load
+				if FileAccess.file_exists(dir_path + file_name):
+					var res = load(dir_path + file_name)
+					if res: 
+						container.add_child(_create_row_ui(res, false, type, dir_path + file_name))
+			file_name = dir.get_next()
+
+func _create_row_ui(res: Resource, is_header: bool, type: String, full_path: String = "") -> HBoxContainer:
+	var row = HBoxContainer.new()
+	row.add_theme_constant_override("separation", 20)
+	
+	var columns = ["Name", "Idle", "Action 1", "Action 2", "Test"]
+	if type == "NPC": columns = ["Name", "Idle", "Talk", "Test"]
+	
+	for col in columns:
+		var control = Control.new()
+		var cell_w = 180 if col != "Name" else 220
+		control.custom_minimum_size = Vector2(cell_w, 180)
+		control.clip_contents = true
+		
+		if is_header:
+			control.custom_minimum_size.y = 40
+			var lbl = Label.new()
+			lbl.text = col.to_upper()
+			lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+			control.add_child(lbl)
+		else:
+			match col:
+				"Name":
+					var lbl = Label.new()
+					var n = res.get("name")
+					lbl.text = n if n != null else "Unknown"
+					lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+					lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+					control.add_child(lbl)
+				"Idle", "Action 1", "Action 2", "Talk":
+					var anim = _create_anim_preview(res, col)
+					control.add_child(anim)
+				"Test":
+					var btn = Button.new()
+					btn.text = "LAUNCH TEST"
+					btn.custom_minimum_size = Vector2(120, 50)
+					btn.pressed.connect(_on_launch_pressed.bind(full_path, type))
+					btn.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+					control.add_child(btn)
+					
+		row.add_child(control)
+	return row
+
+func _create_anim_preview(res: Resource, slot: String) -> Sprite2D:
+	var sprite = Sprite2D.new()
+	var prop_name = ""
+	match slot:
+		"Idle": prop_name = "idle_sheet"
+		"Action 1": prop_name = "attack_sheet"
+		"Action 2": prop_name = "defend_sheet"
+		"Talk": prop_name = "talk_sheet"
+	
+	var tex = res.get(prop_name)
+	if tex and tex is Texture2D:
+		sprite.texture = tex
+		
+		# Metadata logic with safe fallbacks
+		var h = res.get("hframes")
+		var v = res.get("vframes")
+		
+		# Robust NPC support: If hframes is not defined, default to 8 for strips or 1 for static
+		sprite.hframes = h if (h != null and h > 0) else 8 
+		sprite.vframes = v if (v != null and v > 0) else 1 
+		
+		var source_h = float(tex.get_height()) / float(sprite.vframes)
+		var target_scale = BATTLE_PORTRAIT_HEIGHT / source_h if source_h > 0 else 1.0
+		
+		sprite.scale = Vector2(target_scale, target_scale)
+		sprite.position = Vector2(90, 90) 
+		
+		var tot = res.get("total_frames")
+		var final_total = int(tot if (tot != null and tot > 0) else sprite.hframes)
+		
+		var spd = res.get("frame_speed")
+		_animate_ping_pong(sprite, final_total, spd if spd != null else 0.1)
+	else:
+		var lbl = Label.new()
+		lbl.text = "[BLANK]"
+		lbl.modulate = Color.DARK_GRAY
+		lbl.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+		sprite.add_child(lbl)
+		
+	return sprite
+
+func _animate_ping_pong(sprite: Sprite2D, total: int, speed: float):
+	var frame = 0
+	var direction = 1
+	
+	# If only one frame, just stay on frame 0
+	if total <= 1: 
+		sprite.frame = 0
+		return
+		
+	while sprite and is_inside_tree():
+		sprite.frame = frame
+		
+		# Ping-Pong logic: Reverse at boundaries
+		if frame >= total - 1:
+			direction = -1
+		elif frame <= 0:
+			direction = 1
+			
+		frame += direction
+		
+		await get_tree().create_timer(speed).timeout
+
+func _setup_state_manipulator():
+	# Sync UI SpinBoxes with GameManager values
+	if has_node("%HPSpin"): %HPSpin.value = GameManager.current_hp
+	if has_node("%GoldSpin"): %GoldSpin.value = GameManager.gold
+	
+	# Connect signals for real-time testing
+	if has_node("%HPSpin"): %HPSpin.value_changed.connect(func(v): GameManager.current_hp = int(v))
+	if has_node("%GoldSpin"): %GoldSpin.value_changed.connect(func(v): GameManager.gold = int(v))
+
+func _on_launch_pressed(path: String, type: String):
+	# Construct mock node data
+	GameManager.current_node = {
+		"id": "debug_test",
+		"difficulty": 2,
+		"biome": "town",
+		"room_resource_path": path, 
+		"type": "battle" if type == "Enemy" else "event"
+	}
+	
+	# UPDATED: Directing to correct res://features/ folders
+	if type == "Enemy":
+		get_tree().change_scene_to_file("res://features/combat/BattleScene.tscn")
+	else:
+		get_tree().change_scene_to_file("res://features/encounters/EventScene.tscn")

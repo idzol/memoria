@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://data/resources/ItemData.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/items/full/kelp_potion.png" id="2_image"]
+[ext_resource type="Texture2D" path="res://assets/items/icons/kelp_potion.png" id="3_icon"]
+
+[resource]
+script = ExtResource("1_script")
+item_id = "kelp_potion"
+name = "Kelp Potion"
+type = "Consumable"
+level = 4
+hp = 12
+attack = 0
+armour = 0
+effect = "Amphibian"
+description = "A brew that allows breathing underwater."
+ai_prompt = "Cinematic dark fantasy: A green, salty liquid filled with small pieces of seaweed."
+item_image = ExtResource("2_image")
+item_icon = ExtResource("3_icon")
