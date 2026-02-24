@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://bwfjnijvo80p2"
+
+[deps]
+
+files=["res://scripts/sprites/Card.Name.translation", "res://scripts/sprites/Card.Type.translation", "res://scripts/sprites/Card.Value.translation", "res://scripts/sprites/Card.Description.translation", "res://scripts/sprites/Card.Special Effect.translation"]
+
+source_file="res://scripts/sprites/Card.csv"
+dest_files=["res://scripts/sprites/Card.Name.translation", "res://scripts/sprites/Card.Type.translation", "res://scripts/sprites/Card.Value.translation", "res://scripts/sprites/Card.Description.translation", "res://scripts/sprites/Card.Special Effect.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

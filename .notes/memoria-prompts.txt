@@ -13,6 +13,16 @@ assets
 	select best ... 
 
 
+
+	
+links 
+	https://docs.google.com/spreadsheets/d/1MgpBBFfe3s4lEDskU4rbwJQ8lc8gmr7o0pebAP7BaZI/edit?gid=504875481#gid=504875481
+
+	https://docs.google.com/spreadsheets/d/1BVhCvmFrrNGUbYFwAzhaRM08_MC3hzlxxKbPdmfMNfs/edit?gid=0#gid=0
+	
+
+
+
 scene selector 
 	1x combat - make sure combat scene is loading the correct enemy and default 
 	1x event - make sure event is loading correct NPC ...
