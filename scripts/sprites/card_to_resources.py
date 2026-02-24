@@ -8,7 +8,7 @@ CARD_SCRIPT_PATH = "res://data/resources/CardData.gd"
 
 # Asset Paths (Remaining the same as per requirements)
 IMAGE_ROOT = "res://assets/cards/full"
-ICON_ROOT = "res://assets/cards/icons"
+ICON_ROOT = "res://assets/cards/icon"
 
 def generate_card_tres(row):
     card_id = row['ID'].strip()
@@ -20,7 +20,7 @@ def generate_card_tres(row):
     
     # Asset conventions (Kept identical)
     full_art = f"{IMAGE_ROOT}/{card_id}.png"
-    icon_art = f"{ICON_ROOT}/{card_id}.png"
+    icon_art = f"{ICON_ROOT}/{card_id}_icon.png"
     
     # Extract Type for metadata
     c_type = row.get('Type', 'utility').strip().lower()

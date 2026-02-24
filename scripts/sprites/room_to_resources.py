@@ -5,7 +5,7 @@ import os
 CSV_FILE = "scripts/sprites/Room.csv" 
 OUTPUT_ROOT = "data/rooms"
 ROOM_SCRIPT_PATH = "res://data/resources/RoomData.gd"
-ASSET_ROOT = "res://assets/room"
+ASSET_ROOT = "res://assets/rooms"
 
 def infer_type(row):
     enemy = row.get('Enemy', '').strip()
@@ -32,9 +32,11 @@ def generate_room_tres(row):
     os.makedirs(out_dir, exist_ok=True)
     out_path = os.path.join(out_dir, f"{room_id}.tres")
     
-    # NEW ASSET CONVENTION: Organized by Biome
-    map_icon_path = f"{ASSET_ROOT}/{biome}/{room_id}_map.png"
-    scene_bg_path = f"{ASSET_ROOT}/{biome}/{room_id}_scene.png"
+    # ASSET CONVENTION: Organized by Biome
+    # map_icon_path = f"{ASSET_ROOT}/{biome}/{room_id}_map.png"
+    # scene_bg_path = f"{ASSET_ROOT}/{biome}/{room_id}_scene.png"
+    map_icon_path = f"{ASSET_ROOT}/map/{room_id}.png"
+    scene_bg_path = f"{ASSET_ROOT}/scene/{room_id}_room.png"
     
     loot_array = [i.strip() for i in loot_raw.split(',')] if loot_raw else []
     

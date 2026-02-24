@@ -1,261 +1,372 @@
-# Asset & Resource Audit Report
-Generated on: 2026-02-23 06:18:03
+# Memory Dungeon: Asset & Resource Audit
+Generated: 2026-02-25 10:28:31
 
-**Project Root:** `C:\Users\pkubi\Documents\memory-dungeon`
-**GameData Path:** `C:\Users\pkubi\Documents\memory-dungeon\core\GameData.gd`
+## 📊 Category Health
+| Category | Total Resources | Healthy | Broken | Status |
+| :--- | :---: | :---: | :---: | :--- |
+| Cards | 125 | 124 | 1 | ❌ FAILED |
+| Enemies | 81 | 69 | 12 | ❌ FAILED |
+| Items | 155 | 153 | 2 | ❌ FAILED |
+| Npcs | 80 | 49 | 31 | ❌ FAILED |
+| Player | 5 | 3 | 2 | ❌ FAILED |
+| Rooms | 163 | 158 | 5 | ❌ FAILED |
+| Map | 1 | 0 | 1 | ❌ FAILED |
 
-## Summary
-- **Unique static asset references found:** 104
-- **Missing static assets (PNGs, etc):** 60
-- **Required Room Resources (.tres):** 160
-- **Missing Room Resources (.tres):** 158
-- **Missing Biome Directories:** 6
-- **Orphaned .import files:** 0
+## ❌ Broken Resources Details
 
-## 📂 Missing Biome Directories
-> These folders must exist in `res://data/rooms/` for the audit to pass.
-- `res://data/rooms/abyss/` (Currently missing)
-- `res://data/rooms/desert/` (Currently missing)
-- `res://data/rooms/ice_caves/` (Currently missing)
-- `res://data/rooms/swamp/` (Currently missing)
-- `res://data/rooms/the_core/` (Currently missing)
-- `res://data/rooms/void/` (Currently missing)
+### Cards
+- **climbing_pick.tres** (`res://data/cards/climbing_pick.tres`)
+  - ⚠️ Missing: `res://assets/cards/icon/climbing_pick_icon.png`
 
-## 💎 Missing Room Resources (.tres)
-> Files must be named after the **Key** in `GameData.gd` (e.g. `t1.tres`).
+### Enemies
+- **angler_fiend.tres** (`res://data/enemies/angler_fiend.tres`)
+  - ⚠️ Missing: `res://assets/enemies/angler_fiend_idle.png`
+  - ⚠️ Missing: `res://assets/enemies/angler_fiend_attack.png`
+  - ⚠️ Missing: `res://assets/enemies/angler_fiend_defend.png`
+- **ash_wraith.tres** (`res://data/enemies/ash_wraith.tres`)
+  - ⚠️ Missing: `res://assets/enemies/ash_wraith_idle.png`
+  - ⚠️ Missing: `res://assets/enemies/ash_wraith_attack.png`
+  - ⚠️ Missing: `res://assets/enemies/ash_wraith_defend.png`
+- **automaton_scout.tres** (`res://data/enemies/automaton_scout.tres`)
+  - ⚠️ Missing: `res://assets/enemies/automaton_scout_idle.png`
+  - ⚠️ Missing: `res://assets/enemies/automaton_scout_attack.png`
+  - ⚠️ Missing: `res://assets/enemies/automaton_scout_defend.png`
+- **current_wraith.tres** (`res://data/enemies/current_wraith.tres`)
+  - ⚠️ Missing: `res://assets/enemies/current_wraith_idle.png`
+  - ⚠️ Missing: `res://assets/enemies/current_wraith_attack.png`
+  - ⚠️ Missing: `res://assets/enemies/current_wraith_defend.png`
+- **echo_shade.tres** (`res://data/enemies/echo_shade.tres`)
+  - ⚠️ Missing: `res://assets/enemies/echo_shade_idle.png`
+  - ⚠️ Missing: `res://assets/enemies/echo_shade_attack.png`
+  - ⚠️ Missing: `res://assets/enemies/echo_shade_defend.png`
+- **forge_automaton.tres** (`res://data/enemies/forge_automaton.tres`)
+  - ⚠️ Missing: `res://assets/enemies/forge_automaton_idle.png`
+  - ⚠️ Missing: `res://assets/enemies/forge_automaton_attack.png`
+  - ⚠️ Missing: `res://assets/enemies/forge_automaton_defend.png`
+- **glow_eel.tres** (`res://data/enemies/glow_eel.tres`)
+  - ⚠️ Missing: `res://assets/enemies/glow_eel_idle.png`
+  - ⚠️ Missing: `res://assets/enemies/glow_eel_attack.png`
+  - ⚠️ Missing: `res://assets/enemies/glow_eel_defend.png`
+- **loose_armor.tres** (`res://data/enemies/loose_armor.tres`)
+  - ⚠️ Missing: `res://assets/enemies/loose_armor_idle.png`
+  - ⚠️ Missing: `res://assets/enemies/loose_armor_attack.png`
+  - ⚠️ Missing: `res://assets/enemies/loose_armor_defend.png`
+- **rock_spider.tres** (`res://data/enemies/rock_spider.tres`)
+  - ⚠️ Missing: `res://assets/enemies/rock_spider_idle.png`
+  - ⚠️ Missing: `res://assets/enemies/rock_spider_attack.png`
+  - ⚠️ Missing: `res://assets/enemies/rock_spider_defend.png`
+- **scarab_swarm.tres** (`res://data/enemies/scarab_swarm.tres`)
+  - ⚠️ Missing: `res://assets/enemies/scarab_swarm_idle.png`
+  - ⚠️ Missing: `res://assets/enemies/scarab_swarm_attack.png`
+  - ⚠️ Missing: `res://assets/enemies/scarab_swarm_defend.png`
+- **sulfur_spirit.tres** (`res://data/enemies/sulfur_spirit.tres`)
+  - ⚠️ Missing: `res://assets/enemies/sulfur_spirit_idle.png`
+  - ⚠️ Missing: `res://assets/enemies/sulfur_spirit_attack.png`
+  - ⚠️ Missing: `res://assets/enemies/sulfur_spirit_defend.png`
+- **training_dummy.tres** (`res://data/enemies/training_dummy.tres`)
+  - ⚠️ Missing: `res://assets/enemies/training_dummy_idle.png`
+  - ⚠️ Missing: `res://assets/enemies/training_dummy_attack.png`
+  - ⚠️ Missing: `res://assets/enemies/training_dummy_defend.png`
 
-### Biome: abyss
-- `res://data/rooms/abyss/a1.tres`
-- `res://data/rooms/abyss/a10.tres`
-- `res://data/rooms/abyss/a11.tres`
-- `res://data/rooms/abyss/a12.tres`
-- `res://data/rooms/abyss/a13.tres`
-- `res://data/rooms/abyss/a14.tres`
-- `res://data/rooms/abyss/a15.tres`
-- `res://data/rooms/abyss/a16.tres`
-- `res://data/rooms/abyss/a17.tres`
-- `res://data/rooms/abyss/a18.tres`
-- `res://data/rooms/abyss/a19.tres`
-- `res://data/rooms/abyss/a2.tres`
-- `res://data/rooms/abyss/a20.tres`
-- `res://data/rooms/abyss/a3.tres`
-- `res://data/rooms/abyss/a4.tres`
-- `res://data/rooms/abyss/a5.tres`
-- `res://data/rooms/abyss/a6.tres`
-- `res://data/rooms/abyss/a7.tres`
-- `res://data/rooms/abyss/a8.tres`
-- `res://data/rooms/abyss/a9.tres`
+### Items
+- **banjo.tres** (`res://data/items/banjo.tres`)
+  - ⚠️ Missing: `res://assets/items/full/banjo.png`
+  - ⚠️ Missing: `res://assets/items/icon/banjo_icon.png`
+- **clover.tres** (`res://data/items/clover.tres`)
+  - ⚠️ Missing: `res://assets/items/full/clover.png`
+  - ⚠️ Missing: `res://assets/items/icon/clover_icon.png`
 
-### Biome: desert
-- `res://data/rooms/desert/d1.tres`
-- `res://data/rooms/desert/d10.tres`
-- `res://data/rooms/desert/d11.tres`
-- `res://data/rooms/desert/d12.tres`
-- `res://data/rooms/desert/d13.tres`
-- `res://data/rooms/desert/d14.tres`
-- `res://data/rooms/desert/d15.tres`
-- `res://data/rooms/desert/d16.tres`
-- `res://data/rooms/desert/d17.tres`
-- `res://data/rooms/desert/d18.tres`
-- `res://data/rooms/desert/d19.tres`
-- `res://data/rooms/desert/d2.tres`
-- `res://data/rooms/desert/d20.tres`
-- `res://data/rooms/desert/d3.tres`
-- `res://data/rooms/desert/d4.tres`
-- `res://data/rooms/desert/d5.tres`
-- `res://data/rooms/desert/d6.tres`
-- `res://data/rooms/desert/d7.tres`
-- `res://data/rooms/desert/d8.tres`
-- `res://data/rooms/desert/d9.tres`
+### Npcs
+- **ancient_naga.tres** (`res://data/npcs/ancient_naga.tres`)
+  - ⚠️ Missing: `res://assets/npcs/ancient_naga_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/ancient_naga_talk.png`
+- **archeologist.tres** (`res://data/npcs/archeologist.tres`)
+  - ⚠️ Missing: `res://assets/npcs/archeologist_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/archeologist_talk.png`
+- **baker.tres** (`res://data/npcs/baker.tres`)
+  - ⚠️ Missing: `res://assets/npcs/baker_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/baker_talk.png`
+- **beggar.tres** (`res://data/npcs/beggar.tres`)
+  - ⚠️ Missing: `res://assets/npcs/beggar_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/beggar_talk.png`
+- **caravan_cook.tres** (`res://data/npcs/caravan_cook.tres`)
+  - ⚠️ Missing: `res://assets/npcs/caravan_cook_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/caravan_cook_talk.png`
+- **core_surveyor.tres** (`res://data/npcs/core_surveyor.tres`)
+  - ⚠️ Missing: `res://assets/npcs/core_surveyor_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/core_surveyor_talk.png`
+- **drowned_poet.tres** (`res://data/npcs/drowned_poet.tres`)
+  - ⚠️ Missing: `res://assets/npcs/drowned_poet_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/drowned_poet_talk.png`
+- **fey_spirit.tres** (`res://data/npcs/fey_spirit.tres`)
+  - ⚠️ Missing: `res://assets/npcs/fey_spirit_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/fey_spirit_talk.png`
+- **fire_dancer.tres** (`res://data/npcs/fire_dancer.tres`)
+  - ⚠️ Missing: `res://assets/npcs/fire_dancer_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/fire_dancer_talk.png`
+- **foundry_overseer.tres** (`res://data/npcs/foundry_overseer.tres`)
+  - ⚠️ Missing: `res://assets/npcs/foundry_overseer_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/foundry_overseer_talk.png`
+- **fragmented_mind.tres** (`res://data/npcs/fragmented_mind.tres`)
+  - ⚠️ Missing: `res://assets/npcs/fragmented_mind_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/fragmented_mind_talk.png`
+- **frost_hermit.tres** (`res://data/npcs/frost_hermit.tres`)
+  - ⚠️ Missing: `res://assets/npcs/frost_hermit_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/frost_hermit_talk.png`
+- **genie_trapped.tres** (`res://data/npcs/genie_trapped.tres`)
+  - ⚠️ Missing: `res://assets/npcs/genie_trapped_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/genie_trapped_talk.png`
+- **ghost_miner.tres** (`res://data/npcs/ghost_miner.tres`)
+  - ⚠️ Missing: `res://assets/npcs/ghost_miner_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/ghost_miner_talk.png`
+- **herbalist.tres** (`res://data/npcs/herbalist.tres`)
+  - ⚠️ Missing: `res://assets/npcs/herbalist_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/herbalist_talk.png`
+- **ice_sculptor.tres** (`res://data/npcs/ice_sculptor.tres`)
+  - ⚠️ Missing: `res://assets/npcs/ice_sculptor_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/ice_sculptor_talk.png`
+- **legendary_smith.tres** (`res://data/npcs/legendary_smith.tres`)
+  - ⚠️ Missing: `res://assets/npcs/legendary_smith_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/legendary_smith_talk.png`
+- **magma_miner.tres** (`res://data/npcs/magma_miner.tres`)
+  - ⚠️ Missing: `res://assets/npcs/magma_miner_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/magma_miner_talk.png`
+- **mystic.tres** (`res://data/npcs/mystic.tres`)
+  - ⚠️ Missing: `res://assets/npcs/mystic_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/mystic_talk.png`
+- **nomad_leader.tres** (`res://data/npcs/nomad_leader.tres`)
+  - ⚠️ Missing: `res://assets/npcs/nomad_leader_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/nomad_leader_talk.png`
+- **null_priest.tres** (`res://data/npcs/null_priest.tres`)
+  - ⚠️ Missing: `res://assets/npcs/null_priest_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/null_priest_talk.png`
+- **past_self.tres** (`res://data/npcs/past_self.tres`)
+  - ⚠️ Missing: `res://assets/npcs/past_self_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/past_self_talk.png`
+- **pearl_seeker.tres** (`res://data/npcs/pearl_seeker.tres`)
+  - ⚠️ Missing: `res://assets/npcs/pearl_seeker_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/pearl_seeker_talk.png`
+- **pilot_jack.tres** (`res://data/npcs/pilot_jack.tres`)
+  - ⚠️ Missing: `res://assets/npcs/pilot_jack_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/pilot_jack_talk.png`
+- **pressure_mechanic.tres** (`res://data/npcs/pressure_mechanic.tres`)
+  - ⚠️ Missing: `res://assets/npcs/pressure_mechanic_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/pressure_mechanic_talk.png`
+- **satyr.tres** (`res://data/npcs/satyr.tres`)
+  - ⚠️ Missing: `res://assets/npcs/satyr_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/satyr_talk.png`
+- **scorpion_charmer.tres** (`res://data/npcs/scorpion_charmer.tres`)
+  - ⚠️ Missing: `res://assets/npcs/scorpion_charmer_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/scorpion_charmer_talk.png`
+- **snow_scout.tres** (`res://data/npcs/snow_scout.tres`)
+  - ⚠️ Missing: `res://assets/npcs/snow_scout_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/snow_scout_talk.png`
+- **swamp_alchemist.tres** (`res://data/npcs/swamp_alchemist.tres`)
+  - ⚠️ Missing: `res://assets/npcs/swamp_alchemist_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/swamp_alchemist_talk.png`
+- **swamp_hermit.tres** (`res://data/npcs/swamp_hermit.tres`)
+  - ⚠️ Missing: `res://assets/npcs/swamp_hermit_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/swamp_hermit_talk.png`
+- **trench_merchant.tres** (`res://data/npcs/trench_merchant.tres`)
+  - ⚠️ Missing: `res://assets/npcs/trench_merchant_idle.png`
+  - ⚠️ Missing: `res://assets/npcs/trench_merchant_talk.png`
 
-### Biome: forest
-- `res://data/rooms/forest/f10.tres`
-- `res://data/rooms/forest/f11.tres`
-- `res://data/rooms/forest/f12.tres`
-- `res://data/rooms/forest/f13.tres`
-- `res://data/rooms/forest/f14.tres`
-- `res://data/rooms/forest/f15.tres`
-- `res://data/rooms/forest/f16.tres`
-- `res://data/rooms/forest/f17.tres`
-- `res://data/rooms/forest/f18.tres`
-- `res://data/rooms/forest/f19.tres`
-- `res://data/rooms/forest/f2.tres`
-- `res://data/rooms/forest/f20.tres`
-- `res://data/rooms/forest/f3.tres`
-- `res://data/rooms/forest/f4.tres`
-- `res://data/rooms/forest/f5.tres`
-- `res://data/rooms/forest/f6.tres`
-- `res://data/rooms/forest/f7.tres`
-- `res://data/rooms/forest/f8.tres`
-- `res://data/rooms/forest/f9.tres`
+### Player
+- **gold.tres** (`res://data/player/gold.tres`)
+  - ⚠️ Missing: `res://assets/player/gold_idle.png`
+  - ⚠️ Missing: `res://assets/player/gold_attack.png`
+  - ⚠️ Missing: `res://assets/player/gold_defend.png`
+- **leather.tres** (`res://data/player/leather.tres`)
+  - ⚠️ Missing: `res://assets/player/leather_idle.png`
+  - ⚠️ Missing: `res://assets/player/leather_attack.png`
+  - ⚠️ Missing: `res://assets/player/leather_defend.png`
 
-### Biome: ice_caves
-- `res://data/rooms/ice_caves/i1.tres`
-- `res://data/rooms/ice_caves/i10.tres`
-- `res://data/rooms/ice_caves/i11.tres`
-- `res://data/rooms/ice_caves/i12.tres`
-- `res://data/rooms/ice_caves/i13.tres`
-- `res://data/rooms/ice_caves/i14.tres`
-- `res://data/rooms/ice_caves/i15.tres`
-- `res://data/rooms/ice_caves/i16.tres`
-- `res://data/rooms/ice_caves/i17.tres`
-- `res://data/rooms/ice_caves/i18.tres`
-- `res://data/rooms/ice_caves/i19.tres`
-- `res://data/rooms/ice_caves/i2.tres`
-- `res://data/rooms/ice_caves/i20.tres`
-- `res://data/rooms/ice_caves/i3.tres`
-- `res://data/rooms/ice_caves/i4.tres`
-- `res://data/rooms/ice_caves/i5.tres`
-- `res://data/rooms/ice_caves/i6.tres`
-- `res://data/rooms/ice_caves/i7.tres`
-- `res://data/rooms/ice_caves/i8.tres`
-- `res://data/rooms/ice_caves/i9.tres`
+### Rooms
+- **default_battle.tres** (`res://data/rooms/default_battle.tres`)
+  - ⚠️ Missing: `res://assets/rooms/default.png`
+- **abyss_thermal_vent.tres** (`res://data/rooms/abyss/abyss_thermal_vent.tres`)
+  - ⚠️ Missing: `res://assets/rooms/scene/abyss_thermal_vent_room.png`
+- **desert_glass_canyon.tres** (`res://data/rooms/desert/desert_glass_canyon.tres`)
+  - ⚠️ Missing: `res://assets/rooms/map/desert_glass_canyon.png`
+- **ice_caves_sleeping_giant.tres** (`res://data/rooms/ice_caves/ice_caves_sleeping_giant.tres`)
+  - ⚠️ Missing: `res://assets/rooms/scene/ice_caves_sleeping_giant_room.png`
+- **void_blood_fountain.tres** (`res://data/rooms/void/void_blood_fountain.tres`)
+  - ⚠️ Missing: `res://assets/rooms/map/void_blood_fountain.png`
 
-### Biome: swamp
-- `res://data/rooms/swamp/s1.tres`
-- `res://data/rooms/swamp/s10.tres`
-- `res://data/rooms/swamp/s11.tres`
-- `res://data/rooms/swamp/s12.tres`
-- `res://data/rooms/swamp/s13.tres`
-- `res://data/rooms/swamp/s14.tres`
-- `res://data/rooms/swamp/s15.tres`
-- `res://data/rooms/swamp/s16.tres`
-- `res://data/rooms/swamp/s17.tres`
-- `res://data/rooms/swamp/s18.tres`
-- `res://data/rooms/swamp/s19.tres`
-- `res://data/rooms/swamp/s2.tres`
-- `res://data/rooms/swamp/s20.tres`
-- `res://data/rooms/swamp/s3.tres`
-- `res://data/rooms/swamp/s4.tres`
-- `res://data/rooms/swamp/s5.tres`
-- `res://data/rooms/swamp/s6.tres`
-- `res://data/rooms/swamp/s7.tres`
-- `res://data/rooms/swamp/s8.tres`
-- `res://data/rooms/swamp/s9.tres`
+### Map
+- **map_data.tres** (`res://data/map/map_data.tres`)
+  - ⚠️ Missing: `res://data/resources/map_asset_data.gd`
+  - ⚠️ Missing: `res://assets/maps/icon/heart.png`
+  - ⚠️ Missing: `res://assets/maps/icon/scroll.png`
+  - ⚠️ Missing: `res://assets/maps/icon/skull.png`
+  - ⚠️ Missing: `res://assets/maps/icon/trap.png`
+  - ⚠️ Missing: `res://assets/maps/backgrounds/town.png`
+  - ⚠️ Missing: `res://assets/maps/backgrounds/forest.png`
+  - ⚠️ Missing: `res://assets/maps/backgrounds/ice_caves.png`
+  - ⚠️ Missing: `res://assets/maps/backgrounds/desert.png`
+  - ⚠️ Missing: `res://assets/maps/backgrounds/swamp.png`
+  - ⚠️ Missing: `res://assets/maps/backgrounds/abyss.png`
+  - ⚠️ Missing: `res://assets/maps/backgrounds/void.png`
+  - ⚠️ Missing: `res://assets/maps/backgrounds/the_core.png`
+  - ⚠️ Missing: `res://assets/maps/grids/town_grid.png`
+  - ⚠️ Missing: `res://assets/maps/grids/forest_grid.png`
+  - ⚠️ Missing: `res://assets/maps/grids/ice_caves_grid.png`
+  - ⚠️ Missing: `res://assets/maps/grids/desert_grid.png`
+  - ⚠️ Missing: `res://assets/maps/grids/swamp_grid.png`
+  - ⚠️ Missing: `res://assets/maps/grids/abyss_grid.png`
+  - ⚠️ Missing: `res://assets/maps/grids/void_grid.png`
+  - ⚠️ Missing: `res://assets/maps/grids/the_core_grid.png`
 
-### Biome: the_core
-- `res://data/rooms/the_core/c1.tres`
-- `res://data/rooms/the_core/c10.tres`
-- `res://data/rooms/the_core/c11.tres`
-- `res://data/rooms/the_core/c12.tres`
-- `res://data/rooms/the_core/c13.tres`
-- `res://data/rooms/the_core/c14.tres`
-- `res://data/rooms/the_core/c15.tres`
-- `res://data/rooms/the_core/c16.tres`
-- `res://data/rooms/the_core/c17.tres`
-- `res://data/rooms/the_core/c18.tres`
-- `res://data/rooms/the_core/c19.tres`
-- `res://data/rooms/the_core/c2.tres`
-- `res://data/rooms/the_core/c20.tres`
-- `res://data/rooms/the_core/c3.tres`
-- `res://data/rooms/the_core/c4.tres`
-- `res://data/rooms/the_core/c5.tres`
-- `res://data/rooms/the_core/c6.tres`
-- `res://data/rooms/the_core/c7.tres`
-- `res://data/rooms/the_core/c8.tres`
-- `res://data/rooms/the_core/c9.tres`
-
-### Biome: town
-- `res://data/rooms/town/t10.tres`
-- `res://data/rooms/town/t11.tres`
-- `res://data/rooms/town/t12.tres`
-- `res://data/rooms/town/t13.tres`
-- `res://data/rooms/town/t14.tres`
-- `res://data/rooms/town/t15.tres`
-- `res://data/rooms/town/t16.tres`
-- `res://data/rooms/town/t17.tres`
-- `res://data/rooms/town/t18.tres`
-- `res://data/rooms/town/t19.tres`
-- `res://data/rooms/town/t2.tres`
-- `res://data/rooms/town/t20.tres`
-- `res://data/rooms/town/t3.tres`
-- `res://data/rooms/town/t4.tres`
-- `res://data/rooms/town/t5.tres`
-- `res://data/rooms/town/t6.tres`
-- `res://data/rooms/town/t7.tres`
-- `res://data/rooms/town/t8.tres`
-- `res://data/rooms/town/t9.tres`
-
-### Biome: void
-- `res://data/rooms/void/v1.tres`
-- `res://data/rooms/void/v10.tres`
-- `res://data/rooms/void/v11.tres`
-- `res://data/rooms/void/v12.tres`
-- `res://data/rooms/void/v13.tres`
-- `res://data/rooms/void/v14.tres`
-- `res://data/rooms/void/v15.tres`
-- `res://data/rooms/void/v16.tres`
-- `res://data/rooms/void/v17.tres`
-- `res://data/rooms/void/v18.tres`
-- `res://data/rooms/void/v19.tres`
-- `res://data/rooms/void/v2.tres`
-- `res://data/rooms/void/v20.tres`
-- `res://data/rooms/void/v3.tres`
-- `res://data/rooms/void/v4.tres`
-- `res://data/rooms/void/v5.tres`
-- `res://data/rooms/void/v6.tres`
-- `res://data/rooms/void/v7.tres`
-- `res://data/rooms/void/v8.tres`
-- `res://data/rooms/void/v9.tres`
-
-## ❌ Missing Static Assets
-- `res://assets/axe.png`
-- `res://assets/bandage.png`
-- `res://assets/enemy/ale.png`
-- `res://assets/enemy/bandage.png`
-- `res://assets/enemy/bee.png`
-- `res://assets/enemy/blood.png`
-- `res://assets/enemy/bomb.png`
-- `res://assets/enemy/claw.png`
-- `res://assets/enemy/claws.png`
-- `res://assets/enemy/cloak.png`
-- `res://assets/enemy/dagger.png`
-- `res://assets/enemy/eye.png`
-- `res://assets/enemy/fang.png`
-- `res://assets/enemy/fire.png`
-- `res://assets/enemy/fist.png`
-- `res://assets/enemy/frost.png`
-- `res://assets/enemy/ghost.png`
-- `res://assets/enemy/glass.png`
-- `res://assets/enemy/heart.png`
-- `res://assets/enemy/key.png`
-- `res://assets/enemy/leaf.png`
-- `res://assets/enemy/light.png`
-- `res://assets/enemy/lightning.png`
-- `res://assets/enemy/mud.png`
-- `res://assets/enemy/mushroom.png`
-- `res://assets/enemy/ore.png`
-- `res://assets/enemy/potion.png`
-- `res://assets/enemy/scroll.png`
-- `res://assets/enemy/shield.png`
-- `res://assets/enemy/skull.png`
-- `res://assets/enemy/slime.png`
-- `res://assets/enemy/spider.png`
-- `res://assets/enemy/sword.png`
-- `res://assets/enemy/thorn.png`
-- `res://assets/enemy/tome.png`
-- `res://assets/enemy/trap.png`
-- `res://assets/enemy/trident.png`
-- `res://assets/enemy/vapor.png`
-- `res://assets/enemy/vial.png`
-- `res://assets/enemy/water.png`
-- `res://assets/enemy/wing.png`
-- `res://assets/frost.png`
-- `res://assets/heart.png`
-- `res://assets/key.png`
-- `res://assets/maps/icon/heart.png`
-- `res://assets/maps/icon/scroll.png`
-- `res://assets/maps/icon/skull.png`
-- `res://assets/maps/icon/trap.png`
-- `res://assets/mystery.png`
-- `res://assets/npc/archivist/base.png`
-- `res://assets/npc/base.png`
-- `res://assets/player/base.png`
-- `res://assets/player/idle.ogv`
-- `res://assets/potion.png`
-- `res://assets/scroll.png`
-- `res://assets/shield.png`
-- `res://assets/skull.png`
-- `res://assets/sword.png`
-- `res://assets/trap.png`
-- `res://assets/video/intro.ogv`
+## 🧹 Orphaned Assets (Unused)
+> These assets exist in `res://assets/` but are not referenced by any `.tres` file.
+- `res://assets/enemies/hunter_attack.png`
+- `res://assets/enemies/hunter_defend.png`
+- `res://assets/enemies/hunter_idle.png`
+- `res://assets/enemies/last_soul_attack.png`
+- `res://assets/enemies/last_soul_defend.png`
+- `res://assets/enemies/last_soul_idle.png`
+- `res://assets/enemies/sand_spirit1_attack.png`
+- `res://assets/enemies/sand_spirit1_defend.png`
+- `res://assets/enemies/sand_spirit1_idle.png`
+- `res://assets/enemies/trainnig_dummy_attack.png`
+- `res://assets/enemies/trainnig_dummy_defend.png`
+- `res://assets/enemies/trainnig_dummy_idle.png`
+- `res://assets/fonts/Forum-Regular.ttf`
+- `res://assets/fonts/minotaur.ttf`
+- `res://assets/items/full/plant.png`
+- `res://assets/items/icon/plant_icon.png`
+- `res://assets/maps/_legacy/forest_0.png`
+- `res://assets/maps/_legacy/forest_1.png`
+- `res://assets/maps/_legacy/forest_2.png`
+- `res://assets/maps/_legacy/forest_3.png`
+- `res://assets/maps/_legacy/home.png`
+- `res://assets/maps/_legacy/ice.png`
+- `res://assets/maps/_legacy/sand.png`
+- `res://assets/maps/icon/battle.png`
+- `res://assets/maps/icon/event.png`
+- `res://assets/maps/icon/mystery.png`
+- `res://assets/maps/icon/rest.png`
+- `res://assets/music/amb_100.ogg`
+- `res://assets/music/mus_100.ogg`
+- `res://assets/npcs/bayou_bard_interact.png`
+- `res://assets/npcs/berg_merchant_interact.png`
+- `res://assets/npcs/blacksmith_interact.png`
+- `res://assets/npcs/bog_doctor_interact.png`
+- `res://assets/npcs/coral_king_interact.png`
+- `res://assets/npcs/corrupt_clerk_idle.png`
+- `res://assets/npcs/corrupt_clerk_interact.png`
+- `res://assets/npcs/corrupt_clerk_talk.png`
+- `res://assets/npcs/cryomancer_interact.png`
+- `res://assets/npcs/deep_diver_interact.png`
+- `res://assets/npcs/druid_interact.png`
+- `res://assets/npcs/dryad_corruptor_idle.png`
+- `res://assets/npcs/dryad_corruptor_interact.png`
+- `res://assets/npcs/dryad_corruptor_talk.png`
+- `res://assets/npcs/elemental_emissary_interact.png`
+- `res://assets/npcs/exiled_prince_interact.png`
+- `res://assets/npcs/ferryman_interact.png`
+- `res://assets/npcs/frog_folk_elder_interact.png`
+- `res://assets/npcs/frozen_explorer_interact.png`
+- `res://assets/npcs/ghost_scholar_idle.png`
+- `res://assets/npcs/ghost_scholar_interact.png`
+- `res://assets/npcs/ghost_scholar_talk.png`
+- `res://assets/npcs/guard_captain_interact.png`
+- `res://assets/npcs/heat_shaman_interact.png`
+- `res://assets/npcs/hunter_interact.png`
+- `res://assets/npcs/ice_giant_interact.png`
+- `res://assets/npcs/innkeeper_interact.png`
+- `res://assets/npcs/jelly_whisperer_interact.png`
+- `res://assets/npcs/last_soul_interact.png`
+- `res://assets/npcs/lava_slug_idle.png`
+- `res://assets/npcs/lava_slug_interact.png`
+- `res://assets/npcs/lava_slug_talk.png`
+- `res://assets/npcs/leech_swarm_idle.png`
+- `res://assets/npcs/leech_swarm_interact.png`
+- `res://assets/npcs/leech_swarm_talk.png`
+- `res://assets/npcs/librarian_interact.png`
+- `res://assets/npcs/loose_armor2_idle.png`
+- `res://assets/npcs/loose_armor2_interact.png`
+- `res://assets/npcs/loose_armor2_talk.png`
+- `res://assets/npcs/loose_armor_idle.png`
+- `res://assets/npcs/loose_armor_interact.png`
+- `res://assets/npcs/loose_armor_talk.png`
+- `res://assets/npcs/lost_child_interact.png`
+- `res://assets/npcs/mayor_interact.png`
+- `res://assets/npcs/memory_thief_interact.png`
+- `res://assets/npcs/merchant_interact.png`
+- `res://assets/npcs/mermaid_interact.png`
+- `res://assets/npcs/merrow_king_idle.png`
+- `res://assets/npcs/merrow_king_interact.png`
+- `res://assets/npcs/merrow_king_talk.png`
+- `res://assets/npcs/mimic_frost_idle.png`
+- `res://assets/npcs/mimic_frost_interact.png`
+- `res://assets/npcs/mimic_frost_talk.png`
+- `res://assets/npcs/mud_fisher_interact.png`
+- `res://assets/npcs/mud_walker_idle.png`
+- `res://assets/npcs/mud_walker_interact.png`
+- `res://assets/npcs/mud_walker_talk.png`
+- `res://assets/npcs/oasis_keeper_interact.png`
+- `res://assets/npcs/obsidian_artist_interact.png`
+- `res://assets/npcs/paradox_merchant_interact.png`
+- `res://assets/npcs/polar_guide_interact.png`
+- `res://assets/npcs/priest_interact.png`
+- `res://assets/npcs/ranger_interact.png`
+- `res://assets/npcs/reptile_trader_interact.png`
+- `res://assets/npcs/rift_scientist_interact.png`
+- `res://assets/npcs/rift_walker_idle.png`
+- `res://assets/npcs/rift_walker_interact.png`
+- `res://assets/npcs/rift_walker_talk.png`
+- `res://assets/npcs/sand_sailor2_idle.png`
+- `res://assets/npcs/sand_sailor2_interact.png`
+- `res://assets/npcs/sand_sailor2_talk.png`
+- `res://assets/npcs/sand_sailor_interact.png`
+- `res://assets/npcs/sand_spirit1_idle.png`
+- `res://assets/npcs/sand_spirit1_interact.png`
+- `res://assets/npcs/sand_spirit1_talk.png`
+- `res://assets/npcs/sand_spirit_idle.png`
+- `res://assets/npcs/sand_spirit_interact.png`
+- `res://assets/npcs/sand_spirit_talk.png`
+- `res://assets/npcs/scoprion_charmer_idle.png`
+- `res://assets/npcs/scoprion_charmer_interact.png`
+- `res://assets/npcs/scoprion_charmer_talk.png`
+- `res://assets/npcs/sea_hag_interact.png`
+- `res://assets/npcs/sphinx_npc_interact.png`
+- `res://assets/npcs/spore_servant_idle.png`
+- `res://assets/npcs/spore_servant_interact.png`
+- `res://assets/npcs/spore_servant_talk.png`
+- `res://assets/npcs/stablehand_interact.png`
+- `res://assets/npcs/star_gazer_interact.png`
+- `res://assets/npcs/steam_engineer_interact.png`
+- `res://assets/npcs/steam_mephit_idle.png`
+- `res://assets/npcs/steam_mephit_interact.png`
+- `res://assets/npcs/steam_mephit_talk.png`
+- `res://assets/npcs/strange_rabbit_interact.png`
+- `res://assets/npcs/sun_priest_interact.png`
+- `res://assets/npcs/sunken_ghost_interact.png`
+- `res://assets/npcs/swam_alchemist_idle.png`
+- `res://assets/npcs/swam_alchemist_interact.png`
+- `res://assets/npcs/swam_alchemist_talk.png`
+- `res://assets/npcs/swamp_hag_interact.png`
+- `res://assets/npcs/time_keeper_interact.png`
+- `res://assets/npcs/trainnig_dummy_idle.png`
+- `res://assets/npcs/trainnig_dummy_interact.png`
+- `res://assets/npcs/trainnig_dummy_talk.png`
+- `res://assets/npcs/vampire_lord_idle.png`
+- `res://assets/npcs/void_trader_interact.png`
+- `res://assets/npcs/water_elemental_idle.png`
+- `res://assets/npcs/water_elemental_interact.png`
+- `res://assets/npcs/water_elemental_talk.png`
+- `res://assets/npcs/willow_wisp_idle.png`
+- `res://assets/npcs/willow_wisp_interact.png`
+- `res://assets/npcs/willow_wisp_talk.png`
+- `res://assets/npcs/woodcutter_interact.png`
+- `res://assets/npcs/yeti_outcast_interact.png`
+- `res://assets/npcs/yeti_talk.png`
+- `res://assets/player/idle.png`
+- `res://assets/rooms/scene/default.png`
+- `res://assets/themes/Greek.theme`
+- `res://assets/themes/Minotaur.theme`
+- `res://assets/ui/end_day_1.png`
+- `res://assets/ui/end_day_2.png`
+- `res://assets/ui/end_day_3.png`
+- `res://assets/ui/main_background.png`

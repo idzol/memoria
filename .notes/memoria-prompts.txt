@@ -1,4 +1,38 @@
 
+audit assets
+	debug{assets}...
+
+
+card to resource 
+	update paths 
+	{card}.png 
+	{card}_icon.png
+
+debugcard  
+
+	inspect assets 
+	show card.tscn ->
+
+card.tscn 
+	use card resource (tres) 
+	card title 
+	card image 
+	card description 
+
+battlescene.tscn 
+	use card resource (tres)
+	card icon 
+
+character screen 
+	use card.tscn .. 
+	
+	
+====
+
+
+
+	
+
 comfyui workflow 
 	random increment 
 

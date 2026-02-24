@@ -9,7 +9,7 @@ ITEM_SCRIPT_PATH = "res://data/resources/ItemData.gd"
 
 # Asset Paths - Assumes naming follows the 'ID' column (e.g. wood_splinter.png)
 IMAGE_ROOT = "res://assets/items/full"
-ICON_ROOT = "res://assets/items/icons"
+ICON_ROOT = "res://assets/items/icon"
 
 def generate_item_tres(row):
     # 'ID' is now the descriptive slug (e.g., wood_splinter), 'UID' (item_101) is ignored.
@@ -21,7 +21,7 @@ def generate_item_tres(row):
     
     # Asset conventions
     full_art = f"{IMAGE_ROOT}/{item_id}.png"
-    icon_art = f"{ICON_ROOT}/{item_id}.png"
+    icon_art = f"{ICON_ROOT}/{item_id}_icon.png"
     
     # Header: Script + Image + Icon + Resource
     lines = [
