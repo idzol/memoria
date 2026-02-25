@@ -2,6 +2,9 @@
 .godot/
 /android/
 
+# Assets
+assets/
+
 # Python venv
 .venv*
 

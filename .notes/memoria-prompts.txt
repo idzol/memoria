@@ -1,6 +1,6 @@
 
-audit assets
-	debug{assets}...
+== 
+debug{assets}...
 
 
 card to resource 
