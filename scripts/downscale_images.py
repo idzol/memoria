@@ -4,10 +4,15 @@ from PIL import Image
 # Configuration: Folder path and the target width
 # (Height will be calculated automatically to maintain aspect ratio)
 targets = {
-    "./assets/card": 512,
+    "./assets/card_full": 512,
+    "./assets/card_icon": 256,
     "./assets/enemies": 2048,
     "./assets/npcs": 2048,
-    "./assets/player": 2048
+    "./assets/player": 2048,
+    "./assets/maps/backgrounds": 1024,
+    "./assets/maps/grids": 256,
+    "./assets/maps/icons": 128,
+    "./assets/rooms": 512
 }
 
 def resize_images():

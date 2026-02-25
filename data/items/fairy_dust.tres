@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://data/resources/ItemData.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://assets/items/full/fairy_dust.png" id="2_image"]
-[ext_resource type="Texture2D" path="res://assets/items/icons/fairy_dust.png" id="3_icon"]
+[ext_resource type="Texture2D" path="res://assets/items/icon/fairy_dust_icon.png" id="3_icon"]
 
 [resource]
 script = ExtResource("1_script")

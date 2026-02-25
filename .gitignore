@@ -2,12 +2,16 @@
 .godot/
 /android/
 
-# Python venv
-.venv
+# Assets
+assets/
 
-*.tmp                  # Temporary files
-export_presets.cfg     # Only ignore if you want to keep your export paths private
+# Python venv
+.venv*
 
 # System ignores
 .DS_Store
 Thumbs.db
+
+# General 
+*.tmp                  # Temporary files
+export_presets.cfg     # Only ignore if you want to keep your export paths private
