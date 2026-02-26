@@ -1,74 +1,114 @@
 extends Control
 
 # res://features/encounters/EventScene.gd
+# Narrative encounter logic utilizing Room and NPC resources.
 
-# IMPORT: Centralized data
-const GameData = preload("res://core/GameData.gd")
+@onready var background = %Background
+@onready var room_title = %RoomTitle
+@onready var dialog_text = %DialogText
+@onready var choice_container = %ChoiceContainer
+@onready var npc_name_label = %NPCName
+@onready var player_sprite = %PlayerSprite
+@onready var npc_sprite = %NPCSprite
+@onready var exit_button = %ExitButton
 
-@onready var title_label = $MarginContainer/VBoxContainer/Title
-@onready var desc_label = $MarginContainer/VBoxContainer/Description
-@onready var button_container = $MarginContainer/VBoxContainer/Choices
-@onready var icon_label = $MarginContainer/VBoxContainer/Illustration/Icon
-
-var current_event_data = null
+var current_room_res: RoomData = null
+var current_npc_res: NPCData = null
 
 func _ready():
-	_setup_event()
+	exit_button.pressed.connect(_on_exit_pressed)
+	_load_encounter_data()
 
-func _setup_event():
+func _load_encounter_data():
 	var node = GameManager.current_node
-	var event_id = node.get("event_id", "")
+	if not node.has("room_resource_path"): return
 	
-	# 1. Attempt to load specific event ID defined in the room
-	if event_id != "" and GameData.EVENTS.has(event_id):
-		current_event_data = GameData.EVENTS[event_id]
-	else:
-		# 2. Fallback: Pick a random event if node is generic 'event' type 
-		# or if the defined ID was invalid
-		var keys = GameData.EVENTS.keys()
-		var random_key = keys[randi() % keys.size()]
-		current_event_data = GameData.EVENTS[random_key]
+	current_room_res = load(node.room_resource_path) as RoomData
+	if not current_room_res: return
 	
-	_display_event(current_event_data)
-
-func _display_event(event):
-	title_label.text = event.title
-	desc_label.text = event.text
-	icon_label.text = event.get("icon", "❓")
-	
-	# Clear previous choice buttons
-	for child in button_container.get_children():
-		child.queue_free()
+	# 1. Visuals
+	room_title.text = current_room_res.room_name
+	if current_room_res.background_texture:
+		background.texture = current_room_res.background_texture
 		
-	# Build choice buttons dynamically
-	for choice in event.choices:
-		var btn = Button.new()
-		btn.text = choice.text
-		btn.custom_minimum_size.y = 50
-		btn.pressed.connect(_on_choice_selected.bind(choice.effect))
-		button_container.add_child(btn)
-
-func _on_choice_selected(effect: String):
-	# Handle gameplay logic for specific effects
-	match effect:
-		"blood":
-			GameManager.current_hp = max(0, GameManager.current_hp - 15)
-			GameManager.gold += 40
-		"buy_tonic":
-			if GameManager.gold >= 30:
-				GameManager.gold -= 30
-				GameManager.current_hp = min(GameManager.max_hp, GameManager.current_hp + 25)
-		"charge":
-			# Placeholder for future logic
-			print("Status Applied: Charged")
-		"scavenge":
-			GameManager.gold += 15
-		"leave":
-			pass
-			
-	# Update Global UI listeners
-	SignalBus.gold_changed.emit(GameManager.gold)
-	SignalBus.hp_changed.emit(GameManager.current_hp, GameManager.max_hp)
+	# 2. Player Spritesheet
+	_setup_unit_visuals(player_sprite, _get_player_res())
 	
-	# Return to the world map
+	# 3. NPC Logic
+	if current_room_res.npc_id != "":
+		var npc_path = "res://data/npcs/%s.tres" % current_room_res.npc_id
+		if ResourceLoader.exists(npc_path):
+			current_npc_res = load(npc_path) as NPCData
+			_setup_npc(current_npc_res)
+		else:
+			_setup_empty_npc()
+	else:
+		_setup_empty_npc()
+
+func _setup_npc(data: NPCData):
+	npc_name_label.text = data.name
+	npc_name_label.visible = true
+	_setup_unit_visuals(npc_sprite, data)
+	
+	# Start Narrative
+	if data.dialog_tree_id != "" and GameData.DIALOG_TREES.has(data.dialog_tree_id):
+		_display_dialog_node(data.dialog_tree_id, "start")
+	else:
+		dialog_text.text = data.initial_greeting
+
+func _setup_empty_npc():
+	npc_name_label.visible = false
+	npc_sprite.visible = false
+	dialog_text.text = current_room_res.initial_dialog
+
+func _display_dialog_node(tree_id: String, node_id: String):
+	var tree = GameData.DIALOG_TREES[tree_id]
+	if not tree.has(node_id): return
+	
+	var node = tree[node_id]
+	dialog_text.text = node.text
+	
+	for child in choice_container.get_children(): child.queue_free()
+	
+	for opt in node.options:
+		var btn = Button.new()
+		btn.text = opt.text
+		btn.custom_minimum_size.y = 50
+		if opt.has("next_node"):
+			btn.pressed.connect(_display_dialog_node.bind(tree_id, opt.next_node))
+		else:
+			btn.pressed.connect(_on_exit_pressed)
+		choice_container.add_child(btn)
+
+func _setup_unit_visuals(sprite: Sprite2D, res: Resource):
+	if not sprite or not res: return
+	
+	var sheet = res.get("idle_sheet")
+	if sheet:
+		sprite.texture = sheet
+		sprite.hframes = res.get("hframes")
+		sprite.vframes = res.get("vframes")
+		_animate_unit(sprite, res.get("total_frames"), res.get("frame_speed"))
+	else:
+		sprite.visible = false
+
+func _animate_unit(sprite: Sprite2D, total: int, speed: float):
+	var frame = 0
+	var dir = 1
+	while sprite and is_inside_tree():
+		sprite.frame = frame
+		if total > 1:
+			if frame >= total - 1: dir = -1
+			elif frame <= 0: dir = 1
+			frame += dir
+		await get_tree().create_timer(speed).timeout
+
+func _get_player_res() -> PlayerData:
+	# var p_class = GameManager.player_class.to_lower()
+	var p_path = "res://data/player/base.tres" # Static path based on new player logic
+	if ResourceLoader.exists(p_path):
+		return load(p_path) as PlayerData
+	return null
+
+func _on_exit_pressed():
 	get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")

@@ -1,8 +1,61 @@
+
+battlescene 
+
+	status bar 
+		biome | room name 
+		attack
+		spell 
+		defense 
+		conditions
+		round 1 
+		health bar 
+	
+	update damage calculation 
+		plus 		damage (physcial)
+		plus 		damage (spell) 
+		minus 		armour 
+		modified by  status effects 
+
+
+
+map 
+	update to make sure
+	any room visited is tracked, and replaced by room icon 
+	lines drawn correctly between nodes 
+	remove top / bottom scroll
+	
+dialog	
+	npcs 
+	quest ... 
+	
+event scenes 
+	spritemaps for each location ... 
+	
+music
+	add music resource 
+	
+	add music to worldmap biomes 
+	add music to battle 
+	
+	add sfx to cards 
+
+assets 
+
+	map icons 
+		greyscale 
+		
+	player class 
+		players/archivist/archivist_base.tres -> fisher.tres
+		player/idle.ogv -> fisher_idle.png 
+
+	alchemist.tres
+
+
 assets 
 	front card -- same colour as back ... 
 
 player management 
-	
+
 	deck. use card scene  
 	click on card for popup with card / cardicon scene. 
 	shaded ... 
@@ -20,19 +73,14 @@ battle scene
 
 world map 
 	
-	add world tiles 
-
-	show room type icon, not full scene 
-
-	confirm room to NPC mapping 
-	load room scene with NPC  
-
-	icon only, 
-
-	scene 
-	each once 
-
-	show town only 
+	update world map ui to only show one biome depending on input, eg. town 
+	load correct background, eg. map_town_background
+	use correct map grid, eg. map_town_grid image 
+	for undiscovered rooms, show room type icon in map grid   
+	for discovered rooms, show room map icon in map grid 
+	make map grid a scene with 20 px padding and texture in the middle  
+	on world map, when entering a new room load battlescene for enemy, or eventscene for NPC       
+	keep track of rooms visited in gamestate 
 	
 ===
 
@@ -246,6 +294,16 @@ save global settings for
 		update controls page to allow "remap" and 
 
 == 
+
+tutorial
+
+	scene 
+		molos, meets fisher
+		dialog 
+	
+	
+	
+	
 
 battlescene background 
 	confirm how map generator selects *.tres files for each biome 

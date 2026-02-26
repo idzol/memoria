@@ -2,11 +2,14 @@ extends TextureButton
 
 # res://features/combat/Card.gd
 # Advanced card controller using Rarity for backs and Type for fronts.
+# Updated: Detects layout to load correct background sizes and prevents click-spam.
 
 signal card_flipped(card_node)
 
-const CardAssetData = preload("res://data/resources/CardAssetData.gd")
-const CardData = preload("res://data/resources/CardData.gd")
+# Preload required custom types
+#const CardAssetData = preload("res://data/resources/card_asset_data.gd")
+#const CardData = preload("res://data/resources/card_data.gd")
+
 var asset_templates: CardAssetData = preload("res://data/cards/_card_assets.tres")
 
 @onready var back_face = get_node_or_null("%BackFace")
@@ -36,7 +39,7 @@ func _update_pivot():
 func setup(data: CardData):
 	if not data: return
 	
-	# Manual re-fetch for setup calls happening before _ready
+	# Manual re-fetch for cases where setup is called before _ready
 	if not back_face:
 		back_face = get_node_or_null("%BackFace")
 		front_face = get_node_or_null("%FrontFace")
@@ -55,22 +58,29 @@ func setup(data: CardData):
 	if card_image_rect: card_image_rect.texture = data.card_image
 	if card_icon_rect: card_icon_rect.texture = data.card_icon
 	
-	# APPLY TEMPLATES
 	_apply_visual_templates(data)
 
 func _apply_visual_templates(data: CardData):
 	if not asset_templates: return
 	
-	# 1. Skin the Back based on RARITY
+	# Detect Layout: If title_label is null, we are in CardIcon mode (square)
+	var is_icon_mode = title_label == null
 	var rarity_key = data.rarity.to_lower()
+	
+	# 1. Skin the Back based on RARITY and LAYOR
 	if back_template_rect:
-		back_template_rect.texture = asset_templates.get("card_back_" + rarity_key)
+		if is_icon_mode:
+			# Use the square icon background for CardIcon.tscn
+			back_template_rect.texture = asset_templates.get("card_back_" + rarity_key + "_icon")
+		else:
+			# Use the full narrative background for Card.tscn
+			back_template_rect.texture = asset_templates.get("card_back_" + rarity_key)
+			
 	if back_icon_rect:
 		back_icon_rect.texture = asset_templates.get("card_back_" + rarity_key + "_icon")
 
 	# 2. Skin the Front based on TYPE
 	if front_template_rect:
-		# Map types to the front template names provided in your mapping list
 		var type_map = {
 			"attack": "card_front_attack",
 			"armor": "card_front_defend",
@@ -91,7 +101,7 @@ func _on_hover(is_hovering: bool):
 	create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT).tween_property(self, "scale", target_scale, 0.1)
 
 func flip():
-	if is_face_up: return
+	if is_matched or is_face_up: return
 	is_face_up = true
 	z_index = 2
 	var tween = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
@@ -104,7 +114,7 @@ func flip():
 	card_flipped.emit(self)
 
 func flip_back():
-	if is_matched or not is_face_up: return
+	if is_matched: return
 	is_face_up = false
 	var tween = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 	tween.tween_property(self, "scale:x", 0.0, 0.1)
@@ -116,5 +126,8 @@ func flip_back():
 	tween.tween_property(self, "scale:x", 1.0, 0.1)
 
 func _on_pressed():
+	# BLOCK: If BattleScene has physically disabled the button, don't flip
+	if disabled: return
+	
 	if not is_matched and not is_face_up:
 		flip()

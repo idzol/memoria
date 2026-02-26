@@ -114,6 +114,7 @@ func mark_room_cleared(room_id):
 	if world_state.rooms.has(room_id):
 		world_state.rooms[room_id].cleared = true
 		world_state.rooms[room_id].visited = true
+		SaveManager.save_mid_run_state()
 	prepare_victory_loot(current_node)
 
 func record_npc_interaction(npc_id: String, won: bool):
@@ -157,20 +158,22 @@ func start_actual_run():
 	current_level = 1
 	completed_nodes = []
 	player_grid_pos = Vector2i(2, -1) # Ensure player starts at Home
-	active_deck = ["sword", "shield", "heart", "frost", "scroll", "trap"]
+	active_deck = ["sword", "shield", "heart"]
 
-	# Set player location 	
+	# 1. Set player location 	
 	reset_to_home()
 
-	# INITIALIZE FIXED NODES:
-	# Certain squares become "fixed" over time or are guaranteed by the map design
+	# 2. Setup fixed locations - Certain squares become "fixed" over time or are guaranteed by the map design
 	fixed_nodes.clear()
 	# Requirement: First mapnode (center of first layer) is always a Town Square
 	fixed_nodes[Vector2i(2, 0)] = "town_square"
 	
+	# 3. Generate Persistent Map (Run once per run)
+	var gen = preload("res://features/map/MapGenerator.gd").new()
+	run_map = gen.generate_new_map()
 	SaveManager.save_mid_run_state()
 	
-	# Transition to Intro Cinematic instead of WorldMap directly
+	# 3. Transition to Intro Cinematic instead of WorldMap directly
 	get_tree().change_scene_to_file("res://features/ui/IntroCinematic.tscn")
 
 func reset_to_home():
@@ -203,28 +206,10 @@ func load_run_from_data(data: Dictionary):
 
 func _on_node_selected(node_data: Dictionary):
 	current_node = node_data
-	
-	# UPDATED: Loading external room resource if path is provided
-	var res_path = node_data.get("room_resource_path", "")
-	var room_res: RoomData = null
-	
-	if res_path != "" and ResourceLoader.exists(res_path):
-		room_res = load(res_path) as RoomData
+	if not world_state.rooms.has(node_data.id):
+		world_state.rooms[node_data.id] = {"visited": true, "cleared": false}
 	
 	SaveManager.save_mid_run_state()
-	
-	# Priority: Use Resource Type, Fallback to Dictionary Type
-	var type = room_res.type if room_res else node_data.get("type", "battle")
-	
-	match type:
-		"battle", "boss":
-			get_tree().change_scene_to_file("res://features/combat/BattleScene.tscn")
-		"shop":
-			get_tree().change_scene_to_file("res://features/encounters/ShopScene.tscn")
-		"rest":
-			get_tree().change_scene_to_file("res://features/encounters/RestScene.tscn")
-		_:
-			get_tree().change_scene_to_file("res://features/encounters/EventScene.tscn")
 
 
 # --- LOOT LOGIC ---

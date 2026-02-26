@@ -1,97 +1,75 @@
 extends Control
 
 # res://features/map/MapNode.gd
-# Handles individual map node visuals, using a centralized room database for assets and metadata.
+# Handles the dual-state visuals (undiscovered vs discovered) for map nodes.
+# Updated: Uses MapAssetData resource for icon lookups.
 
 signal node_clicked(data)
 
-@onready var room_bg = %RoomBackground
+# Preload types and the specific asset library instance
+# const MapAssetData = preload("res://data/resources/MapAssetData.gd")
+var asset_library: MapAssetData = preload("res://data/map/map_data.tres")
+
 @onready var icon_rect = %Icon
+@onready var grid_texture_rect = %GridTexture
+@onready var player_indicator = %PlayerIcon
 @onready var border = %Border
-@onready var player_icon = %PlayerIcon
-@onready var button = $Button
 
 var node_data = null
 
-func setup_advanced(data, diff_color: Color, is_revealed: bool, is_reachable: bool, is_player_here: bool):
+func setup_biome_node(data: Dictionary, grid_tex: Texture2D, is_cleared: bool, is_player_here: bool, is_revealed: bool, is_reachable: bool):
 	node_data = data
 	
-	# 1. Update Player indicator
-	if player_icon:
-		player_icon.visible = is_player_here
+	# 1. Update Grid Background (Always visible if revealed)
+	if grid_texture_rect:
+		grid_texture_rect.texture = grid_tex
 	
-	# 2. Update Button interaction
-	if button:
-		button.disabled = not (is_reachable or is_player_here)
-		button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND if !button.disabled else Control.CURSOR_ARROW
-
-	# 3. Handle Visibility and Fog of War
-	if !is_revealed:
-		modulate.a = 0.2
-		if icon_rect: icon_rect.visible = false
-		if border: border.self_modulate = Color.GRAY
-		if room_bg:
-			# Fallback for hidden rooms
-			room_bg.texture = load("res://assets/maps/default.png")
+	# 2. Update Player Avatar
+	if player_indicator:
+		player_indicator.visible = is_player_here
+	
+	# 3. Icon Logic
+	if is_revealed:
+		visible = true
+		if is_cleared:
+			# Show specific hand-crafted icon from the Room Resource metadata
+			if data.get("custom_icon_path", "") != "":
+				icon_rect.texture = load(data.custom_icon_path)
+			else:
+				icon_rect.texture = _get_type_icon_texture(data.type)
+			modulate = Color.WHITE
+		else:
+			# Revealed but not cleared: Show generic type icon (Sword, Scroll, etc.)
+			icon_rect.texture = _get_type_icon_texture(data.type)
+			modulate = Color(1.0, 1.0, 1.0, 1.0)
 	else:
-		modulate.a = 1.0 if (is_reachable or is_player_here) else 0.6
-		if icon_rect: icon_rect.visible = true
-		if border: border.self_modulate = diff_color
-		
-		# 4. LOAD RESOURCE DATA
-		# Attempt to load the resource path provided by the MapGenerator
-		var res_path = data.get("room_resource_path", "")
-		var room_res: RoomData = null
-		if res_path != "" and ResourceLoader.exists(res_path):
-			room_res = load(res_path) as RoomData
-		
-		_apply_room_visuals(data, room_res)
+		# Fog of War: If not revealed, node is semi-transparent or hidden
+		icon_rect.texture = null
+		modulate = Color(1, 1, 1, 0.1)
 
-func _apply_room_visuals(data: Dictionary, res: RoomData):
-	# Priority 1: Direct Resource properties (Hand-crafted art)
-	# Priority 2: Biome-based naming conventions (Legacy Support)
-	# Priority 3: Type-based Fallbacks (Engine icons)
-	
-	var biome = data.get("biome", "town")
-	var r_key = data.get("room_key", "default")
-	
-	# Handle Icon (The map marker)
-	if icon_rect:
-		if res and res.map_icon:
-			icon_rect.texture = res.map_icon
+	# 4. Border Polish
+	if border:
+		if is_player_here:
+			border.modulate = Color.CYAN
+		elif is_reachable:
+			border.modulate = Color.WHITE
 		else:
-			# Try naming convention fallback
-			var convention_path = "res://assets/maps/%s_%s_world.png" % [biome, r_key]
-			if ResourceLoader.exists(convention_path):
-				icon_rect.texture = load(convention_path)
-			else:
-				# Absolute fallback based on room type string
-				icon_rect.texture = _get_fallback_icon(data.get("type", "battle"))
-			
-	# Handle Background (The "Mini-View" inside the map node)
-	if room_bg:
-		if res and res.background_texture:
-			room_bg.texture = res.background_texture
-		else:
-			# Try background naming convention
-			var bg_convention = "res://assets/rooms/%s_%s_bg.png" % [biome, r_key]
-			if ResourceLoader.exists(bg_convention):
-				room_bg.texture = load(bg_convention)
-			else:
-				room_bg.texture = load("res://assets/maps/default.png")
+			border.modulate = Color(1, 1, 1, 0.2)
 
-
-func _get_fallback_icon(type: String) -> Texture2D:
-	match type:
-		"home": return load("res://assets/maps/home.png")
-		"battle": return load("res://assets/sword.png")
-		"shop": return load("res://assets/key.png")
-		"rest": return load("res://assets/heart.png")
-		"event": return load("res://assets/scroll.png")
-		"lore": return load("res://assets/scroll.png")
-		"trap": return load("res://assets/trap.png")
-		"boss": return load("res://assets/skull.png")
-	return load("res://assets/trap.png")
+func _get_type_icon_texture(type: String) -> Texture2D:
+	if not asset_library:
+		return null
+		
+	# Dynamically map the room type string to the MapAssetData property names
+	# e.g. "battle" -> "map_icon_battle"
+	var property_name = "map_icon_" + type.to_lower()
+	
+	if property_name in asset_library:
+		var tex = asset_library.get(property_name)
+		if tex: return tex
+	
+	# Fallback to mystery icon if type is unknown or texture is null
+	return asset_library.map_icon_mystery
 
 func _on_button_pressed():
 	if node_data:
