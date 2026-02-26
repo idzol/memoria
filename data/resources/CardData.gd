@@ -2,11 +2,12 @@ extends Resource
 class_name CardData
 
 # res://data/resources/card_data.gd
-# Standardized resource for all game cards (Combat, Loot, Spells).
+# Standardized resource for all game cards. Updated to include Rarity.
 
 @export_group("Identity")
 @export var card_id: String = ""
 @export var name: String = "Unknown Card"
+@export_enum("common", "uncommon", "rare", "epic", "unique") var rarity: String = "common"
 @export_enum("attack", "armor", "heal", "trap", "utility", "charge", "treasure") var type: String = "attack"
 
 @export_group("Stats & Effects")

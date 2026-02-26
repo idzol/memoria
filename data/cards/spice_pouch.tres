@@ -8,6 +8,7 @@
 script = ExtResource("1_script")
 card_id = "spice_pouch"
 name = "Spice Pouch"
+rarity = "common"
 type = "heal"
 value = 2
 description = "Adds a little kick"

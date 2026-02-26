@@ -1,23 +1,122 @@
 [gd_scene format=3 uid="uid://ds43twav0dxus"]
 
 [ext_resource type="Script" uid="uid://csn80tiagf37g" path="res://features/combat/Card.gd" id="1_k81y5"]
-[ext_resource type="Texture2D" uid="uid://ndwcsgrrly0d" path="res://assets/card/back2.png" id="2_1nuix"]
+[ext_resource type="Texture2D" uid="uid://cmyeha26b6ndv" path="res://assets/cards/back/card_back_common.png" id="2_back"]
+[ext_resource type="Theme" uid="uid://djn7txycnus44" path="res://assets/themes/Card.theme" id="3_74jmb"]
 
-[node name="Card" type="TextureButton" unique_id=1088095668]
-custom_minimum_size = Vector2(100, 100)
-offset_right = 100.0
-offset_bottom = 100.0
-pivot_offset = Vector2(50, 50)
+[node name="Card" type="TextureButton" unique_id=1976348525]
+custom_minimum_size = Vector2(160, 240)
+offset_right = 160.0
+offset_bottom = 240.0
+pivot_offset = Vector2(80, 120)
 script = ExtResource("1_k81y5")
 
-[node name="Back" type="Sprite2D" parent="." unique_id=738520551]
+[node name="BackFace" type="Control" parent="." unique_id=162875299]
 unique_name_in_owner = true
-position = Vector2(50, 50)
-scale = Vector2(0.125, 0.125)
-texture = ExtResource("2_1nuix")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 
-[node name="Icon" type="Sprite2D" parent="." unique_id=306189642]
+[node name="BackTemplate" type="TextureRect" parent="BackFace" unique_id=439933644]
 unique_name_in_owner = true
-position = Vector2(50, 50)
-scale = Vector2(0.125, 0.125)
-texture = ExtResource("2_1nuix")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_back")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="BackIcon" type="TextureRect" parent="BackFace" unique_id=730051171]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="FrontFace" type="Control" parent="." unique_id=1393326153]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="FrontTemplate" type="TextureRect" parent="FrontFace" unique_id=1717842601]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Margin" type="MarginContainer" parent="FrontFace" unique_id=1847005412]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="ContentLayout" type="VBoxContainer" parent="FrontFace/Margin" unique_id=563369061]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="TitleLabel" type="Label" parent="FrontFace/Margin/ContentLayout" unique_id=1703925142]
+unique_name_in_owner = true
+layout_mode = 2
+theme = ExtResource("3_74jmb")
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 14
+text = "CARD NAME"
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+
+[node name="CardImage" type="TextureRect" parent="FrontFace/Margin/ContentLayout" unique_id=1043657746]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Spacer" type="Control" parent="FrontFace/Margin/ContentLayout" unique_id=372946949]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+
+[node name="DescriptionLabel" type="Label" parent="FrontFace/Margin/ContentLayout" unique_id=152902939]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+theme = ExtResource("3_74jmb")
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 11
+text = "Card description goes here..."
+horizontal_alignment = 1
+autowrap_mode = 3
+max_lines_visible = 3

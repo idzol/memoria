@@ -8,6 +8,7 @@
 script = ExtResource("1_script")
 card_id = "leather_scraps"
 name = "Leather Scraps"
+rarity = "common"
 type = "armor"
 value = 3
 description = "Basic protection bits"

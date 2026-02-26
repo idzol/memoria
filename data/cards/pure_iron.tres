@@ -8,6 +8,7 @@
 script = ExtResource("1_script")
 card_id = "pure_iron"
 name = "Pure Iron"
+rarity = "unique"
 type = "armor"
 value = 14
 description = "Refined protection."

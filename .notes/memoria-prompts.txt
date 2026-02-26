@@ -1,23 +1,57 @@
+assets 
+	front card -- same colour as back ... 
 
-== 
+player management 
+	
+	deck. use card scene  
+	click on card for popup with card / cardicon scene. 
+	shaded ... 
+
+
+battle scene 
+
+	update to use player cards 
+	
+	victory 
+		loot icons 
+		card icons .. 
+		* logic to only provide items on first battle 
+		* add room to global state "victory"
+
+world map 
+	
+	add world tiles 
+
+	show room type icon, not full scene 
+
+	confirm room to NPC mapping 
+	load room scene with NPC  
+
+	icon only, 
+
+	scene 
+	each once 
+
+	show town only 
+	
+===
+
+assets 
+	card back
+	card front 
+
 debug{assets}...
 
-
-card to resource 
-	update paths 
-	{card}.png 
-	{card}_icon.png
-
 debugcard  
-
 	inspect assets 
 	show card.tscn ->
 
-card.tscn 
-	use card resource (tres) 
-	card title 
-	card image 
-	card description 
+update card.tscn to use 
+	card background. 
+	card resource (tres) 
+		card title. position the title centre top 
+		card image. position the card resource image, below the title  
+		card description. position the card text, below the image 
 
 battlescene.tscn 
 	use card resource (tres)

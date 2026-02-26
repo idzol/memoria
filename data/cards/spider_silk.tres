@@ -8,6 +8,7 @@
 script = ExtResource("1_script")
 card_id = "spider_silk"
 name = "Spider Silk"
+rarity = "rare"
 type = "utility"
 value = 0
 description = "Stronger than steel."

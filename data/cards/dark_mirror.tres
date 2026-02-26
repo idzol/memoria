@@ -8,6 +8,7 @@
 script = ExtResource("1_script")
 card_id = "dark_mirror"
 name = "Dark Mirror"
+rarity = "epic"
 type = "utility"
 value = 0
 description = "Reflects the void."

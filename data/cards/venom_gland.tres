@@ -8,6 +8,7 @@
 script = ExtResource("1_script")
 card_id = "venom_gland"
 name = "Venom Gland"
+rarity = "rare"
 type = "attack"
 value = 13
 description = "Raw natural toxin."
