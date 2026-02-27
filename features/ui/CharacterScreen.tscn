@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://c5n80tiagf37k"]
 
-[ext_resource type="Theme" uid="uid://cy1tv88ir10yq" path="res://assets/themes/Greek.theme" id="1_7s1hf"]
-[ext_resource type="Script" uid="uid://rgr8malaxgov" path="res://features/ui/CharacterScreen.gd" id="1_char_screen"]
+[ext_resource type="Theme" uid="uid://cy1tv88ir10yq" path="res://assets/themes/Greek.theme" id="1_theme"]
+[ext_resource type="Script" uid="uid://rgr8malaxgov" path="res://features/ui/CharacterScreen.gd" id="2_logic"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_profile"]
 bg_color = Color(0.08, 0.08, 0.1, 1)
 border_width_left = 2
 border_width_top = 2
@@ -11,17 +11,31 @@ border_width_right = 2
 border_width_bottom = 2
 border_color = Color(0.25, 0.25, 0.3, 1)
 
-[node name="CharacterScreen" type="Control" unique_id=2080419446]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg"]
+bg_color = Color(0.05, 0.05, 0.07, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp"]
+bg_color = Color(0.8, 0.2, 0.2, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xp"]
+bg_color = Color(0.2, 0.6, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tabs"]
+bg_color = Color(0.05, 0.05, 0.07, 0.5)
+border_width_bottom = 2
+border_color = Color(0.3, 0.3, 0.35, 1)
+
+[node name="CharacterScreen" type="Control" unique_id=857937786]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("1_7s1hf")
-script = ExtResource("1_char_screen")
+theme = ExtResource("1_theme")
+script = ExtResource("2_logic")
 
-[node name="Background" type="ColorRect" parent="." unique_id=1267712367]
+[node name="Background" type="ColorRect" parent="." unique_id=589435426]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -30,7 +44,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.05, 0.05, 0.07, 1)
 
-[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1765168271]
+[node name="Margin" type="MarginContainer" parent="." unique_id=794968981]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -42,96 +56,194 @@ theme_override_constants/margin_top = 40
 theme_override_constants/margin_right = 40
 theme_override_constants/margin_bottom = 40
 
-[node name="MainHBox" type="HBoxContainer" parent="MarginContainer" unique_id=399320514]
+[node name="HBox" type="HBoxContainer" parent="Margin" unique_id=1150760027]
 layout_mode = 2
 theme_override_constants/separation = 40
 
-[node name="LeftPanel" type="VBoxContainer" parent="MarginContainer/MainHBox" unique_id=1272024659]
-custom_minimum_size = Vector2(300, 0)
+[node name="LeftPanel" type="VBoxContainer" parent="Margin/HBox" unique_id=1981598700]
+custom_minimum_size = Vector2(320, 0)
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="PortraitFrame" type="Panel" parent="MarginContainer/MainHBox/LeftPanel" unique_id=168020228]
+[node name="PortraitFrame" type="Panel" parent="Margin/HBox/LeftPanel" unique_id=2010811886]
 custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+theme_override_styles/panel = SubResource("StyleBoxFlat_profile")
 
-[node name="PortraitIcon" type="Label" parent="MarginContainer/MainHBox/LeftPanel/PortraitFrame" unique_id=529916985]
+[node name="PortraitIcon" type="Label" parent="Margin/HBox/LeftPanel/PortraitFrame" unique_id=432342091]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_font_sizes/font_size = 80
+theme_override_font_sizes/font_size = 100
 text = "👤"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="StatsPanel" type="VBoxContainer" parent="MarginContainer/MainHBox/LeftPanel" unique_id=943763161]
+[node name="Stats" type="VBoxContainer" parent="Margin/HBox/LeftPanel" unique_id=1346464050]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 18
 
-[node name="ClassName" type="Label" parent="MarginContainer/MainHBox/LeftPanel/StatsPanel" unique_id=1382782209]
+[node name="ClassName" type="Label" parent="Margin/HBox/LeftPanel/Stats" unique_id=1890775986]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.6, 1, 1)
 theme_override_font_sizes/font_size = 32
 text = "The Archivist"
 
-[node name="HPLabel" type="Label" parent="MarginContainer/MainHBox/LeftPanel/StatsPanel" unique_id=1940439258]
+[node name="VitalitySection" type="VBoxContainer" parent="Margin/HBox/LeftPanel/Stats" unique_id=2020787633]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="BarLabel" type="Label" parent="Margin/HBox/LeftPanel/Stats/VitalitySection" unique_id=541049503]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "VITALITY"
+horizontal_alignment = 1
+
+[node name="HPBar" type="ProgressBar" parent="Margin/HBox/LeftPanel/Stats/VitalitySection" unique_id=598860209]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_hp")
+value = 100.0
+show_percentage = false
+
+[node name="HPText" type="Label" parent="Margin/HBox/LeftPanel/Stats/VitalitySection" unique_id=440011981]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
-text = "HP: 100 / 100"
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 18
+text = "100 / 100"
+horizontal_alignment = 1
 
-[node name="GoldLabel" type="Label" parent="MarginContainer/MainHBox/LeftPanel/StatsPanel" unique_id=1062182667]
+[node name="MemorySection" type="VBoxContainer" parent="Margin/HBox/LeftPanel/Stats" unique_id=1510941059]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="BarLabel" type="Label" parent="Margin/HBox/LeftPanel/Stats/MemorySection" unique_id=404100785]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "MEMORY PROGRESS"
+horizontal_alignment = 1
+
+[node name="XPBar" type="ProgressBar" parent="Margin/HBox/LeftPanel/Stats/MemorySection" unique_id=1669763133]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_xp")
+value = 45.0
+show_percentage = false
+
+[node name="XPText" type="Label" parent="Margin/HBox/LeftPanel/Stats/MemorySection" unique_id=1359508293]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 18
+text = "45 / 100"
+horizontal_alignment = 1
+
+[node name="CombatGrid" type="GridContainer" parent="Margin/HBox/LeftPanel/Stats" unique_id=2032702433]
+layout_mode = 2
+theme_override_constants/h_separation = 20
+columns = 2
+
+[node name="AtkLabel" type="Label" parent="Margin/HBox/LeftPanel/Stats/CombatGrid" unique_id=375960267]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Attack: 10"
+
+[node name="DefLabel" type="Label" parent="Margin/HBox/LeftPanel/Stats/CombatGrid" unique_id=30287748]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Defense: 5"
+
+[node name="GoldLabel" type="Label" parent="Margin/HBox/LeftPanel/Stats" unique_id=1605348463]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.8, 0.2, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 24
 text = "Gold: 250"
 
-[node name="Control" type="Control" parent="MarginContainer/MainHBox/LeftPanel" unique_id=1220904516]
+[node name="Spacer" type="Control" parent="Margin/HBox/LeftPanel" unique_id=177805238]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="BackButton" type="Button" parent="MarginContainer/MainHBox/LeftPanel" unique_id=798724725]
+[node name="BackButton" type="Button" parent="Margin/HBox/LeftPanel" unique_id=217366603]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 text = "RETURN TO MAP"
 
-[node name="RightPanel" type="VBoxContainer" parent="MarginContainer/MainHBox" unique_id=1336656533]
+[node name="RightPanel" type="TabContainer" parent="Margin/HBox" unique_id=173133850]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 20
+theme_override_styles/panel = SubResource("StyleBoxFlat_tabs")
+current_tab = 0
 
-[node name="DeckHeader" type="HBoxContainer" parent="MarginContainer/MainHBox/RightPanel" unique_id=1176720441]
+[node name="DECK" type="VBoxContainer" parent="Margin/HBox/RightPanel" unique_id=671344639]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="Header" type="HBoxContainer" parent="Margin/HBox/RightPanel/DECK" unique_id=1404211732]
 layout_mode = 2
 
-[node name="Title" type="Label" parent="MarginContainer/MainHBox/RightPanel/DeckHeader" unique_id=821228365]
+[node name="Title" type="Label" parent="Margin/HBox/RightPanel/DECK/Header" unique_id=1396855671]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 28
 text = "DECK MANAGEMENT"
 
-[node name="DeckCount" type="Label" parent="MarginContainer/MainHBox/RightPanel/DeckHeader" unique_id=1788643951]
+[node name="DeckCount" type="Label" parent="Margin/HBox/RightPanel/DECK/Header" unique_id=66199905]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 0.8, 1, 1)
-theme_override_font_sizes/font_size = 24
 text = "Active Pairs: 0 / 12"
 
-[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/MainHBox/RightPanel" unique_id=901876002]
+[node name="Scroll" type="ScrollContainer" parent="Margin/HBox/RightPanel/DECK" unique_id=244879403]
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="CardGrid" type="GridContainer" parent="MarginContainer/MainHBox/RightPanel/ScrollContainer" unique_id=1725483048]
+[node name="DeckGrid" type="GridContainer" parent="Margin/HBox/RightPanel/DECK/Scroll" unique_id=1983826941]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/h_separation = 20
-theme_override_constants/v_separation = 20
-columns = 3
+theme_override_constants/v_separation = 30
+columns = 4
+
+[node name="INVENTORY" type="VBoxContainer" parent="Margin/HBox/RightPanel" unique_id=991487087]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="Header" type="HBoxContainer" parent="Margin/HBox/RightPanel/INVENTORY" unique_id=565745408]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Margin/HBox/RightPanel/INVENTORY/Header" unique_id=2136886436]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 28
+text = "EQUIPPED GEAR"
+
+[node name="ItemCount" type="Label" parent="Margin/HBox/RightPanel/INVENTORY/Header" unique_id=1314249790]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Equipped: 0 / 3"
+
+[node name="Scroll" type="ScrollContainer" parent="Margin/HBox/RightPanel/INVENTORY" unique_id=293155851]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="ItemGrid" type="GridContainer" parent="Margin/HBox/RightPanel/INVENTORY/Scroll" unique_id=606622562]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 30
+columns = 4

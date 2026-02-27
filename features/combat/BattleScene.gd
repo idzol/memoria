@@ -4,9 +4,20 @@ extends Node2D
 # Refactored for strict flip limits, proactive reshuffle, and extensible damage math.
 
 @onready var grid = %GridContainer
-@onready var player_hp_label = %PlayerHP
-@onready var enemy_hp_label = %EnemyHP
 @onready var log_box = %LogBox
+
+# Status Bar References
+@onready var biome_room_label = %BiomeRoomLabel
+@onready var player_stats_label = %PlayerStatsLabel
+@onready var conditions_container = %ConditionsContainer
+@onready var round_label = %RoundLabel
+@onready var settings_btn = %SettingsBtn
+
+# Dynamic HP Bars
+@onready var player_hp_bar = %PlayerHPBar
+@onready var player_hp_text = %PlayerHPText
+@onready var enemy_hp_bar = %EnemyHPBar
+@onready var enemy_hp_text = %EnemyHPText
 
 # UI Layers
 @onready var dialog_overlay = %DialogOverlay
@@ -31,6 +42,10 @@ var current_enemy_res: EnemyData = null
 # Current Stats for Calculation
 var p_hp: int = 100
 var e_hp: int = 100
+var p_atk: int = 10 # Base attack
+var p_def: int = 5  # Base defense
+var round_number: int = 1
+
 var active_status_effects = {"player": [], "enemy": []} # e.g. ["vulnerable", "charged"]
 
 func _ready():
@@ -45,14 +60,32 @@ func _ready():
 	# Debug win / lose connections
 	if has_node("%DebugWinBtn"): %DebugWinBtn.pressed.connect(_debug_win)
 	if has_node("%DebugLoseBtn"): %DebugLoseBtn.pressed.connect(_debug_lose)
-
+	# Connect Settings
+	if settings_btn:
+		settings_btn.pressed.connect(_on_settings_pressed)
+	_sync_status_bar
 	_setup_player_spritesheet()
 	_setup_enemy_portrait()
 	_init_encounter()
+	
+	# Initial UI Sync
+	_sync_status_bar()
 	update_ui()
 
-# --- INPUT & FLOW ---
 
+func _sync_status_bar():
+	# Biome | Room
+	var biome_name = current_room_res.biome.capitalize() if current_room_res else "Unknown"
+	var room_name = current_room_res.room_name if current_room_res else "Battle"
+	biome_room_label.text = "%s  |  %s" % [biome_name, room_name]
+	
+	# Stats
+	player_stats_label.text = "ATK: %d   DEF: %d" % [p_atk, p_def]
+	
+	# Round
+	round_label.text = "ROUND: %d" % round_number
+
+# --- INPUT & FLOW ---
 func _on_card_flipped(card):
 	# Block if busy or over
 	if is_battle_over or not can_flip or flipped_cards.size() >= 2:
@@ -231,9 +264,21 @@ func _check_win_loss():
 		is_battle_over = true
 		get_tree().call_deferred("change_scene_to_file", "res://features/ui/RunSummary.tscn")
 
-func update_ui():
-	player_hp_label.text = "HP: %d/%d" % [p_hp, GameManager.max_hp]
-	enemy_hp_label.text = "HP: %d" % e_hp
+
+func update_ui(instant: bool = false):
+	# Dynamic Text update
+	player_hp_text.text = "%d / %d" % [p_hp, GameManager.max_hp]
+	enemy_hp_text.text = "HP: %d" % e_hp
+	
+	# Dynamic Bar update with Tween
+	var duration = 0.0 if instant else 0.4
+	
+	var p_tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	p_tween.tween_property(player_hp_bar, "value", (float(p_hp) / GameManager.max_hp) * 100, duration)
+	
+	var max_e = current_enemy_res.hp + (difficulty * 15) if current_enemy_res else 100
+	var e_tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	e_tween.tween_property(enemy_hp_bar, "value", (float(e_hp) / max_e) * 100, duration)
 
 func add_log(text):
 	var lbl = Label.new(); lbl.text = "> " + text; log_box.add_child(lbl)
@@ -243,6 +288,14 @@ func _flash_unit(overlay, color):
 	if not overlay: return
 	overlay.color = color; overlay.color.a = 0.5
 	create_tween().tween_property(overlay, "color:a", 0.0, 0.4)
+
+func _on_settings_pressed():
+	# Assuming settings overlay is preloaded or in a manager
+	var settings = preload("res://features/ui/SettingsOverlay.tscn").instantiate()
+	get_tree().root.add_child(settings)
+	# battle_ui.hide()
+	
+# --- VISUAL HELPERS ---
 
 func _setup_player_spritesheet():
 	var idle_tex = load("res://assets/player/base_idle.png")

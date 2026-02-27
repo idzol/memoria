@@ -1,187 +1,162 @@
 extends Control
 
 # res://features/ui/CharacterScreen.gd
-# Handles inventory management, deck building, and player stats.
-const CardData = preload("res://data/resources/CardData.gd")
+# Manages the dual-tab interface for Deck Building and Item Equipment.
+# Updated: Integrated stacked bar/text layout and full-card representation.
 
-@onready var card_grid = %CardGrid
+const CardData = preload("res://data/resources/CardData.gd")
+const CardScene = preload("res://features/combat/Card.tscn")
+
+@onready var deck_grid = %DeckGrid
+@onready var item_grid = %ItemGrid
 @onready var deck_count_label = %DeckCount
+@onready var item_count_label = %ItemCount
 @onready var class_label = %ClassName
-@onready var hp_label = %HPLabel
+
+# Bars and Labels
+@onready var hp_bar = %HPBar
+@onready var hp_text = %HPText
+@onready var xp_bar = %XPBar
+@onready var xp_text = %XPText
+
+# Secondary Stats
+@onready var atk_label = %AtkLabel
+@onready var def_label = %DefLabel
 @onready var gold_label = %GoldLabel
 @onready var back_button = %BackButton
 
 const CARDS_ROOT = "res://data/cards/"
+const ITEMS_ROOT = "res://data/items/"
 
 func _ready():
 	_update_stats_ui()
-	_populate_inventory()
-	_update_deck_counter()
+	_populate_deck_tab()
+	_populate_inventory_tab()
+	_update_counters()
 	
 	if back_button:
 		back_button.pressed.connect(_on_back_pressed)
 
 func _update_stats_ui():
-	# Display Character Class and Level
-	if class_label: 
-		var p_class = GameManager.get("player_class")
-		var p_lvl = GameManager.get("player_level")
-		if p_lvl == null: p_lvl = 1 # Fallback for new runs
-		
-		class_label.text = "%s (Lvl %d)" % [
-			p_class if p_class != null else "Hero",
-			p_lvl
-		]
-		
-	if hp_label: 
-		var cur_hp = GameManager.get("current_hp")
-		var m_hp = GameManager.get("max_hp")
-		hp_label.text = "HP: %d / %d" % [
-			cur_hp if cur_hp != null else 0, 
-			m_hp if m_hp != null else 100
-		]
-		
-	if gold_label: 
-		var g = GameManager.get("gold")
-		gold_label.text = "Gold: " + str(g if g != null else 0)
-
-func _populate_inventory():
-	# Clear the grid for a fresh render to update states
-	for child in card_grid.get_children(): 
-		child.queue_free()
+	# Character Identity & Level
+	var p_lvl = GameManager.player_level
+	class_label.text = "%s (Lvl %d)" % [GameManager.player_class, p_lvl]
 	
-	# Iterate through the strings in GameManager.player_inventory
-	for card_id in GameManager.player_inventory:
+	# Vitality (Health)
+	hp_bar.max_value = GameManager.max_hp
+	hp_bar.value = GameManager.current_hp
+	hp_text.text = "%d / %d" % [GameManager.current_hp, GameManager.max_hp]
+	
+	# Memory (Experience)
+	# Threshold logic: 100 XP per level
+	var max_xp = GameManager.player_level * 100 
+	xp_bar.max_value = max_xp
+	xp_bar.value = GameManager.player_xp
+	xp_text.text = "%d / %d" % [GameManager.player_xp, max_xp]
+	
+	# Combat Stats
+	atk_label.text = "ATTACK: %d" % GameManager.player_attack
+	def_label.text = "DEFENSE: %d" % GameManager.player_defense
+	gold_label.text = "GOLD: %d" % GameManager.gold
+
+# --- DECK MANAGEMENT ---
+
+func _populate_deck_tab():
+	for child in deck_grid.get_children(): child.queue_free()
+	
+	for card_id in GameManager.player_cards:
 		var path = CARDS_ROOT + card_id + ".tres"
-		
 		if ResourceLoader.exists(path):
-			var res = load(path)
-			if res is CardData:
-				var card_ui = _create_card_ui(card_id, res)
-				card_grid.add_child(card_ui)
-		else:
-			push_warning("CharacterScreen: Missing card resource at: " + path)
+			var res = load(path) as CardData
+			_add_card_to_grid(deck_grid, card_id, res, "deck")
 
-func _create_card_ui(id: String, data: CardData) -> PanelContainer:
-	var panel = PanelContainer.new()
-	panel.custom_minimum_size = Vector2(280, 160)
+# --- INVENTORY MANAGEMENT ---
+
+func _populate_inventory_tab():
+	for child in item_grid.get_children(): child.queue_free()
 	
-	var style = StyleBoxFlat.new()
-	style.bg_color = Color(0.12, 0.12, 0.15)
-	style.set_border_width_all(2)
-	style.border_color = Color(0.3, 0.3, 0.35)
-	style.set_corner_radius_all(6)
-	panel.add_theme_stylebox_override("panel", style)
+	# Pool of discovered items
+	for item_id in GameManager.player_items:
+		var path = ITEMS_ROOT + item_id + ".tres"
+		if ResourceLoader.exists(path):
+			var res = load(path) as CardData
+			_add_card_to_grid(item_grid, item_id, res, "item")
+
+# --- SHARED GRID LOGIC ---
+
+func _add_card_to_grid(container: GridContainer, id: String, res: CardData, mode: String):
+	# INSTANTIATE FULL CARD
+	var card_ui = CardScene.instantiate()
+	container.add_child(card_ui)
 	
-	var margin = MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 10)
-	margin.add_theme_constant_override("margin_right", 10)
-	margin.add_theme_constant_override("margin_top", 10)
-	margin.add_theme_constant_override("margin_bottom", 10)
-	panel.add_child(margin)
+	# Visual scaling for management views
+	card_ui.custom_minimum_size = Vector2(160, 240)
+	card_ui.scale = Vector2(0.9, 0.9)
+	card_ui.setup(res)
 	
-	var hbox_main = HBoxContainer.new()
-	hbox_main.add_theme_constant_override("separation", 15)
-	margin.add_child(hbox_main)
+	# Force face-up and disable standard flip animation
+	card_ui.get_node("%BackFace").visible = false
+	card_ui.get_node("%FrontFace").visible = true
+	card_ui.is_face_up = true
 	
-	# Preview: Use the High-Res Card Image
-	var tex_rect = TextureRect.new()
-	tex_rect.custom_minimum_size = Vector2(80, 120)
-	tex_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	tex_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_update_selection_visuals(card_ui, id, mode)
 	
-	if data.card_image:
-		tex_rect.texture = data.card_image
+	# Override interaction (clicking toggles deck status instead of flipping)
+	card_ui.pressed.disconnect(card_ui._on_pressed)
+	if mode == "deck":
+		card_ui.pressed.connect(_on_deck_card_clicked.bind(card_ui, id))
 	else:
-		# Fallback to icon or placeholder
-		tex_rect.texture = data.card_icon if data.card_icon else load("res://icon.svg")
-		tex_rect.modulate = Color(1, 0.2, 0.2, 0.4) if !data.card_image else Color.WHITE
+		card_ui.pressed.connect(_on_inventory_item_clicked.bind(card_ui, id))
 
-	hbox_main.add_child(tex_rect)
-	
-	var vbox_text = VBoxContainer.new()
-	vbox_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	hbox_main.add_child(vbox_text)
-	
-	var name_hbox = HBoxContainer.new()
-	vbox_text.add_child(name_hbox)
-	
-	var name_lbl = Label.new()
-	name_lbl.text = data.name
-	name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	name_lbl.add_theme_font_size_override("font_size", 18)
-	name_hbox.add_child(name_lbl)
-	
-	var check = CheckBox.new()
-	var is_in_deck = id in GameManager.active_deck
-	check.button_pressed = is_in_deck
-	
-	# Minimum requirement check (Prevent deselecting below 3 pairs)
-	if GameManager.active_deck.size() <= 3 and is_in_deck:
-		check.disabled = true
-		check.modulate.a = 0.5
-	
-	check.toggled.connect(_on_card_toggled.bind(style, id))
-	name_hbox.add_child(check)
-	
-	var desc_lbl = Label.new()
-	desc_lbl.text = data.description
-	desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	desc_lbl.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
-	vbox_text.add_child(desc_lbl)
-	
-	if is_in_deck:
-		style.border_color = Color(0.4, 0.8, 1.0)
-		style.bg_color = Color(0.1, 0.15, 0.25)
-	
-	return panel
-
-func _on_card_toggled(is_active: bool, style: StyleBoxFlat, id: String):
-	var active_deck = GameManager.get("active_deck")
-	if active_deck == null: return
-	
-	if is_active:
-		# Max limit check
-		if active_deck.size() >= 12:
-			_populate_inventory()
-			return
-			
-		if not id in active_deck:
-			active_deck.append(id)
-			style.border_color = Color(0.4, 0.8, 1.0)
-			style.bg_color = Color(0.1, 0.2, 0.3)
+func _on_deck_card_clicked(node: Control, id: String):
+	var deck = GameManager.active_deck
+	if id in deck:
+		if deck.size() > 3: deck.erase(id)
 	else:
-		# MINIMUM REQUIREMENT CHECK
-		if active_deck.size() <= 3:
-			_populate_inventory()
-			return
-			
-		active_deck.erase(id)
-		style.border_color = Color(0.3, 0.3, 0.35)
-		style.bg_color = Color(0.15, 0.15, 0.18)
-		
-	_update_deck_counter()
-	_populate_inventory() # Refresh to update "greyed out" states of all other cards
+		if deck.size() < 12: deck.append(id)
+	
+	_update_selection_visuals(node, id, "deck")
+	_update_counters()
 	SaveManager.save_mid_run_state()
 
-func _update_deck_counter():
-	if not deck_count_label: return
-	var active_deck = GameManager.get("active_deck")
-	var count = active_deck.size() if active_deck != null else 0
-	deck_count_label.text = "Active Pairs: %d / 12" % count
+func _on_inventory_item_clicked(node: Control, id: String):
+	if not "active_items" in GameManager:
+		GameManager.set("active_items", [])
 	
-	# Visual feedback for minimum and maximum requirements
-	if count <= 3:
-		deck_count_label.modulate = Color.GOLD
-	elif count == 12:
-		deck_count_label.modulate = Color.GREEN
+	var active = GameManager.active_items
+	if id in active:
+		active.erase(id)
 	else:
-		deck_count_label.modulate = Color.SKY_BLUE
+		if active.size() < 3:
+			active.append(id)
+			
+	_update_selection_visuals(node, id, "item")
+	_update_counters()
+	SaveManager.save_mid_run_state()
+
+func _update_selection_visuals(node: Control, id: String, mode: String):
+	var is_active = false
+	if mode == "deck":
+		is_active = id in GameManager.active_deck
+	else:
+		var active_items = GameManager.get("active_items")
+		is_active = id in (active_items if active_items != null else [])
+		
+	if is_active:
+		node.modulate = Color.WHITE
+		node.self_modulate = Color(0.5, 0.8, 1.0) # Blue highlight
+	else:
+		node.modulate = Color(0.6, 0.6, 0.6, 0.8) # Dimmed
+		node.self_modulate = Color.WHITE
+
+func _update_counters():
+	deck_count_label.text = "Active Pairs: %d / 12" % GameManager.active_deck.size()
+	
+	var active_items = GameManager.get("active_items")
+	var item_count = active_items.size() if active_items != null else 0
+	item_count_label.text = "Equipped: %d / 3" % item_count
 
 func _on_back_pressed():
-	# Prevent leaving if the deck is too small (safety check)
 	if GameManager.active_deck.size() < 3:
-		deck_count_label.text = "MIN 3 PAIRS REQUIRED!"
-		return
-		
+		return 
 	get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")

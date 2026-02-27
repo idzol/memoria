@@ -4,6 +4,21 @@ extends Node
 # res://data/GameData.gd
 # Static repository for game content and dialog trees.
 
+
+# Player Expereince 
+
+# Progression: Level 1 starts at 0 XP. 
+# Index represents Level - 1. 
+# Value is total XP required to reach the NEXT level.
+const XP_THRESHOLDS = [10, 50, 200, 500, 1200, 3000, 7500]
+
+static func get_max_xp_for_level(level: int) -> int:
+	if level > 0 and level <= XP_THRESHOLDS.size():
+		return XP_THRESHOLDS[level - 1]
+	return 99999 # Max level fallback
+
+# LEGACY: Events 
+
 const EVENTS = {
 	"whispering_well": {
 		"title": "The Whispering Well",
@@ -33,6 +48,8 @@ const EVENTS = {
 		]
 	}
 }
+
+# LEGACY: Dialog Trees 
 
 const DIALOG_TREES = {
 	# --- TOWN BIOME ---
@@ -270,17 +287,4 @@ const DIALOG_TREES = {
 			"options": [{"text": "Understood", "action": "victory"}]
 		}
 	}
-}
-
-# --- VISUAL ASSET MAPPING ---
-const ICON_MAP = {
-	"home": "res://assets/maps/home.png",
-	"battle": "res://assets/sword.png",
-	"shop": "res://assets/key.png",
-	"rest": "res://assets/heart.png",
-	"event": "res://assets/scroll.png",
-	"lore": "res://assets/scroll.png", # Using scroll for lore NPCs
-	"trap": "res://assets/trap.png",
-	"boss": "res://assets/skull.png",
-	"mystery": "res://assets/mystery.png" # Updated mystery asset
 }

@@ -1,23 +1,33 @@
-
-battlescene 
-
-	status bar 
-		biome | room name 
-		attack
-		spell 
-		defense 
-		conditions
-		round 1 
-		health bar 
 	
-	update damage calculation 
-		plus 		damage (physcial)
-		plus 		damage (spell) 
-		minus 		armour 
-		modified by  status effects 
+update player profile 
+	include visual representation of health bar 
+		player attack
+		player defense 
+		
+		
+update deck management
+	show all cards face up 
+		group cards by rarity: common, uncommon, rare, epic, unique 
+		on click, include or exclude cards from deck  
+	
+	===
+	debugitem -> item cards. description 
+		
+	introduce second tab for item cards. 
+	
+		select three items cards 
+		click to select / deselect items from 
 
+	===
+	introduce thrid tab for inventory icons 
 
+		inventory items 
+		image 
+		description 
 
+		eg. gold 
+	
+	
 map 
 	update to make sure
 	any room visited is tracked, and replaced by room icon 
@@ -301,8 +311,15 @@ tutorial
 		molos, meets fisher
 		dialog 
 	
+
+battlescene 
+
+	turns 
+		"your turn"
+		"enemy turn" 
 	
-	
+	hp bar
+	status bar 
 	
 
 battlescene background 
@@ -542,12 +559,6 @@ introduce game state variables, such that completing a room previously may chang
 ==
 create a json structure for dialog
 create a json structure for room behaviour, based on game state 
-
-===
-create a character screen that shows player, cards in deck
-	introduce concept of player deck 
-	show all cards face up 
-	add dictionary ... 
 
 === 
 update map to show current location with player icon 

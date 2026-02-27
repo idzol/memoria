@@ -12,11 +12,19 @@ var player_xp: int = 0
 var current_hp: int = 100
 var max_hp: int = 100
 var gold: int = 50
-var player_inventory: Array = ["sword", "shield", "heart", "trap", "scroll"]
+var player_cards: Array = ["sword", "shield", "heart", "trap", "scroll"]
+var active_deck: Array = ["sword", "shield", "heart"]
+
+var player_items: Array = [] # inventory (relics, materials)
+var active_items: Array = []
 
 # --- Run Progression ---
 var current_level: int = 1
 var completed_nodes: Array = []
+
+# Combat Stats
+var player_attack: int = 10
+var player_defense: int = 5
 
 var current_node: Dictionary = {}
 var run_map: Dictionary = {} # Stored persistently per run
@@ -27,7 +35,6 @@ var run_map: Dictionary = {} # Stored persistently per run
 
 # Default to uninitialized to avoid (0,0) collision bugs
 var player_grid_pos: Vector2i = Vector2i(-99, -99)
-var active_deck: Array = []
 
 var pending_loot: Array = []   # Loot from the JUST finished battle
 var run_loot: Array = []       # Cumulative loot from the WHOLE run
@@ -129,9 +136,9 @@ func add_card_to_collection(card_id: String):
 	if ResourceLoader.exists(path):
 		if not card_id in world_state.cards.owned:
 			world_state.cards.owned.append(card_id)
-			# Sync with player_inventory for UI compatibility
-			if not card_id in player_inventory:
-				player_inventory.append(card_id)
+			# Sync with player_cards for UI compatibility
+			if not card_id in player_items:
+				player_cards.append(card_id)
 			print("GameManager: Card verified and added to owned collection: ", card_id)
 	else:
 		push_warning("GameManager: Failed to add card. Resource not found at: " + path)
@@ -155,6 +162,7 @@ func load_save_data(data: Dictionary):
 func start_actual_run():
 	current_hp = max_hp
 	gold = 50
+	player_xp = 0
 	current_level = 1
 	completed_nodes = []
 	player_grid_pos = Vector2i(2, -1) # Ensure player starts at Home
