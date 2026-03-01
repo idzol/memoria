@@ -58,8 +58,11 @@ func save_mid_run_state():
 		"max_hp": GameManager.max_hp,
 		"gold": GameManager.gold,
 		
-		"inventory": GameManager.player_inventory,
+		"deck": GameManager.player_deck,
 		"active_deck": GameManager.active_deck,
+
+		"items": GameManager.player_items,
+		"active_items": GameManager.active_items,
 		
 		"current_level": GameManager.current_level,
 		"completed_nodes": GameManager.completed_nodes,

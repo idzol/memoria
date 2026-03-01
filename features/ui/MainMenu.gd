@@ -8,7 +8,7 @@ extends Control
 @onready var save_container = %SaveListVBox
 @onready var name_input = %NameInput
 @onready var music_player = %MenuMusic
-@export var ambient_loop = preload("res://assets/music/amb_100.ogg")
+@export var ambient_loop = preload("res://assets/music/intro_main_music.ogg")
 
 # Confirmation Popup for deletion
 @onready var confirm_delete_popup = %ConfirmDeletePopup

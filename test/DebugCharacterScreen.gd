@@ -77,7 +77,7 @@ func _add_card_to_debug_grid(data: CardData):
 	var btn = Button.new()
 	btn.toggle_mode = true
 	btn.text = "Add to Inv"
-	btn.button_pressed = data.card_id in GameManager.player_inventory
+	btn.button_pressed = data.card_id in GameManager.player_deck
 	btn.toggled.connect(_on_card_toggled.bind(data.card_id))
 	container.add_child(btn)
 	
@@ -85,10 +85,10 @@ func _add_card_to_debug_grid(data: CardData):
 
 func _on_card_toggled(is_active: bool, id: String):
 	if is_active:
-		if not id in GameManager.player_inventory:
-			GameManager.player_inventory.append(id)
+		if not id in GameManager.player_deck:
+			GameManager.player_deck.append(id)
 	else:
-		GameManager.player_inventory.erase(id)
+		GameManager.player_deck.erase(id)
 		GameManager.active_deck.erase(id)
 	
 	status_label.text = "Inventory Updated: " + id

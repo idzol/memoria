@@ -1,32 +1,65 @@
-	
-update player profile 
-	include visual representation of health bar 
-		player attack
-		player defense 
-		
-		
-update deck management
-	show all cards face up 
-		group cards by rarity: common, uncommon, rare, epic, unique 
-		on click, include or exclude cards from deck  
-	
-	===
-	debugitem -> item cards. description 
-		
-	introduce second tab for item cards. 
-	
-		select three items cards 
-		click to select / deselect items from 
+PROMPT 
+===
+Based on the github repostiorty   .notes/SUMMARY.md, create a new feature 
+{in /features/combat that inherits from BaseCombatEntity.}
 
-	===
-	introduce thrid tab for inventory icons 
+===
 
-		inventory items 
-		image 
-		description 
+update character select 
 
-		eg. gold 
+	add background 
 	
+	menu/character/character_select_background.png
+	
+	three choices. place them vertical 
+	
+	menu/character/warrior.png
+	menu/character/scholar.png 
+	menu/character/alchemist.png
+	
+	on select, replace with selected icon 
+
+	menu/character/warrior_select.png
+	menu/character/scholar_select.png 
+	menu/character/alchemist_select.png
+
+	add short description of each class 
+	recommend resource / asset tracking approach 
+
+
+
+item 
+	combat rewards show up as item card discovery 
+	
+
+
+tutorial
+	fisher		hit 3 times 
+	item 		rusty hook
+	echo 		character mgmt
+	2 paths 
+		nothing
+		enemy 	
+	village 
+
+map
+	macro_map - 8 biomes 
+		village 
+		town 
+		forest ...
+
+
+card.tscn 
+	
+	"item" template 
+	
+	title
+	image
+	{type}
+	description 
+	
+	"final" prototype .. 
+
 	
 map 
 	update to make sure
@@ -40,6 +73,12 @@ dialog
 	
 event scenes 
 	spritemaps for each location ... 
+	
+aesthetic 
+	character screen
+	menu buttons 
+	character portrait
+	
 	
 music
 	add music resource 

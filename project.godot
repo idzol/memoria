@@ -27,6 +27,7 @@ SaveManager="*uid://b1h8pr7avoy1t"
 SignalBus="*uid://27c0k1aans6a"
 GameManager="*uid://t7yqaikr52qk"
 GameData="uid://ci1lydkwmaebc"
+AssetRegistry="*uid://d3lufu0kcksfy"
 
 [display]
 

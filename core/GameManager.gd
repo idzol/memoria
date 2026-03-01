@@ -5,18 +5,24 @@ extends Node
 
 # --- Character State ---
 var player_name: String = ""
-var player_class: String = "Archivist"
+var player_class: String = "Warrior"
 var player_level: int = 1
 var player_xp: int = 0
+
+var base_energy: int = 0	# number of guesses start of each board  
+var base_attack: int = 0	
+var base_defense: int = 0	
+
+var current_energy: int = 0	   # number of guesses this turn 
 
 var current_hp: int = 100
 var max_hp: int = 100
 var gold: int = 50
-var player_cards: Array = ["sword", "shield", "heart", "trap", "scroll"]
-var active_deck: Array = ["sword", "shield", "heart"]
+var player_deck: Array = [] # "sword", "shield", "heart", "trap", "scroll"]
+var active_deck: Array = [] # "sword", "shield", "heart"]
 
-var player_items: Array = [] # inventory (relics, materials)
-var active_items: Array = []
+var player_items: Array = [] # "wood_splinter", "mug_of_ale", "iron_scrap"] 
+var active_items: Array = [] # "wood_splinter"]
 
 # --- Run Progression ---
 var current_level: int = 1
@@ -136,9 +142,9 @@ func add_card_to_collection(card_id: String):
 	if ResourceLoader.exists(path):
 		if not card_id in world_state.cards.owned:
 			world_state.cards.owned.append(card_id)
-			# Sync with player_cards for UI compatibility
+			# Sync with player_deck for UI compatibility
 			if not card_id in player_items:
-				player_cards.append(card_id)
+				player_deck.append(card_id)
 			print("GameManager: Card verified and added to owned collection: ", card_id)
 	else:
 		push_warning("GameManager: Failed to add card. Resource not found at: " + path)

@@ -1,9 +1,57 @@
 class_name GameData
 extends Node
 
-# res://data/GameData.gd
-# Static repository for game content and dialog trees.
+# [AI-CONTRACT]
+# FILE: res://core/GameData.gd
+# FEATURES: Global constants for character statistics and progression balancing.
+# [YOLO-METADATA] TARGET: res://core/GameData.gd
 
+# [UI-107] Centralized Class Statistics Progression
+# Defines stat blocks for 8 levels per class with exaggerated archetypes.
+const CLASS_STATS = {
+	"warrior": [
+		{"max_hp": 25, "energy": 2, "player_attack": 5, "player_defense": 3}, # Lv 1: Brute start
+		{"max_hp": 40, "energy": 2, "player_attack": 8, "player_defense": 5}, # Lv 2
+		{"max_hp": 65, "energy": 3, "player_attack": 12, "player_defense": 8}, # Lv 3
+		{"max_hp": 100, "energy": 3, "player_attack": 18, "player_defense": 12}, # Lv 4
+		{"max_hp": 150, "energy": 3, "player_attack": 25, "player_defense": 18}, # Lv 5
+		{"max_hp": 220, "energy": 4, "player_attack": 35, "player_defense": 25},# Lv 6
+		{"max_hp": 300, "energy": 4, "player_attack": 50, "player_defense": 35},# Lv 7
+		{"max_hp": 450, "energy": 4, "player_attack": 80, "player_defense": 60} # Lv 8: Unstoppable Force
+	],
+	"scholar": [
+		{"max_hp": 10, "energy": 4, "player_attack": 1, "player_defense": 0},  # Lv 1: Very Fragile
+		{"max_hp": 14, "energy": 5, "player_attack": 2, "player_defense": 0},  # Lv 2
+		{"max_hp": 20, "energy": 6, "player_attack": 3, "player_defense": 1},  # Lv 3
+		{"max_hp": 28, "energy": 8, "player_attack": 5, "player_defense": 1},  # Lv 4: Energy Surge
+		{"max_hp": 38, "energy": 10, "player_attack": 7, "player_defense": 2}, # Lv 5
+		{"max_hp": 50, "energy": 12, "player_attack": 10, "player_defense": 2},# Lv 6
+		{"max_hp": 65, "energy": 15, "player_attack": 15, "player_defense": 3},# Lv 7
+		{"max_hp": 85, "energy": 20, "player_attack": 25, "player_defense": 5} # Lv 8: Infinite Casting
+	],
+	"alchemist": [
+		{"max_hp": 18, "energy": 3, "player_attack": 3, "player_defense": 1}, # Lv 1: Balanced
+		{"max_hp": 28, "energy": 3, "player_attack": 5, "player_defense": 2}, # Lv 2
+		{"max_hp": 42, "energy": 4, "player_attack": 8, "player_defense": 3}, # Lv 3
+		{"max_hp": 60, "energy": 5, "player_attack": 12, "player_defense": 5}, # Lv 4
+		{"max_hp": 85, "energy": 6, "player_attack": 18, "player_defense": 8}, # Lv 5
+		{"max_hp": 115, "energy": 7, "player_attack": 25, "player_defense": 12},# Lv 6
+		{"max_hp": 150, "energy": 8, "player_attack": 35, "player_defense": 18},# Lv 7
+		{"max_hp": 200, "energy": 10, "player_attack": 50, "player_defense": 25} # Lv 8: Master of All
+	]
+}
+
+# Identity Gauge constants
+const IDENTITY_THRESHOLD_UNLOCK_NAMES = 25.0
+const IDENTITY_THRESHOLD_UNCRYPT_STATS = 50.0
+const IDENTITY_THRESHOLD_ASTRAL_BRIDGE = 100.0
+
+## Helper to fetch stats for a specific level (1-indexed)
+static func get_stats(class_id: String, level: int = 1) -> Dictionary:
+	var idx = clamp(level - 1, 0, 7)
+	if CLASS_STATS.has(class_id.to_lower()):
+		return CLASS_STATS[class_id.to_lower()][idx]
+	return {}
 
 # Player Expereince 
 
@@ -17,8 +65,7 @@ static func get_max_xp_for_level(level: int) -> int:
 		return XP_THRESHOLDS[level - 1]
 	return 99999 # Max level fallback
 
-# LEGACY: Events 
-
+# LEGACY: Events - remove
 const EVENTS = {
 	"whispering_well": {
 		"title": "The Whispering Well",
@@ -49,8 +96,7 @@ const EVENTS = {
 	}
 }
 
-# LEGACY: Dialog Trees 
-
+# LEGACY: Dialog Trees - remove
 const DIALOG_TREES = {
 	# --- TOWN BIOME ---
 	"t1_gate_guard": {

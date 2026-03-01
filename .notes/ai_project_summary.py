@@ -1,7 +1,7 @@
 # Generates a structured summary of the project directory based on the feature-based refactor.
 # Usage: 
 # ```
-# python3 project_summary.py
+# python3 ai_project_summary.py
 # ```
 
 import os
@@ -10,7 +10,8 @@ import re
 def generate_summary():
     # Define new project directories based on the refactor plan
     target_dirs = ["core", "data", "features", "assets"]
-    output_file = ".notes/SUMMARY.md"
+    # Renamed to .ai-project-summary.md for consistency with the AI context workflow
+    output_file = ".notes/.ai-project-summary.md"
     
     # Ensure .notes directory exists
     if not os.path.exists(".notes"):
@@ -34,7 +35,7 @@ def generate_summary():
                 folder_name = os.path.basename(root)
                 
                 if folder_name != target:
-                    f.write(f"{indent}📂 {folder_name}/\n")
+                    f.write(f"{indent}📁 {folder_name}/\n")
                 
                 sub_indent = ' ' * 4 * (level + 1)
                 for file in sorted(files):

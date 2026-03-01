@@ -60,6 +60,32 @@ func setup(data: CardData):
 	
 	_apply_visual_templates(data)
 
+
+func setup_item(data: ItemData):
+	if not data: return
+	card_type = data.item_id
+	if title_label: title_label.text = data.name.to_upper()
+	
+	# Generate a stat-focused description for items
+	var stat_line = ""
+	if data.attack > 0: stat_line += "ATK+%d " % data.attack
+	if data.armour > 0: stat_line += "DEF+%d " % data.armour
+	if data.hp > 0: stat_line += "HP+%d " % data.hp
+	
+	if description_label: 
+		description_label.text = "[ %s ]\n%s\n%s" % [data.type.to_upper(), stat_line, data.description]
+	
+	if card_image_rect: 
+		card_image_rect.texture = data.item_image
+	
+	# Items use 'Unique' template style by default for high visibility in inventory
+	if asset_templates:
+		if front_template_rect: 
+			front_template_rect.texture = asset_templates.card_front_prepare
+		if back_template_rect: 
+			back_template_rect.texture = asset_templates.card_back_unique
+
+
 func _apply_visual_templates(data: CardData):
 	if not asset_templates: return
 	

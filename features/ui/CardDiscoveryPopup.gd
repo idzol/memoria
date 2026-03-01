@@ -33,8 +33,8 @@ func show_discovery(id: String):
 		card_image.texture = load("res://assets/card/trap.png")
 
 func _on_claim_pressed():
-	if current_card_id != "" and not current_card_id in GameManager.player_inventory:
-		GameManager.player_inventory.append(current_card_id)
+	if current_card_id != "" and not current_card_id in GameManager.player_deck:
+		GameManager.player_deck.append(current_card_id)
 		SaveManager.save_mid_run_state()
 	
 	visible = false

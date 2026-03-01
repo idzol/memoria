@@ -1,4 +1,46 @@
 
+# Code development 
+
+* Generate AI context files 
+
+```
+python3 ./.notes/ai_context_generator.py
+python3 ./.notes/ai_project_summary.py
+```
+
+* Update todo list 
+
+```
+Update todo list based on project context  
+{
+    ./.notes/ai_context_generator.py
+    ./.notes/ai_project_summary.py
+    .ai-todo.md
+} 
+```
+
+* Feature 
+
+``` 
+implement next feature on todo list 
+request additional files as rqd 
+```
+
+
+* YOLO ..
+
+```
+implement feature 
+compare / update existing file   
+run test cases 
+```
+
+
+
+"Read .ai-context.md for our Godot architecture. Based on the mapping in .notes/SUMMARY.md, create a new feature 
+{in /features/combat that inherits from BaseCombatEntity.}"
+
+
 
 # Engine - Menu  
 
