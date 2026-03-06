@@ -77,6 +77,13 @@ func _update_icons():
 
 func _on_confirm_pressed():
 	if selected_class == "": return
+
+	# SHOW LOADING SCREEN
+	GameManager.show_loading("Restoring your identity...")
+	
+	# Wait for UI to paint
+	await get_tree().process_frame
+	await get_tree().process_frame
 	
 	# 5. Initialize Global Stats via GameManager and GameData level 1 stats
 	GameManager.player_class = selected_class.capitalize()
@@ -94,4 +101,13 @@ func _on_confirm_pressed():
 		push_error("Stats initialization failed for: " + selected_class)
 			
 	SignalBus.game_started.emit()
-	get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+
+	# 3. Branching Start Path
+	# Redirects to the appropriate map and initializes specific inventories
+	if GameManager.is_battle_mode:
+		print("[CharacterSelect] Starting BATTLE MODE...")
+		GameManager.start_battle_mode()
+
+	else:
+		print("[CharacterSelect] Starting STORY MODE...")
+		GameManager.start_actual_run()

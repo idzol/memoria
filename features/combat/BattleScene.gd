@@ -272,14 +272,26 @@ func _init_encounter():
 
 func _check_win_loss():
 	if is_battle_over: return
+	
 	if e_hp <= 0:
 		is_battle_over = true
 		GameManager.current_hp = p_hp
 		GameManager.mark_room_cleared(GameManager.current_node.id)
-		get_tree().call_deferred("change_scene_to_file", "res://features/combat/VictoryScreen.tscn")
+		
+		# GLOBAL ROUTING: Battle Mode vs standard World Mode
+		if GameManager.is_battle_mode:
+			# Experience gain logic could be added here
+			get_tree().call_deferred("change_scene_to_file", "res://features/combat/VictoryScreenBattleMode.tscn")
+		else:
+			get_tree().call_deferred("change_scene_to_file", "res://features/combat/VictoryScreen.tscn")
+			
 	elif p_hp <= 0:
 		is_battle_over = true
-		get_tree().call_deferred("change_scene_to_file", "res://features/ui/RunSummary.tscn")
+		if GameManager.is_battle_mode:
+			# In battle mode, death just sends you back to map (or specific restart)
+			get_tree().call_deferred("change_scene_to_file", "res://features/map/BattleMapUI.tscn")
+		else:
+			get_tree().call_deferred("change_scene_to_file", "res://features/ui/RunSummary.tscn")
 
 
 func update_ui(instant: bool = false):

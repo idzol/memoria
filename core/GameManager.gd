@@ -24,6 +24,9 @@ var active_deck: Array = [] # "sword", "shield", "heart"]
 var player_items: Array = [] # "wood_splinter", "mug_of_ale", "iron_scrap"] 
 var active_items: Array = [] # "wood_splinter"]
 
+# --- Game Mode ---
+var is_battle_mode: bool = false
+
 # --- Run Progression ---
 var current_level: int = 1
 var completed_nodes: Array = []
@@ -44,6 +47,28 @@ var player_grid_pos: Vector2i = Vector2i(-99, -99)
 
 var pending_loot: Array = []   # Loot from the JUST finished battle
 var run_loot: Array = []       # Cumulative loot from the WHOLE run
+
+# --- LOADING SCREEN ---
+var loading_overlay_scene = preload("res://features/ui/LoadingOverlay.tscn")
+var active_loading_overlay = null
+
+func show_loading(description: String):
+	if active_loading_overlay: return
+	active_loading_overlay = loading_overlay_scene.instantiate()
+	get_tree().root.add_child(active_loading_overlay)
+	
+	active_loading_overlay.modulate.a = 1.0
+	active_loading_overlay.set_loading_info(description)
+
+func update_loading(description: String, progress: float):
+	if active_loading_overlay:
+		active_loading_overlay.modulate.a = 1.0
+		active_loading_overlay.set_loading_info(description, progress)
+
+func hide_loading():
+	if active_loading_overlay:
+		active_loading_overlay.close()
+		active_loading_overlay = null
 
 # --- PERSISTENT WORLD STATE ---
 # This structure tracks EVERY interaction across the game world.
@@ -164,6 +189,36 @@ func get_save_data() -> Dictionary:
 func load_save_data(data: Dictionary):
 	world_state = data
 
+func start_battle_mode():
+	player_level = 1
+	player_xp = 0
+	current_hp = 100
+	max_hp = 100
+	gold = 100
+	
+	# Testing suite starting items
+	player_items = ["wood_splinter", "mug_of_ale", "iron_scrap"]
+	active_items = []
+	active_deck = ["sword", "shield", "heart"]
+	
+	# Use specialized linear generator
+	var gen = preload("res://features/map/BattleMapGenerator.gd").new()
+	add_child(gen) 
+	
+	# 2. Connect Loading Signals
+	if not gen.is_connected("progress_updated", _on_gen_progress):
+		gen.progress_updated.connect(_on_gen_progress)
+		 
+	# 3. Generate Async
+	run_map = await gen.generate_battle_map()
+
+	# 4. Cleanup	
+	gen.queue_free()
+	player_grid_pos = Vector2i(0, 0)
+	world_state.rooms = {}
+	
+	hide_loading()
+	get_tree().change_scene_to_file("res://features/map/BattleMap.tscn")
 
 func start_actual_run():
 	current_hp = max_hp
@@ -184,11 +239,24 @@ func start_actual_run():
 	
 	# 3. Generate Persistent Map (Run once per run)
 	var gen = preload("res://features/map/MapGenerator.gd").new()
-	run_map = gen.generate_new_map()
+	add_child(gen)
+	
+	# Connect Loading Signals
+	if not gen.is_connected("progress_updated", _on_gen_progress):
+		gen.progress_updated.connect(_on_gen_progress)
+	
+	run_map = await gen.generate_new_map()
 	SaveManager.save_mid_run_state()
 	
-	# 3. Transition to Intro Cinematic instead of WorldMap directly
+	# 4. Cleanup
+	gen.queue_free()
+	hide_loading()
+
+	# Transition to Intro Cinematic instead of WorldMap directly
 	get_tree().change_scene_to_file("res://features/ui/IntroCinematic.tscn")
+
+func _on_gen_progress(percent: float, description: String):
+	update_loading(description, percent)
 
 func reset_to_home():
 	# Standard Home location: Layer -1, Column 2

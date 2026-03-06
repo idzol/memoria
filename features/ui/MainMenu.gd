@@ -7,6 +7,7 @@ extends Control
 @onready var save_list_popup = %SaveListPopup
 @onready var save_container = %SaveListVBox
 @onready var name_input = %NameInput
+@onready var battle_mode_btn = %BattleModeButton
 
 # Confirmation Popup for deletion
 @onready var confirm_delete_popup = %ConfirmDeletePopup
@@ -26,7 +27,8 @@ func _ready():
 	%ControlsBtn.pressed.connect(_on_controls_pressed) # New Connection
 	%CreditsBtn.pressed.connect(_on_credits_pressed)
 	%ExitButton.pressed.connect(_on_exit_pressed)
-	
+	%BattleModeButton.pressed.connect(_on_battle_mode_clicked)
+
 	# Delete Confirmation connections
 	%ConfirmDeleteBtn.pressed.connect(_on_delete_confirmed)
 	%CancelDeleteBtn.pressed.connect(func(): confirm_delete_popup.visible = false)
@@ -37,6 +39,7 @@ func _ready():
 	confirm_delete_popup.visible = false
 	if has_node("%SettingsOverlay"):
 		%SettingsOverlay.visible = false
+
 
 func _request_initial_music():
 	# Double check AudioData constant exists
@@ -58,10 +61,17 @@ func _refresh_continue_button():
 			continue_button.pressed.connect(_on_continue_clicked)
 
 func _on_new_game_clicked():
+	# Set game Mode
+	GameManager.is_battle_mode = false
 	name_entry_popup.visible = true
 	name_input.text = ""
 	name_input.placeholder_text = "Enter unique name..."
 	name_input.grab_focus()
+
+func _on_battle_mode_clicked():
+	# Set game Mode
+	GameManager.is_battle_mode = true
+	get_tree().change_scene_to_file("res://features/ui/CharacterSelect.tscn")
 
 func _on_name_confirmed():
 	var p_name = name_input.text.strip_edges()

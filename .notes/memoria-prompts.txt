@@ -5,37 +5,73 @@ Based on the github repostiorty   .notes/SUMMARY.md, create a new feature
 
 ===
 
+resource structure 
+	enemies 
+		map to "difficulty" 
+		n cards  (x by x)
+	
+	rooms 
+		map to "biome" 
+		
+===
+
+main menu 
+	tscn 
+
+character select 
+	if battle mode 
+	
+===
+
 Battle mode 
 
 	create a "battle mode" that tests the core game loop of battle and card selection 
 	
-	create a new world map that is a a row of 50x rooms. 
-		these rooms are all battle rooms, selected from the room scenes. 
-		only show adjacent rooms 
-		every 3 rooms, include a treasure room 
+	create a world map generator for battle mode that creates a "home" square and then 8 biomes x 10 rooms. 
+		these rooms are selected from the relevant room scenes. 
+		only show adjacent rooms to the player 
+		each "biome" or phase is 10 rooms  
+		every 3 rooms, include a treasure room from that biome 
+		every 10th room, include an NPC room from that biome
 		every 5th room, include a 
-		do not allow a player to visit a previously visited room .. 
+		do not allow a player to go back, or visit a previously visited room .. 
+	
+	create a battle scene map 
+		add an information bar at the top to show biome (1 to 8) and phase (1 to 10), meaning that "1-1" is the first biome, second room. 
+		overlay a progressive shadow for rooms to the left, 3 rooms ago (100% opacity), 2 rooms ago (66% opacity) and 1 room ago (33% opacity) ...		
+		
+	create a treasure room, based on combat scene   
+		treasure room shows n x n cards, using a random background from the biome 
+		on mapping 
+		    Big heal 
+			Heal 
+			Energy  
+			Card - item..  
+			Trap  
+			Big trap 
+			Gold  
+
+	make sure battle mode is set as global game state 
+	
+	on combat victory in battle mode, link to a new battle mode victory screen
+		at end of each battle, player is presented with a selection of three cards with the same uniqueness as the enemy 
+		select one of three cards that aligns to the difficulty of the enemy 
+		if card already in deck, add "already owned" below the card  
+		add that card to the deck 
+			
 	
 	the battle game loop is: 
 		fight an enemy,
-		select card on victory,  
-	
-		
+		select one of three card on victory,  
+		return back 
+			
+		trigger level up if xp > level  
 
+	
 	update main menu to link to battle mode scene 
-	
-	loot screen 
-		at end of each battle, player is presented with a selection of three cards with the same uniqueness as the enemy 
-		
-		
-		
-		victory screen presents 
-		
-	at the end of each battle, show 
-	
-	
-	
-	
+		load character selection screen 
+		once character has been selected, go to a new "battle map" rather than world map
+			
 ==
 
 update settings 

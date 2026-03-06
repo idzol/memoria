@@ -4,6 +4,9 @@ extends Node
 # Generates a procedural map and extracts metadata for performance.
 # Designed to be called once per run and stored in GameManager.
 
+# Progress signals and async support for loading overlays.
+signal progress_updated(percent: float, description: String)
+
 const MAP_LAYERS = 20
 const NODES_PER_LAYER = 5
 const VERTICAL_SPACING = 180
@@ -48,6 +51,13 @@ func generate_new_map() -> Dictionary:
 		var biome_name = BIOME_KEYS[diff]
 		var available = _get_available_rooms(biome_name)
 		
+		# Update loading percentage and description based on current biome
+		var progress = (float(l) / MAP_LAYERS) * 0.8 + 0.1
+		progress_updated.emit(progress, "Charting the %s..." % biome_name.capitalize().replace("_", " "))
+		
+		# Small delay to allow the UI/Loading screen to update
+		await get_tree().process_frame
+		
 		for c in range(NODES_PER_LAYER):
 			var id = str(1 + (l * NODES_PER_LAYER) + c)
 			var res_path = ""
@@ -64,6 +74,9 @@ func generate_new_map() -> Dictionary:
 			nodes[id] = _create_node_entry(id, res_path, biome_name, l, c, diff)
 
 	# 3. Build Connections
+	progress_updated.emit(0.9, "Mapping ley lines and connections...")
+	await get_tree().process_frame
+
 	for id in nodes:
 		var node = nodes[id]
 		var neighbors = [
@@ -77,6 +90,7 @@ func generate_new_map() -> Dictionary:
 			if target: 
 				node.connections.append(target.id)
 	
+	progress_updated.emit(1.0, "World synchronization complete.")
 	return nodes
 
 ## Extracts minimal metadata from a Room Resource without keeping the large resource in memory.
