@@ -7,14 +7,14 @@ extends Control
 @onready var save_list_popup = %SaveListPopup
 @onready var save_container = %SaveListVBox
 @onready var name_input = %NameInput
-@onready var music_player = %MenuMusic
-@export var ambient_loop = preload("res://assets/music/intro_main_music.ogg")
 
 # Confirmation Popup for deletion
 @onready var confirm_delete_popup = %ConfirmDeletePopup
 var _pending_delete_filename: String = ""
 
 func _ready():
+	_request_initial_music.call_deferred()
+
 	_refresh_continue_button()
 	
 	# Connect signals
@@ -38,12 +38,10 @@ func _ready():
 	if has_node("%SettingsOverlay"):
 		%SettingsOverlay.visible = false
 
-	# Connect the finished signal to play the loop
-	music_player.finished.connect(_on_intro_finished)
-
-func _on_intro_finished():
-	music_player.stream = ambient_loop
-	music_player.play()
+func _request_initial_music():
+	# Double check AudioData constant exists
+	var track = AudioData.TRACKS.get("MAIN_MENU", "intro_main_menu")
+	SignalBus.music_change_requested.emit(track, 1.5)
 
 func _refresh_continue_button():
 	# Note: Assumes SaveManager singleton exists
@@ -132,14 +130,23 @@ func _load_specific_run(data: Dictionary):
 	GameManager.load_run_from_data(data)
 
 func _on_settings_pressed():
+	_play_click_sfx()
 	if has_node("%SettingsOverlay"):
 		%SettingsOverlay.visible = true
 
 func _on_controls_pressed():
+	_play_click_sfx()
 	get_tree().change_scene_to_file("res://features/ui/ControlsMenu.tscn")
 
 func _on_credits_pressed():
+	_play_click_sfx()
 	get_tree().change_scene_to_file("res://features/ui/Credits.tscn")
 
 func _on_exit_pressed():
+	_play_click_sfx()
+	SignalBus.game_exited.emit()
 	get_tree().quit()
+
+func _play_click_sfx():
+	# Trigger common UI click sound from music.csv (e.g., sfx_207)
+	SignalBus.sfx_triggered.emit("UI_CLICK")

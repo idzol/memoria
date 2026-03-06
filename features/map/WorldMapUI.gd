@@ -52,9 +52,12 @@ func _ready():
 	# Initial biome load (defaulting to town)
 	load_biome_map("town")
 	
+	# Music 
+	SignalBus.music_change_requested.emit(AudioData.TRACKS["TOWN"], 1.0)
+
 	# Snap/Scroll to player position
 	_scroll_to_player.call_deferred(true)
-
+	
 
 func _setup_ui_features():
 	# Setup Travel Confirmation Dialog
@@ -225,7 +228,7 @@ func _scroll_to_player(is_first_load: bool = false):
 	if not is_inside_tree(): return
 	await get_tree().process_frame
 	
-	var player_y_pos = (GameManager.player_grid_pos.y) * -180 + 3800
+	var player_y_pos = (GameManager.player_grid_pos.y) * -180 + 3400
 	var target_scroll = int(player_y_pos)
 	
 	if is_first_load:

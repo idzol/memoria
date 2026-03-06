@@ -49,7 +49,7 @@ func _setup_npc(data: NPCData):
 	npc_name_label.text = data.name
 	npc_name_label.visible = true
 	_setup_unit_visuals(npc_sprite, data)
-	
+
 	# Start Narrative
 	if data.dialog_tree_id != "" and GameData.DIALOG_TREES.has(data.dialog_tree_id):
 		_display_dialog_node(data.dialog_tree_id, "start")

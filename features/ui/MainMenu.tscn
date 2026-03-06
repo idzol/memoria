@@ -4,7 +4,6 @@
 [ext_resource type="Theme" uid="uid://kw6gdo1dshed" path="res://assets/themes/Minotaur.theme" id="1_uhfsk"]
 [ext_resource type="PackedScene" uid="uid://dm5v8f6r7p2m5" path="res://features/ui/SettingsOverlay.tscn" id="2_settings"]
 [ext_resource type="Texture2D" uid="uid://ki802i37gyb4" path="res://assets/ui/main_background.png" id="3_bg_texture"]
-[ext_resource type="AudioStream" path="res://assets/music/intro_main_music.ogg" id="4_intro_music"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_opaque_modal"]
 bg_color = Color(0.1, 0.1, 0.12, 1)
@@ -242,8 +241,3 @@ text = "CANCEL"
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
-
-[node name="MenuMusic" type="AudioStreamPlayer" parent="." unique_id=1462439773]
-unique_name_in_owner = true
-stream = ExtResource("4_intro_music")
-autoplay = true

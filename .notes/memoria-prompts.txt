@@ -5,6 +5,46 @@ Based on the github repostiorty   .notes/SUMMARY.md, create a new feature
 
 ===
 
+Battle mode 
+
+	create a "battle mode" that tests the core game loop of battle and card selection 
+	
+	create a new world map that is a a row of 50x rooms. 
+		these rooms are all battle rooms, selected from the room scenes. 
+		only show adjacent rooms 
+		every 3 rooms, include a treasure room 
+		every 5th room, include a 
+		do not allow a player to visit a previously visited room .. 
+	
+	the battle game loop is: 
+		fight an enemy,
+		select card on victory,  
+	
+		
+
+	update main menu to link to battle mode scene 
+	
+	loot screen 
+		at end of each battle, player is presented with a selection of three cards with the same uniqueness as the enemy 
+		
+		
+		
+		victory screen presents 
+		
+	at the end of each battle, show 
+	
+	
+	
+	
+==
+
+update settings 
+	
+	use same layout mode as used for "esc" on worldmap 
+
+
+=== 
+
 update character select 
 
 	add background 

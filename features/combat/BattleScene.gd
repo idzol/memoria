@@ -60,14 +60,18 @@ func _ready():
 	# Debug win / lose connections
 	if has_node("%DebugWinBtn"): %DebugWinBtn.pressed.connect(_debug_win)
 	if has_node("%DebugLoseBtn"): %DebugLoseBtn.pressed.connect(_debug_lose)
+
 	# Connect Settings
 	if settings_btn:
 		settings_btn.pressed.connect(_on_settings_pressed)
-	_sync_status_bar
+	_sync_status_bar()
 	_setup_player_spritesheet()
 	_setup_enemy_portrait()
 	_init_encounter()
 	
+	# Music 
+	SignalBus.music_change_requested.emit(AudioData.TRACKS["BATTLE_STANDARD"], 1.0)
+
 	# Initial UI Sync
 	_sync_status_bar()
 	update_ui()
@@ -120,7 +124,7 @@ func _check_match():
 		c1.flip_back()
 		c2.flip_back()
 		_enemy_turn()
-	
+		
 	flipped_cards.clear()
 	update_ui()
 	_check_win_loss()
@@ -153,20 +157,33 @@ func _process_combat_action(card_id: String):
 		e_hp = max(0, e_hp - final_dmg)
 		add_log("Matched %s: Dealt %d %s damage." % [data.name, final_dmg, type])
 		_flash_unit(%EnemyFlash, Color.CRIMSON)
-		
+		# Increase intensity to 0.5 to bring in the drums
+		SignalBus.battle_intensity_changed.emit(0.5)
+		SignalBus.sfx_triggered.emit(AudioData.SFX["SWORD"])
+
 	# 2. Heal Execution
 	if stats.get("heal", 0) > 0:
 		var heal_amt = stats.heal
 		p_hp = min(GameManager.max_hp, p_hp + heal_amt)
 		add_log("Matched %s: Restored %d HP." % [data.name, heal_amt])
 		_flash_unit(%PlayerFlash, Color.SEA_GREEN)
-		
+		# Increase intensity to 0.5 to bring in the drums
+		SignalBus.battle_intensity_changed.emit(0.5)
+		SignalBus.sfx_triggered.emit(AudioData.SFX["HEAL"])
+
 	# 3. Trap Execution
 	if stats.get("trap", 0) > 0:
 		var trap_dmg = stats.trap
 		p_hp = max(0, p_hp - trap_dmg)
 		add_log("Mimic Triggered! Took %d damage." % trap_dmg)
 		_flash_unit(%PlayerFlash, Color.ORANGE_RED)
+		SignalBus.battle_intensity_changed.emit(0.5)
+		SignalBus.sfx_triggered.emit(AudioData.SFX["TRAP"])
+
+	# # 4. Block 
+	# # Increase intensity to 0.5 to bring in the drums
+	# SignalBus.battle_intensity_changed.emit(0.5)
+	# SignalBus.sfx_triggered.emit(AudioData.SFX["SHIELD"])
 
 func _calculate_final_damage(card_val: int, type: String, attacker: String, defender: String) -> int:
 	var total = card_val

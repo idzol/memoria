@@ -1,4 +1,3 @@
-class_name GameData
 extends Node
 
 # [AI-CONTRACT]
@@ -47,23 +46,22 @@ const IDENTITY_THRESHOLD_UNCRYPT_STATS = 50.0
 const IDENTITY_THRESHOLD_ASTRAL_BRIDGE = 100.0
 
 ## Helper to fetch stats for a specific level (1-indexed)
-static func get_stats(class_id: String, level: int = 1) -> Dictionary:
+func get_stats(class_id: String, level: int = 1) -> Dictionary:
 	var idx = clamp(level - 1, 0, 7)
 	if CLASS_STATS.has(class_id.to_lower()):
 		return CLASS_STATS[class_id.to_lower()][idx]
 	return {}
-
-# Player Expereince 
 
 # Progression: Level 1 starts at 0 XP. 
 # Index represents Level - 1. 
 # Value is total XP required to reach the NEXT level.
 const XP_THRESHOLDS = [10, 50, 200, 500, 1200, 3000, 7500]
 
-static func get_max_xp_for_level(level: int) -> int:
+func get_max_xp_for_level(level: int) -> int:
 	if level > 0 and level <= XP_THRESHOLDS.size():
 		return XP_THRESHOLDS[level - 1]
 	return 99999 # Max level fallback
+
 
 # LEGACY: Events - remove
 const EVENTS = {

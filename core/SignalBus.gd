@@ -36,3 +36,11 @@ signal hp_changed(current, max_hp)
 signal save_requested
 signal run_started
 signal run_ended(is_victory)    
+
+# --- Audio Signals [CORE-008] ---
+# Request a change in background music with a specific crossfade duration
+signal music_change_requested(track_id: String, fade_time: float)
+# Adjust the battle intensity (0.0 to 1.0) to mix in percussion layers
+signal battle_intensity_changed(intensity: float)
+# Play a one-shot sound effect by ID (from music.csv/SFX section)
+signal sfx_triggered(sfx_id: String)
