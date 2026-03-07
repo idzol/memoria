@@ -92,4 +92,11 @@ func _update_gold_display():
 	gold_label.text = "Your Gold: " + str(GameManager.gold)
 
 func _on_leave_pressed():
-	get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+	
+	# 1. Branching return path
+	if GameManager.is_battle_mode:
+		# Return to the linear testing map
+		get_tree().change_scene_to_file("res://features/map/BattleMap.tscn")
+	else:
+		# Return to the procedural campaign map
+		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")

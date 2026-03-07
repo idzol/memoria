@@ -18,11 +18,11 @@ var current_energy: int = 0	   # number of guesses this turn
 var current_hp: int = 100
 var max_hp: int = 100
 var gold: int = 50
-var player_deck: Array = [] # "sword", "shield", "heart", "trap", "scroll"]
-var active_deck: Array = [] # "sword", "shield", "heart"]
+var player_deck: Array = [] # "sword", "shield", "heart", "trap", "scroll"
+var active_deck: Array = [] # "sword", "shield", "heart"
 
-var player_items: Array = [] # "wood_splinter", "mug_of_ale", "iron_scrap"] 
-var active_items: Array = [] # "wood_splinter"]
+var player_items: Array = [] # "wood_splinter", "mug_of_ale", "iron_scrap" 
+var active_items: Array = [] # "wood_splinter"
 
 # --- Game Mode ---
 var is_battle_mode: bool = false

@@ -213,9 +213,15 @@ func _update_counters():
 		item_count_label.modulate = Color.WHITE
 
 func _on_back_pressed():
-	# Requirements check
+	# 1. Validation check before allowing exit
 	if GameManager.active_deck.size() < GameManager.player_level:
 		deck_count_label.text = "LEVEL %d REQUIRES %d PAIRS!" % [GameManager.player_level, GameManager.player_level]
 		return 
-		
-	get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+	
+	# 2. Branching return path
+	if GameManager.is_battle_mode:
+		# Return to the linear testing map
+		get_tree().change_scene_to_file("res://features/map/BattleMap.tscn")
+	else:
+		# Return to the procedural campaign map
+		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")

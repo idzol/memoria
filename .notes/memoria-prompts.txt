@@ -4,22 +4,24 @@ Based on the github repostiorty   .notes/SUMMARY.md, create a new feature
 {in /features/combat that inherits from BaseCombatEntity.}
 
 ===
-
 resource structure 
-	enemies 
-		map to "difficulty" 
-		n cards  (x by x)
-	
-	rooms 
-		map to "biome" 
+			
+	battlemap | worldmap 
+		consider merging maps..
 		
-===
-
-main menu 
-	tscn 
-
 character select 
 	if battle mode 
+	
+victory screen 
+	update music to victory .. 
+	
+battle scene map 
+	don't allow player to click same room 
+	
+victory screen performance 
+	  Loading ~200 *.tres files from disk 
+	  res://data/items/*
+	
 	
 ===
 

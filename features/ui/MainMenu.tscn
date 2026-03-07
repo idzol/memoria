@@ -66,7 +66,7 @@ custom_minimum_size = Vector2(300, 60)
 layout_mode = 2
 text = "STORY MODE"
 
-[node name="BattleModeButton" type="Button" parent="CenterContainer/VBoxContainer"]
+[node name="BattleModeButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=92364108]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(320, 60)
 layout_mode = 2

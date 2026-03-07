@@ -111,4 +111,11 @@ func _get_player_res() -> PlayerData:
 	return null
 
 func _on_exit_pressed():
-	get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+
+	# 1. Branching return path
+	if GameManager.is_battle_mode:
+		# Return to the linear testing map
+		get_tree().change_scene_to_file("res://features/map/BattleMap.tscn")
+	else:
+		# Return to the procedural campaign map
+		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")

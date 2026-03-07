@@ -126,7 +126,15 @@ func _on_victory():
 	await get_tree().create_timer(1.0).timeout
 	GameManager.current_hp = player_hp
 	GameManager.mark_room_cleared(current_room.id)
-	get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+	
+	# 1. Branching return path
+	if GameManager.is_battle_mode:
+		# Return to the linear testing map
+		get_tree().change_scene_to_file("res://features/map/BattleMap.tscn")
+	else:
+		# Return to the procedural campaign map
+		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+
 
 func _update_ui_text():
 	player_hp_label.text = "HP: %d/%d" % [player_hp, GameManager.max_hp]

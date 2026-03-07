@@ -13,19 +13,22 @@ const ROOM_ROOT = "res://data/rooms/"
 var _room_pool: Dictionary = {}
 
 func generate_battle_map() -> Dictionary:
-	_scan_all_rooms()
 	var map = {}
 	
 	# 1. CREATE HOME (Layer 0)
+	# Using DataManager to fetch the home resource instantly
+	var home_path = "res://data/rooms/town/home.tres"
+	var home_res = DataManager.get_resource(home_path)
+	
 	map["node_0_0"] = {
 		"id": "node_0_0",
-		"name": "Testing Base",
+		"name": home_res.room_name if home_res else "Testing Base",
 		"type": "home",
 		"biome": "town",
 		"layer": 0,
 		"column": 0,
-		"room_resource_path": "res://data/rooms/town/home.tres",
-		"initial_dialog": "", # Suppress dialog in Battle Mode
+		"room_resource_path": home_path,
+		"initial_dialog": "", 
 		"connections": ["node_1_0", "node_1_1"]
 	}
 	
@@ -34,23 +37,21 @@ func generate_battle_map() -> Dictionary:
 		var biome_id = BIOMES[b_idx]
 		var start_layer = (b_idx * 10) + 1
 		
-		# Emit progress for each biome transition
 		var biome_percent = (float(b_idx) / BIOMES.size()) * 0.9 + 0.1
 		progress_updated.emit(biome_percent, "Charting the %s..." % biome_id.capitalize())
 		
-		# Small delay to allow UI to update and simulate complex calculation
+		# Yield to keep the Loading Overlay responsive
 		await get_tree().process_frame
 
-		for phase in range(1, 11): # Phase 1 to 10 within the biome
+		for phase in range(1, 11): 
 			var current_layer = start_layer + (phase - 1)
-			var nodes_in_layer = 2 
 			
-			for n_idx in range(nodes_in_layer):
+			for n_idx in range(2): # 2 paths per phase
 				var node_id = "node_%d_%d" % [current_layer, n_idx]
 				var target_type = _get_room_type(phase)
 				
-				# Select a room resource matching biome, phase difficulty, and type
-				var room_res = _get_room_resource(biome_id, phase, target_type)
+				# PERFORMANCE: DataManager provides a pre-filtered random room
+				var room_res = DataManager.get_random_room(biome_id, phase, target_type)
 				
 				var data = {
 					"id": node_id,
@@ -62,11 +63,11 @@ func generate_battle_map() -> Dictionary:
 					"column": n_idx,
 					"difficulty": current_layer,
 					"room_resource_path": room_res.resource_path if room_res else "",
-					"initial_dialog": "", # Suppress narrative fluff
+					"initial_dialog": "",
 					"connections": []
 				}
 				
-				# Link to next layer
+				# Linear connection logic
 				if current_layer < 80:
 					data.connections.append("node_%d_0" % (current_layer + 1))
 					data.connections.append("node_%d_1" % (current_layer + 1))
@@ -82,7 +83,6 @@ func _get_room_type(phase: int) -> String:
 	return "battle"
 
 # --- ROOM POOL LOGIC ---
-
 func _scan_all_rooms():
 	_room_pool.clear()
 	for biome in BIOMES:
