@@ -3,6 +3,16 @@ extends Node2D
 # res://features/combat/BattleScene.gd
 # Refactored for strict flip limits, proactive reshuffle, and extensible damage math.
 
+# --- Layout Tuning (Adjust these in the Inspector) ---
+@export_group("Environment Layout")
+## Vertical position as a ratio of screen height (e.g. 0.2 is 20% from the bottom).
+@export_range(0.0, 1.0) var ground_height_ratio: float = 0.2083 # ~150px from bottom on 720p (original baseline)
+## Horizontal margin as a ratio of screen width (e.g. 0.1 is 10% from the edge).
+@export_range(0.0, 0.5) var side_margin_ratio: float = 0.04 # ~51px from edge on 1280p (closer to edges)
+## Vertical offset for the sprite texture center (usually half of sprite height).
+@export var sprite_feet_offset: int = 0
+
+
 @onready var grid = %GridContainer
 @onready var log_box = %LogBox
 
@@ -31,6 +41,7 @@ extends Node2D
 @onready var enemy_sprite = %EnemyPortraitSprite 
 @onready var player_sprite = %PlayerSprite
 @onready var background = get_node_or_null("%Background")
+@onready var floor_rect = get_node_or_null("%FloorRect")
 
 var card_scene = preload("res://features/combat/CardIcon.tscn")
 var in_game_menu_scene = preload("res://features/ui/InGameMenu.tscn")
@@ -87,6 +98,8 @@ func _ready():
 	# Initial UI Sync
 	_sync_status_bar()
 	update_ui()
+	_update_character_placement()
+	get_viewport().size_changed.connect(_update_character_placement)
 
 func _input(event):
 	# Toggle In-Game Menu on Escape (ui_cancel)
@@ -94,6 +107,17 @@ func _input(event):
 		if in_game_menu:
 			if in_game_menu.visible: in_game_menu.close()
 			else: in_game_menu.open()
+
+	if OS.is_debug_build() and event is InputEventKey and event.pressed:
+		# PRESS 'B' TO TOGGLE BACKGROUND (Debugging hidden elements)
+		if event.keycode == KEY_B:
+			background.visible = !background.visible
+			print("[DEBUG] Background Visibility: ", background.visible)
+		
+		# PRESS 'F' TO FORCE FLOOR REFRESH
+		if event.keycode == KEY_F:
+			_apply_room_data(current_room_res)
+
 
 func _sync_stat_icons():
 	# Sync Player Icons
@@ -401,17 +425,15 @@ func _flash_unit(overlay, color):
 	overlay.color = color; overlay.color.a = 0.5
 	create_tween().tween_property(overlay, "color:a", 0.0, 0.4)
 
-	
 # --- VISUAL HELPERS ---
-
 func _setup_player_spritesheet():
 	var idle_tex = load("res://assets/player/base_idle.png")
 	if idle_tex:
 		player_sprite.texture = idle_tex
 		player_sprite.hframes = 8
 		player_sprite.vframes = 1
-		# Force 2x Size (Scale 1.0 relative to previous 0.5)
 		player_sprite.scale = Vector2(1.0, 1.0)
+		player_sprite.offset.y = sprite_feet_offset
 		_animate_unit(player_sprite, 8, 0.12)
 
 func _setup_enemy_portrait():
@@ -432,7 +454,9 @@ func _setup_enemy_portrait():
 			max_e_hp = current_enemy_res.hp
 			e_hp = max_e_hp 
 			if enemy_sprite:
+				enemy_sprite.offset.y = sprite_feet_offset
 				_apply_unit_visuals(enemy_sprite, current_enemy_res)
+
 
 func _animate_unit(sprite: Sprite2D, total: int, speed: float):
 	var frame = 0; var dir = 1
@@ -461,6 +485,7 @@ func _apply_unit_visuals(sprite: Sprite2D, res: Resource):
 		var total = res.get("total_frames")
 		var speed = res.get("frame_speed")
 		_animate_unit(sprite, total if total != null else 8, speed if speed != null else 0.1)
+		_update_character_placement()
 		
 func setup_board():
 
@@ -558,9 +583,69 @@ func _get_weighted_random_card_from_collection() -> String:
 	return collection.pick_random()
 
 func _apply_room_data(res: RoomData):
-	%RoomTitle.text = res.room_name
-	%DialogText.text = res.initial_dialog
-	if background and res.background_texture: background.texture = res.background_texture
+	if has_node("%RoomTitle"): %RoomTitle.text = res.room_name
+	if has_node("%DialogText"): %DialogText.text = res.initial_dialog
+	
+	# 1. Load Background
+	if background and res.background_texture: 
+		background.texture = res.background_texture
+	
+	# 2. Dynamic Floor Loading (Bottom 200px)
+	if floor_rect:
+		var biome = res.biome if res.biome != "" else "town"
+		# Adjusted path to match standard project structure
+		var floor_path = "res://assets/rooms/floor/%s_floor.png" % biome.to_lower()
+		if ResourceLoader.exists(floor_path):
+			floor_rect.texture = load(floor_path)
+			floor_rect.visible = true
+		else:
+			# Fallback if specific file is missing
+			print("[BattleScene] Floor texture missing: ", floor_path)
+			floor_rect.visible = false
+
+
+func _update_character_placement():
+	var v_size = get_viewport_rect().size
+	var floor_mid_y = _get_floor_midline_y(v_size)
+	var edge_margin = v_size.x * side_margin_ratio
+	var player_half_w = _get_sprite_half_width(player_sprite)
+	var enemy_half_w = _get_sprite_half_width(enemy_sprite)
+	var player_half_h = _get_sprite_half_height(player_sprite)
+	var enemy_half_h = _get_sprite_half_height(enemy_sprite)
+	
+	if player_sprite: 
+		player_sprite.offset.y = sprite_feet_offset
+		player_sprite.position = Vector2(
+			edge_margin + player_half_w,
+			floor_mid_y - player_half_h - player_sprite.offset.y
+		)
+		
+	if enemy_sprite: 
+		enemy_sprite.offset.y = sprite_feet_offset
+		enemy_sprite.position = Vector2(
+			v_size.x - edge_margin - enemy_half_w,
+			floor_mid_y - enemy_half_h - enemy_sprite.offset.y
+		)
+
+func _get_sprite_half_width(sprite: Sprite2D) -> float:
+	if not sprite or not sprite.texture:
+		return 0.0
+	var frame_count = max(1, sprite.hframes)
+	var frame_width = float(sprite.texture.get_width()) / float(frame_count)
+	return (frame_width * abs(sprite.scale.x)) * 0.5
+
+func _get_sprite_half_height(sprite: Sprite2D) -> float:
+	if not sprite or not sprite.texture:
+		return 0.0
+	var frame_count = max(1, sprite.vframes)
+	var frame_height = float(sprite.texture.get_height()) / float(frame_count)
+	return (frame_height * abs(sprite.scale.y)) * 0.5
+
+func _get_floor_midline_y(view_size: Vector2) -> float:
+	if floor_rect and floor_rect.visible:
+		var floor_bounds = floor_rect.get_global_rect()
+		return floor_bounds.position.y + (floor_bounds.size.y * 0.5)
+	return view_size.y * (1.0 - ground_height_ratio)
 
 func _debug_win():
 	get_tree().call_deferred("change_scene_to_file", "res://features/combat/VictoryScreen.tscn")

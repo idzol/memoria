@@ -4,10 +4,17 @@ extends CanvasLayer
 
 enum State { IDLE, CONFIRM_SAVE, CONFIRM_ABANDON }
 var current_state = State.IDLE
+func _input(event):
+	if event.is_action_pressed("ui_cancel"):
+		if visible:
+			close()
+		else:
+			open()
 
 func _ready():
 	visible = false
 	%ResumeBtn.pressed.connect(close)
+	%SettingsBtn.pressed.connect(_on_settings_pressed)
 	%SaveExitBtn.pressed.connect(_on_save_exit_pressed)
 	%AbandonBtn.pressed.connect(_on_abandon_pressed)
 	%YesBtn.pressed.connect(_on_confirm_yes)
@@ -19,10 +26,16 @@ func open():
 	current_state = State.IDLE
 	%ConfirmationDialog.visible = false
 	%MenuPanel.visible = true
+	if has_node("%SettingsOverlay"):
+		%SettingsOverlay.visible = false
 
 func close():
 	visible = false
 	get_tree().paused = false
+
+func _on_settings_pressed():
+	if has_node("%SettingsOverlay"):
+		%SettingsOverlay.visible = true
 
 func _on_save_exit_pressed():
 	current_state = State.CONFIRM_SAVE

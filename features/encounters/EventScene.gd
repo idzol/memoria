@@ -3,7 +3,13 @@ extends Control
 # res://features/encounters/EventScene.gd
 # Narrative encounter logic utilizing Room and NPC resources.
 
+@export_group("Environment Layout")
+@export_range(0.0, 1.0) var ground_height_ratio: float = 0.2083 # ~150px from bottom on 720p
+@export_range(0.0, 0.5) var side_margin_ratio: float = 0.04 # ~51px from edge on 1280p
+@export var sprite_feet_offset: int = 0
+
 @onready var background = %Background
+@onready var floor_rect = get_node_or_null("%FloorRect")
 @onready var room_title = %RoomTitle
 @onready var dialog_text = %DialogText
 @onready var choice_container = %ChoiceContainer
@@ -18,6 +24,8 @@ var current_npc_res: NPCData = null
 func _ready():
 	exit_button.pressed.connect(_on_exit_pressed)
 	_load_encounter_data()
+	_update_character_placement()
+	get_viewport().size_changed.connect(_update_character_placement)
 
 func _load_encounter_data():
 	var node = GameManager.current_node
@@ -28,8 +36,7 @@ func _load_encounter_data():
 	
 	# 1. Visuals
 	room_title.text = current_room_res.room_name
-	if current_room_res.background_texture:
-		background.texture = current_room_res.background_texture
+	_apply_room_environment(current_room_res)
 		
 	# 2. Player Spritesheet
 	_setup_unit_visuals(player_sprite, _get_player_res())
@@ -88,6 +95,9 @@ func _setup_unit_visuals(sprite: Sprite2D, res: Resource):
 		sprite.texture = sheet
 		sprite.hframes = res.get("hframes")
 		sprite.vframes = res.get("vframes")
+		sprite.scale = Vector2(1.0, 1.0)
+		sprite.offset.y = sprite_feet_offset
+		_update_character_placement()
 		_animate_unit(sprite, res.get("total_frames"), res.get("frame_speed"))
 	else:
 		sprite.visible = false
@@ -109,6 +119,59 @@ func _get_player_res() -> PlayerData:
 	if ResourceLoader.exists(p_path):
 		return load(p_path) as PlayerData
 	return null
+
+func _apply_room_environment(res: RoomData):
+	if background and res.background_texture:
+		background.texture = res.background_texture
+	if floor_rect:
+		var biome = res.biome if res.biome != "" else "town"
+		var floor_path = "res://assets/rooms/floor/%s_floor.png" % biome.to_lower()
+		if ResourceLoader.exists(floor_path):
+			floor_rect.texture = load(floor_path)
+			floor_rect.visible = true
+		else:
+			floor_rect.visible = false
+
+func _update_character_placement():
+	var v_size = get_viewport_rect().size
+	var floor_mid_y = _get_floor_midline_y(v_size)
+	var edge_margin = v_size.x * side_margin_ratio
+	var player_half_w = _get_sprite_half_width(player_sprite)
+	var npc_half_w = _get_sprite_half_width(npc_sprite)
+	var player_half_h = _get_sprite_half_height(player_sprite)
+	var npc_half_h = _get_sprite_half_height(npc_sprite)
+	if player_sprite:
+		player_sprite.offset.y = sprite_feet_offset
+		player_sprite.position = Vector2(
+			edge_margin + player_half_w,
+			floor_mid_y - player_half_h - player_sprite.offset.y
+		)
+	if npc_sprite and npc_sprite.visible:
+		npc_sprite.offset.y = sprite_feet_offset
+		npc_sprite.position = Vector2(
+			v_size.x - edge_margin - npc_half_w,
+			floor_mid_y - npc_half_h - npc_sprite.offset.y
+		)
+
+func _get_sprite_half_width(sprite: Sprite2D) -> float:
+	if not sprite or not sprite.texture:
+		return 0.0
+	var frame_count = max(1, sprite.hframes)
+	var frame_width = float(sprite.texture.get_width()) / float(frame_count)
+	return (frame_width * abs(sprite.scale.x)) * 0.5
+
+func _get_sprite_half_height(sprite: Sprite2D) -> float:
+	if not sprite or not sprite.texture:
+		return 0.0
+	var frame_count = max(1, sprite.vframes)
+	var frame_height = float(sprite.texture.get_height()) / float(frame_count)
+	return (frame_height * abs(sprite.scale.y)) * 0.5
+
+func _get_floor_midline_y(view_size: Vector2) -> float:
+	if floor_rect and floor_rect.visible:
+		var floor_bounds = floor_rect.get_global_rect()
+		return floor_bounds.position.y + (floor_bounds.size.y * 0.5)
+	return view_size.y * (1.0 - ground_height_ratio)
 
 func _on_exit_pressed():
 

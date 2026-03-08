@@ -1,6 +1,20 @@
+
+AGENTIC
+===
+Google Gemini
+
+OpenAI Codex 
+	try isntall 
+
+
+===
 PROMPT 
 ===
-Based on the github repostiorty   .notes/SUMMARY.md, create a new feature 
+
+update town 
+
+
+Based on the github repostiorty .notes/SUMMARY.md, create a new feature 
 {in /features/combat that inherits from BaseCombatEntity.}
 
 ===
