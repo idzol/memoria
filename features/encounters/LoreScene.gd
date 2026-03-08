@@ -124,4 +124,12 @@ func _on_finish_encounter():
 	# Return to map and mark the node visited/cleared if needed
 	# Note: In lore rooms, we usually mark it cleared immediately upon leaving
 	GameManager.mark_room_cleared(current_room.get("id", "unk"))
-	get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+
+	# Branching return path
+	if GameManager.is_battle_mode:
+		# Return to the linear testing map
+		get_tree().change_scene_to_file("res://features/map/BattleMap.tscn")
+	else:
+		# Return to the procedural campaign map
+		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+

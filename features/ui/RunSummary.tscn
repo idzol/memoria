@@ -1,83 +1,119 @@
 [gd_scene format=3 uid="uid://bxfv20qk13nfw"]
 
-[ext_resource type="Theme" uid="uid://cy1tv88ir10yq" path="res://assets/themes/Greek.theme" id="1_8xux8"]
-[ext_resource type="Script" uid="uid://cv2imhtpubwne" path="res://features/ui/RunSummary.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://cv2imhtpubwne" path="res://features/ui/RunSummary.gd" id="1_summary_script"]
+[ext_resource type="Theme" uid="uid://cy1tv88ir10yq" path="res://assets/themes/Greek.theme" id="2_theme"]
 
-[node name="RunSummary" type="Control" unique_id=1575554418]
+[node name="RunSummary" type="Control" unique_id=2072526531]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("1_8xux8")
-script = ExtResource("1_script")
+theme = ExtResource("2_theme")
+script = ExtResource("1_summary_script")
 
-[node name="Background" type="ColorRect" parent="." unique_id=2063162096]
+[node name="BG" type="ColorRect" parent="." unique_id=2009262483]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.04, 0.04, 0.05, 1)
+color = Color(0.05, 0.05, 0.07, 1)
 
-[node name="MarginContainer" type="MarginContainer" parent="." unique_id=1690696208]
+[node name="Margin" type="MarginContainer" parent="." unique_id=930706037]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 100
-theme_override_constants/margin_top = 50
-theme_override_constants/margin_right = 100
-theme_override_constants/margin_bottom = 50
+theme_override_constants/margin_left = 60
+theme_override_constants/margin_top = 60
+theme_override_constants/margin_right = 60
+theme_override_constants/margin_bottom = 60
 
-[node name="Layout" type="VBoxContainer" parent="MarginContainer" unique_id=1112813799]
+[node name="VBox" type="VBoxContainer" parent="Margin" unique_id=1562217516]
 layout_mode = 2
 theme_override_constants/separation = 30
 
-[node name="Header" type="Label" parent="MarginContainer/Layout" unique_id=1312885976]
+[node name="ResultTitle" type="Label" parent="Margin/VBox" unique_id=385579751]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
 text = "RUN SUMMARY"
 horizontal_alignment = 1
 
-[node name="StatsBox" type="VBoxContainer" parent="MarginContainer/Layout" unique_id=1301047149]
+[node name="HBox" type="HBoxContainer" parent="Margin/VBox" unique_id=1345364364]
 layout_mode = 2
-alignment = 1
+size_flags_vertical = 3
+theme_override_constants/separation = 40
 
-[node name="TotalGoldLabel" type="Label" parent="MarginContainer/Layout/StatsBox" unique_id=9815929]
+[node name="Left" type="VBoxContainer" parent="Margin/VBox/HBox" unique_id=1495223911]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 15
+
+[node name="StatsHeader" type="Label" parent="Margin/VBox/HBox/Left" unique_id=2098498579]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+text = "IDENTITY PROGRESS"
+
+[node name="LevelLabel" type="Label" parent="Margin/VBox/HBox/Left" unique_id=1725962953]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.843137, 0, 1)
-theme_override_font_sizes/font_size = 32
-text = "Total Gold: 0"
-horizontal_alignment = 1
+theme_override_font_sizes/font_size = 28
+text = "Level 1 Archivist"
 
-[node name="HSeparator" type="HSeparator" parent="MarginContainer/Layout" unique_id=570946183]
+[node name="RoomsLabel" type="Label" parent="Margin/VBox/HBox/Left" unique_id=2125099460]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Rooms Conquered: 12"
+
+[node name="Spacer" type="Control" parent="Margin/VBox/HBox/Left" unique_id=1070806456]
+custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 
-[node name="ItemsHeader" type="Label" parent="MarginContainer/Layout" unique_id=415535066]
+[node name="ItemsHeader" type="Label" parent="Margin/VBox/HBox/Left" unique_id=1561072719]
 layout_mode = 2
-text = "COLLECTED ITEMS"
-horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+text = "EQUIPPED ITEMS"
 
-[node name="ItemsScroll" type="ScrollContainer" parent="MarginContainer/Layout" unique_id=1542312437]
+[node name="ItemContainer" type="VBoxContainer" parent="Margin/VBox/HBox/Left" unique_id=1738700370]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Right" type="VBoxContainer" parent="Margin/VBox/HBox" unique_id=1247158087]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.5
+theme_override_constants/separation = 15
+
+[node name="DeckHeader" type="Label" parent="Margin/VBox/HBox/Right" unique_id=1044846326]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+text = "ACTIVE MEMORY PAIRS"
+
+[node name="Scroll" type="ScrollContainer" parent="Margin/VBox/HBox/Right" unique_id=2122174314]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="ItemsList" type="VBoxContainer" parent="MarginContainer/Layout/ItemsScroll" unique_id=457310957]
+[node name="CardContainer" type="GridContainer" parent="Margin/VBox/HBox/Right/Scroll" unique_id=680259708]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 8
+theme_override_constants/h_separation = 15
+theme_override_constants/v_separation = 15
+columns = 5
 
-[node name="CloseButton" type="Button" parent="MarginContainer/Layout" unique_id=1297301443]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(300, 80)
+[node name="Footer" type="CenterContainer" parent="Margin/VBox" unique_id=1508610024]
 layout_mode = 2
-size_flags_horizontal = 4
+
+[node name="MenuButton" type="Button" parent="Margin/VBox/Footer" unique_id=2106797041]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 60)
+layout_mode = 2
 theme_override_font_sizes/font_size = 24
-text = "FINISH EXPEDITION"
+text = "CONTINUE"

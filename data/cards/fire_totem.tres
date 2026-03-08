@@ -8,6 +8,7 @@
 script = ExtResource("1_script")
 card_id = "fire_totem"
 name = "Fire Totem"
+rarity = "uncommon"
 type = "attack_fire"
 value = 25
 description = "A pillar of flame"

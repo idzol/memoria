@@ -8,6 +8,7 @@
 script = ExtResource("1_script")
 card_id = "fairy_dust"
 name = "Fairy Dust"
+rarity = "common"
 type = "heal"
 value = 25
 description = "Sparkling recovery"

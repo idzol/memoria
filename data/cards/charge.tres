@@ -8,6 +8,7 @@
 script = ExtResource("1_script")
 card_id = "charge"
 name = "Overcharge"
+rarity = "common"
 type = "charge"
 value = 0
 description = "Double Next Hit"

@@ -1,15 +1,15 @@
 # Memory Dungeon: Asset & Resource Audit
-Generated: 2026-02-25 10:28:31
+Generated: 2026-02-26 05:17:17
 
 ## 📊 Category Health
 | Category | Total Resources | Healthy | Broken | Status |
 | :--- | :---: | :---: | :---: | :--- |
-| Cards | 125 | 124 | 1 | ❌ FAILED |
-| Enemies | 81 | 69 | 12 | ❌ FAILED |
+| Cards | 126 | 124 | 2 | ❌ FAILED |
+| Enemies | 81 | 70 | 11 | ❌ FAILED |
 | Items | 155 | 153 | 2 | ❌ FAILED |
 | Npcs | 80 | 49 | 31 | ❌ FAILED |
 | Player | 5 | 3 | 2 | ❌ FAILED |
-| Rooms | 163 | 158 | 5 | ❌ FAILED |
+| Rooms | 163 | 159 | 4 | ❌ FAILED |
 | Map | 1 | 0 | 1 | ❌ FAILED |
 
 ## ❌ Broken Resources Details
@@ -17,6 +17,10 @@ Generated: 2026-02-25 10:28:31
 ### Cards
 - **climbing_pick.tres** (`res://data/cards/climbing_pick.tres`)
   - ⚠️ Missing: `res://assets/cards/icon/climbing_pick_icon.png`
+- **_card_asset_data.tres** (`res://data/cards/_card_asset_data.tres`)
+  - ⚠️ Missing: `res://assets/cards/front/card_front_general.png`
+  - ⚠️ Missing: `res://assets/cards/front/card_front_spell.png`
+  - ⚠️ Missing: `res://assets/cards/front/card_front_trap.png`
 
 ### Enemies
 - **angler_fiend.tres** (`res://data/enemies/angler_fiend.tres`)
@@ -47,10 +51,6 @@ Generated: 2026-02-25 10:28:31
   - ⚠️ Missing: `res://assets/enemies/glow_eel_idle.png`
   - ⚠️ Missing: `res://assets/enemies/glow_eel_attack.png`
   - ⚠️ Missing: `res://assets/enemies/glow_eel_defend.png`
-- **loose_armor.tres** (`res://data/enemies/loose_armor.tres`)
-  - ⚠️ Missing: `res://assets/enemies/loose_armor_idle.png`
-  - ⚠️ Missing: `res://assets/enemies/loose_armor_attack.png`
-  - ⚠️ Missing: `res://assets/enemies/loose_armor_defend.png`
 - **rock_spider.tres** (`res://data/enemies/rock_spider.tres`)
   - ⚠️ Missing: `res://assets/enemies/rock_spider_idle.png`
   - ⚠️ Missing: `res://assets/enemies/rock_spider_attack.png`
@@ -182,8 +182,6 @@ Generated: 2026-02-25 10:28:31
   - ⚠️ Missing: `res://assets/player/leather_defend.png`
 
 ### Rooms
-- **default_battle.tres** (`res://data/rooms/default_battle.tres`)
-  - ⚠️ Missing: `res://assets/rooms/default.png`
 - **abyss_thermal_vent.tres** (`res://data/rooms/abyss/abyss_thermal_vent.tres`)
   - ⚠️ Missing: `res://assets/rooms/scene/abyss_thermal_vent_room.png`
 - **desert_glass_canyon.tres** (`res://data/rooms/desert/desert_glass_canyon.tres`)
@@ -219,18 +217,183 @@ Generated: 2026-02-25 10:28:31
 
 ## 🧹 Orphaned Assets (Unused)
 > These assets exist in `res://assets/` but are not referenced by any `.tres` file.
+- `res://assets/.gitignore`
+- `res://assets/cards/front/card_back_common_icon.png`
+- `res://assets/cards/front/card_back_epic_icon.png`
+- `res://assets/cards/front/card_back_rare_icon.png`
+- `res://assets/cards/front/card_back_uncommon_icon.png`
+- `res://assets/cards/front/card_back_unique_icon.png`
+- `res://assets/cards/front/card_front.png`
+- `res://assets/cards/front/card_trap.png`
+- `res://assets/enemies/bayou_bard_attack.png`
+- `res://assets/enemies/bayou_bard_defend.png`
+- `res://assets/enemies/bayou_bard_idle.png`
+- `res://assets/enemies/bayou_bard_talk.png`
+- `res://assets/enemies/berg_merchant_attack.png`
+- `res://assets/enemies/berg_merchant_defend.png`
+- `res://assets/enemies/berg_merchant_idle.png`
+- `res://assets/enemies/blacksmith_attack.png`
+- `res://assets/enemies/blacksmith_defend.png`
+- `res://assets/enemies/blacksmith_idle.png`
+- `res://assets/enemies/bog_doctor_attack.png`
+- `res://assets/enemies/bog_doctor_defend.png`
+- `res://assets/enemies/bog_doctor_idle.png`
+- `res://assets/enemies/coral_king_attack.png`
+- `res://assets/enemies/coral_king_defend.png`
+- `res://assets/enemies/coral_king_idle.png`
+- `res://assets/enemies/cryomancer_attack.png`
+- `res://assets/enemies/cryomancer_defend.png`
+- `res://assets/enemies/cryomancer_idle.png`
+- `res://assets/enemies/deep_diver_attack.png`
+- `res://assets/enemies/deep_diver_defend.png`
+- `res://assets/enemies/deep_diver_idle.png`
+- `res://assets/enemies/druid_attack.png`
+- `res://assets/enemies/druid_defend.png`
+- `res://assets/enemies/druid_idle.png`
+- `res://assets/enemies/elemental_emissary_attack.png`
+- `res://assets/enemies/elemental_emissary_defend.png`
+- `res://assets/enemies/elemental_emissary_idle.png`
+- `res://assets/enemies/exiled_prince_attack.png`
+- `res://assets/enemies/exiled_prince_defend.png`
+- `res://assets/enemies/exiled_prince_idle.png`
+- `res://assets/enemies/ferryman_attack.png`
+- `res://assets/enemies/ferryman_defend.png`
+- `res://assets/enemies/ferryman_idle.png`
+- `res://assets/enemies/frog_folk_elder_attack.png`
+- `res://assets/enemies/frog_folk_elder_defend.png`
+- `res://assets/enemies/frog_folk_elder_idle.png`
+- `res://assets/enemies/frozen_explorer_attack.png`
+- `res://assets/enemies/frozen_explorer_defend.png`
+- `res://assets/enemies/frozen_explorer_idle.png`
+- `res://assets/enemies/guard_captain_attack.png`
+- `res://assets/enemies/guard_captain_defend.png`
+- `res://assets/enemies/guard_captain_idle.png`
+- `res://assets/enemies/heat_shaman_attack.png`
+- `res://assets/enemies/heat_shaman_defend.png`
+- `res://assets/enemies/heat_shaman_idle.png`
 - `res://assets/enemies/hunter_attack.png`
 - `res://assets/enemies/hunter_defend.png`
 - `res://assets/enemies/hunter_idle.png`
+- `res://assets/enemies/ice_giant_attack.png`
+- `res://assets/enemies/ice_giant_defend.png`
+- `res://assets/enemies/ice_giant_idle.png`
+- `res://assets/enemies/innkeeper_attack.png`
+- `res://assets/enemies/innkeeper_defend.png`
+- `res://assets/enemies/innkeeper_idle.png`
+- `res://assets/enemies/jelly_whisperer_attack.png`
+- `res://assets/enemies/jelly_whisperer_defend.png`
+- `res://assets/enemies/jelly_whisperer_idle.png`
 - `res://assets/enemies/last_soul_attack.png`
 - `res://assets/enemies/last_soul_defend.png`
 - `res://assets/enemies/last_soul_idle.png`
+- `res://assets/enemies/librarian_attack.png`
+- `res://assets/enemies/librarian_defend.png`
+- `res://assets/enemies/librarian_idle.png`
+- `res://assets/enemies/loose_armor2_attack.png`
+- `res://assets/enemies/loose_armor2_defend.png`
+- `res://assets/enemies/loose_armor2_idle.png`
+- `res://assets/enemies/lost_child_attack.png`
+- `res://assets/enemies/lost_child_defend.png`
+- `res://assets/enemies/lost_child_idle.png`
+- `res://assets/enemies/mayor_attack.png`
+- `res://assets/enemies/mayor_defend.png`
+- `res://assets/enemies/mayor_idle.png`
+- `res://assets/enemies/memoria icon_attack.png`
+- `res://assets/enemies/memoria icon_defend.png`
+- `res://assets/enemies/memoria icon_idle.png`
+- `res://assets/enemies/memory_thief_attack.png`
+- `res://assets/enemies/memory_thief_defend.png`
+- `res://assets/enemies/memory_thief_idle.png`
+- `res://assets/enemies/merchant_attack.png`
+- `res://assets/enemies/merchant_defend.png`
+- `res://assets/enemies/merchant_idle.png`
+- `res://assets/enemies/mermaid_attack.png`
+- `res://assets/enemies/mermaid_defend.png`
+- `res://assets/enemies/mermaid_idle.png`
+- `res://assets/enemies/mud_fisher_attack.png`
+- `res://assets/enemies/mud_fisher_defend.png`
+- `res://assets/enemies/mud_fisher_idle.png`
+- `res://assets/enemies/oasis_keeper_attack.png`
+- `res://assets/enemies/oasis_keeper_defend.png`
+- `res://assets/enemies/oasis_keeper_idle.png`
+- `res://assets/enemies/obsidian_artist_attack.png`
+- `res://assets/enemies/obsidian_artist_defend.png`
+- `res://assets/enemies/obsidian_artist_idle.png`
+- `res://assets/enemies/paradox_merchant_attack.png`
+- `res://assets/enemies/paradox_merchant_defend.png`
+- `res://assets/enemies/paradox_merchant_idle.png`
+- `res://assets/enemies/polar_guide_attack.png`
+- `res://assets/enemies/polar_guide_defend.png`
+- `res://assets/enemies/polar_guide_idle.png`
+- `res://assets/enemies/priest_attack.png`
+- `res://assets/enemies/priest_defend.png`
+- `res://assets/enemies/priest_idle.png`
+- `res://assets/enemies/ranger_attack.png`
+- `res://assets/enemies/ranger_defend.png`
+- `res://assets/enemies/ranger_idle.png`
+- `res://assets/enemies/reptile_trader_attack.png`
+- `res://assets/enemies/reptile_trader_defend.png`
+- `res://assets/enemies/reptile_trader_idle.png`
+- `res://assets/enemies/rift_scientist_attack.png`
+- `res://assets/enemies/rift_scientist_defend.png`
+- `res://assets/enemies/rift_scientist_idle.png`
+- `res://assets/enemies/sand_sailor2_attack.png`
+- `res://assets/enemies/sand_sailor2_defend.png`
+- `res://assets/enemies/sand_sailor2_idle.png`
+- `res://assets/enemies/sand_sailor_attack.png`
+- `res://assets/enemies/sand_sailor_defend.png`
+- `res://assets/enemies/sand_sailor_idle.png`
 - `res://assets/enemies/sand_spirit1_attack.png`
 - `res://assets/enemies/sand_spirit1_defend.png`
 - `res://assets/enemies/sand_spirit1_idle.png`
+- `res://assets/enemies/scoprion_charmer_attack.png`
+- `res://assets/enemies/scoprion_charmer_defend.png`
+- `res://assets/enemies/scoprion_charmer_idle.png`
+- `res://assets/enemies/sea_hag_attack.png`
+- `res://assets/enemies/sea_hag_defend.png`
+- `res://assets/enemies/sea_hag_idle.png`
+- `res://assets/enemies/sphinx_npc_attack.png`
+- `res://assets/enemies/sphinx_npc_defend.png`
+- `res://assets/enemies/sphinx_npc_idle.png`
+- `res://assets/enemies/stablehand_attack.png`
+- `res://assets/enemies/stablehand_defend.png`
+- `res://assets/enemies/stablehand_idle.png`
+- `res://assets/enemies/star_gazer_attack.png`
+- `res://assets/enemies/star_gazer_defend.png`
+- `res://assets/enemies/star_gazer_idle.png`
+- `res://assets/enemies/steam_engineer_attack.png`
+- `res://assets/enemies/steam_engineer_defend.png`
+- `res://assets/enemies/steam_engineer_idle.png`
+- `res://assets/enemies/strange_rabbit_attack.png`
+- `res://assets/enemies/strange_rabbit_defend.png`
+- `res://assets/enemies/strange_rabbit_idle.png`
+- `res://assets/enemies/sun_priest_attack.png`
+- `res://assets/enemies/sun_priest_defend.png`
+- `res://assets/enemies/sun_priest_idle.png`
+- `res://assets/enemies/sunken_ghost_attack.png`
+- `res://assets/enemies/sunken_ghost_defend.png`
+- `res://assets/enemies/sunken_ghost_idle.png`
+- `res://assets/enemies/swam_alchemist_attack.png`
+- `res://assets/enemies/swam_alchemist_defend.png`
+- `res://assets/enemies/swam_alchemist_idle.png`
+- `res://assets/enemies/swamp_hag_attack.png`
+- `res://assets/enemies/swamp_hag_defend.png`
+- `res://assets/enemies/swamp_hag_idle.png`
+- `res://assets/enemies/time_keeper_attack.png`
+- `res://assets/enemies/time_keeper_defend.png`
+- `res://assets/enemies/time_keeper_idle.png`
 - `res://assets/enemies/trainnig_dummy_attack.png`
 - `res://assets/enemies/trainnig_dummy_defend.png`
 - `res://assets/enemies/trainnig_dummy_idle.png`
+- `res://assets/enemies/void_trader_attack.png`
+- `res://assets/enemies/void_trader_defend.png`
+- `res://assets/enemies/void_trader_idle.png`
+- `res://assets/enemies/woodcutter_attack.png`
+- `res://assets/enemies/woodcutter_defend.png`
+- `res://assets/enemies/woodcutter_idle.png`
+- `res://assets/enemies/yeti_outcast_attack.png`
+- `res://assets/enemies/yeti_outcast_defend.png`
+- `res://assets/enemies/yeti_outcast_idle.png`
 - `res://assets/fonts/Forum-Regular.ttf`
 - `res://assets/fonts/minotaur.ttf`
 - `res://assets/items/full/plant.png`
@@ -242,40 +405,154 @@ Generated: 2026-02-25 10:28:31
 - `res://assets/maps/_legacy/home.png`
 - `res://assets/maps/_legacy/ice.png`
 - `res://assets/maps/_legacy/sand.png`
+- `res://assets/maps/backgrounds/map_abyss_background.png`
+- `res://assets/maps/backgrounds/map_desert_background.png`
+- `res://assets/maps/backgrounds/map_forest_background.png`
+- `res://assets/maps/backgrounds/map_ice_background.png`
+- `res://assets/maps/backgrounds/map_swamp_background.png`
+- `res://assets/maps/backgrounds/map_town_background.png`
+- `res://assets/maps/backgrounds/map_town_background2.png`
+- `res://assets/maps/backgrounds/map_town_background3.png`
+- `res://assets/maps/backgrounds/map_town_background4.png`
+- `res://assets/maps/default.png`
+- `res://assets/maps/grids/map_abyss_grid.png`
+- `res://assets/maps/grids/map_castle_grid.png`
+- `res://assets/maps/grids/map_desert_grid.png`
+- `res://assets/maps/grids/map_forest_grid1.png`
+- `res://assets/maps/grids/map_ice_grid.png`
+- `res://assets/maps/grids/map_swamp_grid.png`
+- `res://assets/maps/grids/map_the_core_grid.png`
+- `res://assets/maps/grids/map_the_core_grid2.png`
+- `res://assets/maps/grids/map_town_grid.png`
+- `res://assets/maps/grids/map_void_grid.png`
 - `res://assets/maps/icon/battle.png`
 - `res://assets/maps/icon/event.png`
 - `res://assets/maps/icon/mystery.png`
 - `res://assets/maps/icon/rest.png`
 - `res://assets/music/amb_100.ogg`
 - `res://assets/music/mus_100.ogg`
+- `res://assets/npcs/bayou_bard_defend.png`
 - `res://assets/npcs/bayou_bard_interact.png`
 - `res://assets/npcs/berg_merchant_interact.png`
 - `res://assets/npcs/blacksmith_interact.png`
+- `res://assets/npcs/blood_flyer_idle.png`
+- `res://assets/npcs/blood_flyer_interact.png`
+- `res://assets/npcs/blood_flyer_talk.png`
 - `res://assets/npcs/bog_doctor_interact.png`
+- `res://assets/npcs/bog_horror_idle.png`
+- `res://assets/npcs/bog_horror_interact.png`
+- `res://assets/npcs/bog_horror_talk.png`
+- `res://assets/npcs/bone_picker_idle.png`
+- `res://assets/npcs/bone_picker_interact.png`
+- `res://assets/npcs/bone_picker_talk.png`
+- `res://assets/npcs/brain_eater_idle.png`
+- `res://assets/npcs/brain_eater_interact.png`
+- `res://assets/npcs/brain_eater_talk.png`
+- `res://assets/npcs/briar_beast_idle.png`
+- `res://assets/npcs/briar_beast_interact.png`
+- `res://assets/npcs/briar_beast_talk.png`
+- `res://assets/npcs/brood_mother_idle.png`
+- `res://assets/npcs/brood_mother_interact.png`
+- `res://assets/npcs/brood_mother_talk.png`
+- `res://assets/npcs/cat_thief_idle.png`
+- `res://assets/npcs/cat_thief_interact.png`
+- `res://assets/npcs/cat_thief_talk.png`
+- `res://assets/npcs/cinder_cat_idle.png`
+- `res://assets/npcs/cinder_cat_interact.png`
+- `res://assets/npcs/cinder_cat_talk.png`
 - `res://assets/npcs/coral_king_interact.png`
 - `res://assets/npcs/corrupt_clerk_idle.png`
 - `res://assets/npcs/corrupt_clerk_interact.png`
 - `res://assets/npcs/corrupt_clerk_talk.png`
 - `res://assets/npcs/cryomancer_interact.png`
+- `res://assets/npcs/cultist_idle.png`
+- `res://assets/npcs/cultist_interact.png`
+- `res://assets/npcs/cultist_talk.png`
 - `res://assets/npcs/deep_diver_interact.png`
+- `res://assets/npcs/deep_lurker_idle.png`
+- `res://assets/npcs/deep_lurker_interact.png`
+- `res://assets/npcs/deep_lurker_talk.png`
+- `res://assets/npcs/drowned_captain_idle.png`
+- `res://assets/npcs/drowned_captain_interact.png`
+- `res://assets/npcs/drowned_captain_talk.png`
+- `res://assets/npcs/drowned_sailor_idle.png`
+- `res://assets/npcs/drowned_sailor_interact.png`
+- `res://assets/npcs/drowned_sailor_talk.png`
 - `res://assets/npcs/druid_interact.png`
+- `res://assets/npcs/drunk_patron_idle.png`
+- `res://assets/npcs/drunk_patron_interact.png`
+- `res://assets/npcs/drunk_patron_talk.png`
 - `res://assets/npcs/dryad_corruptor_idle.png`
 - `res://assets/npcs/dryad_corruptor_interact.png`
 - `res://assets/npcs/dryad_corruptor_talk.png`
+- `res://assets/npcs/dust_devil_idle.png`
+- `res://assets/npcs/dust_devil_interact.png`
+- `res://assets/npcs/dust_devil_talk.png`
 - `res://assets/npcs/elemental_emissary_interact.png`
 - `res://assets/npcs/exiled_prince_interact.png`
+- `res://assets/npcs/feral_cat_idle.png`
+- `res://assets/npcs/feral_cat_interact.png`
+- `res://assets/npcs/feral_cat_talk.png`
+- `res://assets/npcs/feral_hound_idle.png`
+- `res://assets/npcs/feral_hound_interact.png`
+- `res://assets/npcs/feral_hound_talk.png`
 - `res://assets/npcs/ferryman_interact.png`
+- `res://assets/npcs/fire_bat_idle.png`
+- `res://assets/npcs/fire_bat_interact.png`
+- `res://assets/npcs/fire_bat_talk.png`
+- `res://assets/npcs/fire_imp_idle.png`
+- `res://assets/npcs/fire_imp_interact.png`
+- `res://assets/npcs/fire_imp_talk.png`
 - `res://assets/npcs/frog_folk_elder_interact.png`
+- `res://assets/npcs/frost_wisp_idle.png`
+- `res://assets/npcs/frost_wisp_interact.png`
+- `res://assets/npcs/frost_wisp_talk.png`
 - `res://assets/npcs/frozen_explorer_interact.png`
 - `res://assets/npcs/ghost_scholar_idle.png`
 - `res://assets/npcs/ghost_scholar_interact.png`
 - `res://assets/npcs/ghost_scholar_talk.png`
+- `res://assets/npcs/ghoul_idle.png`
+- `res://assets/npcs/ghoul_interact.png`
+- `res://assets/npcs/ghoul_talk.png`
+- `res://assets/npcs/giant_bee_idle.png`
+- `res://assets/npcs/giant_bee_interact.png`
+- `res://assets/npcs/giant_bee_talk.png`
+- `res://assets/npcs/giant_croc_idle.png`
+- `res://assets/npcs/giant_croc_interact.png`
+- `res://assets/npcs/giant_croc_talk.png`
+- `res://assets/npcs/giant_rat_idle.png`
+- `res://assets/npcs/giant_rat_interact.png`
+- `res://assets/npcs/giant_rat_talk.png`
+- `res://assets/npcs/giant_scorpion_idle.png`
+- `res://assets/npcs/giant_scorpion_interact.png`
+- `res://assets/npcs/giant_scorpion_talk.png`
+- `res://assets/npcs/glitch_horror_idle.png`
+- `res://assets/npcs/glitch_horror_interact.png`
+- `res://assets/npcs/glitch_horror_talk.png`
+- `res://assets/npcs/gravity_well_idle.png`
+- `res://assets/npcs/gravity_well_interact.png`
+- `res://assets/npcs/gravity_well_talk.png`
 - `res://assets/npcs/guard_captain_interact.png`
+- `res://assets/npcs/heat_crab_idle.png`
+- `res://assets/npcs/heat_crab_interact.png`
+- `res://assets/npcs/heat_crab_talk.png`
 - `res://assets/npcs/heat_shaman_interact.png`
 - `res://assets/npcs/hunter_interact.png`
+- `res://assets/npcs/ice_bat_idle.png`
+- `res://assets/npcs/ice_bat_interact.png`
+- `res://assets/npcs/ice_bat_talk.png`
 - `res://assets/npcs/ice_giant_interact.png`
+- `res://assets/npcs/ice_golem_idle.png`
+- `res://assets/npcs/ice_golem_interact.png`
+- `res://assets/npcs/ice_golem_talk.png`
 - `res://assets/npcs/innkeeper_interact.png`
+- `res://assets/npcs/iron_golem_idle.png`
+- `res://assets/npcs/iron_golem_interact.png`
+- `res://assets/npcs/iron_golem_talk.png`
 - `res://assets/npcs/jelly_whisperer_interact.png`
+- `res://assets/npcs/kobold_miner_idle.png`
+- `res://assets/npcs/kobold_miner_interact.png`
+- `res://assets/npcs/kobold_miner_talk.png`
 - `res://assets/npcs/last_soul_interact.png`
 - `res://assets/npcs/lava_slug_idle.png`
 - `res://assets/npcs/lava_slug_interact.png`
@@ -292,6 +569,9 @@ Generated: 2026-02-25 10:28:31
 - `res://assets/npcs/loose_armor_talk.png`
 - `res://assets/npcs/lost_child_interact.png`
 - `res://assets/npcs/mayor_interact.png`
+- `res://assets/npcs/memoria icon_idle.png`
+- `res://assets/npcs/memoria icon_interact.png`
+- `res://assets/npcs/memoria icon_talk.png`
 - `res://assets/npcs/memory_thief_interact.png`
 - `res://assets/npcs/merchant_interact.png`
 - `res://assets/npcs/mermaid_interact.png`
@@ -301,13 +581,25 @@ Generated: 2026-02-25 10:28:31
 - `res://assets/npcs/mimic_frost_idle.png`
 - `res://assets/npcs/mimic_frost_interact.png`
 - `res://assets/npcs/mimic_frost_talk.png`
+- `res://assets/npcs/mist_stalker_idle.png`
+- `res://assets/npcs/mist_stalker_interact.png`
+- `res://assets/npcs/mist_stalker_talk.png`
 - `res://assets/npcs/mud_fisher_interact.png`
 - `res://assets/npcs/mud_walker_idle.png`
 - `res://assets/npcs/mud_walker_interact.png`
 - `res://assets/npcs/mud_walker_talk.png`
+- `res://assets/npcs/mummy_king_idle.png`
+- `res://assets/npcs/mummy_king_interact.png`
+- `res://assets/npcs/mummy_king_talk.png`
 - `res://assets/npcs/oasis_keeper_interact.png`
 - `res://assets/npcs/obsidian_artist_interact.png`
+- `res://assets/npcs/ooze_cube_idle.png`
+- `res://assets/npcs/ooze_cube_interact.png`
+- `res://assets/npcs/ooze_cube_talk.png`
 - `res://assets/npcs/paradox_merchant_interact.png`
+- `res://assets/npcs/pickpocket_idle.png`
+- `res://assets/npcs/pickpocket_interact.png`
+- `res://assets/npcs/pickpocket_talk.png`
 - `res://assets/npcs/polar_guide_interact.png`
 - `res://assets/npcs/priest_interact.png`
 - `res://assets/npcs/ranger_interact.png`
@@ -316,6 +608,15 @@ Generated: 2026-02-25 10:28:31
 - `res://assets/npcs/rift_walker_idle.png`
 - `res://assets/npcs/rift_walker_interact.png`
 - `res://assets/npcs/rift_walker_talk.png`
+- `res://assets/npcs/river_lurker_idle.png`
+- `res://assets/npcs/river_lurker_interact.png`
+- `res://assets/npcs/river_lurker_talk.png`
+- `res://assets/npcs/ruffian_idle.png`
+- `res://assets/npcs/ruffian_interact.png`
+- `res://assets/npcs/ruffian_talk.png`
+- `res://assets/npcs/salt_golem_idle.png`
+- `res://assets/npcs/salt_golem_interact.png`
+- `res://assets/npcs/salt_golem_talk.png`
 - `res://assets/npcs/sand_sailor2_idle.png`
 - `res://assets/npcs/sand_sailor2_interact.png`
 - `res://assets/npcs/sand_sailor2_talk.png`
@@ -330,6 +631,30 @@ Generated: 2026-02-25 10:28:31
 - `res://assets/npcs/scoprion_charmer_interact.png`
 - `res://assets/npcs/scoprion_charmer_talk.png`
 - `res://assets/npcs/sea_hag_interact.png`
+- `res://assets/npcs/shadow_wraith_idle.png`
+- `res://assets/npcs/shadow_wraith_interact.png`
+- `res://assets/npcs/shadow_wraith_talk.png`
+- `res://assets/npcs/shard_beast_idle.png`
+- `res://assets/npcs/shard_beast_interact.png`
+- `res://assets/npcs/shard_beast_talk.png`
+- `res://assets/npcs/shock_jelly_idle.png`
+- `res://assets/npcs/shock_jelly_interact.png`
+- `res://assets/npcs/shock_jelly_talk.png`
+- `res://assets/npcs/silent_one_idle.png`
+- `res://assets/npcs/silent_one_interact.png`
+- `res://assets/npcs/silent_one_talk.png`
+- `res://assets/npcs/skeletal_sentry_idle.png`
+- `res://assets/npcs/skeletal_sentry_interact.png`
+- `res://assets/npcs/skeletal_sentry_talk.png`
+- `res://assets/npcs/skeleton_soldier_idle.png`
+- `res://assets/npcs/skeleton_soldier_interact.png`
+- `res://assets/npcs/skeleton_soldier_talk.png`
+- `res://assets/npcs/smelter_demon_idle.png`
+- `res://assets/npcs/smelter_demon_interact.png`
+- `res://assets/npcs/smelter_demon_talk.png`
+- `res://assets/npcs/snow_stalker_idle.png`
+- `res://assets/npcs/snow_stalker_interact.png`
+- `res://assets/npcs/snow_stalker_talk.png`
 - `res://assets/npcs/sphinx_npc_interact.png`
 - `res://assets/npcs/spore_servant_idle.png`
 - `res://assets/npcs/spore_servant_interact.png`
@@ -347,11 +672,31 @@ Generated: 2026-02-25 10:28:31
 - `res://assets/npcs/swam_alchemist_interact.png`
 - `res://assets/npcs/swam_alchemist_talk.png`
 - `res://assets/npcs/swamp_hag_interact.png`
+- `res://assets/npcs/the_keeper_idle.png`
+- `res://assets/npcs/the_keeper_interact.png`
+- `res://assets/npcs/the_keeper_talk.png`
 - `res://assets/npcs/time_keeper_interact.png`
+- `res://assets/npcs/tomb_wight_idle.png`
+- `res://assets/npcs/tomb_wight_interact.png`
+- `res://assets/npcs/tomb_wight_talk.png`
+- `res://assets/npcs/town_bully_idle.png`
+- `res://assets/npcs/town_bully_interact.png`
+- `res://assets/npcs/town_bully_talk.png`
 - `res://assets/npcs/trainnig_dummy_idle.png`
 - `res://assets/npcs/trainnig_dummy_interact.png`
 - `res://assets/npcs/trainnig_dummy_talk.png`
 - `res://assets/npcs/vampire_lord_idle.png`
+- `res://assets/npcs/vampire_lord_interact.png`
+- `res://assets/npcs/vampire_lord_talk.png`
+- `res://assets/npcs/vine_strangler_idle.png`
+- `res://assets/npcs/vine_strangler_interact.png`
+- `res://assets/npcs/vine_strangler_talk.png`
+- `res://assets/npcs/void_ray_idle.png`
+- `res://assets/npcs/void_ray_interact.png`
+- `res://assets/npcs/void_ray_talk.png`
+- `res://assets/npcs/void_stalker_idle.png`
+- `res://assets/npcs/void_stalker_interact.png`
+- `res://assets/npcs/void_stalker_talk.png`
 - `res://assets/npcs/void_trader_interact.png`
 - `res://assets/npcs/water_elemental_idle.png`
 - `res://assets/npcs/water_elemental_interact.png`
@@ -360,6 +705,8 @@ Generated: 2026-02-25 10:28:31
 - `res://assets/npcs/willow_wisp_interact.png`
 - `res://assets/npcs/willow_wisp_talk.png`
 - `res://assets/npcs/woodcutter_interact.png`
+- `res://assets/npcs/yeti_idle.png`
+- `res://assets/npcs/yeti_interact.png`
 - `res://assets/npcs/yeti_outcast_interact.png`
 - `res://assets/npcs/yeti_talk.png`
 - `res://assets/player/idle.png`

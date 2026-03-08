@@ -8,6 +8,7 @@
 script = ExtResource("1_script")
 card_id = "muffled_tongue"
 name = "Muffled Tongue"
+rarity = "epic"
 type = "utility"
 value = 0
 description = "Silences the room."

@@ -1,29 +1,39 @@
-[gd_resource type="Resource" script_class="MapAssetData" load_steps=24 format=3]
+[gd_resource type="Resource" script_class="MapAssetData" format=3 uid="uid://bw2wv8f7nalsg"]
 
-[ext_resource type="Script" path="res://data/resources/map_asset_data.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/maps/icon/home.png" id="2_home"]
-[ext_resource type="Texture2D" path="res://assets/maps/icon/sword.png" id="3_battle"]
-[ext_resource type="Texture2D" path="res://assets/maps/icon/shop.png" id="4_shop"]
-[ext_resource type="Texture2D" path="res://assets/maps/icon/heart.png" id="5_rest"]
-[ext_resource type="Texture2D" path="res://assets/maps/icon/scroll.png" id="6_event"]
-[ext_resource type="Texture2D" path="res://assets/maps/icon/skull.png" id="7_boss"]
-[ext_resource type="Texture2D" path="res://assets/maps/icon/trap.png" id="8_mystery"]
-[ext_resource type="Texture2D" path="res://assets/maps/backgrounds/town.png" id="9_town_bg"]
-[ext_resource type="Texture2D" path="res://assets/maps/backgrounds/forest.png" id="10_forest_bg"]
-[ext_resource type="Texture2D" path="res://assets/maps/backgrounds/ice_caves.png" id="11_ice_bg"]
-[ext_resource type="Texture2D" path="res://assets/maps/backgrounds/desert.png" id="12_desert_bg"]
-[ext_resource type="Texture2D" path="res://assets/maps/backgrounds/swamp.png" id="13_swamp_bg"]
-[ext_resource type="Texture2D" path="res://assets/maps/backgrounds/abyss.png" id="14_abyss_bg"]
-[ext_resource type="Texture2D" path="res://assets/maps/backgrounds/void.png" id="15_void_bg"]
-[ext_resource type="Texture2D" path="res://assets/maps/backgrounds/the_core.png" id="16_core_bg"]
-[ext_resource type="Texture2D" path="res://assets/maps/grids/town_grid.png" id="17_town_gr"]
-[ext_resource type="Texture2D" path="res://assets/maps/grids/forest_grid.png" id="18_forest_gr"]
-[ext_resource type="Texture2D" path="res://assets/maps/grids/ice_caves_grid.png" id="19_ice_gr"]
-[ext_resource type="Texture2D" path="res://assets/maps/grids/desert_grid.png" id="20_desert_gr"]
-[ext_resource type="Texture2D" path="res://assets/maps/grids/swamp_grid.png" id="21_swamp_gr"]
-[ext_resource type="Texture2D" path="res://assets/maps/grids/abyss_grid.png" id="22_abyss_gr"]
-[ext_resource type="Texture2D" path="res://assets/maps/grids/void_grid.png" id="23_void_gr"]
-[ext_resource type="Texture2D" path="res://assets/maps/grids/the_core_grid.png" id="24_core_gr"]
+[ext_resource type="Script" uid="uid://hewcwjpwvq0b" path="res://data/resources/MapAssetData.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://srkh6osjqv15" path="res://assets/maps/icon/home.png" id="2_home"]
+[ext_resource type="Texture2D" uid="uid://dxmkayds4csy" path="res://assets/maps/icon/battle.png" id="3_battle"]
+[ext_resource type="Texture2D" uid="uid://dj32fgyfd4vo1" path="res://assets/maps/icon/shop.png" id="4_shop"]
+[ext_resource type="Texture2D" uid="uid://bq14diqdgc2j8" path="res://assets/maps/icon/rest.png" id="5_rest"]
+[ext_resource type="Texture2D" uid="uid://bh3b1ta81dava" path="res://assets/maps/icon/event.png" id="6_event"]
+[ext_resource type="Texture2D" uid="uid://ctmdecfkymcot" path="res://assets/maps/icon/sword.png" id="7_boss"]
+[ext_resource type="Texture2D" uid="uid://qyksnobseyun" path="res://assets/maps/icon/mystery.png" id="8_mystery"]
+[ext_resource type="Texture2D" uid="uid://dbat5ko8nxhfs" path="res://assets/maps/backgrounds/map_town_background.png" id="9_town_bg"]
+[ext_resource type="Texture2D" uid="uid://b8q6jmoqu5536" path="res://assets/maps/backgrounds/map_forest_background.png" id="10_forest_bg"]
+[ext_resource type="Texture2D" uid="uid://5jsfxoknpiu" path="res://assets/maps/backgrounds/map_desert_background.png" id="12_desert_bg"]
+[ext_resource type="Texture2D" uid="uid://bhwhm24nn1cnx" path="res://assets/maps/backgrounds/map_swamp_background.png" id="13_swamp_bg"]
+[ext_resource type="Texture2D" uid="uid://b7hlf5qsleyy2" path="res://assets/maps/backgrounds/map_abyss_background.png" id="14_abyss_bg"]
+[ext_resource type="Texture2D" uid="uid://dir1gsle46rbw" path="res://assets/maps/grids/map_town_grid.png" id="17_town_gr"]
+[ext_resource type="Texture2D" uid="uid://cxtn8udru8sw6" path="res://assets/maps/grids/map_desert_grid.png" id="20_desert_gr"]
+[ext_resource type="Texture2D" uid="uid://bbhina11jjcyc" path="res://assets/maps/grids/map_swamp_grid.png" id="21_swamp_gr"]
+[ext_resource type="Texture2D" uid="uid://bx5c5i6q82dkc" path="res://assets/maps/grids/map_abyss_grid.png" id="22_abyss_gr"]
+[ext_resource type="Texture2D" uid="uid://clhj7jhxi4q2u" path="res://assets/maps/grids/map_void_grid.png" id="23_void_gr"]
+[ext_resource type="Texture2D" uid="uid://bbs0816uhfxjy" path="res://assets/maps/grids/map_the_core_grid.png" id="24_core_gr"]
+
+[sub_resource type="Resource" id="Resource_185le"]
+metadata/__load_path__ = "res://assets/maps/grids/map_forest_grid.png"
+
+[sub_resource type="Resource" id="Resource_a4kn3"]
+metadata/__load_path__ = "res://assets/maps/backgrounds/map_ice_caves_background.png"
+
+[sub_resource type="Resource" id="Resource_65qql"]
+metadata/__load_path__ = "res://assets/maps/grids/map_ice_caves_grid.png"
+
+[sub_resource type="Resource" id="Resource_8ast1"]
+metadata/__load_path__ = "res://assets/maps/backgrounds/map_the_core_background.png"
+
+[sub_resource type="Resource" id="Resource_xvxs6"]
+metadata/__load_path__ = "res://assets/maps/backgrounds/map_void_background.png"
 
 [resource]
 script = ExtResource("1_script")
@@ -36,15 +46,15 @@ map_icon_boss = ExtResource("7_boss")
 map_icon_mystery = ExtResource("8_mystery")
 map_town_background = ExtResource("9_town_bg")
 map_forest_background = ExtResource("10_forest_bg")
-map_ice_caves_background = ExtResource("11_ice_bg")
+map_ice_caves_background = SubResource("Resource_a4kn3")
 map_desert_background = ExtResource("12_desert_bg")
 map_swamp_background = ExtResource("13_swamp_bg")
 map_abyss_background = ExtResource("14_abyss_bg")
-map_void_background = ExtResource("15_void_bg")
-map_the_core_background = ExtResource("16_core_bg")
+map_void_background = SubResource("Resource_xvxs6")
+map_the_core_background = SubResource("Resource_8ast1")
 map_town_grid = ExtResource("17_town_gr")
-map_forest_grid = ExtResource("18_forest_gr")
-map_ice_caves_grid = ExtResource("19_ice_gr")
+map_forest_grid = SubResource("Resource_185le")
+map_ice_caves_grid = SubResource("Resource_65qql")
 map_desert_grid = ExtResource("20_desert_gr")
 map_swamp_grid = ExtResource("21_swamp_gr")
 map_abyss_grid = ExtResource("22_abyss_gr")

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="UIAssetData" load_steps=4 format=3 uid="uid://ui_assets_instance_01"]
+
+[ext_resource type="Script" path="res://data/resources/ui_asset_data.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://ki802i37gyb4" path="res://assets/ui/main_background.png" id="2_main_bg"]
+[ext_resource type="Texture2D" path="res://assets/ui/character_screen_background.png" id="3_char_bg"]
+
+[resource]
+script = ExtResource("1_script")
+main_menu_bg = ExtResource("2_main_bg")
+character_screen_bg = ExtResource("3_char_bg")

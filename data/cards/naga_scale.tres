@@ -8,6 +8,7 @@
 script = ExtResource("1_script")
 card_id = "naga_scale"
 name = "Naga Scale"
+rarity = "uncommon"
 type = "armor"
 value = 12
 description = "Legendary serpent skin"

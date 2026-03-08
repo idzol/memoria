@@ -8,6 +8,7 @@
 script = ExtResource("1_script")
 card_id = "catfish"
 name = "Slime Catfish"
+rarity = "uncommon"
 type = "heal"
 value = 5
 description = "Hard to hold, easy to eat"

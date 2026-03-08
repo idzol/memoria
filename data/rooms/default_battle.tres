@@ -8,6 +8,6 @@ script = ExtResource("1_room")
 room_name = "Shadowed Thicket"
 type = "battle"
 initial_dialog = "The leaves crunch behind you. You aren't alone."
-enemy_id = "slime"
+enemy_id = "pickpocket"
 difficulty_override = 2
 background_texture = ExtResource("default_bg")

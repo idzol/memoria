@@ -5,18 +5,35 @@ extends Node
 
 # --- Character State ---
 var player_name: String = ""
-var player_class: String = "Archivist"
+var player_class: String = "Warrior"
 var player_level: int = 1
 var player_xp: int = 0
+
+var base_energy: int = 0	# number of guesses start of each board  
+var base_attack: int = 0	
+var base_defense: int = 0	
+
+var current_energy: int = 0	   # number of guesses this turn 
 
 var current_hp: int = 100
 var max_hp: int = 100
 var gold: int = 50
-var player_inventory: Array = ["sword", "shield", "heart", "trap", "scroll"]
+var player_deck: Array = [] # "sword", "shield", "heart", "trap", "scroll"
+var active_deck: Array = [] # "sword", "shield", "heart"
+
+var player_items: Array = [] # "wood_splinter", "mug_of_ale", "iron_scrap" 
+var active_items: Array = [] # "wood_splinter"
+
+# --- Game Mode ---
+var is_battle_mode: bool = false
 
 # --- Run Progression ---
 var current_level: int = 1
 var completed_nodes: Array = []
+
+# Combat Stats
+var player_attack: int = 10
+var player_defense: int = 5
 
 var current_node: Dictionary = {}
 var run_map: Dictionary = {} # Stored persistently per run
@@ -27,10 +44,31 @@ var run_map: Dictionary = {} # Stored persistently per run
 
 # Default to uninitialized to avoid (0,0) collision bugs
 var player_grid_pos: Vector2i = Vector2i(-99, -99)
-var active_deck: Array = []
 
 var pending_loot: Array = []   # Loot from the JUST finished battle
 var run_loot: Array = []       # Cumulative loot from the WHOLE run
+
+# --- LOADING SCREEN ---
+var loading_overlay_scene = preload("res://features/ui/LoadingOverlay.tscn")
+var active_loading_overlay = null
+
+func show_loading(description: String):
+	if active_loading_overlay: return
+	active_loading_overlay = loading_overlay_scene.instantiate()
+	get_tree().root.add_child(active_loading_overlay)
+	
+	active_loading_overlay.modulate.a = 1.0
+	active_loading_overlay.set_loading_info(description)
+
+func update_loading(description: String, progress: float):
+	if active_loading_overlay:
+		active_loading_overlay.modulate.a = 1.0
+		active_loading_overlay.set_loading_info(description, progress)
+
+func hide_loading():
+	if active_loading_overlay:
+		active_loading_overlay.close()
+		active_loading_overlay = null
 
 # --- PERSISTENT WORLD STATE ---
 # This structure tracks EVERY interaction across the game world.
@@ -114,6 +152,7 @@ func mark_room_cleared(room_id):
 	if world_state.rooms.has(room_id):
 		world_state.rooms[room_id].cleared = true
 		world_state.rooms[room_id].visited = true
+		SaveManager.save_mid_run_state()
 	prepare_victory_loot(current_node)
 
 func record_npc_interaction(npc_id: String, won: bool):
@@ -128,9 +167,9 @@ func add_card_to_collection(card_id: String):
 	if ResourceLoader.exists(path):
 		if not card_id in world_state.cards.owned:
 			world_state.cards.owned.append(card_id)
-			# Sync with player_inventory for UI compatibility
-			if not card_id in player_inventory:
-				player_inventory.append(card_id)
+			# Sync with player_deck for UI compatibility
+			if not card_id in player_items:
+				player_deck.append(card_id)
 			print("GameManager: Card verified and added to owned collection: ", card_id)
 	else:
 		push_warning("GameManager: Failed to add card. Resource not found at: " + path)
@@ -150,28 +189,76 @@ func get_save_data() -> Dictionary:
 func load_save_data(data: Dictionary):
 	world_state = data
 
+func start_battle_mode():
+	player_level = 1
+	player_xp = 0
+	current_hp = 100
+	max_hp = 100
+	gold = 100
+	
+	# Testing suite starting items
+	player_items = ["wood_splinter", "mug_of_ale", "iron_scrap"]
+	active_items = []
+	
+	player_deck = ["sword", "shield", "heart"]
+	active_deck = player_deck.duplicate()
+	
+	# Use specialized linear generator
+	var gen = preload("res://features/map/BattleMapGenerator.gd").new()
+	add_child(gen) 
+	
+	# 2. Connect Loading Signals
+	if not gen.is_connected("progress_updated", _on_gen_progress):
+		gen.progress_updated.connect(_on_gen_progress)
+		 
+	# 3. Generate Async
+	run_map = await gen.generate_battle_map()
+
+	# 4. Cleanup	
+	gen.queue_free()
+	player_grid_pos = Vector2i(0, 0)
+	world_state.rooms = {}
+	
+	hide_loading()
+	get_tree().change_scene_to_file("res://features/map/BattleMap.tscn")
 
 func start_actual_run():
 	current_hp = max_hp
 	gold = 50
+	player_xp = 0
 	current_level = 1
 	completed_nodes = []
 	player_grid_pos = Vector2i(2, -1) # Ensure player starts at Home
-	active_deck = ["sword", "shield", "heart", "frost", "scroll", "trap"]
+	active_deck = ["sword", "shield", "heart"]
 
-	# Set player location 	
+	# 1. Set player location 	
 	reset_to_home()
 
-	# INITIALIZE FIXED NODES:
-	# Certain squares become "fixed" over time or are guaranteed by the map design
+	# 2. Setup fixed locations - Certain squares become "fixed" over time or are guaranteed by the map design
 	fixed_nodes.clear()
 	# Requirement: First mapnode (center of first layer) is always a Town Square
 	fixed_nodes[Vector2i(2, 0)] = "town_square"
 	
+	# 3. Generate Persistent Map (Run once per run)
+	var gen = preload("res://features/map/MapGenerator.gd").new()
+	add_child(gen)
+	
+	# Connect Loading Signals
+	if not gen.is_connected("progress_updated", _on_gen_progress):
+		gen.progress_updated.connect(_on_gen_progress)
+	
+	run_map = await gen.generate_new_map()
 	SaveManager.save_mid_run_state()
 	
+	# 4. Cleanup
+	gen.queue_free()
+	hide_loading()
+
 	# Transition to Intro Cinematic instead of WorldMap directly
 	get_tree().change_scene_to_file("res://features/ui/IntroCinematic.tscn")
+
+func _on_gen_progress(percent: float, description: String):
+	update_loading(description, percent)
 
 func reset_to_home():
 	# Standard Home location: Layer -1, Column 2
@@ -203,28 +290,10 @@ func load_run_from_data(data: Dictionary):
 
 func _on_node_selected(node_data: Dictionary):
 	current_node = node_data
-	
-	# UPDATED: Loading external room resource if path is provided
-	var res_path = node_data.get("room_resource_path", "")
-	var room_res: RoomData = null
-	
-	if res_path != "" and ResourceLoader.exists(res_path):
-		room_res = load(res_path) as RoomData
+	if not world_state.rooms.has(node_data.id):
+		world_state.rooms[node_data.id] = {"visited": true, "cleared": false}
 	
 	SaveManager.save_mid_run_state()
-	
-	# Priority: Use Resource Type, Fallback to Dictionary Type
-	var type = room_res.type if room_res else node_data.get("type", "battle")
-	
-	match type:
-		"battle", "boss":
-			get_tree().change_scene_to_file("res://features/combat/BattleScene.tscn")
-		"shop":
-			get_tree().change_scene_to_file("res://features/encounters/ShopScene.tscn")
-		"rest":
-			get_tree().change_scene_to_file("res://features/encounters/RestScene.tscn")
-		_:
-			get_tree().change_scene_to_file("res://features/encounters/EventScene.tscn")
 
 
 # --- LOOT LOGIC ---

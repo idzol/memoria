@@ -7,14 +7,15 @@ extends Control
 @onready var save_list_popup = %SaveListPopup
 @onready var save_container = %SaveListVBox
 @onready var name_input = %NameInput
-@onready var music_player = %MenuMusic
-@export var ambient_loop = preload("res://assets/music/amb_100.ogg")
+@onready var battle_mode_btn = %BattleModeButton
 
 # Confirmation Popup for deletion
 @onready var confirm_delete_popup = %ConfirmDeletePopup
 var _pending_delete_filename: String = ""
 
 func _ready():
+	_request_initial_music.call_deferred()
+
 	_refresh_continue_button()
 	
 	# Connect signals
@@ -26,7 +27,8 @@ func _ready():
 	%ControlsBtn.pressed.connect(_on_controls_pressed) # New Connection
 	%CreditsBtn.pressed.connect(_on_credits_pressed)
 	%ExitButton.pressed.connect(_on_exit_pressed)
-	
+	%BattleModeButton.pressed.connect(_on_battle_mode_clicked)
+
 	# Delete Confirmation connections
 	%ConfirmDeleteBtn.pressed.connect(_on_delete_confirmed)
 	%CancelDeleteBtn.pressed.connect(func(): confirm_delete_popup.visible = false)
@@ -38,12 +40,11 @@ func _ready():
 	if has_node("%SettingsOverlay"):
 		%SettingsOverlay.visible = false
 
-	# Connect the finished signal to play the loop
-	music_player.finished.connect(_on_intro_finished)
 
-func _on_intro_finished():
-	music_player.stream = ambient_loop
-	music_player.play()
+func _request_initial_music():
+	# Double check AudioData constant exists
+	var track = AudioData.TRACKS.get("MAIN_MENU", "intro_main_menu")
+	SignalBus.music_change_requested.emit(track, 1.5)
 
 func _refresh_continue_button():
 	# Note: Assumes SaveManager singleton exists
@@ -60,10 +61,17 @@ func _refresh_continue_button():
 			continue_button.pressed.connect(_on_continue_clicked)
 
 func _on_new_game_clicked():
+	# Set game Mode
+	GameManager.is_battle_mode = false
 	name_entry_popup.visible = true
 	name_input.text = ""
 	name_input.placeholder_text = "Enter unique name..."
 	name_input.grab_focus()
+
+func _on_battle_mode_clicked():
+	# Set game Mode
+	GameManager.is_battle_mode = true
+	get_tree().change_scene_to_file("res://features/ui/CharacterSelect.tscn")
 
 func _on_name_confirmed():
 	var p_name = name_input.text.strip_edges()
@@ -132,14 +140,23 @@ func _load_specific_run(data: Dictionary):
 	GameManager.load_run_from_data(data)
 
 func _on_settings_pressed():
+	_play_click_sfx()
 	if has_node("%SettingsOverlay"):
 		%SettingsOverlay.visible = true
 
 func _on_controls_pressed():
+	_play_click_sfx()
 	get_tree().change_scene_to_file("res://features/ui/ControlsMenu.tscn")
 
 func _on_credits_pressed():
+	_play_click_sfx()
 	get_tree().change_scene_to_file("res://features/ui/Credits.tscn")
 
 func _on_exit_pressed():
+	_play_click_sfx()
+	SignalBus.game_exited.emit()
 	get_tree().quit()
+
+func _play_click_sfx():
+	# Trigger common UI click sound from music.csv (e.g., sfx_207)
+	SignalBus.sfx_triggered.emit("UI_CLICK")

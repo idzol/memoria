@@ -8,6 +8,7 @@
 script = ExtResource("1_script")
 card_id = "blanket"
 name = "Wool Blanket"
+rarity = "common"
 type = "heal"
 value = 5
 description = "Rest more effectively"

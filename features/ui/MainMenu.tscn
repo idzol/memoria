@@ -4,7 +4,6 @@
 [ext_resource type="Theme" uid="uid://kw6gdo1dshed" path="res://assets/themes/Minotaur.theme" id="1_uhfsk"]
 [ext_resource type="PackedScene" uid="uid://dm5v8f6r7p2m5" path="res://features/ui/SettingsOverlay.tscn" id="2_settings"]
 [ext_resource type="Texture2D" uid="uid://ki802i37gyb4" path="res://assets/ui/main_background.png" id="3_bg_texture"]
-[ext_resource type="AudioStream" uid="uid://bhee2hj88v4h0" path="res://assets/music/mus_100.ogg" id="4_intro_music"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_opaque_modal"]
 bg_color = Color(0.1, 0.1, 0.12, 1)
@@ -59,13 +58,20 @@ horizontal_alignment = 1
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 60)
 layout_mode = 2
-text = "CONTINUE RUN"
+text = "CONTINUE"
 
 [node name="StartButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=616082724]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 60)
 layout_mode = 2
-text = "START NEW RUN"
+text = "STORY MODE"
+
+[node name="BattleModeButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=92364108]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.4, 1)
+text = "BATTLE MODE"
 
 [node name="SettingsButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=495069224]
 unique_name_in_owner = true
@@ -242,8 +248,3 @@ text = "CANCEL"
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
-
-[node name="MenuMusic" type="AudioStreamPlayer" parent="." unique_id=1462439773]
-unique_name_in_owner = true
-stream = ExtResource("4_intro_music")
-autoplay = true

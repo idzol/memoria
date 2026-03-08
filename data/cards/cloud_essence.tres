@@ -8,6 +8,7 @@
 script = ExtResource("1_script")
 card_id = "cloud_essence"
 name = "Cloud Essence"
+rarity = "unique"
 type = "utility"
 value = 0
 description = "Lighter than air."

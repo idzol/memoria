@@ -8,6 +8,7 @@
 script = ExtResource("1_script")
 card_id = "lockpick"
 name = "Lockpick"
+rarity = "rare"
 type = "utility"
 value = 0
 description = "For the sticky locks."
