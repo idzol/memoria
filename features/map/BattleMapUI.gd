@@ -13,8 +13,16 @@ extends Control
 @onready var avatar_button = %AvatarButton
 @onready var exit_button = %ExitBtn
 
+# Assets & Resources
 var node_scene = preload("res://features/map/MapNode.tscn")
+var in_game_menu_scene = preload("res://features/ui/InGameMenu.tscn")
+
+# Dialogs
 var travel_dialog: ConfirmationDialog
+var exit_confirmation: ConfirmationDialog
+
+# State
+var in_game_menu = null
 
 # Node dimensions from MapNode.tscn to calculate center
 const NODE_HALF_SIZE = Vector2(90, 90)
@@ -29,24 +37,58 @@ func _ready():
 
 	_draw_map()
 
+	# Instance the In-Game Menu (Esc key)
+	if in_game_menu_scene:
+		in_game_menu = in_game_menu_scene.instantiate()
+		add_child(in_game_menu)
+		in_game_menu.hide()
+
 	# Music 
 	SignalBus.music_change_requested.emit(AudioData.TRACKS["TOWN"], 1.0)
 
 	_scroll_to_player()
 
+
+func _input(event):
+
+	# Toggle In-Game Menu on Escape
+	if event.is_action_pressed("ui_cancel"):
+		if in_game_menu:
+			if in_game_menu.visible: in_game_menu.close()
+			else: in_game_menu.open()
+
+
 func _setup_ui():
+
+	# MODAL: MOVE CHARACTER
 	travel_dialog = ConfirmationDialog.new()
-	travel_dialog.ok_button_text = "Venture Forward"
+	travel_dialog.title = "VENTURE?"
+	travel_dialog.dialog_text = "Confirm you want to travel into the unknown?"
+	travel_dialog.ok_button_text = "YES"
 	add_child(travel_dialog)
 	
+	# MODAL: EXIT CONFIRMATION
+	exit_confirmation = ConfirmationDialog.new()
+	exit_confirmation.title = "ABANDON?"
+	exit_confirmation.dialog_text = "Are you sure you want to end this session? \nYour current progress will be summarized."
+	exit_confirmation.ok_button_text = "YES"
+	exit_confirmation.cancel_button_text = "NO"
+	exit_confirmation.confirmed.connect(_on_exit_confirmed)
+	add_child(exit_confirmation)
+
 	scroll_area.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	scroll_area.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	
+
 	if avatar_button:
 		avatar_button.pressed.connect(_on_avatar_pressed)
 	
 	if exit_button:
-		exit_button.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/ui/MainMenu.tscn"))
+		exit_button.pressed.connect(func(): exit_confirmation.popup_centered())
+
+func _on_exit_confirmed():
+	# Redirect to Run Summary instead of Main Menu
+	get_tree().change_scene_to_file("res://features/ui/RunSummary.tscn")
+
 
 func _draw_map():
 	# Clear previous instances
@@ -96,17 +138,30 @@ func _draw_map():
 		
 		node_ui.node_clicked.connect(_on_node_clicked)
 		
-		# Draw Connections to Next Layer
 		for target_id in data.connections:
 			if map.has(target_id):
 				var target = map[target_id]
 				var target_diff = p_pos.x - target.layer
-				
-				# Only draw lines if target node is also within visible range
-				if target_diff <= 4 and target_diff >= -2:
-					var start_point = node_ui.position + NODE_HALF_SIZE
-					var end_point = Vector2(target.layer * 280 + 200, target.column * 200 + 300) + NODE_HALF_SIZE
-					_draw_line(start_point, end_point, layer_diff)
+				if layer_diff < 2 and target_diff <= 4 and target_diff >= -2:
+					_draw_hand_drawn_dotted_line(node_ui.position + NODE_HALF_SIZE, Vector2(target.layer * 280 + 200, target.column * 200 + 300) + NODE_HALF_SIZE)
+
+
+func _draw_hand_drawn_dotted_line(p1: Vector2, p2: Vector2):
+	var dir = (p2 - p1).normalized()
+	var dist = p1.distance_to(p2)
+	var current_dist = 0.0
+	while current_dist < dist:
+		var segment = Line2D.new()
+		segment.width = 6.0
+		segment.default_color = Color(0.2, 0.12, 0.05, 0.8)
+		segment.begin_cap_mode = Line2D.LINE_CAP_ROUND
+		var jitter_s = Vector2(randf_range(-3, 3), randf_range(-3, 3))
+		var jitter_e = Vector2(randf_range(-3, 3), randf_range(-3, 3))
+		segment.add_point(p1 + dir * current_dist + jitter_s)
+		segment.add_point(p1 + dir * min(current_dist + 10.0, dist) + jitter_e)
+		lines_container.add_child(segment)
+		current_dist += 22.0
+
 
 func _draw_line(p1: Vector2, p2: Vector2, layer_diff: int):
 	var line = Line2D.new()
@@ -144,7 +199,7 @@ func _on_node_clicked(data: Dictionary):
 	if data.layer != p_pos.x + 1:
 		return
 
-	travel_dialog.dialog_text = "Venture into the unknown?"
+	# travel_dialog.dialog_text = "VENTURE?"
 	for c in travel_dialog.confirmed.get_connections(): travel_dialog.confirmed.disconnect(c.callable)
 	travel_dialog.confirmed.connect(func():
 		GameManager.player_grid_pos = Vector2i(data.layer, data.column)

@@ -1,6 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://b77asnldqt0xe"]
+[gd_scene format=3 uid="uid://b77asnldqt0xe"]
 
-[ext_resource type="Script" path="res://features/combat/BattleScene.gd" id="1_ltshs"]
+[ext_resource type="Script" uid="uid://t5ler8jigjuj" path="res://features/combat/BattleScene.gd" id="1_ltshs"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_status"]
 bg_color = Color(0.05, 0.05, 0.07, 0.9)
@@ -10,18 +10,16 @@ shadow_size = 4
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_bg"]
 bg_color = Color(0.1, 0.05, 0.05, 1)
-corner_radius_all = 4
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_fill"]
 bg_color = Color(0.8, 0.2, 0.2, 1)
-corner_radius_all = 4
 shadow_color = Color(0.8, 0.2, 0.2, 0.4)
 shadow_size = 2
 
-[node name="BattleScene" type="Node2D"]
+[node name="BattleScene" type="Node2D" unique_id=2057072900]
 script = ExtResource("1_ltshs")
 
-[node name="Background" type="TextureRect" parent="."]
+[node name="Background" type="TextureRect" parent="." unique_id=97564794]
 unique_name_in_owner = true
 anchors_preset = 15
 anchor_right = 1.0
@@ -33,10 +31,10 @@ grow_vertical = 2
 expand_mode = 1
 stretch_mode = 6
 
-[node name="UI" type="CanvasLayer" parent="."]
+[node name="UI" type="CanvasLayer" parent="." unique_id=766578918]
 unique_name_in_owner = true
 
-[node name="MainLayout" type="VBoxContainer" parent="UI"]
+[node name="MainLayout" type="VBoxContainer" parent="UI" unique_id=1424454082]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -44,76 +42,101 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 0
 
-[node name="StatusBar" type="PanelContainer" parent="UI/MainLayout"]
+[node name="StatusBar" type="PanelContainer" parent="UI/MainLayout" unique_id=1499484597]
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_status")
 
-[node name="Margin" type="MarginContainer" parent="UI/MainLayout/StatusBar"]
+[node name="Margin" type="MarginContainer" parent="UI/MainLayout/StatusBar" unique_id=1825030430]
 layout_mode = 2
 theme_override_constants/margin_left = 30
 theme_override_constants/margin_right = 30
 
-[node name="HBox" type="HBoxContainer" parent="UI/MainLayout/StatusBar/Margin"]
+[node name="HBox" type="HBoxContainer" parent="UI/MainLayout/StatusBar/Margin" unique_id=2113167652]
 layout_mode = 2
 theme_override_constants/separation = 40
 
-[node name="BiomeRoomLabel" type="Label" parent="UI/MainLayout/StatusBar/Margin/HBox"]
+[node name="BiomeRoomLabel" type="Label" parent="UI/MainLayout/StatusBar/Margin/HBox" unique_id=1361719417]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.7, 1, 1)
 text = "TOWN | VILLAGE GATE"
 vertical_alignment = 1
 
-[node name="PlayerStatsLabel" type="Label" parent="UI/MainLayout/StatusBar/Margin/HBox"]
+[node name="EnergyLabel" type="Label" parent="UI/MainLayout/StatusBar/Margin/HBox" unique_id=1341911504]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
-text = "ATK: 10   DEF: 5"
-horizontal_alignment = 1
+theme_override_colors/font_color = Color(1, 0.8, 0.2, 1)
+text = "⚡ ENERGY: 5"
 vertical_alignment = 1
 
-[node name="ConditionsContainer" type="HBoxContainer" parent="UI/MainLayout/StatusBar/Margin/HBox"]
-unique_name_in_owner = true
+[node name="Spacer" type="Control" parent="UI/MainLayout/StatusBar/Margin/HBox" unique_id=1043080828]
 layout_mode = 2
-theme_override_constants/separation = 10
+size_flags_horizontal = 3
 
-[node name="RoundLabel" type="Label" parent="UI/MainLayout/StatusBar/Margin/HBox"]
+[node name="RoundLabel" type="Label" parent="UI/MainLayout/StatusBar/Margin/HBox" unique_id=1391829108]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.9, 0.5, 1)
 text = "ROUND: 1"
 vertical_alignment = 1
 
-[node name="SettingsBtn" type="Button" parent="UI/MainLayout/StatusBar/Margin/HBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(40, 0)
-layout_mode = 2
-text = "⚙"
-flat = true
-
-[node name="StageLayoutContainer" type="MarginContainer" parent="UI/MainLayout"]
+[node name="StageLayoutContainer" type="MarginContainer" parent="UI/MainLayout" unique_id=1930373478]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/margin_left = 40
-theme_override_constants/margin_top = 40
+theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 40
 theme_override_constants/margin_bottom = 40
 
-[node name="StageLayout" type="HBoxContainer" parent="UI/MainLayout/StageLayoutContainer"]
+[node name="StageLayout" type="HBoxContainer" parent="UI/MainLayout/StageLayoutContainer" unique_id=2116080245]
 layout_mode = 2
 theme_override_constants/separation = 40
 
-[node name="PlayerColumn" type="VBoxContainer" parent="UI/MainLayout/StageLayoutContainer/StageLayout"]
+[node name="PlayerColumn" type="VBoxContainer" parent="UI/MainLayout/StageLayoutContainer/StageLayout" unique_id=1490255894]
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 alignment = 1
 
-[node name="HPContainer" type="VBoxContainer" parent="UI/MainLayout/StageLayoutContainer/StageLayout/PlayerColumn"]
+[node name="StatsHUD" type="HBoxContainer" parent="UI/MainLayout/StageLayoutContainer/StageLayout/PlayerColumn" unique_id=318216201]
+layout_mode = 2
+theme_override_constants/separation = 15
+alignment = 1
+
+[node name="Atk" type="HBoxContainer" parent="UI/MainLayout/StageLayoutContainer/StageLayout/PlayerColumn/StatsHUD" unique_id=908953826]
+layout_mode = 2
+
+[node name="Icon" type="Label" parent="UI/MainLayout/StageLayoutContainer/StageLayout/PlayerColumn/StatsHUD/Atk" unique_id=1161195676]
+layout_mode = 2
+text = "⚔️"
+
+[node name="PlayerAtkVal" type="Label" parent="UI/MainLayout/StageLayoutContainer/StageLayout/PlayerColumn/StatsHUD/Atk" unique_id=1388890321]
+unique_name_in_owner = true
+layout_mode = 2
+text = "10"
+
+[node name="Separator" type="Label" parent="UI/MainLayout/StageLayoutContainer/StageLayout/PlayerColumn/StatsHUD" unique_id=482090314]
+modulate = Color(1, 1, 1, 0.3)
+layout_mode = 2
+text = "|"
+
+[node name="Def" type="HBoxContainer" parent="UI/MainLayout/StageLayoutContainer/StageLayout/PlayerColumn/StatsHUD" unique_id=6570246]
+layout_mode = 2
+
+[node name="Icon" type="Label" parent="UI/MainLayout/StageLayoutContainer/StageLayout/PlayerColumn/StatsHUD/Def" unique_id=803647422]
+layout_mode = 2
+text = "🛡️"
+
+[node name="PlayerDefVal" type="Label" parent="UI/MainLayout/StageLayoutContainer/StageLayout/PlayerColumn/StatsHUD/Def" unique_id=1768039524]
+unique_name_in_owner = true
+layout_mode = 2
+text = "5"
+
+[node name="HPContainer" type="VBoxContainer" parent="UI/MainLayout/StageLayoutContainer/StageLayout/PlayerColumn" unique_id=1103211157]
 layout_mode = 2
 theme_override_constants/separation = 5
 
-[node name="PlayerHPBar" type="ProgressBar" parent="UI/MainLayout/StageLayoutContainer/StageLayout/PlayerColumn/HPContainer"]
+[node name="PlayerHPBar" type="ProgressBar" parent="UI/MainLayout/StageLayoutContainer/StageLayout/PlayerColumn/HPContainer" unique_id=190649885]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 15)
 layout_mode = 2
@@ -122,24 +145,24 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
 value = 100.0
 show_percentage = false
 
-[node name="PlayerHPText" type="Label" parent="UI/MainLayout/StageLayoutContainer/StageLayout/PlayerColumn/HPContainer"]
+[node name="PlayerHPText" type="Label" parent="UI/MainLayout/StageLayoutContainer/StageLayout/PlayerColumn/HPContainer" unique_id=832179908]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "100 / 100"
 horizontal_alignment = 1
 
-[node name="Box" type="Panel" parent="UI/MainLayout/StageLayoutContainer/StageLayout/PlayerColumn"]
+[node name="Box" type="Panel" parent="UI/MainLayout/StageLayoutContainer/StageLayout/PlayerColumn" unique_id=1845501367]
 self_modulate = Color(1, 1, 1, 0)
 custom_minimum_size = Vector2(220, 300)
 layout_mode = 2
 
-[node name="PlayerSprite" type="Sprite2D" parent="UI/MainLayout/StageLayoutContainer/StageLayout/PlayerColumn/Box"]
+[node name="PlayerSprite" type="Sprite2D" parent="UI/MainLayout/StageLayoutContainer/StageLayout/PlayerColumn/Box" unique_id=111910774]
 unique_name_in_owner = true
 position = Vector2(110, 150)
 hframes = 8
 
-[node name="PlayerFlash" type="ColorRect" parent="UI/MainLayout/StageLayoutContainer/StageLayout/PlayerColumn/Box"]
+[node name="PlayerFlash" type="ColorRect" parent="UI/MainLayout/StageLayoutContainer/StageLayout/PlayerColumn/Box" unique_id=1191237667]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -150,13 +173,13 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(1, 1, 1, 0)
 
-[node name="ArenaCenter" type="PanelContainer" parent="UI/MainLayout/StageLayoutContainer/StageLayout"]
+[node name="ArenaCenter" type="PanelContainer" parent="UI/MainLayout/StageLayoutContainer/StageLayout" unique_id=509819627]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(450, 450)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="GridContainer" type="GridContainer" parent="UI/MainLayout/StageLayoutContainer/StageLayout/ArenaCenter"]
+[node name="GridContainer" type="GridContainer" parent="UI/MainLayout/StageLayoutContainer/StageLayout/ArenaCenter" unique_id=426704683]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
@@ -165,26 +188,60 @@ theme_override_constants/h_separation = 12
 theme_override_constants/v_separation = 12
 columns = 4
 
-[node name="LogDisplay" type="ScrollContainer" parent="UI/MainLayout/StageLayoutContainer/StageLayout/ArenaCenter"]
+[node name="LogDisplay" type="ScrollContainer" parent="UI/MainLayout/StageLayoutContainer/StageLayout/ArenaCenter" unique_id=894197337]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="LogBox" type="VBoxContainer" parent="UI/MainLayout/StageLayoutContainer/StageLayout/ArenaCenter/LogDisplay"]
+[node name="LogBox" type="VBoxContainer" parent="UI/MainLayout/StageLayoutContainer/StageLayout/ArenaCenter/LogDisplay" unique_id=1335967961]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="EnemyColumn" type="VBoxContainer" parent="UI/MainLayout/StageLayoutContainer/StageLayout"]
+[node name="EnemyColumn" type="VBoxContainer" parent="UI/MainLayout/StageLayoutContainer/StageLayout" unique_id=1973834274]
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 alignment = 1
 
-[node name="HPContainer" type="VBoxContainer" parent="UI/MainLayout/StageLayoutContainer/StageLayout/EnemyColumn"]
+[node name="StatsHUD" type="HBoxContainer" parent="UI/MainLayout/StageLayoutContainer/StageLayout/EnemyColumn" unique_id=1856823326]
+layout_mode = 2
+theme_override_constants/separation = 15
+alignment = 1
+
+[node name="Atk" type="HBoxContainer" parent="UI/MainLayout/StageLayoutContainer/StageLayout/EnemyColumn/StatsHUD" unique_id=951810037]
+layout_mode = 2
+
+[node name="Icon" type="Label" parent="UI/MainLayout/StageLayoutContainer/StageLayout/EnemyColumn/StatsHUD/Atk" unique_id=861193680]
+layout_mode = 2
+text = "⚔️"
+
+[node name="EnemyAtkVal" type="Label" parent="UI/MainLayout/StageLayoutContainer/StageLayout/EnemyColumn/StatsHUD/Atk" unique_id=1589852244]
+unique_name_in_owner = true
+layout_mode = 2
+text = "12"
+
+[node name="Separator" type="Label" parent="UI/MainLayout/StageLayoutContainer/StageLayout/EnemyColumn/StatsHUD" unique_id=1790650599]
+modulate = Color(1, 1, 1, 0.3)
+layout_mode = 2
+text = "|"
+
+[node name="Def" type="HBoxContainer" parent="UI/MainLayout/StageLayoutContainer/StageLayout/EnemyColumn/StatsHUD" unique_id=1019304791]
+layout_mode = 2
+
+[node name="Icon" type="Label" parent="UI/MainLayout/StageLayoutContainer/StageLayout/EnemyColumn/StatsHUD/Def" unique_id=523560751]
+layout_mode = 2
+text = "🛡️"
+
+[node name="EnemyDefVal" type="Label" parent="UI/MainLayout/StageLayoutContainer/StageLayout/EnemyColumn/StatsHUD/Def" unique_id=1440054065]
+unique_name_in_owner = true
+layout_mode = 2
+text = "3"
+
+[node name="HPContainer" type="VBoxContainer" parent="UI/MainLayout/StageLayoutContainer/StageLayout/EnemyColumn" unique_id=1620140039]
 layout_mode = 2
 theme_override_constants/separation = 5
 
-[node name="EnemyHPBar" type="ProgressBar" parent="UI/MainLayout/StageLayoutContainer/StageLayout/EnemyColumn/HPContainer"]
+[node name="EnemyHPBar" type="ProgressBar" parent="UI/MainLayout/StageLayoutContainer/StageLayout/EnemyColumn/HPContainer" unique_id=529412657]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 15)
 layout_mode = 2
@@ -193,24 +250,24 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
 value = 100.0
 show_percentage = false
 
-[node name="EnemyHPText" type="Label" parent="UI/MainLayout/StageLayoutContainer/StageLayout/EnemyColumn/HPContainer"]
+[node name="EnemyHPText" type="Label" parent="UI/MainLayout/StageLayoutContainer/StageLayout/EnemyColumn/HPContainer" unique_id=79066156]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "HP: 50"
 horizontal_alignment = 1
 
-[node name="Box" type="Panel" parent="UI/MainLayout/StageLayoutContainer/StageLayout/EnemyColumn"]
+[node name="Box" type="Panel" parent="UI/MainLayout/StageLayoutContainer/StageLayout/EnemyColumn" unique_id=1565589982]
 self_modulate = Color(1, 1, 1, 0)
 custom_minimum_size = Vector2(220, 300)
 layout_mode = 2
 
-[node name="EnemyPortraitSprite" type="Sprite2D" parent="UI/MainLayout/StageLayoutContainer/StageLayout/EnemyColumn/Box"]
+[node name="EnemyPortraitSprite" type="Sprite2D" parent="UI/MainLayout/StageLayoutContainer/StageLayout/EnemyColumn/Box" unique_id=732197009]
 unique_name_in_owner = true
 position = Vector2(110, 150)
 hframes = 8
 
-[node name="EnemyFlash" type="ColorRect" parent="UI/MainLayout/StageLayoutContainer/StageLayout/EnemyColumn/Box"]
+[node name="EnemyFlash" type="ColorRect" parent="UI/MainLayout/StageLayoutContainer/StageLayout/EnemyColumn/Box" unique_id=334933302]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -220,11 +277,11 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(1, 1, 1, 0)
 
-[node name="DialogOverlay" type="CanvasLayer" parent="."]
+[node name="DialogOverlay" type="CanvasLayer" parent="." unique_id=572680537]
 unique_name_in_owner = true
 visible = false
 
-[node name="BG" type="ColorRect" parent="DialogOverlay"]
+[node name="BG" type="ColorRect" parent="DialogOverlay" unique_id=1939856161]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -232,7 +289,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.05, 0.05, 0.07, 0.9)
 
-[node name="VBox" type="VBoxContainer" parent="DialogOverlay"]
+[node name="VBox" type="VBoxContainer" parent="DialogOverlay" unique_id=994321991]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -246,14 +303,14 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 20
 
-[node name="RoomTitle" type="Label" parent="DialogOverlay/VBox"]
+[node name="RoomTitle" type="Label" parent="DialogOverlay/VBox" unique_id=177651732]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "Room Name"
 horizontal_alignment = 1
 
-[node name="DialogText" type="Label" parent="DialogOverlay/VBox"]
+[node name="DialogText" type="Label" parent="DialogOverlay/VBox" unique_id=1582537534]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/line_spacing = 5
@@ -261,7 +318,7 @@ text = "Encounter Text..."
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="OptionContainer" type="VBoxContainer" parent="DialogOverlay/VBox"]
+[node name="OptionContainer" type="VBoxContainer" parent="DialogOverlay/VBox" unique_id=2110074576]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 10

@@ -14,9 +14,9 @@ const PATHS = {
 }
 
 # CONFIG: Time Budget (in microseconds)
-# 2000 usec = 2ms. A 60fps frame is ~16.6ms. 
+# 1000 usec = 1ms. A 60fps frame is ~16.6ms. 
 # We use only a tiny fraction to ensure UI remains perfectly smooth.
-const FRAME_BUDGET_USEC = 2000 
+const FRAME_BUDGET_USEC = 1000 
 
 var _registry: Dictionary = {"cards": {}, "items": {}, "rooms": {}}
 var _resource_cache: Dictionary = {}

@@ -199,7 +199,9 @@ func start_battle_mode():
 	# Testing suite starting items
 	player_items = ["wood_splinter", "mug_of_ale", "iron_scrap"]
 	active_items = []
-	active_deck = ["sword", "shield", "heart"]
+	
+	player_deck = ["sword", "shield", "heart"]
+	active_deck = player_deck.duplicate()
 	
 	# Use specialized linear generator
 	var gen = preload("res://features/map/BattleMapGenerator.gd").new()

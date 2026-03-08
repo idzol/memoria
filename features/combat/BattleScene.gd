@@ -8,10 +8,13 @@ extends Node2D
 
 # Status Bar References
 @onready var biome_room_label = %BiomeRoomLabel
-@onready var player_stats_label = %PlayerStatsLabel
-@onready var conditions_container = %ConditionsContainer
+# @onready var conditions_container = %ConditionsContainer
 @onready var round_label = %RoundLabel
-@onready var settings_btn = %SettingsBtn
+@onready var energy_label = %EnergyLabel 
+@onready var player_atk_val = %PlayerAtkVal
+@onready var player_def_val = %PlayerDefVal
+@onready var enemy_atk_val = %EnemyAtkVal
+@onready var enemy_def_val = %EnemyDefVal
 
 # Dynamic HP Bars
 @onready var player_hp_bar = %PlayerHPBar
@@ -30,6 +33,7 @@ extends Node2D
 @onready var background = get_node_or_null("%Background")
 
 var card_scene = preload("res://features/combat/CardIcon.tscn")
+var in_game_menu_scene = preload("res://features/ui/InGameMenu.tscn")
 
 # --- Combat State ---
 var flipped_cards: Array = []
@@ -38,33 +42,41 @@ var is_battle_over: bool = false
 var difficulty: int = 0
 var current_room_res: RoomData = null
 var current_enemy_res: EnemyData = null
+var in_game_menu = null
 
 # Current Stats for Calculation
-var p_hp: int = 100
-var e_hp: int = 100
-var p_atk: int = 10 # Base attack
-var p_def: int = 5  # Base defense
+var p_hp: int = 1
+var e_hp: int = 1
+var max_e_hp: int = 1 
+
+var p_atk: int = 0 # Base attack
+var p_def: int = 0 # Base defense
 var round_number: int = 1
 
 var active_status_effects = {"player": [], "enemy": []} # e.g. ["vulnerable", "charged"]
 
 func _ready():
 	var node_data = GameManager.current_node
-	difficulty = node_data.get("difficulty", 1)
+	difficulty = node_data["difficulty"] if "difficulty" in node_data else 1
+
 	p_hp = GameManager.current_hp
-	
+	p_atk = GameManager.base_attack
+	p_def = GameManager.base_defense
+
 	if node_data.has("room_resource_path"):
 		current_room_res = load(node_data.room_resource_path) as RoomData
 		_apply_room_data(current_room_res)
 	
-	# Debug win / lose connections
-	if has_node("%DebugWinBtn"): %DebugWinBtn.pressed.connect(_debug_win)
-	if has_node("%DebugLoseBtn"): %DebugLoseBtn.pressed.connect(_debug_lose)
+	# Instance the In-Game Menu (Esc key)
+	if in_game_menu_scene:
+		in_game_menu = in_game_menu_scene.instantiate()
+		add_child(in_game_menu)
+		in_game_menu.hide()
 
-	# Connect Settings
-	if settings_btn:
-		settings_btn.pressed.connect(_on_settings_pressed)
-	_sync_status_bar()
+	# Debug win / lose connections
+	# if has_node("%DebugWinBtn"): %DebugWinBtn.pressed.connect(_debug_win)
+	# if has_node("%DebugLoseBtn"): %DebugLoseBtn.pressed.connect(_debug_lose)
+
 	_setup_player_spritesheet()
 	_setup_enemy_portrait()
 	_init_encounter()
@@ -76,6 +88,27 @@ func _ready():
 	_sync_status_bar()
 	update_ui()
 
+func _input(event):
+	# Toggle In-Game Menu on Escape (ui_cancel)
+	if event.is_action_pressed("ui_cancel"):
+		if in_game_menu:
+			if in_game_menu.visible: in_game_menu.close()
+			else: in_game_menu.open()
+
+func _sync_stat_icons():
+	# Sync Player Icons
+	if player_atk_val: player_atk_val.text = str(p_atk)
+	if player_def_val: player_def_val.text = str(p_def)
+	
+	# Sync Enemy Icons
+	if current_enemy_res:
+		enemy_atk_val.text = str(current_enemy_res.base_damage)
+		enemy_def_val.text = str(current_enemy_res.armor)
+	
+	# Energy HUD
+	if energy_label:
+		energy_label.text = "⚡ ENERGY: %d" % GameManager.current_energy
+
 
 func _sync_status_bar():
 	# Biome | Room
@@ -83,59 +116,112 @@ func _sync_status_bar():
 	var room_name = current_room_res.room_name if current_room_res else "Battle"
 	biome_room_label.text = "%s  |  %s" % [biome_name, room_name]
 	
-	# Stats
-	player_stats_label.text = "ATK: %d   DEF: %d" % [p_atk, p_def]
-	
 	# Round
 	round_label.text = "ROUND: %d" % round_number
 
 # --- INPUT & FLOW ---
 func _on_card_flipped(card):
-	# Block if busy or over
-	if is_battle_over or not can_flip or flipped_cards.size() >= 2:
-		if card.is_face_up and not card.is_matched:
+	if is_battle_over or not can_flip:
+		if is_instance_valid(card) and card.is_face_up and not card.is_matched:
 			card.flip_back()
 		return
 	
-	flipped_cards.append(card)
+	# ENERGY CHECK: Block more flips if energy is depleted
+	if GameManager.current_energy <= 0:
+		if is_instance_valid(card) and card.is_face_up and not card.is_matched:
+			card.flip_back()
+		return
 
-	# If we hit 2 cards, lock everything instantly
-	if flipped_cards.size() == 2:
-		can_flip = false 
-		_toggle_grid_interaction(false) 
-		_check_match()
+	flipped_cards.append(card)
+	
+	# REDUCE ENERGY: Every click counts as a guess
+	GameManager.current_energy = max(0, GameManager.current_energy - 1)
+	_sync_stat_icons() # Update UI immediately
+	
+	_check_match()
 
 func _check_match():
-	var c1 = flipped_cards[0]
-	var c2 = flipped_cards[1]
+	flipped_cards = flipped_cards.filter(func(c): return is_instance_valid(c))
 	
-	# Small delay to let player process the icons
-	await get_tree().create_timer(0.8).timeout
-	if not is_inside_tree() or is_battle_over: return
+	# MULTI-TURN LOGIC: Look for the FIRST pair in the pool of turned cards
+	var c1 = null
+	var c2 = null
 	
-	if c1.card_type == c2.card_type:
-		# SUCCESS: Match
-		c1.is_matched = true; c2.is_matched = true
-		c1.modulate = Color(0.6, 1.2, 0.6)
-		c2.modulate = Color(0.6, 1.2, 0.6)
-		_process_combat_action(c1.card_type)
-	else:
-		# FAILURE: Flip back
-		c1.flip_back()
-		c2.flip_back()
-		_enemy_turn()
+	for i in range(flipped_cards.size()):
+		for j in range(i + 1, flipped_cards.size()):
+			if flipped_cards[i].card_type == flipped_cards[j].card_type:
+				c1 = flipped_cards[i]
+				c2 = flipped_cards[j]
+				break
+		if c1: break
+	
+	if c1:
+		# SUCCESS: Match Found
+		can_flip = false 
+		flipped_cards.erase(c1)
+		flipped_cards.erase(c2)
 		
-	flipped_cards.clear()
-	update_ui()
-	_check_win_loss()
+		await get_tree().create_timer(0.4).timeout
+		if not is_inside_tree() or is_battle_over: return
+		if not (is_instance_valid(c1) and is_instance_valid(c2)): return
+		
+		c1.is_matched = true; c2.is_matched = true
+		c1.modulate = Color(0.6, 1.2, 0.6); c2.modulate = Color(0.6, 1.2, 0.6)
+		
+		_process_combat_action(c1.card_type)
+		update_ui()
+		_check_win_loss()
+		
+		# Resolve the turn attempt since a match was found
+		_resolve_turn_end()
+		
+	elif GameManager.current_energy <= 0:
+		# FAILURE: Out of energy and no pairs exist in the turned cards
+		can_flip = false
+		await get_tree().create_timer(1.0).timeout
+		if not is_inside_tree() or is_battle_over: return
+		
+		_enemy_turn()
+		update_ui()
+		_check_win_loss()
+		_resolve_turn_end()
+
+func _resolve_turn_end():
+	if is_battle_over: return
 	
-	# AUTO-RESHUFFLE CHECK: Triggered after the match state is resolved
-	if not is_battle_over:
-		if _should_reshuffle():
-			_trigger_reshuffle()
-		else:
-			can_flip = true
-			_toggle_grid_interaction(true)
+	# Flip back any remaining unmatched cards in the current attempt pool
+	for card in flipped_cards:
+		if is_instance_valid(card):
+			card.flip_back()
+	flipped_cards.clear()
+	
+	# CHECK RESHUFFLE: Only if no pairs remain on board (ignoring energy)
+	if _should_reshuffle():
+		_trigger_reshuffle()
+	else:
+		# Reset energy for the next set of guesses
+		GameManager.current_energy = GameManager.base_energy if "base_energy" in GameManager else 2
+		_sync_stat_icons()
+		can_flip = true
+		_toggle_grid_interaction(true)
+
+func _post_resolution_check():
+	if is_battle_over: return
+	
+	if GameManager.current_energy <= 0:
+		add_log("Out of energy! Turn ends.")
+		for card in flipped_cards:
+			if is_instance_valid(card):
+				card.flip_back()
+		flipped_cards.clear()
+		
+		await get_tree().create_timer(0.8).timeout
+		_trigger_reshuffle()
+	elif _should_reshuffle():
+		_trigger_reshuffle()
+	else:
+		can_flip = true
+		_toggle_grid_interaction(true)
 
 func _toggle_grid_interaction(enabled: bool):
 	for card in grid.get_children():
@@ -144,67 +230,59 @@ func _toggle_grid_interaction(enabled: bool):
 
 # --- DAMAGE CALCULATION (Extensible) ---
 func _process_combat_action(card_id: String):
-	var data = CardDatabase.get_card(card_id)
-	var stats = data.get("stats", {})
+	var res = DataManager.get_resource("res://data/cards/" + card_id + ".tres")
+	if not res: return
 	
-	# Identify Damage Type (Physical vs Magical)
-	var type = "physical"
-	if card_id in ["frost", "lightning", "bomb", "scroll"]: type = "magical"
+	var type = "magical" if card_id in ["frost", "lightning", "bomb", "scroll"] else "physical"
 	
-	# 1. Damage Execution
-	if stats.get("damage", 0) > 0:
-		var final_dmg = _calculate_final_damage(stats.damage, type, "player", "enemy")
-		e_hp = max(0, e_hp - final_dmg)
-		add_log("Matched %s: Dealt %d %s damage." % [data.name, final_dmg, type])
-		_flash_unit(%EnemyFlash, Color.CRIMSON)
-		# Increase intensity to 0.5 to bring in the drums
-		SignalBus.battle_intensity_changed.emit(0.5)
-		SignalBus.sfx_triggered.emit(AudioData.SFX["SWORD"])
+	if res.value > 0:
+		if res.type == "attack":
+			var final_dmg = _calculate_final_damage(res.value, type, "player", "enemy")
+			e_hp = max(0, e_hp - final_dmg)
+			add_log("Matched %s: Dealt %d damage." % [res.name, final_dmg])
+			_flash_unit(%EnemyFlash, Color.CRIMSON)
+			SignalBus.battle_intensity_changed.emit(0.5)
+			SignalBus.sfx_triggered.emit(AudioData.SFX["SWORD"])
 
-	# 2. Heal Execution
-	if stats.get("heal", 0) > 0:
-		var heal_amt = stats.heal
-		p_hp = min(GameManager.max_hp, p_hp + heal_amt)
-		add_log("Matched %s: Restored %d HP." % [data.name, heal_amt])
-		_flash_unit(%PlayerFlash, Color.SEA_GREEN)
-		# Increase intensity to 0.5 to bring in the drums
-		SignalBus.battle_intensity_changed.emit(0.5)
-		SignalBus.sfx_triggered.emit(AudioData.SFX["HEAL"])
+		elif res.type == "trap":
+			var trap_dmg = res.value
+			p_hp = max(0, p_hp - trap_dmg)
+			add_log("Matched %s: Took %d damage." % [res.name, res.value])
+			_flash_unit(%PlayerFlash, Color.ORANGE_RED)
+			SignalBus.battle_intensity_changed.emit(0.5)
+			SignalBus.sfx_triggered.emit(AudioData.SFX["TRAP"])
 
-	# 3. Trap Execution
-	if stats.get("trap", 0) > 0:
-		var trap_dmg = stats.trap
-		p_hp = max(0, p_hp - trap_dmg)
-		add_log("Mimic Triggered! Took %d damage." % trap_dmg)
-		_flash_unit(%PlayerFlash, Color.ORANGE_RED)
-		SignalBus.battle_intensity_changed.emit(0.5)
-		SignalBus.sfx_triggered.emit(AudioData.SFX["TRAP"])
+		elif res.type == "heal":
+			p_hp = min(GameManager.max_hp, p_hp + res.value)
+			add_log("Matched %s: Restored %d HP." % [res.name, res.value])
+			_flash_unit(%PlayerFlash, Color.SEA_GREEN)
+			SignalBus.battle_intensity_changed.emit(0.5)
+			SignalBus.sfx_triggered.emit(AudioData.SFX["HEAL"])
 
-	# # 4. Block 
-	# # Increase intensity to 0.5 to bring in the drums
-	# SignalBus.battle_intensity_changed.emit(0.5)
-	# SignalBus.sfx_triggered.emit(AudioData.SFX["SHIELD"])
+		# Block 
+		# SignalBus.battle_intensity_changed.emit(0.5)
+		# SignalBus.sfx_triggered.emit(AudioData.SFX["SHIELD"])
 
 func _calculate_final_damage(card_val: int, type: String, attacker: String, defender: String) -> int:
 	var total = card_val
 	
 	# A. Add Base Stats
 	if attacker == "player":
-		# Archivists might have higher spell power, Berserkers higher physical
-		if type == "physical": total += 5 # Placeholder for Player STR
-		else: total += 3 # Placeholder for Player INT
+		if type == "physical": total += p_atk 
+		else: total += 0 # Placeholder for spell 
 	else:
 		# Enemy scaling
-		total += difficulty * 2
-	
+		var enemy_base = current_enemy_res.base_damage if current_enemy_res else 5
+		total += enemy_base
+		
 	# B. Subtract Defense
 	if defender == "enemy":
 		var arm = current_enemy_res.armor if current_enemy_res else 0
-		var res = 2 # Placeholder for enemy magic resist
+		var res = 0 # Placeholder for enemy magic resist
 		total -= (arm if type == "physical" else res)
 	else:
 		# Player defense
-		total -= 2 # Placeholder for basic player armor
+		total -= p_def 
 		
 	# C. Status Effect Multipliers
 	if active_status_effects[defender].has("vulnerable"):
@@ -217,7 +295,7 @@ func _calculate_final_damage(card_val: int, type: String, attacker: String, defe
 
 func _enemy_turn():
 	# Simple enemy attack using the same formula logic
-	var base_dmg = 8 + difficulty
+	var base_dmg = current_enemy_res.base_damage
 	var final_dmg = _calculate_final_damage(base_dmg, "physical", "enemy", "player")
 	p_hp -= final_dmg
 	add_log("Enemy strikes for %d damage." % final_dmg)
@@ -229,11 +307,12 @@ func _should_reshuffle() -> bool:
 	var unmatched_count = 0
 	
 	for card in grid.get_children():
-		if not card.is_matched:
+		if is_instance_valid(card) and not card.is_matched:
 			unmatched_count += 1
 			# Traps are unmatchable in this pool, so we only count pairs for other types
 			if card.card_type != "trap":
-				counts[card.card_type] = counts.get(card.card_type, 0) + 1
+				var current_count = counts[card.card_type] if card.card_type in counts else 0
+				counts[card.card_type] = current_count + 1
 	
 	# If only 1 card (like the trap) is left, it's impossible to match.
 	if unmatched_count <= 1:
@@ -302,13 +381,17 @@ func update_ui(instant: bool = false):
 	# Dynamic Bar update with Tween
 	var duration = 0.0 if instant else 0.4
 	
-	var p_tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	p_tween.tween_property(player_hp_bar, "value", (float(p_hp) / GameManager.max_hp) * 100, duration)
+	if player_hp_bar:
+		player_hp_bar.max_value = GameManager.max_hp
+		create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT).tween_property(player_hp_bar, "value", p_hp, duration)
 	
-	var max_e = current_enemy_res.hp + (difficulty * 15) if current_enemy_res else 100
-	var e_tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	e_tween.tween_property(enemy_hp_bar, "value", (float(e_hp) / max_e) * 100, duration)
+	if enemy_hp_bar:
+		enemy_hp_bar.max_value = max_e_hp
+		create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT).tween_property(enemy_hp_bar, "value", e_hp, duration)
 
+	_sync_stat_icons()
+	round_label.text = "ROUND: %d" % round_number
+	
 func add_log(text):
 	var lbl = Label.new(); lbl.text = "> " + text; log_box.add_child(lbl)
 	# Auto-scroll logic if needed
@@ -318,11 +401,6 @@ func _flash_unit(overlay, color):
 	overlay.color = color; overlay.color.a = 0.5
 	create_tween().tween_property(overlay, "color:a", 0.0, 0.4)
 
-func _on_settings_pressed():
-	# Assuming settings overlay is preloaded or in a manager
-	var settings = preload("res://features/ui/SettingsOverlay.tscn").instantiate()
-	get_tree().root.add_child(settings)
-	# battle_ui.hide()
 	
 # --- VISUAL HELPERS ---
 
@@ -337,12 +415,23 @@ func _setup_player_spritesheet():
 		_animate_unit(player_sprite, 8, 0.12)
 
 func _setup_enemy_portrait():
+	var e_path = ""
+	
+	# 1. Attempt to resolve path from the current room metadata
 	if current_room_res and current_room_res.enemy_id != "":
-		var e_path = "res://data/enemies/%s.tres" % current_room_res.enemy_id
-		if ResourceLoader.exists(e_path):
-			current_enemy_res = load(e_path) as EnemyData
-			if current_enemy_res:
-				e_hp = current_enemy_res.hp + (difficulty * 15)
+		e_path = "res://data/enemies/%s.tres" % current_room_res.enemy_id
+	
+	# 2. Default: If room has no enemy or resource is missing, load default enemy
+	if e_path == "" or not ResourceLoader.exists(e_path):
+		e_path = "res://data/enemies/pickpocket.tres"
+		
+	# 3. Final load and assignment
+	if ResourceLoader.exists(e_path):
+		current_enemy_res = load(e_path) as EnemyData
+		if current_enemy_res:
+			max_e_hp = current_enemy_res.hp
+			e_hp = max_e_hp 
+			if enemy_sprite:
 				_apply_unit_visuals(enemy_sprite, current_enemy_res)
 
 func _animate_unit(sprite: Sprite2D, total: int, speed: float):
@@ -374,27 +463,51 @@ func _apply_unit_visuals(sprite: Sprite2D, res: Resource):
 		_animate_unit(sprite, total if total != null else 8, speed if speed != null else 0.1)
 		
 func setup_board():
+
+	# Clear any existing tracking to prevent stale references 
+	flipped_cards.clear()
+	
+	# ENERGY INITIALIZATION: Reset energy when a new board is generated
+	GameManager.current_energy = GameManager.base_energy if "base_energy" in GameManager else 2
+	round_number += 1
+
 	for child in grid.get_children(): child.queue_free()
+
+	# 1. Determine Grid Size
 	var size = 3
 	if difficulty >= 3: size = 4
 	if difficulty >= 6: size = 5
+	if difficulty >= 9: size = 6
 	grid.columns = size
 	
 	var total_slots = size * size
 	var pair_count = floor(total_slots / 2.0)
+	
+	# 2. Build the Deck Pool
+	# Start with the player's active deck selection
 	var deck_pool = GameManager.active_deck.duplicate()
 	deck_pool.shuffle()
-	
-	while deck_pool.size() < pair_count: deck_pool.append("sword")
-	
+
+	# 3. Fill gaps from player deck (Rarity-Weighted)
+	while deck_pool.size() < pair_count:
+		var extra_card = _get_weighted_random_card_from_collection()
+		if extra_card != "":
+			deck_pool.append(extra_card)
+		else:
+			# Absolute safety fallback if player_deck is empty
+			deck_pool.append("sword") 
+
+	# 4. Create the Grid (Duplicate into pairs)
 	var selected_ids = deck_pool.slice(0, pair_count)
 	var final_grid_ids = []
 	for id in selected_ids:
 		final_grid_ids.append(id); final_grid_ids.append(id)
 	
+	# Add the Trap card if grid is odd (e.g. 3x3)
 	if final_grid_ids.size() < total_slots: final_grid_ids.append("trap")
 	final_grid_ids.shuffle()
 	
+	# 5. Instantiate Cards
 	var card_dim = floor((450.0 - (12.0 * (size + 1.0))) / float(size))
 	for card_id in final_grid_ids:
 		var c = card_scene.instantiate(); grid.add_child(c)
@@ -403,6 +516,46 @@ func setup_board():
 		if FileAccess.file_exists(res_path): c.setup(load(res_path))
 		else: c.card_type = card_id
 		c.card_flipped.connect(_on_card_flipped)
+
+	# Final UI updates 
+	_sync_stat_icons()
+	
+
+func _get_weighted_random_card_from_collection() -> String:
+	var collection = GameManager.player_deck # The total list of owned card IDs
+	if collection.is_empty(): return ""
+	
+	# Weight Map based on Card Rarity
+	var weights = {
+		"common": 100,
+		"uncommon": 50,
+		"rare": 20,
+		"epic": 10,
+		"unique": 5
+	}
+	
+	var candidates = []
+	var total_weight = 0
+	
+	for card_id in collection:
+		var res = DataManager.get_resource("res://data/cards/" + card_id + ".tres")
+		var rarity = "common"
+		if res and "rarity" in res:
+			rarity = res.rarity.to_lower()
+		
+		var w = weights[rarity] if rarity in weights else 10
+		candidates.append({"id": card_id, "weight": w})
+		total_weight += w
+		
+	# Random roll within total weight
+	var roll = randi() % total_weight
+	var current_sum = 0
+	for item in candidates:
+		current_sum += item.weight
+		if roll < current_sum:
+			return item.id
+			
+	return collection.pick_random()
 
 func _apply_room_data(res: RoomData):
 	%RoomTitle.text = res.room_name

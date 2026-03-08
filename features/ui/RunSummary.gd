@@ -1,59 +1,67 @@
 extends Control
 
 # res://features/ui/RunSummary.gd
-# Summary screen handling the distinction between expedition cycles and run resets.
+# Displays final stats and handles mode-specific redirection.
 
-@onready var total_gold_label = %TotalGoldLabel
-@onready var items_list = %ItemsList
-@onready var close_button = %CloseButton
-# Assuming a second button for hard resets exists in the TSCN or is added
-@onready var end_run_button = get_node_or_null("%EndRunButton") 
+@onready var result_title = %ResultTitle
+@onready var level_label = %LevelLabel
+@onready var rooms_label = %RoomsLabel
+@onready var card_container = %CardContainer
+@onready var item_container = %ItemContainer
+@onready var menu_button = %MenuButton
+
+const CardIconScene = preload("res://features/combat/CardIcon.tscn")
 
 func _ready():
-	# Display cumulative stats for the current expedition/day
-	var run_gold = 0
-	for loot in GameManager.run_loot:
-		if loot.id == "gold":
-			run_gold += loot.amount
-	
-	total_gold_label.text = "Total Gold Found: " + str(run_gold)
-	
-	var unique_items = []
-	for loot in GameManager.run_loot:
-		if loot.id != "gold" and not unique_items.has(loot.name):
-			unique_items.append(loot.name)
-			var lbl = Label.new()
-			lbl.text = loot.name
-			items_list.add_child(lbl)
+	_setup_summary()
+	if menu_button:
+		menu_button.pressed.connect(_on_exit_pressed)
 
-	# Primary flow: Finish the day and return home
-	close_button.pressed.connect(_finish_run)
+func _setup_summary():
+	# 1. Title Logic
+	if GameManager.current_hp > 0:
+		result_title.text = "RUN COMPLETED"
+		result_title.modulate = Color.GOLD
+	else:
+		result_title.text = "DIVINITY LOST"
+		result_title.modulate = Color.CRIMSON
 	
-	# Optional flow: Completely end the run and clear map progress
-	if end_run_button:
-		end_run_button.pressed.connect(_end_run)
+	# 2. Basic Stats
+	level_label.text = "Level %d %s" % [GameManager.player_level, GameManager.player_class]
+	
+	var rooms_cleared = 0
+	for id in GameManager.world_state.rooms:
+		if GameManager.world_state.rooms[id].get("cleared", false):
+			rooms_cleared += 1
+	rooms_label.text = "Rooms Conquered: %d" % rooms_cleared
+	
+	# 3. Populate Card Collection
+	for child in card_container.get_children(): child.queue_free()
+	for card_id in GameManager.active_deck:
+		var ci = CardIconScene.instantiate()
+		card_container.add_child(ci)
+		var res = DataManager.get_resource("res://data/cards/" + card_id + ".tres")
+		if res:
+			ci.setup(res)
+			ci.get_node("%BackFace").visible = false
+			ci.get_node("%FrontFace").visible = true
+			ci.is_face_up = true
+	
+	# 4. Populate Items
+	for child in item_container.get_children(): child.queue_free()
+	for item_id in GameManager.active_items:
+		var lbl = Label.new()
+		lbl.text = " • " + item_id.replace("_", " ").capitalize()
+		lbl.add_theme_font_size_override("font_size", 18)
+		item_container.add_child(lbl)
 
-## Finish the Day/Expedition:
-## Returns the player home but keeps the map and exploration progress intact.
-func _finish_run():
-	# Return to Home location at Layer -1, Column 2
-	GameManager.reset_to_home()
-	
-	# We DO NOT clear run_map here. 
-	# This allows the map to progressively become more explored over multiple expeditions.
-	
-	# Transition back to menu so player can "Continue"
-	get_tree().change_scene_to_file("res://features/ui/MainMenu.tscn")
-
-## End the Run:
-## Clears all session history, including the map and cumulative loot.
-func _end_run():
-	# Hard reset of player position
-	GameManager.reset_to_home()
-	
-	# Full wipe of session/run data
-	GameManager.run_loot.clear()
-	GameManager.run_map = {} 
-	
-	# Return to Main Menu
-	get_tree().change_scene_to_file("res://features/ui/MainMenu.tscn")
+func _on_exit_pressed():
+	if GameManager.is_battle_mode:
+		# Return to Menu
+		get_tree().change_scene_to_file("res://scenes/ui/MainMenu.tscn")
+	else:
+		# Return to Overworld and Reset to Home
+		GameManager.player_grid_pos = Vector2i(2, 0) # Reset to home coord
+		GameManager.current_hp = GameManager.max_hp # Partial restore for next attempt
+		SaveManager.save_mid_run_state()
+		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")

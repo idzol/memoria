@@ -33,7 +33,7 @@ func _ready():
 	# If map doesn't exist (e.g. direct scene run), generate a temporary one
 	if GameManager.run_map.is_empty():
 		var gen = preload("res://features/map/MapGenerator.gd").new()
-		GameManager.run_map = gen.generate_new_map()
+		GameManager.run_map = await gen.generate_new_map()
 
 	# Ensure GameManager is initialized if this is the start of a run
 	if GameManager.player_grid_pos == Vector2i(-99, -99):
