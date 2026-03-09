@@ -132,4 +132,3 @@ func _on_finish_encounter():
 	else:
 		# Return to the procedural campaign map
 		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
-

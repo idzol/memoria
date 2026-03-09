@@ -15,9 +15,14 @@ extends Node
 
 var current_track_id: String = ""
 var intensity: float = 0.0
+var global_master_volume: float = 1.0
+var global_music_volume: float = 1.0
+var global_sfx_volume: float = 1.0
 
 const MUSIC_PATH = "res://assets/music/"
 const SFX_PATH = "res://assets/sfx/"
+const SETTINGS_PATH = "user://settings.cfg"
+const SETTINGS_SECTION_AUDIO = "audio"
 
 func _ready():
 	add_child(music_player_base)
@@ -40,6 +45,86 @@ func _ready():
 		var idx = AudioServer.get_bus_index(bus_name)
 		if idx != -1 and AudioServer.is_bus_mute(idx):
 			AudioServer.set_bus_mute(idx, false)
+	
+	_load_audio_settings()
+	_apply_all_global_volumes()
+
+func set_master_volume(value: float):
+	global_master_volume = clamp(value, 0.0, 1.0)
+	_apply_all_global_volumes()
+	_save_audio_settings()
+
+func set_music_volume(value: float):
+	global_music_volume = clamp(value, 0.0, 1.0)
+	_apply_all_global_volumes()
+	_save_audio_settings()
+
+func set_sfx_volume(value: float):
+	global_sfx_volume = clamp(value, 0.0, 1.0)
+	_apply_all_global_volumes()
+	_save_audio_settings()
+
+func get_master_volume() -> float:
+	return global_master_volume
+
+func get_music_volume() -> float:
+	return global_music_volume
+
+func get_sfx_volume() -> float:
+	return global_sfx_volume
+
+func _apply_all_global_volumes():
+	# Final effective levels are derived from master * channel volume.
+	var effective_music = global_master_volume * global_music_volume
+	var effective_sfx = global_master_volume * global_sfx_volume
+	
+	# Keep master at unity so channel buses receive the computed effective levels.
+	_apply_bus_volume("Master", 1.0)
+	_apply_bus_volume("Music", effective_music)
+	_apply_bus_volume("Percussion", effective_music)
+	_apply_bus_volume("SFX", effective_sfx)
+	_apply_runtime_player_volumes()
+
+func _apply_runtime_player_volumes():
+	var music_db = _to_db(global_master_volume * global_music_volume)
+	var sfx_db = _to_db(global_master_volume * global_sfx_volume)
+	if is_instance_valid(music_player_base):
+		music_player_base.volume_db = music_db
+	if is_instance_valid(music_player_perc):
+		# Percussion still gets intensity layering on top, but base loudness follows music scaling.
+		music_player_perc.volume_db = music_db if intensity <= 0.0 else _to_db((global_master_volume * global_music_volume) * intensity)
+	if is_instance_valid(sfx_player):
+		sfx_player.volume_db = sfx_db
+
+func _load_audio_settings():
+	var cfg = ConfigFile.new()
+	var err = cfg.load(SETTINGS_PATH)
+	if err != OK:
+		return
+	global_master_volume = clamp(float(cfg.get_value(SETTINGS_SECTION_AUDIO, "master_volume", global_master_volume)), 0.0, 1.0)
+	global_music_volume = clamp(float(cfg.get_value(SETTINGS_SECTION_AUDIO, "music_volume", global_music_volume)), 0.0, 1.0)
+	global_sfx_volume = clamp(float(cfg.get_value(SETTINGS_SECTION_AUDIO, "sfx_volume", global_sfx_volume)), 0.0, 1.0)
+
+func _save_audio_settings():
+	var cfg = ConfigFile.new()
+	cfg.set_value(SETTINGS_SECTION_AUDIO, "master_volume", global_master_volume)
+	cfg.set_value(SETTINGS_SECTION_AUDIO, "music_volume", global_music_volume)
+	cfg.set_value(SETTINGS_SECTION_AUDIO, "sfx_volume", global_sfx_volume)
+	var err = cfg.save(SETTINGS_PATH)
+	if err != OK:
+		push_warning("AudioManager: Failed to save audio settings to " + SETTINGS_PATH)
+
+func _apply_bus_volume(bus_name: String, linear_volume: float):
+	var bus_idx = AudioServer.get_bus_index(bus_name)
+	if bus_idx == -1:
+		return
+	AudioServer.set_bus_volume_db(bus_idx, _to_db(linear_volume))
+
+func _to_db(linear_volume: float) -> float:
+	var v = clamp(linear_volume, 0.0, 1.0)
+	if v <= 0.0001:
+		return -80.0
+	return linear_to_db(v)
 
 func _on_music_change_requested(track_id: String, fade_time: float = 2.0):
 	var actual_id = AudioData.get_track_id(track_id)
@@ -79,7 +164,7 @@ func _on_music_change_requested(track_id: String, fade_time: float = 2.0):
 	
 	# Fade In
 	var fade_in = create_tween().set_parallel(true)
-	fade_in.tween_property(music_player_base, "volume_db", 0.0, fade_time)
+	fade_in.tween_property(music_player_base, "volume_db", _to_db(global_master_volume * global_music_volume), fade_time)
 	
 	# Sync percussion to current intensity
 	_on_battle_intensity_changed(intensity)
@@ -98,10 +183,8 @@ func _on_track_finished():
 func _on_battle_intensity_changed(new_intensity: float):
 	intensity = clamp(new_intensity, 0.0, 1.0)
 	
-	# FIX: Prevent NaN/Inf errors by ensuring a minimum value before db conversion
-	# linear_to_db(0) returns -inf, which breaks Tweens using TRANS_SINE
-	var target_db = linear_to_db(max(intensity, 0.0001))
-	if target_db < -79.0: target_db = -80.0
+	var effective_perc = (global_master_volume * global_music_volume) * intensity
+	var target_db = _to_db(effective_perc)
 	
 	var tween = create_tween()
 	tween.tween_property(music_player_perc, "volume_db", target_db, 0.8).set_trans(Tween.TRANS_SINE)
@@ -119,5 +202,6 @@ func _on_sfx_triggered(sfx_id: String):
 		add_child(temp_player)
 		temp_player.stream = sfx_stream
 		temp_player.bus = "SFX"
+		temp_player.volume_db = _to_db(global_master_volume * global_sfx_volume)
 		temp_player.play()
 		temp_player.finished.connect(temp_player.queue_free)

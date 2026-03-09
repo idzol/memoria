@@ -1,0 +1,210 @@
+[gd_scene format=3 uid="uid://bgfq5lnp2tmu0"]
+
+[ext_resource type="Script" uid="uid://b4kab8i6m212y" path="res://features/ui/CharacterLevelUp.gd" id="1_logic"]
+[ext_resource type="Theme" uid="uid://cy1tv88ir10yq" path="res://assets/themes/Greek.theme" id="2_theme"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.08, 0.08, 0.1, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.25, 0.25, 0.3, 1)
+
+[node name="CharacterLevelUp" type="Control" unique_id=732653605]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_logic")
+
+[node name="BG" type="ColorRect" parent="." unique_id=1468014192]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.04, 0.05, 0.07, 0.95)
+
+[node name="Center" type="CenterContainer" parent="." unique_id=1492709876]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Root" type="VBoxContainer" parent="Center" unique_id=2067431227]
+custom_minimum_size = Vector2(900, 520)
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="Center/Root" unique_id=2696243]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 44
+text = "LEVEL UP!"
+horizontal_alignment = 1
+
+[node name="Panels" type="HBoxContainer" parent="Center/Root" unique_id=963004239]
+layout_mode = 2
+theme_override_constants/separation = 30
+alignment = 1
+
+[node name="CurrentPanel" type="PanelContainer" parent="Center/Root/Panels" unique_id=209735836]
+custom_minimum_size = Vector2(360, 340)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="CurrentVBox" type="VBoxContainer" parent="Center/Root/Panels/CurrentPanel" unique_id=243696090]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="OldLevelLabel" type="Label" parent="Center/Root/Panels/CurrentPanel/CurrentVBox" unique_id=2002055289]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Level 1"
+horizontal_alignment = 1
+
+[node name="RowHP" type="HBoxContainer" parent="Center/Root/Panels/CurrentPanel/CurrentVBox" unique_id=873633417]
+layout_mode = 2
+
+[node name="Icon" type="Label" parent="Center/Root/Panels/CurrentPanel/CurrentVBox/RowHP" unique_id=365679639]
+layout_mode = 2
+text = "\u2764 HP"
+modulate = Color(0.88, 0.24, 0.24, 1)
+[node name="OldHP" type="Label" parent="Center/Root/Panels/CurrentPanel/CurrentVBox/RowHP" unique_id=1508559470]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0"
+horizontal_alignment = 2
+
+[node name="RowEnergy" type="HBoxContainer" parent="Center/Root/Panels/CurrentPanel/CurrentVBox" unique_id=1273308660]
+layout_mode = 2
+
+[node name="Icon" type="Label" parent="Center/Root/Panels/CurrentPanel/CurrentVBox/RowEnergy" unique_id=299571549]
+layout_mode = 2
+text = "\u26a1 ENERGY"
+modulate = Color(1, 0.86, 0.35, 1)
+[node name="OldEnergy" type="Label" parent="Center/Root/Panels/CurrentPanel/CurrentVBox/RowEnergy" unique_id=44955385]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0"
+horizontal_alignment = 2
+
+[node name="RowAttack" type="HBoxContainer" parent="Center/Root/Panels/CurrentPanel/CurrentVBox" unique_id=181391817]
+layout_mode = 2
+
+[node name="Icon" type="Label" parent="Center/Root/Panels/CurrentPanel/CurrentVBox/RowAttack" unique_id=301263802]
+layout_mode = 2
+text = "\u2694 ATTACK"
+
+[node name="OldAttack" type="Label" parent="Center/Root/Panels/CurrentPanel/CurrentVBox/RowAttack" unique_id=616183343]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0"
+horizontal_alignment = 2
+
+[node name="RowDefense" type="HBoxContainer" parent="Center/Root/Panels/CurrentPanel/CurrentVBox" unique_id=1583786972]
+layout_mode = 2
+
+[node name="Icon" type="Label" parent="Center/Root/Panels/CurrentPanel/CurrentVBox/RowDefense" unique_id=606931673]
+layout_mode = 2
+text = "\u26e8 DEFENSE"
+
+[node name="OldDefense" type="Label" parent="Center/Root/Panels/CurrentPanel/CurrentVBox/RowDefense" unique_id=1942642639]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0"
+horizontal_alignment = 2
+
+[node name="NewPanel" type="PanelContainer" parent="Center/Root/Panels" unique_id=359303443]
+custom_minimum_size = Vector2(360, 340)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="NewVBox" type="VBoxContainer" parent="Center/Root/Panels/NewPanel" unique_id=1975016851]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="NewLevelLabel" type="Label" parent="Center/Root/Panels/NewPanel/NewVBox" unique_id=151860132]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 1, 0.7, 1)
+theme_override_font_sizes/font_size = 30
+text = "Level 2"
+horizontal_alignment = 1
+
+[node name="RowHP" type="HBoxContainer" parent="Center/Root/Panels/NewPanel/NewVBox" unique_id=218034840]
+layout_mode = 2
+
+[node name="Icon" type="Label" parent="Center/Root/Panels/NewPanel/NewVBox/RowHP" unique_id=921374691]
+layout_mode = 2
+text = "\u2764 HP"
+modulate = Color(0.88, 0.24, 0.24, 1)
+[node name="NewHP" type="Label" parent="Center/Root/Panels/NewPanel/NewVBox/RowHP" unique_id=1232121499]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0"
+horizontal_alignment = 2
+
+[node name="RowEnergy" type="HBoxContainer" parent="Center/Root/Panels/NewPanel/NewVBox" unique_id=1447044626]
+layout_mode = 2
+
+[node name="Icon" type="Label" parent="Center/Root/Panels/NewPanel/NewVBox/RowEnergy" unique_id=1955236700]
+layout_mode = 2
+text = "\u26a1 ENERGY"
+modulate = Color(1, 0.86, 0.35, 1)
+[node name="NewEnergy" type="Label" parent="Center/Root/Panels/NewPanel/NewVBox/RowEnergy" unique_id=486624854]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0"
+horizontal_alignment = 2
+
+[node name="RowAttack" type="HBoxContainer" parent="Center/Root/Panels/NewPanel/NewVBox" unique_id=17873944]
+layout_mode = 2
+
+[node name="Icon" type="Label" parent="Center/Root/Panels/NewPanel/NewVBox/RowAttack" unique_id=976818282]
+layout_mode = 2
+text = "\u2694 ATTACK"
+
+[node name="NewAttack" type="Label" parent="Center/Root/Panels/NewPanel/NewVBox/RowAttack" unique_id=1536473934]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0"
+horizontal_alignment = 2
+
+[node name="RowDefense" type="HBoxContainer" parent="Center/Root/Panels/NewPanel/NewVBox" unique_id=1253685165]
+layout_mode = 2
+
+[node name="Icon" type="Label" parent="Center/Root/Panels/NewPanel/NewVBox/RowDefense" unique_id=987731124]
+layout_mode = 2
+text = "\u26e8 DEFENSE"
+
+[node name="NewDefense" type="Label" parent="Center/Root/Panels/NewPanel/NewVBox/RowDefense" unique_id=1045811303]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0"
+horizontal_alignment = 2
+
+[node name="ContinueButton" type="Button" parent="Center/Root" unique_id=2008074121]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 56)
+layout_mode = 2
+text = "CONTINUE"
+
+

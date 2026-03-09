@@ -20,7 +20,7 @@ func setup_mid_game_test(p_class: String, gold: int, hp: int, deck: Array):
 	GameManager.current_hp = hp
 	GameManager.active_deck = deck
 	GameManager.player_inventory = deck.duplicate()
-	GameManager.current_level = 10
+	GameManager.player_level = 10
 	
 	# Manually set a target node to simulate map selection
 	GameManager.current_node = {

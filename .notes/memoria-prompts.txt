@@ -1,22 +1,42 @@
+
+AGENTIC
+===
+Google Gemini
+
+OpenAI Codex 
+	try isntall 
+
+
+===
 PROMPT 
 ===
-Based on the github repostiorty   .notes/SUMMARY.md, create a new feature 
-{in /features/combat that inherits from BaseCombatEntity.}
+
+floor -> allow unique floor for each background, otherwise default for the biome (eg
 
 ===
-battle scene - map 
-	track in gamemanager the status of a room, update if it has been "cleared" (ie. enemies defeated)   
-	if player re-enters the same room, check if the room has been cleared 
-	if cleared load the same room background without the enemy / battlescene 
-	load as a standard room (eventscene) without enemy, with "exit to overworld" button  
 
-player xp
-	add to player total on death 
+ingamemenu pressing "abandon run"
+trigger runsummary scene and populate values 
+if gamemanager is_battle_mode, then exit to main menu 
+if not is_battle_mode, reset player hp to full and location to home 
+
+
+===
+
+refactor room scenes (eventscene, battlescene, lorescene) into a single scene 
+
+if enemy | combat, load combat board 
+if npc, load dialog board 
+if treasure, load treasure board 
+if completed | empty, load empty room 
+
+===
+on gamemanager start_actual_run and start_battle_mode, update current_hp, max_hp to use gamedata CLASS_STATS to get hp for the correct class. replace current_level variable with player_level for consistency
+
+===
 
 battle scene - map 
 	remove duplciates (eg. pickpocket) 
-
-
 	
 asset cleanup 
 	enemies 

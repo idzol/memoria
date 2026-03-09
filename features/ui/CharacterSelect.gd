@@ -1,113 +1,182 @@
 # [AI-CONTRACT]
 # FILE: res://features/ui/CharacterSelect.gd
-# FEATURES: Warrior/Scholar/Alchemist selection, stylebox override for ConfirmBtn background stretch, persistent button highlighting.
-# [YOLO-METADATA] TARGET: res://features/ui/CharacterSelect.gd
+# FEATURES: Horizontal class tiles, keyboard selection, and live level-1 stat summary.
 
 extends Control
-
-# [UI-107] Character Selection Screen Implementation
-# Manages selection state, icon swapping, and class initialization.
 
 @onready var description_label = %DescriptionLabel
 @onready var warrior_btn = %WarriorBtn
 @onready var scholar_btn = %ScholarBtn
 @onready var alchemist_btn = %AlchemistBtn
+@onready var warrior_tile = %WarriorTile
+@onready var scholar_tile = %ScholarTile
+@onready var alchemist_tile = %AlchemistTile
 @onready var background_tex = %BackgroundTexture
 @onready var confirm_btn = %ConfirmBtn
+@onready var cancel_btn = %CancelBtn
+@onready var hp_value_label = %HPValue
+@onready var energy_icon_label = %EnergyIcon
+@onready var energy_value_label = %EnergyValue
+@onready var attack_value_label = %AttackValue
+@onready var defense_value_label = %DefenseValue
 
 var selected_class: String = ""
+var selected_index: int = 0
+
+const CLASS_IDS := ["warrior", "scholar", "alchemist"]
+const ENERGY_PIP_FULL = Color(1.0, 0.86, 0.35, 1.0)
+const ENERGY_PIP_EMPTY = Color(0.46, 0.35, 0.08, 1.0)
+const ICON_ENERGY = "\u26a1"
+
+var tile_default_style: StyleBoxFlat
+var tile_selected_style: StyleBoxFlat
 
 func _ready():
-	# 1. Set background texture
 	if AssetRegistry.CHARACTER_ASSETS.has("background"):
 		background_tex.texture = load(AssetRegistry.CHARACTER_ASSETS.background)
-	
-	# 2. Stretch button.png to full size of ConfirmBtn using StyleBoxTexture
-	if AssetRegistry.CHARACTER_ASSETS.has("confirm_button"):
-		var tex = load(AssetRegistry.CHARACTER_ASSETS.confirm_button)
-		var sb = StyleBoxTexture.new()
-		sb.texture = tex
-		# Apply stylebox to all states to ensure the background is always visible and stretched
-		confirm_btn.add_theme_stylebox_override("normal", sb)
-		confirm_btn.add_theme_stylebox_override("hover", sb)
-		confirm_btn.add_theme_stylebox_override("pressed", sb)
-		confirm_btn.add_theme_stylebox_override("disabled", sb)
-		confirm_btn.add_theme_stylebox_override("focus", sb)
-	
-	# 3. Enable toggle mode for class buttons to maintain visual "pressed" state
-	for btn in [warrior_btn, scholar_btn, alchemist_btn]:
-		btn.toggle_mode = true
-		# Prevent un-toggling the same button by clicking it again
-		btn.action_mode = BaseButton.ACTION_MODE_BUTTON_PRESS
-	
-	# 4. Connect signals
-	warrior_btn.pressed.connect(_on_class_clicked.bind("warrior"))
-	scholar_btn.pressed.connect(_on_class_clicked.bind("scholar"))
-	alchemist_btn.pressed.connect(_on_class_clicked.bind("alchemist"))
-	confirm_btn.pressed.connect(_on_confirm_pressed)
-	
-	# 5. Initial UI state
-	confirm_btn.disabled = true
-	description_label.text = "Choose your path to reclaim your divinity..."
-	_update_icons()
 
-func _on_class_clicked(class_id: String):
-	selected_class = class_id
-	
-	if AssetRegistry.CHARACTER_ASSETS.has(class_id):
-		description_label.text = AssetRegistry.CHARACTER_ASSETS[class_id].desc
-		
+	_setup_confirm_button_style()
+	_setup_tile_styles()
+	_connect_signals()
+
 	confirm_btn.disabled = false
-	_update_icons()
+	_select_index(0)
 
-func _update_icons():
-	var classes = ["warrior", "scholar", "alchemist"]
+func _input(event):
+	if event.is_action_pressed("ui_cancel"):
+		_return_to_main_menu()
+		return
+	if event.is_action_pressed("ui_left") or event.is_action_pressed("ui_up"):
+		_select_index(posmod(selected_index - 1, CLASS_IDS.size()))
+		return
+	if event.is_action_pressed("ui_right") or event.is_action_pressed("ui_down"):
+		_select_index(posmod(selected_index + 1, CLASS_IDS.size()))
+		return
+	if event.is_action_pressed("ui_accept"):
+		_on_confirm_pressed()
+
+func _setup_confirm_button_style():
+	if not AssetRegistry.CHARACTER_ASSETS.has("confirm_button"):
+		return
+	var tex = load(AssetRegistry.CHARACTER_ASSETS.confirm_button)
+	if not tex:
+		return
+	var sb = StyleBoxTexture.new()
+	sb.texture = tex
+	confirm_btn.add_theme_stylebox_override("normal", sb)
+	confirm_btn.add_theme_stylebox_override("hover", sb)
+	confirm_btn.add_theme_stylebox_override("pressed", sb)
+	confirm_btn.add_theme_stylebox_override("disabled", sb)
+	confirm_btn.add_theme_stylebox_override("focus", sb)
+
+func _setup_tile_styles():
+	tile_default_style = StyleBoxFlat.new()
+	tile_default_style.bg_color = Color(0.08, 0.08, 0.1, 0.78)
+	tile_default_style.border_width_left = 2
+	tile_default_style.border_width_top = 2
+	tile_default_style.border_width_right = 2
+	tile_default_style.border_width_bottom = 2
+	tile_default_style.border_color = Color(1, 1, 1, 0.14)
+	tile_default_style.corner_radius_top_left = 12
+	tile_default_style.corner_radius_top_right = 12
+	tile_default_style.corner_radius_bottom_right = 12
+	tile_default_style.corner_radius_bottom_left = 12
+
+	tile_selected_style = StyleBoxFlat.new()
+	tile_selected_style.bg_color = Color(0.14, 0.18, 0.14, 0.92)
+	tile_selected_style.border_width_left = 3
+	tile_selected_style.border_width_top = 3
+	tile_selected_style.border_width_right = 3
+	tile_selected_style.border_width_bottom = 3
+	tile_selected_style.border_color = Color(0.34, 0.72, 0.45, 0.98)
+	tile_selected_style.corner_radius_top_left = 12
+	tile_selected_style.corner_radius_top_right = 12
+	tile_selected_style.corner_radius_bottom_right = 12
+	tile_selected_style.corner_radius_bottom_left = 12
+
+func _connect_signals():
+	warrior_btn.pressed.connect(_on_class_clicked.bind(0))
+	scholar_btn.pressed.connect(_on_class_clicked.bind(1))
+	alchemist_btn.pressed.connect(_on_class_clicked.bind(2))
+	confirm_btn.pressed.connect(_on_confirm_pressed)
+	cancel_btn.pressed.connect(_return_to_main_menu)
+
+func _on_class_clicked(index: int):
+	_select_index(index)
+
+func _select_index(index: int):
+	selected_index = clamp(index, 0, CLASS_IDS.size() - 1)
+	selected_class = CLASS_IDS[selected_index]
+	_update_tiles_and_icons()
+	_update_stats_summary()
+
+func _update_tiles_and_icons():
 	var buttons = [warrior_btn, scholar_btn, alchemist_btn]
-	
-	for i in range(classes.size()):
-		var class_id = classes[i]
-		var btn = buttons[i]
-		var is_selected = (selected_class == class_id)
-		
-		# Swap to selected icon if this class is the active choice
-		btn.icon = AssetRegistry.get_character_texture(class_id, is_selected)
-		
-		# Keep the button visually "highlighted/pressed" via the theme
-		btn.set_pressed_no_signal(is_selected)
+	var tiles = [warrior_tile, scholar_tile, alchemist_tile]
+
+	for i in range(CLASS_IDS.size()):
+		var class_id = CLASS_IDS[i]
+		var is_selected = i == selected_index
+		var btn: TextureButton = buttons[i]
+		var tile: PanelContainer = tiles[i]
+
+		btn.texture_normal = AssetRegistry.get_character_texture(class_id, is_selected)
+		btn.modulate = Color(1, 1, 1, 1) if is_selected else Color(0.84, 0.84, 0.84, 1)
+		tile.add_theme_stylebox_override("panel", tile_selected_style if is_selected else tile_default_style)
+
+func _update_stats_summary():
+	var stats = GameData.get_stats(selected_class, 1)
+	if stats.is_empty():
+		description_label.text = "No stats found for selected class."
+		hp_value_label.text = "0"
+		energy_value_label.text = "0"
+		attack_value_label.text = "0"
+		defense_value_label.text = "0"
+		energy_icon_label.text = ICON_ENERGY
+		return
+
+	var desc = AssetRegistry.CHARACTER_ASSETS.get(selected_class, {}).get("desc", "")
+	var hp := int(stats.get("max_hp", 0))
+	var energy := int(stats.get("energy", 0))
+	var attack := int(stats.get("player_attack", 0))
+	var defense := int(stats.get("player_defense", 0))
+
+	description_label.text = desc
+	hp_value_label.text = str(hp)
+	energy_value_label.text = str(energy)
+	attack_value_label.text = str(attack)
+	defense_value_label.text = str(defense)
+	energy_icon_label.text = ICON_ENERGY
+	energy_icon_label.modulate = ENERGY_PIP_FULL if energy > 0 else ENERGY_PIP_EMPTY
 
 func _on_confirm_pressed():
-	if selected_class == "": return
+	if selected_class == "":
+		return
 
-	# SHOW LOADING SCREEN
 	GameManager.show_loading("Restoring your identity...")
-	
-	# Wait for UI to paint
 	await get_tree().process_frame
 	await get_tree().process_frame
-	
-	# 5. Initialize Global Stats via GameManager and GameData level 1 stats
+
 	GameManager.player_class = selected_class.capitalize()
 	GameManager.player_level = 1
-	
+
 	var stats = GameData.get_stats(selected_class, 1)
 	if not stats.is_empty():
 		GameManager.max_hp = stats.max_hp
 		GameManager.current_hp = GameManager.max_hp
-		# Initialize combat stats in GameManager for later use
 		GameManager.base_energy = stats.energy
 		GameManager.base_attack = stats.player_attack
 		GameManager.base_defense = stats.player_defense
 	else:
 		push_error("Stats initialization failed for: " + selected_class)
-			
+
 	SignalBus.game_started.emit()
 
-	# 3. Branching Start Path
-	# Redirects to the appropriate map and initializes specific inventories
 	if GameManager.is_battle_mode:
-		print("[CharacterSelect] Starting BATTLE MODE...")
 		GameManager.start_battle_mode()
-
 	else:
-		print("[CharacterSelect] Starting STORY MODE...")
 		GameManager.start_actual_run()
+
+func _return_to_main_menu():
+	get_tree().change_scene_to_file("res://features/ui/MainMenu.tscn")
+

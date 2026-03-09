@@ -4,8 +4,8 @@ extends Control
 # Handles character progression, stat calculation, and dual-tab management.
 # Updated: Dynamic level-based requirements for deck and items.
 
-const CardData = preload("res://data/resources/CardData.gd")
-const ItemData = preload("res://data/resources/ItemData.gd")
+# const CardData = preload("res://data/resources/CardData.gd")
+# const ItemData = preload("res://data/resources/ItemData.gd")
 const CardScene = preload("res://features/combat/Card.tscn")
 
 @onready var deck_grid = %DeckGrid
@@ -23,6 +23,7 @@ const CardScene = preload("res://features/combat/Card.tscn")
 # Secondary Stats
 @onready var atk_label = %AtkLabel
 @onready var def_label = %DefLabel
+@onready var energy_label = %EnergyLabel
 @onready var gold_label = %GoldLabel
 @onready var back_button = %BackButton
 
@@ -44,50 +45,35 @@ func _update_stats_ui():
 	class_label.text = "%s (Lvl %d)" % [GameManager.player_class, p_lvl]
 	
 	# 2. STAT CALCULATION
-	var totals = _calculate_total_stats()
+	GameManager.recalculate_player_totals()
+	var totals = GameManager.get_item_stat_bonuses()
 	
 	# 3. Vitality (Base + Item HP)
-	var total_max_hp = GameManager.max_hp + totals.hp_bonus
+	var total_max_hp = GameManager.player_hp_total
 	hp_bar.max_value = total_max_hp
 	hp_bar.value = GameManager.current_hp
-	hp_text.text = "%d / %d" % [GameManager.current_hp, total_max_hp]
+	hp_text.text = "\u2764 %d / %d" % [GameManager.current_hp, total_max_hp]
 	
 	# 4. Memory (Experience)
-	var max_xp = GameManager.player_level * 100 
+	var max_xp = GameData.get_max_xp_for_level(GameManager.player_level)
 	xp_bar.max_value = max_xp
 	xp_bar.value = GameManager.player_xp
 	xp_text.text = "%d / %d" % [GameManager.player_xp, max_xp]
 	
 	# 5. Combat Stats Display
-	atk_label.text = "ATTACK: %d (%d+%d)" % [
-		GameManager.player_attack + totals.atk_bonus,
+	atk_label.text = "\u2694 ATTACK: %d (%d+%d)" % [
+		GameManager.player_attack_total,
 		GameManager.player_attack,
 		totals.atk_bonus
 	]
-	def_label.text = "DEFENSE: %d (%d+%d)" % [
-		GameManager.player_defense + totals.def_bonus,
+	def_label.text = "\u26e8 DEFENSE: %d (%d+%d)" % [
+		GameManager.player_defense_total,
 		GameManager.player_defense,
 		totals.def_bonus
 	]
+	energy_label.text = "\u26a1 ENERGY: %d" % int(GameManager.base_energy)
 	
 	gold_label.text = "GOLD: %d" % GameManager.gold
-
-func _calculate_total_stats() -> Dictionary:
-	var bonuses = {"atk_bonus": 0, "def_bonus": 0, "hp_bonus": 0}
-	
-	var active_items = GameManager.get("active_items")
-	var equipped_list = active_items if active_items != null else []
-	
-	for item_id in equipped_list:
-		var path = ITEMS_ROOT + item_id + ".tres"
-		if ResourceLoader.exists(path):
-			var res = load(path) as ItemData
-			if res:
-				bonuses.atk_bonus += res.attack
-				bonuses.def_bonus += res.armour
-				bonuses.hp_bonus += res.hp
-				
-	return bonuses
 
 # --- DECK MANAGEMENT ---
 

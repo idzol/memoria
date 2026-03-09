@@ -8,6 +8,10 @@ var player_name: String = ""
 var player_class: String = "Warrior"
 var player_level: int = 1
 var player_xp: int = 0
+var last_xp_gained: int = 0
+var pending_level_up: Dictionary = {}
+var level_up_return_scene: String = ""
+var run_summary_exit_to_main_menu: bool = false
 
 var base_energy: int = 0	# number of guesses start of each board  
 var base_attack: int = 0	
@@ -15,9 +19,9 @@ var base_defense: int = 0
 
 var current_energy: int = 0	   # number of guesses this turn 
 
-var current_hp: int = 100
-var max_hp: int = 100
-var gold: int = 50
+var current_hp: int = 10
+var max_hp: int = 10
+var gold: int = 0
 var player_deck: Array = [] # "sword", "shield", "heart", "trap", "scroll"
 var active_deck: Array = [] # "sword", "shield", "heart"
 
@@ -28,12 +32,14 @@ var active_items: Array = [] # "wood_splinter"
 var is_battle_mode: bool = false
 
 # --- Run Progression ---
-var current_level: int = 1
 var completed_nodes: Array = []
 
 # Combat Stats
 var player_attack: int = 10
 var player_defense: int = 5
+var player_hp_total: int = 10
+var player_attack_total: int = 10
+var player_defense_total: int = 5
 
 var current_node: Dictionary = {}
 var run_map: Dictionary = {} # Stored persistently per run
@@ -97,6 +103,7 @@ var current_deck: Array:
 # Persistent "Fixed" locations that stay the same for this character
 # Format: { Vector2i(column, layer): "type_string" }
 var fixed_nodes: Dictionary = {}
+const ITEMS_ROOT = "res://data/items/"
 
 func _ready():
 	SignalBus.node_selected.connect(_on_node_selected)
@@ -145,15 +152,56 @@ func get_random_room_resource(area_key: String) -> RoomData:
 
 # --- STATE ACCESSORS ---
 func mark_room_visited(room_id):
-	if world_state.rooms.has(room_id):
-		world_state.rooms[room_id].visited = true
+	_ensure_room_state(room_id)
+	world_state.rooms[room_id].visited = true
 
 func mark_room_cleared(room_id):
-	if world_state.rooms.has(room_id):
-		world_state.rooms[room_id].cleared = true
-		world_state.rooms[room_id].visited = true
-		SaveManager.save_mid_run_state()
+	_ensure_room_state(room_id)
+	world_state.rooms[room_id].cleared = true
+	world_state.rooms[room_id].visited = true
+	SaveManager.save_mid_run_state()
 	prepare_victory_loot(current_node)
+
+func add_player_xp(amount: int) -> Dictionary:
+	var gained = max(0, amount)
+	player_xp += gained
+	last_xp_gained = gained
+	
+	var start_level = player_level
+	var start_stats = _get_class_stats_for_level(start_level)
+	var max_level = _get_max_class_level()
+	
+	while player_level < max_level and player_xp >= GameData.get_max_xp_for_level(player_level):
+		player_level += 1
+	
+	var leveled_up = player_level > start_level
+	if leveled_up:
+		var new_stats = _get_class_stats_for_level(player_level)
+		_apply_level_stats(new_stats)
+		pending_level_up = {
+			"old_level": start_level,
+			"new_level": player_level,
+			"old_stats": start_stats,
+			"new_stats": new_stats
+		}
+		SignalBus.level_up.emit(player_level)
+	
+	return {
+		"gained": gained,
+		"leveled_up": leveled_up,
+		"new_level": player_level
+	}
+
+func is_room_cleared(room_id: String) -> bool:
+	if room_id == "":
+		return false
+	return world_state.rooms.has(room_id) and world_state.rooms[room_id].get("cleared", false)
+
+func _ensure_room_state(room_id: String):
+	if room_id == "":
+		return
+	if not world_state.rooms.has(room_id):
+		world_state.rooms[room_id] = {"visited": true, "cleared": false}
 
 func record_npc_interaction(npc_id: String, won: bool):
 	if world_state.npcs.has(npc_id):
@@ -182,6 +230,25 @@ func add_item(item_id: String):
 func has_item(item_id: String) -> bool:
 	return world_state.items.owned.has(item_id)
 
+func get_item_stat_bonuses() -> Dictionary:
+	var bonuses = {"atk_bonus": 0, "def_bonus": 0, "hp_bonus": 0}
+	for item_id in active_items:
+		var path = ITEMS_ROOT + item_id + ".tres"
+		if ResourceLoader.exists(path):
+			var res = load(path) as ItemData
+			if res:
+				bonuses.atk_bonus += res.attack
+				bonuses.def_bonus += res.armour
+				bonuses.hp_bonus += res.hp
+	return bonuses
+
+func recalculate_player_totals():
+	var totals = get_item_stat_bonuses()
+	player_hp_total = max_hp + totals.hp_bonus
+	player_attack_total = player_attack + totals.atk_bonus
+	player_defense_total = player_defense + totals.def_bonus
+	current_hp = clamp(current_hp, 0, player_hp_total)
+
 # --- SAVE/LOAD BRIDGE ---
 func get_save_data() -> Dictionary:
 	return world_state
@@ -192,8 +259,12 @@ func load_save_data(data: Dictionary):
 func start_battle_mode():
 	player_level = 1
 	player_xp = 0
-	current_hp = 100
-	max_hp = 100
+	last_xp_gained = 0
+	pending_level_up = {}
+	level_up_return_scene = ""
+	var start_stats = _get_class_stats_for_level(player_level)
+	_apply_level_stats(start_stats)
+	current_hp = max_hp
 	gold = 100
 	
 	# Testing suite starting items
@@ -202,6 +273,7 @@ func start_battle_mode():
 	
 	player_deck = ["sword", "shield", "heart"]
 	active_deck = player_deck.duplicate()
+	recalculate_player_totals()
 	
 	# Use specialized linear generator
 	var gen = preload("res://features/map/BattleMapGenerator.gd").new()
@@ -223,13 +295,19 @@ func start_battle_mode():
 	get_tree().change_scene_to_file("res://features/map/BattleMap.tscn")
 
 func start_actual_run():
+	player_level = 1
+	var start_stats = _get_class_stats_for_level(player_level)
+	_apply_level_stats(start_stats)
 	current_hp = max_hp
 	gold = 50
 	player_xp = 0
-	current_level = 1
+	last_xp_gained = 0
+	pending_level_up = {}
+	level_up_return_scene = ""
 	completed_nodes = []
 	player_grid_pos = Vector2i(2, -1) # Ensure player starts at Home
 	active_deck = ["sword", "shield", "heart"]
+	recalculate_player_totals()
 
 	# 1. Set player location 	
 	reset_to_home()
@@ -265,14 +343,34 @@ func reset_to_home():
 	player_grid_pos = Vector2i(2, -1)
 
 func load_run_from_data(data: Dictionary):
+	is_battle_mode = data.get("is_battle_mode", false)
 	player_name = data.get("player_name", "Unknown")
 	player_class = data.get("player_class", "Archivist")
-	player_level = data.get("player_level", 1)
+	player_level = data.get("player_level", data.get("current_level", 1))
+	player_xp = data.get("player_xp", 0)
+	last_xp_gained = data.get("last_xp_gained", 0)
+	pending_level_up = _decode_variant_field(data, "pending_level_up", {})
+	level_up_return_scene = data.get("level_up_return_scene", "")
 
 	current_hp = data.get("hp", 100)
 	max_hp = data.get("max_hp", 100)
 	gold = data.get("gold", 0)
-	current_level = data.get("current_level", 1)
+	base_energy = data.get("base_energy", base_energy)
+	base_attack = data.get("base_attack", base_attack)
+	base_defense = data.get("base_defense", base_defense)
+	current_energy = data.get("current_energy", current_energy)
+	player_attack = data.get("player_attack", base_attack)
+	player_defense = data.get("player_defense", base_defense)
+	player_deck = data.get("deck", [])
+	active_deck = data.get("active_deck", [])
+	player_items = data.get("items", [])
+	active_items = data.get("active_items", [])
+	world_state = _decode_variant_field(data, "world_state", world_state)
+	current_node = _decode_variant_field(data, "current_node", {})
+	run_map = _decode_variant_field(data, "run_map", run_map)
+	pending_loot = _decode_variant_field(data, "pending_loot", [])
+	run_loot = _decode_variant_field(data, "run_loot", [])
+	recalculate_player_totals()
 	completed_nodes = data.get("completed_nodes", [])
 	
 	# Restore fixed node data
@@ -282,16 +380,23 @@ func load_run_from_data(data: Dictionary):
 	var saved_pos = data.get("grid_pos", [2, -1])
 	player_grid_pos = Vector2i(saved_pos[0], saved_pos[1])
 	
-	if data.has("run_map"):
-		run_map = data.run_map
+	if is_battle_mode:
+		get_tree().change_scene_to_file("res://features/map/BattleMap.tscn")
+	else:
+		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
 
-	get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+func _decode_variant_field(data: Dictionary, key: String, default_value):
+	var raw = data.get(key, default_value)
+	if raw is String:
+		var decoded = str_to_var(raw)
+		return decoded if decoded != null else default_value
+	return raw
 
 
 func _on_node_selected(node_data: Dictionary):
 	current_node = node_data
-	if not world_state.rooms.has(node_data.id):
-		world_state.rooms[node_data.id] = {"visited": true, "cleared": false}
+	_ensure_room_state(str(node_data.get("id", "")))
+	mark_room_visited(str(node_data.get("id", "")))
 	
 	SaveManager.save_mid_run_state()
 
@@ -379,6 +484,44 @@ func _on_combat_won():
 
 func _on_combat_lost():
 	get_tree().call_deferred("change_scene_to_file", "res://features/ui/DeathScreen.tscn")
+
+func _get_normalized_class_id() -> String:
+	var raw = player_class.to_lower()
+	match raw:
+		"archivist":
+			return "scholar"
+		"berserker":
+			return "warrior"
+		"illusionist":
+			return "alchemist"
+		_:
+			return raw
+
+func _get_max_class_level() -> int:
+	var class_id = _get_normalized_class_id()
+	if GameData.CLASS_STATS.has(class_id):
+		return GameData.CLASS_STATS[class_id].size()
+	return 1
+
+func _get_class_stats_for_level(level: int) -> Dictionary:
+	return GameData.get_stats(_get_normalized_class_id(), level)
+
+func _apply_level_stats(stats: Dictionary):
+	if stats.is_empty():
+		return
+	var old_hp_total = player_hp_total
+	max_hp = int(stats.get("max_hp", max_hp))
+	base_energy = int(stats.get("energy", base_energy))
+	base_attack = int(stats.get("player_attack", base_attack))
+	base_defense = int(stats.get("player_defense", base_defense))
+	player_attack = base_attack
+	player_defense = base_defense
+	recalculate_player_totals()
+	
+	if player_hp_total > old_hp_total:
+		current_hp += (player_hp_total - old_hp_total)
+	current_hp = clamp(current_hp, 0, player_hp_total)
+	SignalBus.hp_changed.emit(current_hp, player_hp_total)
 
 func take_damage(amount: int):
 	current_hp = max(0, current_hp - amount)

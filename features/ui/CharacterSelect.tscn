@@ -31,80 +31,275 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.470588)
+color = Color(0, 0, 0, 0.52)
 
-[node name="MainLayout" type="HBoxContainer" parent="." unique_id=962224711]
+[node name="MainVBox" type="VBoxContainer" parent="."]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -547.0
-offset_top = -304.0
-offset_right = 547.0
-offset_bottom = 304.0
+anchors_preset = 15
+anchor_left = 0.06
+anchor_top = 0.08
+anchor_right = 0.94
+anchor_bottom = 0.92
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 122
-alignment = 1
+theme_override_constants/separation = 26
 
-[node name="SelectionColumn" type="VBoxContainer" parent="MainLayout" unique_id=655338004]
-custom_minimum_size = Vector2(425, 0)
+[node name="TitleLabel" type="Label" parent="MainVBox"]
 layout_mode = 2
-theme_override_constants/separation = 36
-alignment = 1
-
-[node name="WarriorBtn" type="Button" parent="MainLayout/SelectionColumn" unique_id=1978996444]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 122)
-layout_mode = 2
-theme_override_font_sizes/font_size = 29
-text = "WARRIOR"
-expand_icon = true
-
-[node name="ScholarBtn" type="Button" parent="MainLayout/SelectionColumn" unique_id=286383627]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 122)
-layout_mode = 2
-theme_override_font_sizes/font_size = 29
-text = "SCHOLAR"
-expand_icon = true
-
-[node name="AlchemistBtn" type="Button" parent="MainLayout/SelectionColumn" unique_id=1850249279]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 122)
-layout_mode = 2
-theme_override_font_sizes/font_size = 29
-text = "ALCHEMIST"
-expand_icon = true
-
-[node name="InfoColumn" type="VBoxContainer" parent="MainLayout" unique_id=909373392]
-custom_minimum_size = Vector2(486, 0)
-layout_mode = 2
-alignment = 1
-
-[node name="DescriptionLabel" type="Label" parent="MainLayout/InfoColumn" unique_id=622500198]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(243, 182)
-layout_mode = 2
-theme_override_font_sizes/font_size = 29
-text = "Select a character to reclaim your memories..."
+theme_override_font_sizes/font_size = 54
+text = "CHOOSE YOUR IDENTITY"
 horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 3
 
-[node name="Spacer" type="Control" parent="MainLayout/InfoColumn" unique_id=434882599]
-custom_minimum_size = Vector2(0, 49)
+[node name="ContentRow" type="HBoxContainer" parent="MainVBox"]
 layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 18
 
-[node name="ConfirmBtn" type="Button" parent="MainLayout/InfoColumn" unique_id=1377981204]
+[node name="WarriorTile" type="PanelContainer" parent="MainVBox/ContentRow" unique_id=210001001]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(304, 97)
+custom_minimum_size = Vector2(240, 420)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBox" type="VBoxContainer" parent="MainVBox/ContentRow/WarriorTile"]
+layout_mode = 2
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="WarriorBtn" type="TextureButton" parent="MainVBox/ContentRow/WarriorTile/VBox" unique_id=1978996444]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 280)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_type_variation = &"HeaderButton"
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="WarriorLabel" type="Label" parent="MainVBox/ContentRow/WarriorTile/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "WARRIOR"
+horizontal_alignment = 1
+
+[node name="ScholarTile" type="PanelContainer" parent="MainVBox/ContentRow" unique_id=210001002]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 420)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBox" type="VBoxContainer" parent="MainVBox/ContentRow/ScholarTile"]
+layout_mode = 2
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="ScholarBtn" type="TextureButton" parent="MainVBox/ContentRow/ScholarTile/VBox" unique_id=286383627]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 280)
+layout_mode = 2
+size_flags_horizontal = 4
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="ScholarLabel" type="Label" parent="MainVBox/ContentRow/ScholarTile/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "SCHOLAR"
+horizontal_alignment = 1
+
+[node name="AlchemistTile" type="PanelContainer" parent="MainVBox/ContentRow" unique_id=210001003]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 420)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBox" type="VBoxContainer" parent="MainVBox/ContentRow/AlchemistTile"]
+layout_mode = 2
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="AlchemistBtn" type="TextureButton" parent="MainVBox/ContentRow/AlchemistTile/VBox" unique_id=1850249279]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 280)
+layout_mode = 2
+size_flags_horizontal = 4
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="AlchemistLabel" type="Label" parent="MainVBox/ContentRow/AlchemistTile/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "ALCHEMIST"
+horizontal_alignment = 1
+
+[node name="StatsTile" type="PanelContainer" parent="MainVBox/ContentRow" unique_id=210001004]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 420)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBox" type="VBoxContainer" parent="MainVBox/ContentRow/StatsTile"]
+layout_mode = 2
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 14
+
+[node name="StatsTitle" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "LEVEL 1 STATS"
+horizontal_alignment = 1
+
+[node name="StatsRows" type="VBoxContainer" parent="MainVBox/ContentRow/StatsTile/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HPRow" type="HBoxContainer" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="HPIcon" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/HPRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "\u2764"
+modulate = Color(0.88, 0.24, 0.24, 1)
+[node name="HPLabel" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/HPRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "HP"
+
+[node name="HPValue" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/HPRow" unique_id=622500101]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 10
 theme_override_font_sizes/font_size = 24
+text = "0"
+horizontal_alignment = 2
+
+[node name="EnergyRow" type="HBoxContainer" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="EnergyIcon" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/EnergyRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "\u26a1"
+modulate = Color(1, 0.86, 0.35, 1)
+
+[node name="EnergyLabel" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/EnergyRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "ENERGY"
+
+[node name="EnergyValue" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/EnergyRow" unique_id=622500103]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 10
+theme_override_font_sizes/font_size = 24
+text = "0"
+horizontal_alignment = 2
+
+[node name="AttackRow" type="HBoxContainer" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="AttackIcon" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/AttackRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "\u2694"
+
+[node name="AttackLabel" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/AttackRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "ATTACK"
+
+[node name="AttackValue" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/AttackRow" unique_id=622500104]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 10
+theme_override_font_sizes/font_size = 24
+text = "0"
+horizontal_alignment = 2
+
+[node name="DefenseRow" type="HBoxContainer" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="DefenseIcon" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/DefenseRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "\u26e8"
+
+[node name="DefenseLabel" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/DefenseRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "DEFENSE"
+
+[node name="DefenseValue" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/DefenseRow" unique_id=622500105]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 10
+theme_override_font_sizes/font_size = 24
+text = "0"
+horizontal_alignment = 2
+
+[node name="DescriptionBox" type="PanelContainer" parent="MainVBox/ContentRow/StatsTile/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="DescriptionPadding" type="MarginContainer" parent="MainVBox/ContentRow/StatsTile/VBox/DescriptionBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 12
+
+[node name="DescriptionLabel" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/DescriptionBox/DescriptionPadding" unique_id=622500198]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 22
+text = "Select a class to inspect stats."
+autowrap_mode = 3
+
+[node name="BottomBar" type="CenterContainer" parent="MainVBox"]
+layout_mode = 2
+
+[node name="BottomButtons" type="HBoxContainer" parent="MainVBox/BottomBar"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="ConfirmBtn" type="Button" parent="MainVBox/BottomBar/BottomButtons" unique_id=1377981204]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 92)
+layout_mode = 2
+theme_type_variation = &"HeaderButton"
+theme_override_font_sizes/font_size = 28
 text = "RESTORE IDENTITY"
-icon_alignment = 1
-expand_icon = true
+
+[node name="CancelBtn" type="Button" parent="MainVBox/BottomBar/BottomButtons" unique_id=1377981205]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 92)
+layout_mode = 2
+theme_type_variation = &"HeaderButton"
+theme_override_font_sizes/font_size = 28
+text = "CANCEL"
+
+

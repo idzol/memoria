@@ -3,6 +3,16 @@ extends Node2D
 # res://features/combat/BattleScene.gd
 # Refactored for strict flip limits, proactive reshuffle, and extensible damage math.
 
+# --- Layout Tuning (Adjust these in the Inspector) ---
+@export_group("Environment Layout")
+## Vertical position as a ratio of screen height (e.g. 0.2 is 20% from the bottom).
+@export_range(0.0, 1.0) var ground_height_ratio: float = 0.2083 # ~150px from bottom on 720p (original baseline)
+## Horizontal margin as a ratio of screen width (e.g. 0.1 is 10% from the edge).
+@export_range(0.0, 0.5) var side_margin_ratio: float = 0.04 # ~51px from edge on 1280p (closer to edges)
+## Vertical offset for the sprite texture center (usually half of sprite height).
+@export var sprite_feet_offset: int = 0
+
+
 @onready var grid = %GridContainer
 @onready var log_box = %LogBox
 
@@ -10,7 +20,7 @@ extends Node2D
 @onready var biome_room_label = %BiomeRoomLabel
 # @onready var conditions_container = %ConditionsContainer
 @onready var round_label = %RoundLabel
-@onready var energy_label = %EnergyLabel 
+@onready var energy_pips = %EnergyPips
 @onready var player_atk_val = %PlayerAtkVal
 @onready var player_def_val = %PlayerDefVal
 @onready var enemy_atk_val = %EnemyAtkVal
@@ -31,6 +41,7 @@ extends Node2D
 @onready var enemy_sprite = %EnemyPortraitSprite 
 @onready var player_sprite = %PlayerSprite
 @onready var background = get_node_or_null("%Background")
+@onready var floor_rect = get_node_or_null("%FloorRect")
 
 var card_scene = preload("res://features/combat/CardIcon.tscn")
 var in_game_menu_scene = preload("res://features/ui/InGameMenu.tscn")
@@ -42,7 +53,10 @@ var is_battle_over: bool = false
 var difficulty: int = 0
 var current_room_res: RoomData = null
 var current_enemy_res: EnemyData = null
+var current_player_res: PlayerData = null
 var in_game_menu = null
+var is_cleared_room: bool = false
+var death_transition_in_progress: bool = false
 
 # Current Stats for Calculation
 var p_hp: int = 1
@@ -51,17 +65,28 @@ var max_e_hp: int = 1
 
 var p_atk: int = 0 # Base attack
 var p_def: int = 0 # Base defense
+var temp_armor_bonus: int = 0 # Temporary defense from matched armor cards
 var round_number: int = 1
+var keyboard_selected_card_index: int = -1
+var keyboard_selection_active: bool = false
+var card_selection_style: StyleBoxFlat
 
 var active_status_effects = {"player": [], "enemy": []} # e.g. ["vulnerable", "charged"]
+const ENERGY_PIP_FULL = Color(1.0, 0.86, 0.35, 1.0)
+const ENERGY_PIP_EMPTY = Color(0.46, 0.35, 0.08, 1.0)
+const CARD_SELECTION_OUTLINE = "KeyboardCardSelectionOutline"
+const ACTION_ANIM_DURATION = 0.35
+const ENERGY_PIP_CHAR = "▮"
 
 func _ready():
 	var node_data = GameManager.current_node
 	difficulty = node_data["difficulty"] if "difficulty" in node_data else 1
+	is_cleared_room = GameManager.is_room_cleared(str(node_data.get("id", "")))
+	GameManager.recalculate_player_totals()
 
 	p_hp = GameManager.current_hp
-	p_atk = GameManager.base_attack
-	p_def = GameManager.base_defense
+	p_atk = GameManager.player_attack_total
+	p_def = GameManager.player_defense_total
 
 	if node_data.has("room_resource_path"):
 		current_room_res = load(node_data.room_resource_path) as RoomData
@@ -72,14 +97,19 @@ func _ready():
 		in_game_menu = in_game_menu_scene.instantiate()
 		add_child(in_game_menu)
 		in_game_menu.hide()
+	if has_node("%MenuIconBtn"):
+		%MenuIconBtn.pressed.connect(_toggle_in_game_menu)
 
 	# Debug win / lose connections
 	# if has_node("%DebugWinBtn"): %DebugWinBtn.pressed.connect(_debug_win)
 	# if has_node("%DebugLoseBtn"): %DebugLoseBtn.pressed.connect(_debug_lose)
 
 	_setup_player_spritesheet()
-	_setup_enemy_portrait()
-	_init_encounter()
+	if is_cleared_room:
+		_setup_cleared_room_view()
+	else:
+		_setup_enemy_portrait()
+		_init_encounter()
 	
 	# Music 
 	SignalBus.music_change_requested.emit(AudioData.TRACKS["BATTLE_STANDARD"], 1.0)
@@ -87,18 +117,216 @@ func _ready():
 	# Initial UI Sync
 	_sync_status_bar()
 	update_ui()
+	_setup_card_selection_style()
+	_update_character_placement()
+	get_viewport().size_changed.connect(_on_viewport_resized)
 
 func _input(event):
-	# Toggle In-Game Menu on Escape (ui_cancel)
+	# Escape: close active menu layer, otherwise exit to overworld map.
 	if event.is_action_pressed("ui_cancel"):
-		if in_game_menu:
-			if in_game_menu.visible: in_game_menu.close()
-			else: in_game_menu.open()
+		if _handle_menu_cancel():
+			return
+		if not _is_current_room_cleared():
+			return
+		_exit_to_overworld_from_battle()
+		return
+
+	# Dialog overlay: Enter accepts the primary option (e.g. "Enter Combat").
+	if dialog_overlay and dialog_overlay.visible and event.is_action_pressed("ui_accept"):
+		_activate_dialog_primary_option()
+		return
+
+	if _can_handle_keyboard_card_input():
+		if event.is_action_pressed("ui_left"):
+			_move_keyboard_card_selection(-1)
+			return
+		if event.is_action_pressed("ui_right"):
+			_move_keyboard_card_selection(1)
+			return
+		if event.is_action_pressed("ui_up"):
+			_move_keyboard_card_selection(-grid.columns)
+			return
+		if event.is_action_pressed("ui_down"):
+			_move_keyboard_card_selection(grid.columns)
+			return
+		if event.is_action_pressed("ui_accept"):
+			_activate_keyboard_selected_card()
+			return
+
+	if event is InputEventKey and event.pressed and not event.is_echo():
+		_clear_keyboard_card_selection()
+	elif event is InputEventMouseButton and event.pressed:
+		_clear_keyboard_card_selection()
+
+	if OS.is_debug_build() and event is InputEventKey and event.pressed:
+		# PRESS 'B' TO TOGGLE BACKGROUND (Debugging hidden elements)
+		if event.keycode == KEY_B:
+			background.visible = !background.visible
+			print("[DEBUG] Background Visibility: ", background.visible)
+		
+		# PRESS 'F' TO FORCE FLOOR REFRESH
+		if event.keycode == KEY_F:
+			_apply_room_data(current_room_res)
+
+func _toggle_in_game_menu():
+	if in_game_menu:
+		if in_game_menu.visible:
+			in_game_menu.close()
+		else:
+			in_game_menu.open()
+			_clear_keyboard_card_selection()
+
+func _handle_menu_cancel() -> bool:
+	if not in_game_menu or not in_game_menu.visible:
+		return false
+	if in_game_menu.has_method("handle_cancel"):
+		return in_game_menu.handle_cancel()
+	in_game_menu.close()
+	return true
+
+func _exit_to_overworld_from_battle():
+	if GameManager.is_battle_mode:
+		get_tree().change_scene_to_file("res://features/map/BattleMap.tscn")
+	else:
+		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+
+func _is_current_room_cleared() -> bool:
+	if is_cleared_room:
+		return true
+	var node_data = GameManager.current_node
+	var room_id = str(node_data.get("id", ""))
+	if room_id == "":
+		return false
+	return GameManager.is_room_cleared(room_id)
+
+func _setup_card_selection_style():
+	if card_selection_style:
+		return
+	card_selection_style = StyleBoxFlat.new()
+	card_selection_style.draw_center = true
+	card_selection_style.bg_color = Color(0, 0, 0, 0)
+	card_selection_style.border_width_left = 4
+	card_selection_style.border_width_top = 4
+	card_selection_style.border_width_right = 4
+	card_selection_style.border_width_bottom = 4
+	card_selection_style.border_color = Color(0.1, 0.75, 0.28, 1.0)
+
+func _can_handle_keyboard_card_input() -> bool:
+	if is_battle_over or not can_flip:
+		return false
+	if not battle_ui or not battle_ui.visible:
+		return false
+	if in_game_menu and in_game_menu.visible:
+		return false
+	if dialog_overlay and dialog_overlay.visible:
+		return false
+	return true
+
+func _move_keyboard_card_selection(step: int):
+	var cards = _get_grid_cards()
+	if cards.is_empty():
+		_clear_keyboard_card_selection()
+		return
+	var child_count = cards.size()
+	var first_idx = _find_first_navigable_card_index(cards)
+	if first_idx == -1:
+		_clear_keyboard_card_selection()
+		return
+	# First arrow press should reveal/select the top-left available card.
+	if keyboard_selected_card_index < 0:
+		keyboard_selected_card_index = first_idx
+		keyboard_selection_active = true
+		_refresh_keyboard_card_outline()
+		return
+	var start_idx = keyboard_selected_card_index
+	var next_idx = start_idx
+	var safety = 0
+	while safety < child_count:
+		next_idx = posmod(next_idx + step, child_count)
+		var card = cards[next_idx]
+		if _is_navigable_card(card):
+			keyboard_selected_card_index = next_idx
+			keyboard_selection_active = true
+			_refresh_keyboard_card_outline()
+			return
+		safety += 1
+
+func _activate_keyboard_selected_card():
+	var cards = _get_grid_cards()
+	if cards.is_empty():
+		_clear_keyboard_card_selection()
+		return
+	if keyboard_selected_card_index < 0 or keyboard_selected_card_index >= cards.size():
+		return
+	var card = cards[keyboard_selected_card_index]
+	if not _is_navigable_card(card):
+		return
+	card.flip()
+	_clear_keyboard_card_selection()
+
+func _clear_keyboard_card_selection():
+	keyboard_selection_active = false
+	keyboard_selected_card_index = -1
+	_refresh_keyboard_card_outline()
+
+func _refresh_keyboard_card_outline():
+	var cards = _get_grid_cards()
+	for card in cards:
+		if not is_instance_valid(card):
+			continue
+		var existing = card.get_node_or_null(CARD_SELECTION_OUTLINE)
+		if existing:
+			existing.queue_free()
+	if not keyboard_selection_active:
+		return
+	if keyboard_selected_card_index < 0 or keyboard_selected_card_index >= cards.size():
+		return
+	var selected_card = cards[keyboard_selected_card_index]
+	if not is_instance_valid(selected_card):
+		return
+	var outline = Panel.new()
+	outline.name = CARD_SELECTION_OUTLINE
+	outline.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	outline.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	outline.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	outline.grow_vertical = Control.GROW_DIRECTION_BOTH
+	outline.z_index = 100
+	outline.offset_left = 0
+	outline.offset_top = 0
+	outline.offset_right = 0
+	outline.offset_bottom = 0
+	outline.add_theme_stylebox_override("panel", card_selection_style)
+	selected_card.add_child(outline)
+
+func _activate_dialog_primary_option():
+	if not has_node("%OptionContainer"):
+		return
+	for child in %OptionContainer.get_children():
+		if child is Button and child.visible and not child.disabled:
+			(child as Button).pressed.emit()
+			return
+
+func _get_grid_cards() -> Array:
+	var result: Array = []
+	for child in grid.get_children():
+		if child is TextureButton:
+			result.append(child)
+	return result
+
+func _find_first_navigable_card_index(cards: Array) -> int:
+	for i in range(cards.size()):
+		if _is_navigable_card(cards[i]):
+			return i
+	return -1
+
+func _is_navigable_card(card) -> bool:
+	return is_instance_valid(card) and not card.disabled and not card.is_matched and not card.is_face_up
+
 
 func _sync_stat_icons():
 	# Sync Player Icons
 	if player_atk_val: player_atk_val.text = str(p_atk)
-	if player_def_val: player_def_val.text = str(p_def)
+	if player_def_val: player_def_val.text = str(p_def + temp_armor_bonus)
 	
 	# Sync Enemy Icons
 	if current_enemy_res:
@@ -106,8 +334,24 @@ func _sync_stat_icons():
 		enemy_def_val.text = str(current_enemy_res.armor)
 	
 	# Energy HUD
-	if energy_label:
-		energy_label.text = "⚡ ENERGY: %d" % GameManager.current_energy
+	_render_energy_pips()
+
+func _render_energy_pips():
+	if not energy_pips:
+		return
+	var max_energy = GameManager.base_energy if "base_energy" in GameManager else 2
+	var current_energy = clamp(GameManager.current_energy, 0, max_energy)
+	while energy_pips.get_child_count() > max_energy:
+		energy_pips.get_child(energy_pips.get_child_count() - 1).queue_free()
+	while energy_pips.get_child_count() < max_energy:
+		var pip = Label.new()
+		pip.text = ENERGY_PIP_CHAR
+		pip.add_theme_font_size_override("font_size", 22)
+		energy_pips.add_child(pip)
+	for i in range(energy_pips.get_child_count()):
+		var pip_node = energy_pips.get_child(i) as Label
+		if pip_node:
+			pip_node.modulate = ENERGY_PIP_FULL if i < current_energy else ENERGY_PIP_EMPTY
 
 
 func _sync_status_bar():
@@ -121,6 +365,7 @@ func _sync_status_bar():
 
 # --- INPUT & FLOW ---
 func _on_card_flipped(card):
+	_clear_keyboard_card_selection()
 	if is_battle_over or not can_flip:
 		if is_instance_valid(card) and card.is_face_up and not card.is_matched:
 			card.flip_back()
@@ -188,6 +433,7 @@ func _check_match():
 
 func _resolve_turn_end():
 	if is_battle_over: return
+	_clear_keyboard_card_selection()
 	
 	# Flip back any remaining unmatched cards in the current attempt pool
 	for card in flipped_cards:
@@ -237,6 +483,8 @@ func _process_combat_action(card_id: String):
 	
 	if res.value > 0:
 		if res.type == "attack":
+			_play_unit_sheet_temporarily(player_sprite, current_player_res, "attack_sheet", ACTION_ANIM_DURATION)
+			_play_unit_sheet_temporarily(enemy_sprite, current_enemy_res, "defend_sheet", ACTION_ANIM_DURATION)
 			var final_dmg = _calculate_final_damage(res.value, type, "player", "enemy")
 			e_hp = max(0, e_hp - final_dmg)
 			add_log("Matched %s: Dealt %d damage." % [res.name, final_dmg])
@@ -245,23 +493,31 @@ func _process_combat_action(card_id: String):
 			SignalBus.sfx_triggered.emit(AudioData.SFX["SWORD"])
 
 		elif res.type == "trap":
-			var trap_dmg = res.value
+			_play_unit_sheet_temporarily(player_sprite, current_player_res, "defend_sheet", ACTION_ANIM_DURATION)
+			var trap_dmg = max(1, int(res.value) - (p_def + temp_armor_bonus))
 			p_hp = max(0, p_hp - trap_dmg)
-			add_log("Matched %s: Took %d damage." % [res.name, res.value])
+			add_log("Matched %s: Took %d damage." % [res.name, trap_dmg])
+			if temp_armor_bonus > 0:
+				add_log("Armor bonus breaks after the hit.")
+				temp_armor_bonus = 0
+				_sync_stat_icons()
 			_flash_unit(%PlayerFlash, Color.ORANGE_RED)
 			SignalBus.battle_intensity_changed.emit(0.5)
 			SignalBus.sfx_triggered.emit(AudioData.SFX["TRAP"])
 
 		elif res.type == "heal":
-			p_hp = min(GameManager.max_hp, p_hp + res.value)
+			p_hp = min(GameManager.player_hp_total, p_hp + res.value)
 			add_log("Matched %s: Restored %d HP." % [res.name, res.value])
 			_flash_unit(%PlayerFlash, Color.SEA_GREEN)
 			SignalBus.battle_intensity_changed.emit(0.5)
 			SignalBus.sfx_triggered.emit(AudioData.SFX["HEAL"])
 
-		# Block 
-		# SignalBus.battle_intensity_changed.emit(0.5)
-		# SignalBus.sfx_triggered.emit(AudioData.SFX["SHIELD"])
+		elif res.type == "armor":
+			temp_armor_bonus += int(res.value)
+			add_log("Matched %s: +%d armor for the next hit." % [res.name, int(res.value)])
+			_flash_unit(%PlayerFlash, Color.GOLD)
+			SignalBus.battle_intensity_changed.emit(0.5)
+			SignalBus.sfx_triggered.emit(AudioData.SFX["SHIELD"])
 
 func _calculate_final_damage(card_val: int, type: String, attacker: String, defender: String) -> int:
 	var total = card_val
@@ -282,7 +538,7 @@ func _calculate_final_damage(card_val: int, type: String, attacker: String, defe
 		total -= (arm if type == "physical" else res)
 	else:
 		# Player defense
-		total -= p_def 
+		total -= (p_def + temp_armor_bonus)
 		
 	# C. Status Effect Multipliers
 	if active_status_effects[defender].has("vulnerable"):
@@ -296,9 +552,16 @@ func _calculate_final_damage(card_val: int, type: String, attacker: String, defe
 func _enemy_turn():
 	# Simple enemy attack using the same formula logic
 	var base_dmg = current_enemy_res.base_damage
-	var final_dmg = _calculate_final_damage(base_dmg, "physical", "enemy", "player")
+	# Pass 0 here because _calculate_final_damage already injects enemy base attack.
+	_play_unit_sheet_temporarily(enemy_sprite, current_enemy_res, "attack_sheet", ACTION_ANIM_DURATION)
+	_play_unit_sheet_temporarily(player_sprite, current_player_res, "defend_sheet", ACTION_ANIM_DURATION)
+	var final_dmg = _calculate_final_damage(0, "physical", "enemy", "player")
 	p_hp -= final_dmg
 	add_log("Enemy strikes for %d damage." % final_dmg)
+	if temp_armor_bonus > 0:
+		add_log("Armor bonus breaks after the hit.")
+		temp_armor_bonus = 0
+		_sync_stat_icons()
 	_flash_unit(%PlayerFlash, Color.CRIMSON)
 
 # --- BOARD MANAGEMENT ---
@@ -326,6 +589,7 @@ func _should_reshuffle() -> bool:
 	return true
 
 func _trigger_reshuffle():
+	_clear_keyboard_card_selection()
 	can_flip = false
 	_toggle_grid_interaction(false)
 	add_log("The path is blocked. Shuffling memories...")
@@ -349,15 +613,49 @@ func _init_encounter():
 	)
 	%OptionContainer.add_child(btn)
 
+func _setup_cleared_room_view():
+	battle_ui.hide()
+	dialog_overlay.show()
+	if enemy_sprite:
+		enemy_sprite.visible = false
+	if has_node("%EnemyFlash"):
+		%EnemyFlash.visible = false
+	for child in %OptionContainer.get_children():
+		child.queue_free()
+	dialog_text.text = "This room has already been cleared."
+	var exit_btn = Button.new()
+	exit_btn.text = "Exit to Overworld"
+	exit_btn.custom_minimum_size.y = 50
+	exit_btn.pressed.connect(_exit_cleared_room)
+	%OptionContainer.add_child(exit_btn)
+
+func _exit_cleared_room():
+	if GameManager.is_battle_mode:
+		get_tree().change_scene_to_file("res://features/map/BattleMap.tscn")
+	else:
+		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+
 func _check_win_loss():
 	if is_battle_over: return
 	
 	if e_hp <= 0:
 		is_battle_over = true
 		GameManager.current_hp = p_hp
+		var xp_reward = current_enemy_res.xp_reward if current_enemy_res else 0
+		var xp_result = GameManager.add_player_xp(xp_reward)
 		GameManager.mark_room_cleared(GameManager.current_node.id)
+		if xp_result.get("leveled_up", false):
+			GameManager.level_up_return_scene = "res://features/combat/VictoryScreenBattleMode.tscn" if GameManager.is_battle_mode else "res://features/combat/VictoryScreen.tscn"
+			await get_tree().create_timer(1.5).timeout
+			if not is_inside_tree():
+				return
+			get_tree().call_deferred("change_scene_to_file", "res://features/ui/CharacterLevelUp.tscn")
+			return
 		
 		# GLOBAL ROUTING: Battle Mode vs standard World Mode
+		await get_tree().create_timer(1.5).timeout
+		if not is_inside_tree():
+			return
 		if GameManager.is_battle_mode:
 			# Experience gain logic could be added here
 			get_tree().call_deferred("change_scene_to_file", "res://features/combat/VictoryScreenBattleMode.tscn")
@@ -366,23 +664,31 @@ func _check_win_loss():
 			
 	elif p_hp <= 0:
 		is_battle_over = true
+		if death_transition_in_progress:
+			return
+		death_transition_in_progress = true
+		GameManager.current_hp = max(0, p_hp)
 		if GameManager.is_battle_mode:
-			# In battle mode, death just sends you back to map (or specific restart)
-			get_tree().call_deferred("change_scene_to_file", "res://features/map/BattleMapUI.tscn")
+			# Battle mode: show DeathScreen, then RunSummary
+			await _fade_to_black_and_change_scene("res://features/ui/DeathScreen.tscn")
 		else:
-			get_tree().call_deferred("change_scene_to_file", "res://features/ui/RunSummary.tscn")
+			# Story mode: reset run state, then show DeathScreen, then WorldMap
+			GameManager.reset_to_home()
+			GameManager.current_hp = GameManager.player_hp_total
+			GameManager.current_node = {}
+			await _fade_to_black_and_change_scene("res://features/ui/DeathScreen.tscn")
 
 
 func update_ui(instant: bool = false):
 	# Dynamic Text update
-	player_hp_text.text = "%d / %d" % [p_hp, GameManager.max_hp]
+	player_hp_text.text = "%d / %d" % [p_hp, GameManager.player_hp_total]
 	enemy_hp_text.text = "HP: %d" % e_hp
 	
 	# Dynamic Bar update with Tween
 	var duration = 0.0 if instant else 0.4
 	
 	if player_hp_bar:
-		player_hp_bar.max_value = GameManager.max_hp
+		player_hp_bar.max_value = GameManager.player_hp_total
 		create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT).tween_property(player_hp_bar, "value", p_hp, duration)
 	
 	if enemy_hp_bar:
@@ -401,18 +707,22 @@ func _flash_unit(overlay, color):
 	overlay.color = color; overlay.color.a = 0.5
 	create_tween().tween_property(overlay, "color:a", 0.0, 0.4)
 
-	
 # --- VISUAL HELPERS ---
-
 func _setup_player_spritesheet():
+	var p_path = "res://data/player/base.tres"
+	if ResourceLoader.exists(p_path):
+		current_player_res = load(p_path) as PlayerData
+	if current_player_res:
+		_apply_unit_visuals(player_sprite, current_player_res)
+		return
 	var idle_tex = load("res://assets/player/base_idle.png")
 	if idle_tex:
 		player_sprite.texture = idle_tex
-		player_sprite.hframes = 8
-		player_sprite.vframes = 1
-		# Force 2x Size (Scale 1.0 relative to previous 0.5)
+		player_sprite.hframes = 6
+		player_sprite.vframes = 6
 		player_sprite.scale = Vector2(1.0, 1.0)
-		_animate_unit(player_sprite, 8, 0.12)
+		player_sprite.offset.y = sprite_feet_offset
+		_start_unit_animation(player_sprite, 8, 0.12)
 
 func _setup_enemy_portrait():
 	var e_path = ""
@@ -432,11 +742,14 @@ func _setup_enemy_portrait():
 			max_e_hp = current_enemy_res.hp
 			e_hp = max_e_hp 
 			if enemy_sprite:
+				enemy_sprite.offset.y = sprite_feet_offset
+				enemy_sprite.flip_h = true
 				_apply_unit_visuals(enemy_sprite, current_enemy_res)
 
-func _animate_unit(sprite: Sprite2D, total: int, speed: float):
+
+func _animate_unit(sprite: Sprite2D, total: int, speed: float, anim_token: int):
 	var frame = 0; var dir = 1
-	while sprite and is_inside_tree():
+	while sprite and is_inside_tree() and int(sprite.get_meta("anim_token", -1)) == anim_token:
 		sprite.frame = frame
 		if total > 1:
 			if frame >= total - 1: dir = -1
@@ -444,25 +757,71 @@ func _animate_unit(sprite: Sprite2D, total: int, speed: float):
 			frame += dir
 		await get_tree().create_timer(speed).timeout
 
+func _start_unit_animation(sprite: Sprite2D, total: int, speed: float):
+	if not sprite:
+		return
+	var next_token = int(sprite.get_meta("anim_token", 0)) + 1
+	sprite.set_meta("anim_token", next_token)
+	_animate_unit(sprite, max(1, total), max(0.01, speed), next_token)
+
 func _apply_unit_visuals(sprite: Sprite2D, res: Resource):
 	if not sprite or not res: return
 	var sheet = res.get("idle_sheet")
 	if sheet:
-		sprite.texture = sheet
-		
-		var h = res.get("hframes")
-		sprite.hframes = h if h != null else 8
-		var v = res.get("vframes")
-		sprite.vframes = v if v != null else 1
-		
-		# Set to 2x size (1.0 scale)
-		sprite.scale = Vector2(1.0, 1.0)
-		
-		var total = res.get("total_frames")
-		var speed = res.get("frame_speed")
-		_animate_unit(sprite, total if total != null else 8, speed if speed != null else 0.1)
+		_apply_unit_sheet(sprite, res, sheet)
+		_start_unit_animation(sprite, _get_unit_total_frames(res), _get_unit_frame_speed(res))
+		_update_character_placement()
+
+func _apply_unit_sheet(sprite: Sprite2D, res: Resource, sheet: Texture2D):
+	if not sprite or not res or not sheet:
+		return
+	sprite.texture = sheet
+	var h = res.get("hframes")
+	sprite.hframes = h if h != null else 8
+	var v = res.get("vframes")
+	sprite.vframes = v if v != null else 1
+	sprite.scale = Vector2(1.0, 1.0)
+	sprite.offset.y = sprite_feet_offset
+
+func _get_unit_total_frames(res: Resource) -> int:
+	var total = res.get("total_frames")
+	return total if total != null else 8
+
+func _get_unit_frame_speed(res: Resource) -> float:
+	var speed = res.get("frame_speed")
+	return speed if speed != null else 0.1
+
+func _play_unit_sheet_temporarily(sprite: Sprite2D, res: Resource, sheet_key: String, duration: float = ACTION_ANIM_DURATION):
+	if not sprite or not res:
+		return
+	var action_sheet = res.get(sheet_key)
+	if not action_sheet:
+		return
+	_apply_unit_sheet(sprite, res, action_sheet)
+	_start_unit_animation(sprite, _get_unit_total_frames(res), _get_unit_frame_speed(res))
+	_queue_unit_idle_restore(sprite, res, duration)
+
+func _queue_unit_idle_restore(sprite: Sprite2D, res: Resource, duration: float):
+	if not sprite or not res:
+		return
+	var next_restore_token = int(sprite.get_meta("restore_token", 0)) + 1
+	sprite.set_meta("restore_token", next_restore_token)
+	_restore_unit_idle_after_delay(sprite, res, duration, next_restore_token)
+
+func _restore_unit_idle_after_delay(sprite: Sprite2D, res: Resource, duration: float, restore_token: int):
+	await get_tree().create_timer(max(0.01, duration)).timeout
+	if not is_inside_tree() or not sprite:
+		return
+	if int(sprite.get_meta("restore_token", -1)) != restore_token:
+		return
+	var idle_sheet = res.get("idle_sheet")
+	if not idle_sheet:
+		return
+	_apply_unit_sheet(sprite, res, idle_sheet)
+	_start_unit_animation(sprite, _get_unit_total_frames(res), _get_unit_frame_speed(res))
 		
 func setup_board():
+	_clear_keyboard_card_selection()
 
 	# Clear any existing tracking to prevent stale references 
 	flipped_cards.clear()
@@ -558,12 +917,109 @@ func _get_weighted_random_card_from_collection() -> String:
 	return collection.pick_random()
 
 func _apply_room_data(res: RoomData):
-	%RoomTitle.text = res.room_name
-	%DialogText.text = res.initial_dialog
-	if background and res.background_texture: background.texture = res.background_texture
+	if has_node("%RoomTitle"): %RoomTitle.text = res.room_name
+	if has_node("%DialogText"): %DialogText.text = res.initial_dialog
+	
+	# 1. Load Background
+	if background and res.background_texture: 
+		background.texture = res.background_texture
+	
+	# 2. Dynamic Floor Loading (Bottom 200px)
+	if floor_rect:
+		var biome = res.biome if res.biome != "" else "town"
+		# Adjusted path to match standard project structure
+		var floor_path = "res://assets/rooms/floor/%s_floor.png" % biome.to_lower()
+		if ResourceLoader.exists(floor_path):
+			floor_rect.texture = load(floor_path)
+			floor_rect.stretch_mode = TextureRect.STRETCH_SCALE
+			floor_rect.visible = true
+			_fit_floor_to_container_width()
+		else:
+			# Fallback if specific file is missing
+			print("[BattleScene] Floor texture missing: ", floor_path)
+			floor_rect.visible = false
+
+func _on_viewport_resized():
+	_fit_floor_to_container_width()
+	_update_character_placement()
+
+func _fit_floor_to_container_width():
+	if not floor_rect or not floor_rect.texture:
+		return
+	var view_size = get_viewport_rect().size
+	if view_size.x <= 0.0:
+		return
+	var tex_size = floor_rect.texture.get_size()
+	if tex_size.x <= 0.0:
+		return
+	var scaled_height = (view_size.x / tex_size.x) * tex_size.y
+	floor_rect.offset_top = -scaled_height
+	floor_rect.offset_bottom = 0.0
+
+
+func _update_character_placement():
+	var v_size = get_viewport_rect().size
+	var floor_mid_y = _get_floor_midline_y(v_size)
+	var edge_margin = v_size.x * side_margin_ratio
+	var player_half_w = _get_sprite_half_width(player_sprite)
+	var enemy_half_w = _get_sprite_half_width(enemy_sprite)
+	var player_half_h = _get_sprite_half_height(player_sprite)
+	var enemy_half_h = _get_sprite_half_height(enemy_sprite)
+	
+	if player_sprite: 
+		player_sprite.offset.y = sprite_feet_offset
+		player_sprite.position = Vector2(
+			edge_margin + player_half_w,
+			floor_mid_y - player_half_h - player_sprite.offset.y
+		)
+		
+	if enemy_sprite: 
+		enemy_sprite.offset.y = sprite_feet_offset
+		enemy_sprite.position = Vector2(
+			v_size.x - edge_margin - enemy_half_w,
+			floor_mid_y - enemy_half_h - enemy_sprite.offset.y
+		)
+
+func _get_sprite_half_width(sprite: Sprite2D) -> float:
+	if not sprite or not sprite.texture:
+		return 0.0
+	var frame_count = max(1, sprite.hframes)
+	var frame_width = float(sprite.texture.get_width()) / float(frame_count)
+	return (frame_width * abs(sprite.scale.x)) * 0.5
+
+func _get_sprite_half_height(sprite: Sprite2D) -> float:
+	if not sprite or not sprite.texture:
+		return 0.0
+	var frame_count = max(1, sprite.vframes)
+	var frame_height = float(sprite.texture.get_height()) / float(frame_count)
+	return (frame_height * abs(sprite.scale.y)) * 0.5
+
+func _get_floor_midline_y(view_size: Vector2) -> float:
+	if floor_rect and floor_rect.visible:
+		var floor_bounds = floor_rect.get_global_rect()
+		return floor_bounds.position.y + (floor_bounds.size.y * 0.5)
+	return view_size.y * (1.0 - ground_height_ratio)
 
 func _debug_win():
 	get_tree().call_deferred("change_scene_to_file", "res://features/combat/VictoryScreen.tscn")
 
 func _debug_lose():
 	get_tree().call_deferred("change_scene_to_file", "res://features/ui/RunSummary.tscn")
+
+func _fade_to_black_and_change_scene(scene_path: String):
+	var fade_layer = CanvasLayer.new()
+	fade_layer.layer = 100
+	add_child(fade_layer)
+	
+	var fade_rect = ColorRect.new()
+	fade_rect.color = Color(0, 0, 0, 0)
+	fade_rect.anchors_preset = Control.PRESET_FULL_RECT
+	fade_rect.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	fade_rect.grow_vertical = Control.GROW_DIRECTION_BOTH
+	fade_layer.add_child(fade_rect)
+	
+	var tween = create_tween()
+	tween.tween_property(fade_rect, "color:a", 1.0, 0.6)
+	await tween.finished
+	if is_inside_tree():
+		get_tree().change_scene_to_file(scene_path)

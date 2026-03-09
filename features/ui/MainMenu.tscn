@@ -71,7 +71,16 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(320, 60)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.8, 0.4, 1)
+theme_override_colors/font_hover_color = Color(1, 0.8, 0.4, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.8, 0.4, 1)
+theme_override_colors/font_focus_color = Color(1, 0.8, 0.4, 1)
 text = "BATTLE MODE"
+
+[node name="ModeDivider" type="ColorRect" parent="CenterContainer/VBoxContainer" unique_id=1321190042]
+custom_minimum_size = Vector2(300, 2)
+layout_mode = 2
+size_flags_horizontal = 4
+color = Color(1, 1, 1, 0.18)
 
 [node name="SettingsButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=495069224]
 unique_name_in_owner = true
@@ -151,10 +160,22 @@ custom_minimum_size = Vector2(100, 40)
 layout_mode = 2
 text = "CANCEL"
 
+[node name="SaveListBlocker" type="ColorRect" parent="." unique_id=1230045678]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+color = Color(0, 0, 0, 0.35)
+
 [node name="SaveListPopup" type="Panel" parent="." unique_id=1113500575]
 unique_name_in_owner = true
 visible = false
-custom_minimum_size = Vector2(600, 500)
+custom_minimum_size = Vector2(600, 700)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -172,6 +193,11 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/separation = 14
+
+[node name="TopPad" type="Control" parent="SaveListPopup/VBox"]
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
 
 [node name="Title" type="Label" parent="SaveListPopup/VBox" unique_id=872572816]
 layout_mode = 2
@@ -195,6 +221,10 @@ custom_minimum_size = Vector2(200, 40)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "CLOSE"
+
+[node name="BottomPad" type="Control" parent="SaveListPopup/VBox"]
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
 
 [node name="ConfirmDeletePopup" type="Panel" parent="." unique_id=1379172302]
 unique_name_in_owner = true
