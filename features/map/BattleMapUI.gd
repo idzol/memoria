@@ -22,9 +22,14 @@ var travel_dialog: ConfirmationDialog
 
 # State
 var in_game_menu = null
+var node_widgets_by_id: Dictionary = {}
+var node_base_border_color_by_id: Dictionary = {}
+var reachable_node_ids: Array[String] = []
+var selected_reachable_index: int = -1
 
 # Node dimensions from MapNode.tscn to calculate center
 const NODE_HALF_SIZE = Vector2(90, 90)
+const KEYBOARD_SELECTED_BORDER_COLOR = Color(0.05, 0.36, 0.16, 1.0)
 
 func _ready():
 	_setup_ui()
@@ -53,6 +58,21 @@ func _input(event):
 	# Toggle In-Game Menu on Escape
 	if event.is_action_pressed("ui_cancel"):
 		_toggle_in_game_menu()
+		return
+	
+	if event.is_echo():
+		return
+	if in_game_menu and in_game_menu.visible:
+		return
+	if travel_dialog and travel_dialog.visible:
+		return
+	
+	if event.is_action_pressed("ui_up"):
+		_move_selection(-1)
+	elif event.is_action_pressed("ui_down"):
+		_move_selection(1)
+	elif event.is_action_pressed("ui_accept"):
+		_activate_selected_node()
 
 
 func _setup_ui():
@@ -85,6 +105,8 @@ func _draw_map():
 	# Clear previous instances
 	for n in node_container.get_children(): n.queue_free()
 	for l in lines_container.get_children(): l.queue_free()
+	node_widgets_by_id.clear()
+	node_base_border_color_by_id.clear()
 	
 	var map = GameManager.run_map
 	var p_pos = GameManager.player_grid_pos
@@ -99,6 +121,7 @@ func _draw_map():
 	
 	for id in map:
 		var data = map[id]
+		var id_key = str(id)
 		var layer_diff = p_pos.x - data.layer
 		
 		# Visibility Check for the source node
@@ -115,6 +138,10 @@ func _draw_map():
 		var is_cleared = GameManager.world_state.rooms.has(id) and GameManager.world_state.rooms[id].cleared
 		
 		node_ui.setup_biome_node(data, null, is_cleared, is_player_here, true, is_reachable)
+		node_widgets_by_id[id_key] = node_ui
+		var border = node_ui.get_node_or_null("%Border")
+		if border:
+			node_base_border_color_by_id[id_key] = border.modulate
 		
 		# Apply Progressive Shadows
 		if layer_diff == 1:
@@ -135,6 +162,100 @@ func _draw_map():
 				var target_diff = p_pos.x - target.layer
 				if layer_diff < 2 and target_diff <= 4 and target_diff >= -2:
 					_draw_hand_drawn_dotted_line(node_ui.position + NODE_HALF_SIZE, Vector2(target.layer * 280 + 200, target.column * 200 + 300) + NODE_HALF_SIZE)
+	
+	_rebuild_keyboard_targets()
+	_refresh_keyboard_selection_highlight()
+
+func _rebuild_keyboard_targets():
+	reachable_node_ids.clear()
+	selected_reachable_index = -1
+	
+	var map = GameManager.run_map
+	var current_id = _find_current_node_id()
+	if current_id == "":
+		return
+	if not map.has(current_id):
+		return
+	
+	var current_data = map[current_id]
+	for raw_target_id in current_data.get("connections", []):
+		var target_id = _resolve_map_key(raw_target_id)
+		if target_id == "":
+			continue
+		var target = map[target_id]
+		if int(target.layer) == GameManager.player_grid_pos.x + 1:
+			reachable_node_ids.append(target_id)
+	
+	# Fallback for linear layouts with missing connection metadata.
+	if reachable_node_ids.is_empty():
+		for id in map:
+			var id_key = str(id)
+			var data = map[id]
+			if int(data.layer) == GameManager.player_grid_pos.x + 1:
+				reachable_node_ids.append(id_key)
+	
+	reachable_node_ids.sort_custom(func(a, b):
+		return int(map[a].column) < int(map[b].column)
+	)
+	if not reachable_node_ids.is_empty():
+		selected_reachable_index = 0
+
+func _find_current_node_id() -> String:
+	var p_pos = GameManager.player_grid_pos
+	for id in GameManager.run_map:
+		var data = GameManager.run_map[id]
+		if int(data.layer) == p_pos.x and int(data.column) == p_pos.y:
+			return str(id)
+	return ""
+
+func _resolve_map_key(raw_key) -> String:
+	if GameManager.run_map.has(raw_key):
+		return str(raw_key)
+	var as_string = str(raw_key)
+	if GameManager.run_map.has(as_string):
+		return as_string
+	return ""
+
+func _move_selection(step: int):
+	if reachable_node_ids.is_empty():
+		return
+	selected_reachable_index = posmod(selected_reachable_index + step, reachable_node_ids.size())
+	_refresh_keyboard_selection_highlight()
+
+func _activate_selected_node():
+	if reachable_node_ids.is_empty():
+		return
+	if selected_reachable_index < 0 or selected_reachable_index >= reachable_node_ids.size():
+		return
+	var selected_id = reachable_node_ids[selected_reachable_index]
+	if not GameManager.run_map.has(selected_id):
+		return
+	_on_node_clicked(GameManager.run_map[selected_id])
+
+func _refresh_keyboard_selection_highlight():
+	for id_key in node_widgets_by_id.keys():
+		var node_ui = node_widgets_by_id[id_key]
+		if not is_instance_valid(node_ui):
+			continue
+		var border = node_ui.get_node_or_null("%Border")
+		if not border:
+			continue
+		var base_color = node_base_border_color_by_id.get(id_key, border.modulate)
+		border.modulate = base_color
+	
+	if reachable_node_ids.is_empty():
+		return
+	if selected_reachable_index < 0 or selected_reachable_index >= reachable_node_ids.size():
+		return
+	var selected_id = reachable_node_ids[selected_reachable_index]
+	if not node_widgets_by_id.has(selected_id):
+		return
+	var selected_node = node_widgets_by_id[selected_id]
+	if not is_instance_valid(selected_node):
+		return
+	var selected_border = selected_node.get_node_or_null("%Border")
+	if selected_border:
+		selected_border.modulate = KEYBOARD_SELECTED_BORDER_COLOR
 
 
 func _draw_hand_drawn_dotted_line(p1: Vector2, p2: Vector2):
@@ -183,6 +304,13 @@ func _draw_line(p1: Vector2, p2: Vector2, layer_diff: int):
 	lines_container.add_child(line)
 
 func _on_node_clicked(data: Dictionary):
+	var clicked_id = str(data.get("id", ""))
+	if clicked_id != "":
+		var idx = reachable_node_ids.find(clicked_id)
+		if idx != -1:
+			selected_reachable_index = idx
+			_refresh_keyboard_selection_highlight()
+	
 	var p_pos = GameManager.player_grid_pos
 	if data.layer == p_pos.x and data.column == p_pos.y:
 		_enter_room(data)

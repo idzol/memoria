@@ -63,11 +63,16 @@ var max_e_hp: int = 1
 
 var p_atk: int = 0 # Base attack
 var p_def: int = 0 # Base defense
+var temp_armor_bonus: int = 0 # Temporary defense from matched armor cards
 var round_number: int = 1
+var keyboard_selected_card_index: int = -1
+var keyboard_selection_active: bool = false
+var card_selection_style: StyleBoxFlat
 
 var active_status_effects = {"player": [], "enemy": []} # e.g. ["vulnerable", "charged"]
 const ENERGY_PIP_FULL = Color(1.0, 0.86, 0.35, 1.0)
 const ENERGY_PIP_EMPTY = Color(0.46, 0.35, 0.08, 1.0)
+const CARD_SELECTION_OUTLINE = "KeyboardCardSelectionOutline"
 const ENERGY_PIP_CHAR = "▮"
 
 func _ready():
@@ -109,13 +114,44 @@ func _ready():
 	# Initial UI Sync
 	_sync_status_bar()
 	update_ui()
+	_setup_card_selection_style()
 	_update_character_placement()
 	get_viewport().size_changed.connect(_update_character_placement)
 
 func _input(event):
-	# Toggle In-Game Menu on Escape (ui_cancel)
+	# Escape: close active menu layer, otherwise exit to overworld map.
 	if event.is_action_pressed("ui_cancel"):
-		_toggle_in_game_menu()
+		if _handle_menu_cancel():
+			return
+		_exit_to_overworld_from_battle()
+		return
+
+	# Dialog overlay: Enter accepts the primary option (e.g. "Enter Combat").
+	if dialog_overlay and dialog_overlay.visible and event.is_action_pressed("ui_accept"):
+		_activate_dialog_primary_option()
+		return
+
+	if _can_handle_keyboard_card_input():
+		if event.is_action_pressed("ui_left"):
+			_move_keyboard_card_selection(-1)
+			return
+		if event.is_action_pressed("ui_right"):
+			_move_keyboard_card_selection(1)
+			return
+		if event.is_action_pressed("ui_up"):
+			_move_keyboard_card_selection(-grid.columns)
+			return
+		if event.is_action_pressed("ui_down"):
+			_move_keyboard_card_selection(grid.columns)
+			return
+		if event.is_action_pressed("ui_accept"):
+			_activate_keyboard_selected_card()
+			return
+
+	if event is InputEventKey and event.pressed and not event.is_echo():
+		_clear_keyboard_card_selection()
+	elif event is InputEventMouseButton and event.pressed:
+		_clear_keyboard_card_selection()
 
 	if OS.is_debug_build() and event is InputEventKey and event.pressed:
 		# PRESS 'B' TO TOGGLE BACKGROUND (Debugging hidden elements)
@@ -133,12 +169,137 @@ func _toggle_in_game_menu():
 			in_game_menu.close()
 		else:
 			in_game_menu.open()
+			_clear_keyboard_card_selection()
+
+func _handle_menu_cancel() -> bool:
+	if not in_game_menu or not in_game_menu.visible:
+		return false
+	if in_game_menu.has_method("handle_cancel"):
+		return in_game_menu.handle_cancel()
+	in_game_menu.close()
+	return true
+
+func _exit_to_overworld_from_battle():
+	if GameManager.is_battle_mode:
+		get_tree().change_scene_to_file("res://features/map/BattleMap.tscn")
+	else:
+		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+
+func _setup_card_selection_style():
+	if card_selection_style:
+		return
+	card_selection_style = StyleBoxFlat.new()
+	card_selection_style.draw_center = false
+	card_selection_style.border_width_left = 4
+	card_selection_style.border_width_top = 4
+	card_selection_style.border_width_right = 4
+	card_selection_style.border_width_bottom = 4
+	card_selection_style.border_color = Color(0.05, 0.36, 0.16, 1.0)
+
+func _can_handle_keyboard_card_input() -> bool:
+	if is_battle_over or not can_flip:
+		return false
+	if not battle_ui or not battle_ui.visible:
+		return false
+	if in_game_menu and in_game_menu.visible:
+		return false
+	if dialog_overlay and dialog_overlay.visible:
+		return false
+	return true
+
+func _move_keyboard_card_selection(step: int):
+	var cards = _get_grid_cards()
+	if cards.is_empty():
+		_clear_keyboard_card_selection()
+		return
+	var child_count = cards.size()
+	var start_idx = keyboard_selected_card_index if keyboard_selected_card_index >= 0 else _find_first_navigable_card_index(cards)
+	if start_idx == -1:
+		_clear_keyboard_card_selection()
+		return
+	var next_idx = start_idx
+	var safety = 0
+	while safety < child_count:
+		next_idx = posmod(next_idx + step, child_count)
+		var card = cards[next_idx]
+		if _is_navigable_card(card):
+			keyboard_selected_card_index = next_idx
+			keyboard_selection_active = true
+			_refresh_keyboard_card_outline()
+			return
+		safety += 1
+
+func _activate_keyboard_selected_card():
+	var cards = _get_grid_cards()
+	if cards.is_empty():
+		_clear_keyboard_card_selection()
+		return
+	if keyboard_selected_card_index < 0 or keyboard_selected_card_index >= cards.size():
+		return
+	var card = cards[keyboard_selected_card_index]
+	if not _is_navigable_card(card):
+		return
+	card.flip()
+	_clear_keyboard_card_selection()
+
+func _clear_keyboard_card_selection():
+	keyboard_selection_active = false
+	keyboard_selected_card_index = -1
+	_refresh_keyboard_card_outline()
+
+func _refresh_keyboard_card_outline():
+	var cards = _get_grid_cards()
+	for card in cards:
+		if not is_instance_valid(card):
+			continue
+		var existing = card.get_node_or_null(CARD_SELECTION_OUTLINE)
+		if existing:
+			existing.queue_free()
+	if not keyboard_selection_active:
+		return
+	if keyboard_selected_card_index < 0 or keyboard_selected_card_index >= cards.size():
+		return
+	var selected_card = cards[keyboard_selected_card_index]
+	if not is_instance_valid(selected_card):
+		return
+	var outline = Panel.new()
+	outline.name = CARD_SELECTION_OUTLINE
+	outline.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	outline.anchors_preset = Control.PRESET_FULL_RECT
+	outline.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	outline.grow_vertical = Control.GROW_DIRECTION_BOTH
+	outline.add_theme_stylebox_override("panel", card_selection_style)
+	selected_card.add_child(outline)
+
+func _activate_dialog_primary_option():
+	if not has_node("%OptionContainer"):
+		return
+	for child in %OptionContainer.get_children():
+		if child is Button and child.visible and not child.disabled:
+			(child as Button).pressed.emit()
+			return
+
+func _get_grid_cards() -> Array:
+	var result: Array = []
+	for child in grid.get_children():
+		if child is TextureButton:
+			result.append(child)
+	return result
+
+func _find_first_navigable_card_index(cards: Array) -> int:
+	for i in range(cards.size()):
+		if _is_navigable_card(cards[i]):
+			return i
+	return -1
+
+func _is_navigable_card(card) -> bool:
+	return is_instance_valid(card) and not card.disabled and not card.is_matched and not card.is_face_up
 
 
 func _sync_stat_icons():
 	# Sync Player Icons
 	if player_atk_val: player_atk_val.text = str(p_atk)
-	if player_def_val: player_def_val.text = str(p_def)
+	if player_def_val: player_def_val.text = str(p_def + temp_armor_bonus)
 	
 	# Sync Enemy Icons
 	if current_enemy_res:
@@ -177,6 +338,7 @@ func _sync_status_bar():
 
 # --- INPUT & FLOW ---
 func _on_card_flipped(card):
+	_clear_keyboard_card_selection()
 	if is_battle_over or not can_flip:
 		if is_instance_valid(card) and card.is_face_up and not card.is_matched:
 			card.flip_back()
@@ -301,9 +463,13 @@ func _process_combat_action(card_id: String):
 			SignalBus.sfx_triggered.emit(AudioData.SFX["SWORD"])
 
 		elif res.type == "trap":
-			var trap_dmg = res.value
+			var trap_dmg = max(1, int(res.value) - (p_def + temp_armor_bonus))
 			p_hp = max(0, p_hp - trap_dmg)
-			add_log("Matched %s: Took %d damage." % [res.name, res.value])
+			add_log("Matched %s: Took %d damage." % [res.name, trap_dmg])
+			if temp_armor_bonus > 0:
+				add_log("Armor bonus breaks after the hit.")
+				temp_armor_bonus = 0
+				_sync_stat_icons()
 			_flash_unit(%PlayerFlash, Color.ORANGE_RED)
 			SignalBus.battle_intensity_changed.emit(0.5)
 			SignalBus.sfx_triggered.emit(AudioData.SFX["TRAP"])
@@ -315,9 +481,12 @@ func _process_combat_action(card_id: String):
 			SignalBus.battle_intensity_changed.emit(0.5)
 			SignalBus.sfx_triggered.emit(AudioData.SFX["HEAL"])
 
-		# Block 
-		# SignalBus.battle_intensity_changed.emit(0.5)
-		# SignalBus.sfx_triggered.emit(AudioData.SFX["SHIELD"])
+		elif res.type == "armor":
+			temp_armor_bonus += int(res.value)
+			add_log("Matched %s: +%d armor for the next hit." % [res.name, int(res.value)])
+			_flash_unit(%PlayerFlash, Color.GOLD)
+			SignalBus.battle_intensity_changed.emit(0.5)
+			SignalBus.sfx_triggered.emit(AudioData.SFX["SHIELD"])
 
 func _calculate_final_damage(card_val: int, type: String, attacker: String, defender: String) -> int:
 	var total = card_val
@@ -338,7 +507,7 @@ func _calculate_final_damage(card_val: int, type: String, attacker: String, defe
 		total -= (arm if type == "physical" else res)
 	else:
 		# Player defense
-		total -= p_def 
+		total -= (p_def + temp_armor_bonus)
 		
 	# C. Status Effect Multipliers
 	if active_status_effects[defender].has("vulnerable"):
@@ -352,9 +521,14 @@ func _calculate_final_damage(card_val: int, type: String, attacker: String, defe
 func _enemy_turn():
 	# Simple enemy attack using the same formula logic
 	var base_dmg = current_enemy_res.base_damage
-	var final_dmg = _calculate_final_damage(base_dmg, "physical", "enemy", "player")
+	# Pass 0 here because _calculate_final_damage already injects enemy base attack.
+	var final_dmg = _calculate_final_damage(0, "physical", "enemy", "player")
 	p_hp -= final_dmg
 	add_log("Enemy strikes for %d damage." % final_dmg)
+	if temp_armor_bonus > 0:
+		add_log("Armor bonus breaks after the hit.")
+		temp_armor_bonus = 0
+		_sync_stat_icons()
 	_flash_unit(%PlayerFlash, Color.CRIMSON)
 
 # --- BOARD MANAGEMENT ---
@@ -382,6 +556,7 @@ func _should_reshuffle() -> bool:
 	return true
 
 func _trigger_reshuffle():
+	_clear_keyboard_card_selection()
 	can_flip = false
 	_toggle_grid_interaction(false)
 	add_log("The path is blocked. Shuffling memories...")
@@ -438,10 +613,16 @@ func _check_win_loss():
 		GameManager.mark_room_cleared(GameManager.current_node.id)
 		if xp_result.get("leveled_up", false):
 			GameManager.level_up_return_scene = "res://features/combat/VictoryScreenBattleMode.tscn" if GameManager.is_battle_mode else "res://features/combat/VictoryScreen.tscn"
+			await get_tree().create_timer(1.5).timeout
+			if not is_inside_tree():
+				return
 			get_tree().call_deferred("change_scene_to_file", "res://features/ui/CharacterLevelUp.tscn")
 			return
 		
 		# GLOBAL ROUTING: Battle Mode vs standard World Mode
+		await get_tree().create_timer(1.5).timeout
+		if not is_inside_tree():
+			return
 		if GameManager.is_battle_mode:
 			# Experience gain logic could be added here
 			get_tree().call_deferred("change_scene_to_file", "res://features/combat/VictoryScreenBattleMode.tscn")
@@ -450,11 +631,16 @@ func _check_win_loss():
 			
 	elif p_hp <= 0:
 		is_battle_over = true
+		GameManager.current_hp = max(0, p_hp)
 		if GameManager.is_battle_mode:
-			# In battle mode, death just sends you back to map (or specific restart)
-			get_tree().call_deferred("change_scene_to_file", "res://features/map/BattleMapUI.tscn")
+			# Battle mode: show DeathScreen, then RunSummary
+			get_tree().call_deferred("change_scene_to_file", "res://features/ui/DeathScreen.tscn")
 		else:
-			get_tree().call_deferred("change_scene_to_file", "res://features/ui/RunSummary.tscn")
+			# Story mode: reset run state, then show DeathScreen, then WorldMap
+			GameManager.reset_to_home()
+			GameManager.current_hp = GameManager.player_hp_total
+			GameManager.current_node = {}
+			get_tree().call_deferred("change_scene_to_file", "res://features/ui/DeathScreen.tscn")
 
 
 func update_ui(instant: bool = false):
@@ -549,6 +735,7 @@ func _apply_unit_visuals(sprite: Sprite2D, res: Resource):
 		_update_character_placement()
 		
 func setup_board():
+	_clear_keyboard_card_selection()
 
 	# Clear any existing tracking to prevent stale references 
 	flipped_cards.clear()

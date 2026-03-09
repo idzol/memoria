@@ -36,11 +36,17 @@ func _ready():
 
 func _input(event):
 	if event.is_action_pressed("ui_cancel"):
-		if in_game_menu:
-			if in_game_menu.visible:
-				in_game_menu.close()
-			else:
-				in_game_menu.open()
+		if _handle_menu_cancel():
+			return
+		_on_exit_pressed()
+
+func _handle_menu_cancel() -> bool:
+	if not in_game_menu or not in_game_menu.visible:
+		return false
+	if in_game_menu.has_method("handle_cancel"):
+		return in_game_menu.handle_cancel()
+	in_game_menu.close()
+	return true
 
 func _load_encounter_data():
 	var node = GameManager.current_node

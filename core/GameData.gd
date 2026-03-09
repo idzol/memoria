@@ -9,34 +9,34 @@ extends Node
 # Defines stat blocks for 8 levels per class with exaggerated archetypes.
 const CLASS_STATS = {
 	"warrior": [
-		{"max_hp": 25, "energy": 2, "player_attack": 5, "player_defense": 3}, # Lv 1: Brute start
+		{"max_hp": 20, "energy": 2, "player_attack": 5, "player_defense": 3}, # Lv 1: Brute start
 		{"max_hp": 40, "energy": 2, "player_attack": 8, "player_defense": 5}, # Lv 2
-		{"max_hp": 65, "energy": 3, "player_attack": 12, "player_defense": 8}, # Lv 3
-		{"max_hp": 100, "energy": 3, "player_attack": 18, "player_defense": 12}, # Lv 4
-		{"max_hp": 150, "energy": 3, "player_attack": 25, "player_defense": 18}, # Lv 5
-		{"max_hp": 220, "energy": 4, "player_attack": 35, "player_defense": 25},# Lv 6
-		{"max_hp": 300, "energy": 4, "player_attack": 50, "player_defense": 35},# Lv 7
-		{"max_hp": 450, "energy": 4, "player_attack": 80, "player_defense": 60} # Lv 8: Unstoppable Force
+		{"max_hp": 65, "energy": 2, "player_attack": 12, "player_defense": 8}, # Lv 3
+		{"max_hp": 100, "energy": 2, "player_attack": 18, "player_defense": 12}, # Lv 4
+		{"max_hp": 150, "energy": 2, "player_attack": 25, "player_defense": 18}, # Lv 5
+		{"max_hp": 220, "energy": 3, "player_attack": 35, "player_defense": 25},# Lv 6
+		{"max_hp": 300, "energy": 3, "player_attack": 50, "player_defense": 35},# Lv 7
+		{"max_hp": 450, "energy": 3, "player_attack": 80, "player_defense": 60} # Lv 8: Unstoppable Force
 	],
 	"scholar": [
-		{"max_hp": 10, "energy": 4, "player_attack": 1, "player_defense": 0},  # Lv 1: Very Fragile
-		{"max_hp": 14, "energy": 5, "player_attack": 2, "player_defense": 0},  # Lv 2
-		{"max_hp": 20, "energy": 6, "player_attack": 3, "player_defense": 1},  # Lv 3
-		{"max_hp": 28, "energy": 8, "player_attack": 5, "player_defense": 1},  # Lv 4: Energy Surge
-		{"max_hp": 38, "energy": 10, "player_attack": 7, "player_defense": 2}, # Lv 5
-		{"max_hp": 50, "energy": 12, "player_attack": 10, "player_defense": 2},# Lv 6
-		{"max_hp": 65, "energy": 15, "player_attack": 15, "player_defense": 3},# Lv 7
-		{"max_hp": 85, "energy": 20, "player_attack": 25, "player_defense": 5} # Lv 8: Infinite Casting
+		{"max_hp": 10, "energy": 2, "player_attack": 1, "player_defense": 0},  # Lv 1: Very Fragile
+		{"max_hp": 14, "energy": 2, "player_attack": 2, "player_defense": 0},  # Lv 2
+		{"max_hp": 20, "energy": 2, "player_attack": 3, "player_defense": 1},  # Lv 3
+		{"max_hp": 28, "energy": 3, "player_attack": 5, "player_defense": 1},  # Lv 4: Energy Surge
+		{"max_hp": 38, "energy": 3, "player_attack": 7, "player_defense": 2}, # Lv 5
+		{"max_hp": 50, "energy": 3, "player_attack": 10, "player_defense": 2},# Lv 6
+		{"max_hp": 65, "energy": 3, "player_attack": 15, "player_defense": 3},# Lv 7
+		{"max_hp": 85, "energy": 4, "player_attack": 25, "player_defense": 5} # Lv 8: Infinite Casting
 	],
 	"alchemist": [
-		{"max_hp": 18, "energy": 3, "player_attack": 3, "player_defense": 1}, # Lv 1: Balanced
-		{"max_hp": 28, "energy": 3, "player_attack": 5, "player_defense": 2}, # Lv 2
-		{"max_hp": 42, "energy": 4, "player_attack": 8, "player_defense": 3}, # Lv 3
-		{"max_hp": 60, "energy": 5, "player_attack": 12, "player_defense": 5}, # Lv 4
-		{"max_hp": 85, "energy": 6, "player_attack": 18, "player_defense": 8}, # Lv 5
-		{"max_hp": 115, "energy": 7, "player_attack": 25, "player_defense": 12},# Lv 6
-		{"max_hp": 150, "energy": 8, "player_attack": 35, "player_defense": 18},# Lv 7
-		{"max_hp": 200, "energy": 10, "player_attack": 50, "player_defense": 25} # Lv 8: Master of All
+		{"max_hp": 18, "energy": 2, "player_attack": 3, "player_defense": 1}, # Lv 1: Balanced
+		{"max_hp": 28, "energy": 2, "player_attack": 5, "player_defense": 2}, # Lv 2
+		{"max_hp": 42, "energy": 2, "player_attack": 8, "player_defense": 3}, # Lv 3
+		{"max_hp": 60, "energy": 2, "player_attack": 12, "player_defense": 5}, # Lv 4
+		{"max_hp": 85, "energy": 3, "player_attack": 18, "player_defense": 8}, # Lv 5
+		{"max_hp": 115, "energy": 3, "player_attack": 25, "player_defense": 12},# Lv 6
+		{"max_hp": 150, "energy": 3, "player_attack": 35, "player_defense": 18},# Lv 7
+		{"max_hp": 200, "energy": 3, "player_attack": 50, "player_defense": 25} # Lv 8: Master of All
 	]
 }
 

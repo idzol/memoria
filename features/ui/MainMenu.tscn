@@ -73,6 +73,12 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.8, 0.4, 1)
 text = "BATTLE MODE"
 
+[node name="ModeDivider" type="ColorRect" parent="CenterContainer/VBoxContainer" unique_id=1321190042]
+custom_minimum_size = Vector2(300, 2)
+layout_mode = 2
+size_flags_horizontal = 4
+color = Color(1, 1, 1, 0.18)
+
 [node name="SettingsButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=495069224]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 50)

@@ -4,8 +4,8 @@ extends Control
 # Handles character progression, stat calculation, and dual-tab management.
 # Updated: Dynamic level-based requirements for deck and items.
 
-const CardData = preload("res://data/resources/CardData.gd")
-const ItemData = preload("res://data/resources/ItemData.gd")
+# const CardData = preload("res://data/resources/CardData.gd")
+# const ItemData = preload("res://data/resources/ItemData.gd")
 const CardScene = preload("res://features/combat/Card.tscn")
 
 @onready var deck_grid = %DeckGrid

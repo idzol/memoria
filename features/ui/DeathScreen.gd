@@ -4,30 +4,30 @@ extends Control
 
 @onready var wake_up_button = %WakeUpButton
 @onready var anim_player = %AnimationPlayer
+@onready var death_background = %DeathBackground
 
 func _ready():
 	# Ensure the cursor is visible and interaction is enabled
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	_apply_random_background()
 	
 	if wake_up_button:
 		wake_up_button.pressed.connect(_on_wake_up_pressed)
 
+func _apply_random_background():
+	if not death_background:
+		return
+	randomize()
+	var n = randi_range(1, 3)
+	var path = "res://assets/ui/end_day_%d.png" % n
+	if ResourceLoader.exists(path):
+		death_background.texture = load(path)
+
 func _on_wake_up_pressed():
-	# 1. Restore Player Health to Maximum
-	# Accessing GameManager via Autoload
-	GameManager.current_hp = GameManager.max_hp
-	
-	# 2. Reset progress for the "Day" (Resetting current floor/nodes)
-	# This simulates starting back at the 'village' or start of the map
-	GameManager.completed_nodes = []
-	GameManager.player_level = 1
-	# Resetting current location to the starting "Home" node (ID 0)
-	GameManager.current_node_id = 0
-	
-	# 3. Save the state so the player doesn't lose persistent progress
+	# Save the latest death-state updates before transitioning.
 	SaveManager.save_mid_run_state()
 	
-	# 4. Fade out and return to the map using a robust transition
+	# Fade out and route by game mode.
 	_fade_and_exit()
 
 func _fade_and_exit():
@@ -36,4 +36,7 @@ func _fade_and_exit():
 	
 	# Using await instead of a lambda prevents common "Expected end of file" parser errors
 	await tween.finished
-	get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+	if GameManager.is_battle_mode:
+		get_tree().change_scene_to_file("res://features/ui/RunSummary.tscn")
+	else:
+		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
