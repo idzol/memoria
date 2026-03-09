@@ -7,6 +7,11 @@ extends Control
 @onready var continue_button = %ContinueButton
 
 func _ready():
+	var xp_lbl = Label.new()
+	xp_lbl.text = "XP Gained: %d" % GameManager.last_xp_gained
+	xp_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	loot_container.add_child(xp_lbl)
+
 	# Display only the loot from the most recent battle
 	for item in GameManager.pending_loot:
 		var lbl = Label.new()

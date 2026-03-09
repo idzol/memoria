@@ -11,26 +11,35 @@ OpenAI Codex
 PROMPT 
 ===
 
-update town 
+floor -> allow unique floor for each background, otherwise default for the biome (eg
+
+===
 
 
-Based on the github repostiorty .notes/SUMMARY.md, create a new feature 
-{in /features/combat that inherits from BaseCombatEntity.}
+===
+
+refactor room scenes (eventscene, battlescene, lorescene) into a single scene 
+
+if enemy | combat, load combat board 
+if npc, load dialog board 
+if treasure, load treasure board 
+if completed | empty, load empty room 
+
+===
+
+* battlescene: sprite positioning 
+* gamemanager: check for xp level up  
+* characterlevelup: character xp level up
+* eventscene: settings menu 
+
+
+on updating GameManager.player_xp, check for player level up event. check whether player_xp exceeds GameData.XP_THRESHOLDS for the current level (get_max_xp_for_level). update characterscreen to use xp from GameData.XP_THRESHOLDS
+
+create new "character level up" scene that shows current stats and new stats after level up from GameData.CLASS_STATS. position current level on the left, and new stats on the right. add icons for hp, energy, attack, defense.  
 
 ===
 battle scene - map 
-	track in gamemanager the status of a room, update if it has been "cleared" (ie. enemies defeated)   
-	if player re-enters the same room, check if the room has been cleared 
-	if cleared load the same room background without the enemy / battlescene 
-	load as a standard room (eventscene) without enemy, with "exit to overworld" button  
-
-player xp
-	add to player total on death 
-
-battle scene - map 
 	remove duplciates (eg. pickpocket) 
-
-
 	
 asset cleanup 
 	enemies 

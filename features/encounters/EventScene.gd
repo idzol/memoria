@@ -18,14 +18,29 @@ extends Control
 @onready var npc_sprite = %NPCSprite
 @onready var exit_button = %ExitButton
 
+var in_game_menu_scene = preload("res://features/ui/InGameMenu.tscn")
+var in_game_menu = null
 var current_room_res: RoomData = null
 var current_npc_res: NPCData = null
 
 func _ready():
+	if in_game_menu_scene:
+		in_game_menu = in_game_menu_scene.instantiate()
+		add_child(in_game_menu)
+		in_game_menu.hide()
+
 	exit_button.pressed.connect(_on_exit_pressed)
 	_load_encounter_data()
 	_update_character_placement()
 	get_viewport().size_changed.connect(_update_character_placement)
+
+func _input(event):
+	if event.is_action_pressed("ui_cancel"):
+		if in_game_menu:
+			if in_game_menu.visible:
+				in_game_menu.close()
+			else:
+				in_game_menu.open()
 
 func _load_encounter_data():
 	var node = GameManager.current_node

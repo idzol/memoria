@@ -54,7 +54,7 @@ func _on_confirm_yes():
 		SaveManager.save_mid_run_state()
 		_exit_to_menu()
 	elif current_state == State.CONFIRM_ABANDON:
-		_exit_to_menu()
+		_exit_to_run_summary()
 
 func _on_confirm_no():
 	current_state = State.IDLE
@@ -64,3 +64,7 @@ func _on_confirm_no():
 func _exit_to_menu():
 	get_tree().paused = false
 	get_tree().change_scene_to_file("res://features/ui/MainMenu.tscn")
+
+func _exit_to_run_summary():
+	get_tree().paused = false
+	get_tree().change_scene_to_file("res://features/ui/RunSummary.tscn")

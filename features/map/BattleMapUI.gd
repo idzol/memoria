@@ -211,6 +211,7 @@ func _on_node_clicked(data: Dictionary):
 
 func _enter_room(data: Dictionary):
 	GameManager.current_node = data
+	SignalBus.node_selected.emit(data)
 	match data.type:
 		"battle": get_tree().change_scene_to_file("res://features/combat/BattleScene.tscn")
 		"treasure": get_tree().change_scene_to_file("res://features/encounters/TreasureScene.tscn")

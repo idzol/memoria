@@ -53,7 +53,7 @@ func _update_stats_ui():
 	hp_text.text = "%d / %d" % [GameManager.current_hp, total_max_hp]
 	
 	# 4. Memory (Experience)
-	var max_xp = GameManager.player_level * 100 
+	var max_xp = GameData.get_max_xp_for_level(GameManager.player_level)
 	xp_bar.max_value = max_xp
 	xp_bar.value = GameManager.player_xp
 	xp_text.text = "%d / %d" % [GameManager.player_xp, max_xp]

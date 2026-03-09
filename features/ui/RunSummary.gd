@@ -57,11 +57,11 @@ func _setup_summary():
 
 func _on_exit_pressed():
 	if GameManager.is_battle_mode:
-		# Return to Menu
-		get_tree().change_scene_to_file("res://scenes/ui/MainMenu.tscn")
+		# Battle mode: return to Main Menu
+		get_tree().change_scene_to_file("res://features/ui/MainMenu.tscn")
 	else:
-		# Return to Overworld and Reset to Home
-		GameManager.player_grid_pos = Vector2i(2, 0) # Reset to home coord
-		GameManager.current_hp = GameManager.max_hp # Partial restore for next attempt
+		# Story mode: return to world map UI at home with full health
+		GameManager.reset_to_home()
+		GameManager.current_hp = GameManager.max_hp
 		SaveManager.save_mid_run_state()
 		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")

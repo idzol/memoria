@@ -54,6 +54,7 @@ var difficulty: int = 0
 var current_room_res: RoomData = null
 var current_enemy_res: EnemyData = null
 var in_game_menu = null
+var is_cleared_room: bool = false
 
 # Current Stats for Calculation
 var p_hp: int = 1
@@ -69,6 +70,7 @@ var active_status_effects = {"player": [], "enemy": []} # e.g. ["vulnerable", "c
 func _ready():
 	var node_data = GameManager.current_node
 	difficulty = node_data["difficulty"] if "difficulty" in node_data else 1
+	is_cleared_room = GameManager.is_room_cleared(str(node_data.get("id", "")))
 
 	p_hp = GameManager.current_hp
 	p_atk = GameManager.base_attack
@@ -89,8 +91,11 @@ func _ready():
 	# if has_node("%DebugLoseBtn"): %DebugLoseBtn.pressed.connect(_debug_lose)
 
 	_setup_player_spritesheet()
-	_setup_enemy_portrait()
-	_init_encounter()
+	if is_cleared_room:
+		_setup_cleared_room_view()
+	else:
+		_setup_enemy_portrait()
+		_init_encounter()
 	
 	# Music 
 	SignalBus.music_change_requested.emit(AudioData.TRACKS["BATTLE_STANDARD"], 1.0)
@@ -373,13 +378,41 @@ func _init_encounter():
 	)
 	%OptionContainer.add_child(btn)
 
+func _setup_cleared_room_view():
+	battle_ui.hide()
+	dialog_overlay.show()
+	if enemy_sprite:
+		enemy_sprite.visible = false
+	if has_node("%EnemyFlash"):
+		%EnemyFlash.visible = false
+	for child in %OptionContainer.get_children():
+		child.queue_free()
+	dialog_text.text = "This room has already been cleared."
+	var exit_btn = Button.new()
+	exit_btn.text = "Exit to Overworld"
+	exit_btn.custom_minimum_size.y = 50
+	exit_btn.pressed.connect(_exit_cleared_room)
+	%OptionContainer.add_child(exit_btn)
+
+func _exit_cleared_room():
+	if GameManager.is_battle_mode:
+		get_tree().change_scene_to_file("res://features/map/BattleMap.tscn")
+	else:
+		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+
 func _check_win_loss():
 	if is_battle_over: return
 	
 	if e_hp <= 0:
 		is_battle_over = true
 		GameManager.current_hp = p_hp
+		var xp_reward = current_enemy_res.xp_reward if current_enemy_res else 0
+		var xp_result = GameManager.add_player_xp(xp_reward)
 		GameManager.mark_room_cleared(GameManager.current_node.id)
+		if xp_result.get("leveled_up", false):
+			GameManager.level_up_return_scene = "res://features/combat/VictoryScreenBattleMode.tscn" if GameManager.is_battle_mode else "res://features/combat/VictoryScreen.tscn"
+			get_tree().call_deferred("change_scene_to_file", "res://features/ui/CharacterLevelUp.tscn")
+			return
 		
 		# GLOBAL ROUTING: Battle Mode vs standard World Mode
 		if GameManager.is_battle_mode:
@@ -455,6 +488,7 @@ func _setup_enemy_portrait():
 			e_hp = max_e_hp 
 			if enemy_sprite:
 				enemy_sprite.offset.y = sprite_feet_offset
+				enemy_sprite.flip_h = true
 				_apply_unit_visuals(enemy_sprite, current_enemy_res)
 
 

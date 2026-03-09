@@ -8,6 +8,9 @@ var player_name: String = ""
 var player_class: String = "Warrior"
 var player_level: int = 1
 var player_xp: int = 0
+var last_xp_gained: int = 0
+var pending_level_up: Dictionary = {}
+var level_up_return_scene: String = ""
 
 var base_energy: int = 0	# number of guesses start of each board  
 var base_attack: int = 0	
@@ -145,15 +148,56 @@ func get_random_room_resource(area_key: String) -> RoomData:
 
 # --- STATE ACCESSORS ---
 func mark_room_visited(room_id):
-	if world_state.rooms.has(room_id):
-		world_state.rooms[room_id].visited = true
+	_ensure_room_state(room_id)
+	world_state.rooms[room_id].visited = true
 
 func mark_room_cleared(room_id):
-	if world_state.rooms.has(room_id):
-		world_state.rooms[room_id].cleared = true
-		world_state.rooms[room_id].visited = true
-		SaveManager.save_mid_run_state()
+	_ensure_room_state(room_id)
+	world_state.rooms[room_id].cleared = true
+	world_state.rooms[room_id].visited = true
+	SaveManager.save_mid_run_state()
 	prepare_victory_loot(current_node)
+
+func add_player_xp(amount: int) -> Dictionary:
+	var gained = max(0, amount)
+	player_xp += gained
+	last_xp_gained = gained
+	
+	var start_level = player_level
+	var start_stats = _get_class_stats_for_level(start_level)
+	var max_level = _get_max_class_level()
+	
+	while player_level < max_level and player_xp >= GameData.get_max_xp_for_level(player_level):
+		player_level += 1
+	
+	var leveled_up = player_level > start_level
+	if leveled_up:
+		var new_stats = _get_class_stats_for_level(player_level)
+		_apply_level_stats(new_stats)
+		pending_level_up = {
+			"old_level": start_level,
+			"new_level": player_level,
+			"old_stats": start_stats,
+			"new_stats": new_stats
+		}
+		SignalBus.level_up.emit(player_level)
+	
+	return {
+		"gained": gained,
+		"leveled_up": leveled_up,
+		"new_level": player_level
+	}
+
+func is_room_cleared(room_id: String) -> bool:
+	if room_id == "":
+		return false
+	return world_state.rooms.has(room_id) and world_state.rooms[room_id].get("cleared", false)
+
+func _ensure_room_state(room_id: String):
+	if room_id == "":
+		return
+	if not world_state.rooms.has(room_id):
+		world_state.rooms[room_id] = {"visited": true, "cleared": false}
 
 func record_npc_interaction(npc_id: String, won: bool):
 	if world_state.npcs.has(npc_id):
@@ -192,6 +236,9 @@ func load_save_data(data: Dictionary):
 func start_battle_mode():
 	player_level = 1
 	player_xp = 0
+	last_xp_gained = 0
+	pending_level_up = {}
+	level_up_return_scene = ""
 	current_hp = 100
 	max_hp = 100
 	gold = 100
@@ -226,6 +273,9 @@ func start_actual_run():
 	current_hp = max_hp
 	gold = 50
 	player_xp = 0
+	last_xp_gained = 0
+	pending_level_up = {}
+	level_up_return_scene = ""
 	current_level = 1
 	completed_nodes = []
 	player_grid_pos = Vector2i(2, -1) # Ensure player starts at Home
@@ -268,6 +318,7 @@ func load_run_from_data(data: Dictionary):
 	player_name = data.get("player_name", "Unknown")
 	player_class = data.get("player_class", "Archivist")
 	player_level = data.get("player_level", 1)
+	player_xp = data.get("player_xp", 0)
 
 	current_hp = data.get("hp", 100)
 	max_hp = data.get("max_hp", 100)
@@ -290,8 +341,8 @@ func load_run_from_data(data: Dictionary):
 
 func _on_node_selected(node_data: Dictionary):
 	current_node = node_data
-	if not world_state.rooms.has(node_data.id):
-		world_state.rooms[node_data.id] = {"visited": true, "cleared": false}
+	_ensure_room_state(str(node_data.get("id", "")))
+	mark_room_visited(str(node_data.get("id", "")))
 	
 	SaveManager.save_mid_run_state()
 
@@ -379,6 +430,43 @@ func _on_combat_won():
 
 func _on_combat_lost():
 	get_tree().call_deferred("change_scene_to_file", "res://features/ui/DeathScreen.tscn")
+
+func _get_normalized_class_id() -> String:
+	var raw = player_class.to_lower()
+	match raw:
+		"archivist":
+			return "scholar"
+		"berserker":
+			return "warrior"
+		"illusionist":
+			return "alchemist"
+		_:
+			return raw
+
+func _get_max_class_level() -> int:
+	var class_id = _get_normalized_class_id()
+	if GameData.CLASS_STATS.has(class_id):
+		return GameData.CLASS_STATS[class_id].size()
+	return 1
+
+func _get_class_stats_for_level(level: int) -> Dictionary:
+	return GameData.get_stats(_get_normalized_class_id(), level)
+
+func _apply_level_stats(stats: Dictionary):
+	if stats.is_empty():
+		return
+	var old_max_hp = max_hp
+	max_hp = int(stats.get("max_hp", max_hp))
+	base_energy = int(stats.get("energy", base_energy))
+	base_attack = int(stats.get("player_attack", base_attack))
+	base_defense = int(stats.get("player_defense", base_defense))
+	player_attack = base_attack
+	player_defense = base_defense
+	
+	if max_hp > old_max_hp:
+		current_hp += (max_hp - old_max_hp)
+	current_hp = clamp(current_hp, 0, max_hp)
+	SignalBus.hp_changed.emit(current_hp, max_hp)
 
 func take_damage(amount: int):
 	current_hp = max(0, current_hp - amount)
