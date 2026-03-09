@@ -15,6 +15,11 @@ floor -> allow unique floor for each background, otherwise default for the biome
 
 ===
 
+ingamemenu pressing "abandon run"
+trigger runsummary scene and populate values 
+if gamemanager is_battle_mode, then exit to main menu 
+if not is_battle_mode, reset player hp to full and location to home 
+
 
 ===
 
@@ -26,18 +31,10 @@ if treasure, load treasure board
 if completed | empty, load empty room 
 
 ===
-
-* battlescene: sprite positioning 
-* gamemanager: check for xp level up  
-* characterlevelup: character xp level up
-* eventscene: settings menu 
-
-
-on updating GameManager.player_xp, check for player level up event. check whether player_xp exceeds GameData.XP_THRESHOLDS for the current level (get_max_xp_for_level). update characterscreen to use xp from GameData.XP_THRESHOLDS
-
-create new "character level up" scene that shows current stats and new stats after level up from GameData.CLASS_STATS. position current level on the left, and new stats on the right. add icons for hp, energy, attack, defense.  
+on gamemanager start_actual_run and start_battle_mode, update current_hp, max_hp to use gamedata CLASS_STATS to get hp for the correct class. replace current_level variable with player_level for consistency
 
 ===
+
 battle scene - map 
 	remove duplciates (eg. pickpocket) 
 	

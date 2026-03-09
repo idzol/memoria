@@ -18,9 +18,9 @@ var base_defense: int = 0
 
 var current_energy: int = 0	   # number of guesses this turn 
 
-var current_hp: int = 100
-var max_hp: int = 100
-var gold: int = 50
+var current_hp: int = 10
+var max_hp: int = 10
+var gold: int = 0
 var player_deck: Array = [] # "sword", "shield", "heart", "trap", "scroll"
 var active_deck: Array = [] # "sword", "shield", "heart"
 
@@ -31,12 +31,14 @@ var active_items: Array = [] # "wood_splinter"
 var is_battle_mode: bool = false
 
 # --- Run Progression ---
-var current_level: int = 1
 var completed_nodes: Array = []
 
 # Combat Stats
 var player_attack: int = 10
 var player_defense: int = 5
+var player_hp_total: int = 10
+var player_attack_total: int = 10
+var player_defense_total: int = 5
 
 var current_node: Dictionary = {}
 var run_map: Dictionary = {} # Stored persistently per run
@@ -100,6 +102,7 @@ var current_deck: Array:
 # Persistent "Fixed" locations that stay the same for this character
 # Format: { Vector2i(column, layer): "type_string" }
 var fixed_nodes: Dictionary = {}
+const ITEMS_ROOT = "res://data/items/"
 
 func _ready():
 	SignalBus.node_selected.connect(_on_node_selected)
@@ -226,6 +229,25 @@ func add_item(item_id: String):
 func has_item(item_id: String) -> bool:
 	return world_state.items.owned.has(item_id)
 
+func get_item_stat_bonuses() -> Dictionary:
+	var bonuses = {"atk_bonus": 0, "def_bonus": 0, "hp_bonus": 0}
+	for item_id in active_items:
+		var path = ITEMS_ROOT + item_id + ".tres"
+		if ResourceLoader.exists(path):
+			var res = load(path) as ItemData
+			if res:
+				bonuses.atk_bonus += res.attack
+				bonuses.def_bonus += res.armour
+				bonuses.hp_bonus += res.hp
+	return bonuses
+
+func recalculate_player_totals():
+	var totals = get_item_stat_bonuses()
+	player_hp_total = max_hp + totals.hp_bonus
+	player_attack_total = player_attack + totals.atk_bonus
+	player_defense_total = player_defense + totals.def_bonus
+	current_hp = clamp(current_hp, 0, player_hp_total)
+
 # --- SAVE/LOAD BRIDGE ---
 func get_save_data() -> Dictionary:
 	return world_state
@@ -239,8 +261,9 @@ func start_battle_mode():
 	last_xp_gained = 0
 	pending_level_up = {}
 	level_up_return_scene = ""
-	current_hp = 100
-	max_hp = 100
+	var start_stats = _get_class_stats_for_level(player_level)
+	_apply_level_stats(start_stats)
+	current_hp = max_hp
 	gold = 100
 	
 	# Testing suite starting items
@@ -249,6 +272,7 @@ func start_battle_mode():
 	
 	player_deck = ["sword", "shield", "heart"]
 	active_deck = player_deck.duplicate()
+	recalculate_player_totals()
 	
 	# Use specialized linear generator
 	var gen = preload("res://features/map/BattleMapGenerator.gd").new()
@@ -270,16 +294,19 @@ func start_battle_mode():
 	get_tree().change_scene_to_file("res://features/map/BattleMap.tscn")
 
 func start_actual_run():
+	player_level = 1
+	var start_stats = _get_class_stats_for_level(player_level)
+	_apply_level_stats(start_stats)
 	current_hp = max_hp
 	gold = 50
 	player_xp = 0
 	last_xp_gained = 0
 	pending_level_up = {}
 	level_up_return_scene = ""
-	current_level = 1
 	completed_nodes = []
 	player_grid_pos = Vector2i(2, -1) # Ensure player starts at Home
 	active_deck = ["sword", "shield", "heart"]
+	recalculate_player_totals()
 
 	# 1. Set player location 	
 	reset_to_home()
@@ -315,15 +342,34 @@ func reset_to_home():
 	player_grid_pos = Vector2i(2, -1)
 
 func load_run_from_data(data: Dictionary):
+	is_battle_mode = data.get("is_battle_mode", false)
 	player_name = data.get("player_name", "Unknown")
 	player_class = data.get("player_class", "Archivist")
-	player_level = data.get("player_level", 1)
+	player_level = data.get("player_level", data.get("current_level", 1))
 	player_xp = data.get("player_xp", 0)
+	last_xp_gained = data.get("last_xp_gained", 0)
+	pending_level_up = _decode_variant_field(data, "pending_level_up", {})
+	level_up_return_scene = data.get("level_up_return_scene", "")
 
 	current_hp = data.get("hp", 100)
 	max_hp = data.get("max_hp", 100)
 	gold = data.get("gold", 0)
-	current_level = data.get("current_level", 1)
+	base_energy = data.get("base_energy", base_energy)
+	base_attack = data.get("base_attack", base_attack)
+	base_defense = data.get("base_defense", base_defense)
+	current_energy = data.get("current_energy", current_energy)
+	player_attack = data.get("player_attack", base_attack)
+	player_defense = data.get("player_defense", base_defense)
+	player_deck = data.get("deck", [])
+	active_deck = data.get("active_deck", [])
+	player_items = data.get("items", [])
+	active_items = data.get("active_items", [])
+	world_state = _decode_variant_field(data, "world_state", world_state)
+	current_node = _decode_variant_field(data, "current_node", {})
+	run_map = _decode_variant_field(data, "run_map", run_map)
+	pending_loot = _decode_variant_field(data, "pending_loot", [])
+	run_loot = _decode_variant_field(data, "run_loot", [])
+	recalculate_player_totals()
 	completed_nodes = data.get("completed_nodes", [])
 	
 	# Restore fixed node data
@@ -333,10 +379,17 @@ func load_run_from_data(data: Dictionary):
 	var saved_pos = data.get("grid_pos", [2, -1])
 	player_grid_pos = Vector2i(saved_pos[0], saved_pos[1])
 	
-	if data.has("run_map"):
-		run_map = data.run_map
+	if is_battle_mode:
+		get_tree().change_scene_to_file("res://features/map/BattleMap.tscn")
+	else:
+		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
 
-	get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+func _decode_variant_field(data: Dictionary, key: String, default_value):
+	var raw = data.get(key, default_value)
+	if raw is String:
+		var decoded = str_to_var(raw)
+		return decoded if decoded != null else default_value
+	return raw
 
 
 func _on_node_selected(node_data: Dictionary):
@@ -455,18 +508,19 @@ func _get_class_stats_for_level(level: int) -> Dictionary:
 func _apply_level_stats(stats: Dictionary):
 	if stats.is_empty():
 		return
-	var old_max_hp = max_hp
+	var old_hp_total = player_hp_total
 	max_hp = int(stats.get("max_hp", max_hp))
 	base_energy = int(stats.get("energy", base_energy))
 	base_attack = int(stats.get("player_attack", base_attack))
 	base_defense = int(stats.get("player_defense", base_defense))
 	player_attack = base_attack
 	player_defense = base_defense
+	recalculate_player_totals()
 	
-	if max_hp > old_max_hp:
-		current_hp += (max_hp - old_max_hp)
-	current_hp = clamp(current_hp, 0, max_hp)
-	SignalBus.hp_changed.emit(current_hp, max_hp)
+	if player_hp_total > old_hp_total:
+		current_hp += (player_hp_total - old_hp_total)
+	current_hp = clamp(current_hp, 0, player_hp_total)
+	SignalBus.hp_changed.emit(current_hp, player_hp_total)
 
 func take_damage(amount: int):
 	current_hp = max(0, current_hp - amount)

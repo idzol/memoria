@@ -20,7 +20,7 @@ func _on_wake_up_pressed():
 	# 2. Reset progress for the "Day" (Resetting current floor/nodes)
 	# This simulates starting back at the 'village' or start of the map
 	GameManager.completed_nodes = []
-	GameManager.current_level = 1
+	GameManager.player_level = 1
 	# Resetting current location to the starting "Home" node (ID 0)
 	GameManager.current_node_id = 0
 	

@@ -5,6 +5,7 @@ extends Control
 @onready var continue_button = %ContinueButton
 @onready var name_entry_popup = %NameEntryPopup
 @onready var save_list_popup = %SaveListPopup
+@onready var save_list_blocker = %SaveListBlocker
 @onready var save_container = %SaveListVBox
 @onready var name_input = %NameInput
 @onready var battle_mode_btn = %BattleModeButton
@@ -12,6 +13,7 @@ extends Control
 # Confirmation Popup for deletion
 @onready var confirm_delete_popup = %ConfirmDeletePopup
 var _pending_delete_filename: String = ""
+var _pending_mode_is_battle: bool = false
 
 func _ready():
 	_request_initial_music.call_deferred()
@@ -22,7 +24,7 @@ func _ready():
 	%StartButton.pressed.connect(_on_new_game_clicked)
 	%ConfirmNameBtn.pressed.connect(_on_name_confirmed)
 	%CancelNameBtn.pressed.connect(func(): name_entry_popup.visible = false)
-	%CloseSavesBtn.pressed.connect(func(): save_list_popup.visible = false)
+	%CloseSavesBtn.pressed.connect(func(): _set_save_list_popup_visible(false))
 	%SettingsButton.pressed.connect(_on_settings_pressed)
 	%ControlsBtn.pressed.connect(_on_controls_pressed) # New Connection
 	%CreditsBtn.pressed.connect(_on_credits_pressed)
@@ -35,7 +37,7 @@ func _ready():
 	
 	# Hide overlays
 	name_entry_popup.visible = false
-	save_list_popup.visible = false
+	_set_save_list_popup_visible(false)
 	confirm_delete_popup.visible = false
 	if has_node("%SettingsOverlay"):
 		%SettingsOverlay.visible = false
@@ -61,17 +63,19 @@ func _refresh_continue_button():
 			continue_button.pressed.connect(_on_continue_clicked)
 
 func _on_new_game_clicked():
-	# Set game Mode
-	GameManager.is_battle_mode = false
+	_pending_mode_is_battle = false
+	_open_name_entry_popup()
+
+func _on_battle_mode_clicked():
+	_pending_mode_is_battle = true
+	_open_name_entry_popup()
+
+func _open_name_entry_popup():
+	GameManager.is_battle_mode = _pending_mode_is_battle
 	name_entry_popup.visible = true
 	name_input.text = ""
 	name_input.placeholder_text = "Enter unique name..."
 	name_input.grab_focus()
-
-func _on_battle_mode_clicked():
-	# Set game Mode
-	GameManager.is_battle_mode = true
-	get_tree().change_scene_to_file("res://features/ui/CharacterSelect.tscn")
 
 func _on_name_confirmed():
 	var p_name = name_input.text.strip_edges()
@@ -89,8 +93,13 @@ func _on_name_confirmed():
 	get_tree().change_scene_to_file("res://features/ui/CharacterSelect.tscn")
 
 func _on_continue_clicked():
-	save_list_popup.visible = true
+	_set_save_list_popup_visible(true)
 	_populate_save_list()
+
+func _set_save_list_popup_visible(is_visible: bool):
+	save_list_popup.visible = is_visible
+	if save_list_blocker:
+		save_list_blocker.visible = is_visible
 
 func _populate_save_list():
 	for child in save_container.get_children():
@@ -99,12 +108,22 @@ func _populate_save_list():
 	var saves = SaveManager.get_save_list()
 	for data in saves:
 		var hbox = HBoxContainer.new()
+		hbox.add_theme_constant_override("separation", 12)
 		save_container.add_child(hbox)
+
+		var mode_label = Label.new()
+		var is_battle = data.get("is_battle_mode", false)
+		mode_label.text = "BATTLE MODE" if is_battle else "STORY MODE"
+		mode_label.custom_minimum_size = Vector2(130, 50)
+		mode_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		mode_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		mode_label.modulate = Color(1.0, 0.8, 0.4, 1.0) if is_battle else Color(0.6, 0.9, 1.0, 1.0)
+		hbox.add_child(mode_label)
 		
 		var btn = Button.new()
 		var icon = _get_class_icon(data.get("player_class", "Archivist"))
 		var p_name = data.get("player_name", "Unknown")
-		var floor_num = data.get("current_level", 1)
+		var floor_num = data.get("player_level", data.get("current_level", 1))
 		btn.text = "%s %s | Floor %d" % [icon, p_name, floor_num]
 		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		btn.custom_minimum_size.y = 50
@@ -137,6 +156,7 @@ func _get_class_icon(c_name: String) -> String:
 		_: return "👤"
 
 func _load_specific_run(data: Dictionary):
+	_set_save_list_popup_visible(false)
 	GameManager.load_run_from_data(data)
 
 func _on_settings_pressed():

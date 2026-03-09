@@ -113,9 +113,9 @@ size_flags_vertical = 4
 theme_override_font_sizes/font_size = 36
 text = "👤"
 
-[node name="ExitBtn" type="Button" parent="TopBar/Margin/HBox/Right"]
+[node name="MenuIconBtn" type="Button" parent="TopBar/Margin/HBox/Right"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(120, 50)
+custom_minimum_size = Vector2(42, 34)
 layout_mode = 2
 size_flags_vertical = 4
-text = "QUIT"
+text = "☰"

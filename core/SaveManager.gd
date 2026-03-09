@@ -49,22 +49,36 @@ func save_mid_run_state():
 	
 	# AUTHENTICATED PROFILE DATA
 	var run_data = {
+		"is_battle_mode": GameManager.is_battle_mode,
 		"player_name": GameManager.player_name,
 		"player_class": GameManager.player_class,
 		"player_level": GameManager.player_level,
 		"player_xp": GameManager.player_xp,
+		"last_xp_gained": GameManager.last_xp_gained,
+		"pending_level_up": var_to_str(GameManager.pending_level_up),
+		"level_up_return_scene": GameManager.level_up_return_scene,
 
 		"hp": GameManager.current_hp,
 		"max_hp": GameManager.max_hp,
 		"gold": GameManager.gold,
+		"base_energy": GameManager.base_energy,
+		"base_attack": GameManager.base_attack,
+		"base_defense": GameManager.base_defense,
+		"current_energy": GameManager.current_energy,
+		"player_attack": GameManager.player_attack,
+		"player_defense": GameManager.player_defense,
 		
 		"deck": GameManager.player_deck,
 		"active_deck": GameManager.active_deck,
 
 		"items": GameManager.player_items,
 		"active_items": GameManager.active_items,
+		"world_state": var_to_str(GameManager.world_state),
+		"current_node": var_to_str(GameManager.current_node),
+		"run_map": var_to_str(GameManager.run_map),
+		"pending_loot": var_to_str(GameManager.pending_loot),
+		"run_loot": var_to_str(GameManager.run_loot),
 		
-		"current_level": GameManager.current_level,
 		"completed_nodes": GameManager.completed_nodes,
 		"grid_pos": [GameManager.player_grid_pos.x, GameManager.player_grid_pos.y],
 		

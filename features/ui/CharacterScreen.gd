@@ -44,10 +44,11 @@ func _update_stats_ui():
 	class_label.text = "%s (Lvl %d)" % [GameManager.player_class, p_lvl]
 	
 	# 2. STAT CALCULATION
-	var totals = _calculate_total_stats()
+	GameManager.recalculate_player_totals()
+	var totals = GameManager.get_item_stat_bonuses()
 	
 	# 3. Vitality (Base + Item HP)
-	var total_max_hp = GameManager.max_hp + totals.hp_bonus
+	var total_max_hp = GameManager.player_hp_total
 	hp_bar.max_value = total_max_hp
 	hp_bar.value = GameManager.current_hp
 	hp_text.text = "%d / %d" % [GameManager.current_hp, total_max_hp]
@@ -60,34 +61,17 @@ func _update_stats_ui():
 	
 	# 5. Combat Stats Display
 	atk_label.text = "ATTACK: %d (%d+%d)" % [
-		GameManager.player_attack + totals.atk_bonus,
+		GameManager.player_attack_total,
 		GameManager.player_attack,
 		totals.atk_bonus
 	]
 	def_label.text = "DEFENSE: %d (%d+%d)" % [
-		GameManager.player_defense + totals.def_bonus,
+		GameManager.player_defense_total,
 		GameManager.player_defense,
 		totals.def_bonus
 	]
 	
 	gold_label.text = "GOLD: %d" % GameManager.gold
-
-func _calculate_total_stats() -> Dictionary:
-	var bonuses = {"atk_bonus": 0, "def_bonus": 0, "hp_bonus": 0}
-	
-	var active_items = GameManager.get("active_items")
-	var equipped_list = active_items if active_items != null else []
-	
-	for item_id in equipped_list:
-		var path = ITEMS_ROOT + item_id + ".tres"
-		if ResourceLoader.exists(path):
-			var res = load(path) as ItemData
-			if res:
-				bonuses.atk_bonus += res.attack
-				bonuses.def_bonus += res.armour
-				bonuses.hp_bonus += res.hp
-				
-	return bonuses
 
 # --- DECK MANAGEMENT ---
 

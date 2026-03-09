@@ -11,7 +11,7 @@ extends Control
 @onready var tracker_text = %TrackerText
 @onready var scroll_area = %MapArea
 @onready var avatar_button = %AvatarButton
-@onready var exit_button = %ExitBtn
+@onready var menu_icon_btn = %MenuIconBtn
 
 # Assets & Resources
 var node_scene = preload("res://features/map/MapNode.tscn")
@@ -19,7 +19,6 @@ var in_game_menu_scene = preload("res://features/ui/InGameMenu.tscn")
 
 # Dialogs
 var travel_dialog: ConfirmationDialog
-var exit_confirmation: ConfirmationDialog
 
 # State
 var in_game_menu = null
@@ -53,9 +52,7 @@ func _input(event):
 
 	# Toggle In-Game Menu on Escape
 	if event.is_action_pressed("ui_cancel"):
-		if in_game_menu:
-			if in_game_menu.visible: in_game_menu.close()
-			else: in_game_menu.open()
+		_toggle_in_game_menu()
 
 
 func _setup_ui():
@@ -67,27 +64,21 @@ func _setup_ui():
 	travel_dialog.ok_button_text = "YES"
 	add_child(travel_dialog)
 	
-	# MODAL: EXIT CONFIRMATION
-	exit_confirmation = ConfirmationDialog.new()
-	exit_confirmation.title = "ABANDON?"
-	exit_confirmation.dialog_text = "Are you sure you want to end this session? \nYour current progress will be summarized."
-	exit_confirmation.ok_button_text = "YES"
-	exit_confirmation.cancel_button_text = "NO"
-	exit_confirmation.confirmed.connect(_on_exit_confirmed)
-	add_child(exit_confirmation)
-
 	scroll_area.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	scroll_area.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 
 	if avatar_button:
 		avatar_button.pressed.connect(_on_avatar_pressed)
-	
-	if exit_button:
-		exit_button.pressed.connect(func(): exit_confirmation.popup_centered())
 
-func _on_exit_confirmed():
-	# Redirect to Run Summary instead of Main Menu
-	get_tree().change_scene_to_file("res://features/ui/RunSummary.tscn")
+	if menu_icon_btn:
+		menu_icon_btn.pressed.connect(_toggle_in_game_menu)
+
+func _toggle_in_game_menu():
+	if in_game_menu:
+		if in_game_menu.visible:
+			in_game_menu.close()
+		else:
+			in_game_menu.open()
 
 
 func _draw_map():

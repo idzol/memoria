@@ -20,7 +20,7 @@ extends Node2D
 @onready var biome_room_label = %BiomeRoomLabel
 # @onready var conditions_container = %ConditionsContainer
 @onready var round_label = %RoundLabel
-@onready var energy_label = %EnergyLabel 
+@onready var energy_pips = %EnergyPips
 @onready var player_atk_val = %PlayerAtkVal
 @onready var player_def_val = %PlayerDefVal
 @onready var enemy_atk_val = %EnemyAtkVal
@@ -66,15 +66,19 @@ var p_def: int = 0 # Base defense
 var round_number: int = 1
 
 var active_status_effects = {"player": [], "enemy": []} # e.g. ["vulnerable", "charged"]
+const ENERGY_PIP_FULL = Color(1.0, 0.86, 0.35, 1.0)
+const ENERGY_PIP_EMPTY = Color(0.46, 0.35, 0.08, 1.0)
+const ENERGY_PIP_CHAR = "▮"
 
 func _ready():
 	var node_data = GameManager.current_node
 	difficulty = node_data["difficulty"] if "difficulty" in node_data else 1
 	is_cleared_room = GameManager.is_room_cleared(str(node_data.get("id", "")))
+	GameManager.recalculate_player_totals()
 
 	p_hp = GameManager.current_hp
-	p_atk = GameManager.base_attack
-	p_def = GameManager.base_defense
+	p_atk = GameManager.player_attack_total
+	p_def = GameManager.player_defense_total
 
 	if node_data.has("room_resource_path"):
 		current_room_res = load(node_data.room_resource_path) as RoomData
@@ -85,6 +89,8 @@ func _ready():
 		in_game_menu = in_game_menu_scene.instantiate()
 		add_child(in_game_menu)
 		in_game_menu.hide()
+	if has_node("%MenuIconBtn"):
+		%MenuIconBtn.pressed.connect(_toggle_in_game_menu)
 
 	# Debug win / lose connections
 	# if has_node("%DebugWinBtn"): %DebugWinBtn.pressed.connect(_debug_win)
@@ -109,9 +115,7 @@ func _ready():
 func _input(event):
 	# Toggle In-Game Menu on Escape (ui_cancel)
 	if event.is_action_pressed("ui_cancel"):
-		if in_game_menu:
-			if in_game_menu.visible: in_game_menu.close()
-			else: in_game_menu.open()
+		_toggle_in_game_menu()
 
 	if OS.is_debug_build() and event is InputEventKey and event.pressed:
 		# PRESS 'B' TO TOGGLE BACKGROUND (Debugging hidden elements)
@@ -122,6 +126,13 @@ func _input(event):
 		# PRESS 'F' TO FORCE FLOOR REFRESH
 		if event.keycode == KEY_F:
 			_apply_room_data(current_room_res)
+
+func _toggle_in_game_menu():
+	if in_game_menu:
+		if in_game_menu.visible:
+			in_game_menu.close()
+		else:
+			in_game_menu.open()
 
 
 func _sync_stat_icons():
@@ -135,8 +146,24 @@ func _sync_stat_icons():
 		enemy_def_val.text = str(current_enemy_res.armor)
 	
 	# Energy HUD
-	if energy_label:
-		energy_label.text = "⚡ ENERGY: %d" % GameManager.current_energy
+	_render_energy_pips()
+
+func _render_energy_pips():
+	if not energy_pips:
+		return
+	var max_energy = GameManager.base_energy if "base_energy" in GameManager else 2
+	var current_energy = clamp(GameManager.current_energy, 0, max_energy)
+	while energy_pips.get_child_count() > max_energy:
+		energy_pips.get_child(energy_pips.get_child_count() - 1).queue_free()
+	while energy_pips.get_child_count() < max_energy:
+		var pip = Label.new()
+		pip.text = ENERGY_PIP_CHAR
+		pip.add_theme_font_size_override("font_size", 22)
+		energy_pips.add_child(pip)
+	for i in range(energy_pips.get_child_count()):
+		var pip_node = energy_pips.get_child(i) as Label
+		if pip_node:
+			pip_node.modulate = ENERGY_PIP_FULL if i < current_energy else ENERGY_PIP_EMPTY
 
 
 func _sync_status_bar():
@@ -282,7 +309,7 @@ func _process_combat_action(card_id: String):
 			SignalBus.sfx_triggered.emit(AudioData.SFX["TRAP"])
 
 		elif res.type == "heal":
-			p_hp = min(GameManager.max_hp, p_hp + res.value)
+			p_hp = min(GameManager.player_hp_total, p_hp + res.value)
 			add_log("Matched %s: Restored %d HP." % [res.name, res.value])
 			_flash_unit(%PlayerFlash, Color.SEA_GREEN)
 			SignalBus.battle_intensity_changed.emit(0.5)
@@ -432,14 +459,14 @@ func _check_win_loss():
 
 func update_ui(instant: bool = false):
 	# Dynamic Text update
-	player_hp_text.text = "%d / %d" % [p_hp, GameManager.max_hp]
+	player_hp_text.text = "%d / %d" % [p_hp, GameManager.player_hp_total]
 	enemy_hp_text.text = "HP: %d" % e_hp
 	
 	# Dynamic Bar update with Tween
 	var duration = 0.0 if instant else 0.4
 	
 	if player_hp_bar:
-		player_hp_bar.max_value = GameManager.max_hp
+		player_hp_bar.max_value = GameManager.player_hp_total
 		create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT).tween_property(player_hp_bar, "value", p_hp, duration)
 	
 	if enemy_hp_bar:

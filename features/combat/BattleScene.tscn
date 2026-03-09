@@ -104,12 +104,10 @@ theme_override_colors/font_color = Color(0.6, 0.7, 1, 1)
 text = "TOWN | VILLAGE GATE"
 vertical_alignment = 1
 
-[node name="EnergyLabel" type="Label" parent="UI/MainLayout/StatusBar/Margin/HBox" unique_id=209627737]
+[node name="EnergyPips" type="HBoxContainer" parent="UI/MainLayout/StatusBar/Margin/HBox" unique_id=209627737]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.8, 0.2, 1)
-text = "⚡ ENERGY: 5"
-vertical_alignment = 1
+theme_override_constants/separation = 4
 
 [node name="Spacer" type="Control" parent="UI/MainLayout/StatusBar/Margin/HBox" unique_id=1399739920]
 layout_mode = 2
@@ -121,6 +119,12 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.9, 0.5, 1)
 text = "ROUND: 1"
 vertical_alignment = 1
+
+[node name="MenuIconBtn" type="Button" parent="UI/MainLayout/StatusBar/Margin/HBox" unique_id=1777002211]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(42, 34)
+layout_mode = 2
+text = "☰"
 
 [node name="StageLayoutContainer" type="MarginContainer" parent="UI/MainLayout" unique_id=1788464385]
 layout_mode = 2
@@ -339,3 +343,5 @@ autowrap_mode = 3
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 10
+
+
