@@ -31,8 +31,9 @@ func _ready():
 
 	exit_button.pressed.connect(_on_exit_pressed)
 	_load_encounter_data()
+	_fit_floor_to_container_width()
 	_update_character_placement()
-	get_viewport().size_changed.connect(_update_character_placement)
+	get_viewport().size_changed.connect(_on_viewport_resized)
 
 func _input(event):
 	if event.is_action_pressed("ui_cancel"):
@@ -59,8 +60,8 @@ func _load_encounter_data():
 	room_title.text = current_room_res.room_name
 	_apply_room_environment(current_room_res)
 		
-	# 2. Player Spritesheet
-	_setup_unit_visuals(player_sprite, _get_player_res())
+	# 2. Player Spritesheet (same setup as BattleScene)
+	_setup_player_spritesheet()
 	
 	# 3. NPC Logic
 	if current_room_res.npc_id != "":
@@ -77,6 +78,7 @@ func _setup_npc(data: NPCData):
 	npc_name_label.text = data.name
 	npc_name_label.visible = true
 	_setup_unit_visuals(npc_sprite, data)
+	npc_sprite.flip_h = true
 
 	# Start Narrative
 	if data.dialog_tree_id != "" and GameData.DIALOG_TREES.has(data.dialog_tree_id):
@@ -123,6 +125,17 @@ func _setup_unit_visuals(sprite: Sprite2D, res: Resource):
 	else:
 		sprite.visible = false
 
+func _setup_player_spritesheet():
+	var idle_tex = load("res://assets/player/base_idle.png")
+	if idle_tex:
+		player_sprite.texture = idle_tex
+		player_sprite.hframes = 6
+		player_sprite.vframes = 6
+		player_sprite.scale = Vector2(1.0, 1.0)
+		player_sprite.offset.y = sprite_feet_offset
+		_update_character_placement()
+		_animate_unit(player_sprite, 8, 0.12)
+
 func _animate_unit(sprite: Sprite2D, total: int, speed: float):
 	var frame = 0
 	var dir = 1
@@ -134,13 +147,6 @@ func _animate_unit(sprite: Sprite2D, total: int, speed: float):
 			frame += dir
 		await get_tree().create_timer(speed).timeout
 
-func _get_player_res() -> PlayerData:
-	# var p_class = GameManager.player_class.to_lower()
-	var p_path = "res://data/player/base.tres" # Static path based on new player logic
-	if ResourceLoader.exists(p_path):
-		return load(p_path) as PlayerData
-	return null
-
 func _apply_room_environment(res: RoomData):
 	if background and res.background_texture:
 		background.texture = res.background_texture
@@ -149,9 +155,28 @@ func _apply_room_environment(res: RoomData):
 		var floor_path = "res://assets/rooms/floor/%s_floor.png" % biome.to_lower()
 		if ResourceLoader.exists(floor_path):
 			floor_rect.texture = load(floor_path)
+			floor_rect.stretch_mode = TextureRect.STRETCH_SCALE
 			floor_rect.visible = true
+			_fit_floor_to_container_width()
 		else:
 			floor_rect.visible = false
+
+func _on_viewport_resized():
+	_fit_floor_to_container_width()
+	_update_character_placement()
+
+func _fit_floor_to_container_width():
+	if not floor_rect or not floor_rect.texture:
+		return
+	var view_size = get_viewport_rect().size
+	if view_size.x <= 0.0:
+		return
+	var tex_size = floor_rect.texture.get_size()
+	if tex_size.x <= 0.0:
+		return
+	var scaled_height = (view_size.x / tex_size.x) * tex_size.y
+	floor_rect.offset_top = -scaled_height
+	floor_rect.offset_bottom = 0.0
 
 func _update_character_placement():
 	var v_size = get_viewport_rect().size

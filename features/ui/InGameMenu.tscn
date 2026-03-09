@@ -77,6 +77,14 @@ layout_mode = 2
 size_flags_horizontal = 4
 text = "SAVE AND EXIT"
 
+[node name="EndDayBtn" type="Button" parent="MenuPanel/VBox" unique_id=209876543]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "END DAY"
+
 [node name="AbandonBtn" type="Button" parent="MenuPanel/VBox" unique_id=1468724680]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 50)

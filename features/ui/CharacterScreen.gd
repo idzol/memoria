@@ -23,6 +23,7 @@ const CardScene = preload("res://features/combat/Card.tscn")
 # Secondary Stats
 @onready var atk_label = %AtkLabel
 @onready var def_label = %DefLabel
+@onready var energy_label = %EnergyLabel
 @onready var gold_label = %GoldLabel
 @onready var back_button = %BackButton
 
@@ -51,7 +52,7 @@ func _update_stats_ui():
 	var total_max_hp = GameManager.player_hp_total
 	hp_bar.max_value = total_max_hp
 	hp_bar.value = GameManager.current_hp
-	hp_text.text = "%d / %d" % [GameManager.current_hp, total_max_hp]
+	hp_text.text = "\u2764 %d / %d" % [GameManager.current_hp, total_max_hp]
 	
 	# 4. Memory (Experience)
 	var max_xp = GameData.get_max_xp_for_level(GameManager.player_level)
@@ -60,16 +61,17 @@ func _update_stats_ui():
 	xp_text.text = "%d / %d" % [GameManager.player_xp, max_xp]
 	
 	# 5. Combat Stats Display
-	atk_label.text = "ATTACK: %d (%d+%d)" % [
+	atk_label.text = "\u2694 ATTACK: %d (%d+%d)" % [
 		GameManager.player_attack_total,
 		GameManager.player_attack,
 		totals.atk_bonus
 	]
-	def_label.text = "DEFENSE: %d (%d+%d)" % [
+	def_label.text = "\u26e8 DEFENSE: %d (%d+%d)" % [
 		GameManager.player_defense_total,
 		GameManager.player_defense,
 		totals.def_bonus
 	]
+	energy_label.text = "\u26a1 ENERGY: %d" % int(GameManager.base_energy)
 	
 	gold_label.text = "GOLD: %d" % GameManager.gold
 

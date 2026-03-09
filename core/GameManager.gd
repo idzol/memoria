@@ -11,6 +11,7 @@ var player_xp: int = 0
 var last_xp_gained: int = 0
 var pending_level_up: Dictionary = {}
 var level_up_return_scene: String = ""
+var run_summary_exit_to_main_menu: bool = false
 
 var base_energy: int = 0	# number of guesses start of each board  
 var base_attack: int = 0	

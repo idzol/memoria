@@ -53,8 +53,10 @@ var is_battle_over: bool = false
 var difficulty: int = 0
 var current_room_res: RoomData = null
 var current_enemy_res: EnemyData = null
+var current_player_res: PlayerData = null
 var in_game_menu = null
 var is_cleared_room: bool = false
+var death_transition_in_progress: bool = false
 
 # Current Stats for Calculation
 var p_hp: int = 1
@@ -73,6 +75,7 @@ var active_status_effects = {"player": [], "enemy": []} # e.g. ["vulnerable", "c
 const ENERGY_PIP_FULL = Color(1.0, 0.86, 0.35, 1.0)
 const ENERGY_PIP_EMPTY = Color(0.46, 0.35, 0.08, 1.0)
 const CARD_SELECTION_OUTLINE = "KeyboardCardSelectionOutline"
+const ACTION_ANIM_DURATION = 0.35
 const ENERGY_PIP_CHAR = "▮"
 
 func _ready():
@@ -116,12 +119,14 @@ func _ready():
 	update_ui()
 	_setup_card_selection_style()
 	_update_character_placement()
-	get_viewport().size_changed.connect(_update_character_placement)
+	get_viewport().size_changed.connect(_on_viewport_resized)
 
 func _input(event):
 	# Escape: close active menu layer, otherwise exit to overworld map.
 	if event.is_action_pressed("ui_cancel"):
 		if _handle_menu_cancel():
+			return
+		if not _is_current_room_cleared():
 			return
 		_exit_to_overworld_from_battle()
 		return
@@ -185,16 +190,26 @@ func _exit_to_overworld_from_battle():
 	else:
 		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
 
+func _is_current_room_cleared() -> bool:
+	if is_cleared_room:
+		return true
+	var node_data = GameManager.current_node
+	var room_id = str(node_data.get("id", ""))
+	if room_id == "":
+		return false
+	return GameManager.is_room_cleared(room_id)
+
 func _setup_card_selection_style():
 	if card_selection_style:
 		return
 	card_selection_style = StyleBoxFlat.new()
-	card_selection_style.draw_center = false
+	card_selection_style.draw_center = true
+	card_selection_style.bg_color = Color(0, 0, 0, 0)
 	card_selection_style.border_width_left = 4
 	card_selection_style.border_width_top = 4
 	card_selection_style.border_width_right = 4
 	card_selection_style.border_width_bottom = 4
-	card_selection_style.border_color = Color(0.05, 0.36, 0.16, 1.0)
+	card_selection_style.border_color = Color(0.1, 0.75, 0.28, 1.0)
 
 func _can_handle_keyboard_card_input() -> bool:
 	if is_battle_over or not can_flip:
@@ -213,10 +228,17 @@ func _move_keyboard_card_selection(step: int):
 		_clear_keyboard_card_selection()
 		return
 	var child_count = cards.size()
-	var start_idx = keyboard_selected_card_index if keyboard_selected_card_index >= 0 else _find_first_navigable_card_index(cards)
-	if start_idx == -1:
+	var first_idx = _find_first_navigable_card_index(cards)
+	if first_idx == -1:
 		_clear_keyboard_card_selection()
 		return
+	# First arrow press should reveal/select the top-left available card.
+	if keyboard_selected_card_index < 0:
+		keyboard_selected_card_index = first_idx
+		keyboard_selection_active = true
+		_refresh_keyboard_card_outline()
+		return
+	var start_idx = keyboard_selected_card_index
 	var next_idx = start_idx
 	var safety = 0
 	while safety < child_count:
@@ -265,9 +287,14 @@ func _refresh_keyboard_card_outline():
 	var outline = Panel.new()
 	outline.name = CARD_SELECTION_OUTLINE
 	outline.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	outline.anchors_preset = Control.PRESET_FULL_RECT
+	outline.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	outline.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	outline.grow_vertical = Control.GROW_DIRECTION_BOTH
+	outline.z_index = 100
+	outline.offset_left = 0
+	outline.offset_top = 0
+	outline.offset_right = 0
+	outline.offset_bottom = 0
 	outline.add_theme_stylebox_override("panel", card_selection_style)
 	selected_card.add_child(outline)
 
@@ -406,6 +433,7 @@ func _check_match():
 
 func _resolve_turn_end():
 	if is_battle_over: return
+	_clear_keyboard_card_selection()
 	
 	# Flip back any remaining unmatched cards in the current attempt pool
 	for card in flipped_cards:
@@ -455,6 +483,8 @@ func _process_combat_action(card_id: String):
 	
 	if res.value > 0:
 		if res.type == "attack":
+			_play_unit_sheet_temporarily(player_sprite, current_player_res, "attack_sheet", ACTION_ANIM_DURATION)
+			_play_unit_sheet_temporarily(enemy_sprite, current_enemy_res, "defend_sheet", ACTION_ANIM_DURATION)
 			var final_dmg = _calculate_final_damage(res.value, type, "player", "enemy")
 			e_hp = max(0, e_hp - final_dmg)
 			add_log("Matched %s: Dealt %d damage." % [res.name, final_dmg])
@@ -463,6 +493,7 @@ func _process_combat_action(card_id: String):
 			SignalBus.sfx_triggered.emit(AudioData.SFX["SWORD"])
 
 		elif res.type == "trap":
+			_play_unit_sheet_temporarily(player_sprite, current_player_res, "defend_sheet", ACTION_ANIM_DURATION)
 			var trap_dmg = max(1, int(res.value) - (p_def + temp_armor_bonus))
 			p_hp = max(0, p_hp - trap_dmg)
 			add_log("Matched %s: Took %d damage." % [res.name, trap_dmg])
@@ -522,6 +553,8 @@ func _enemy_turn():
 	# Simple enemy attack using the same formula logic
 	var base_dmg = current_enemy_res.base_damage
 	# Pass 0 here because _calculate_final_damage already injects enemy base attack.
+	_play_unit_sheet_temporarily(enemy_sprite, current_enemy_res, "attack_sheet", ACTION_ANIM_DURATION)
+	_play_unit_sheet_temporarily(player_sprite, current_player_res, "defend_sheet", ACTION_ANIM_DURATION)
 	var final_dmg = _calculate_final_damage(0, "physical", "enemy", "player")
 	p_hp -= final_dmg
 	add_log("Enemy strikes for %d damage." % final_dmg)
@@ -631,16 +664,19 @@ func _check_win_loss():
 			
 	elif p_hp <= 0:
 		is_battle_over = true
+		if death_transition_in_progress:
+			return
+		death_transition_in_progress = true
 		GameManager.current_hp = max(0, p_hp)
 		if GameManager.is_battle_mode:
 			# Battle mode: show DeathScreen, then RunSummary
-			get_tree().call_deferred("change_scene_to_file", "res://features/ui/DeathScreen.tscn")
+			await _fade_to_black_and_change_scene("res://features/ui/DeathScreen.tscn")
 		else:
 			# Story mode: reset run state, then show DeathScreen, then WorldMap
 			GameManager.reset_to_home()
 			GameManager.current_hp = GameManager.player_hp_total
 			GameManager.current_node = {}
-			get_tree().call_deferred("change_scene_to_file", "res://features/ui/DeathScreen.tscn")
+			await _fade_to_black_and_change_scene("res://features/ui/DeathScreen.tscn")
 
 
 func update_ui(instant: bool = false):
@@ -673,14 +709,20 @@ func _flash_unit(overlay, color):
 
 # --- VISUAL HELPERS ---
 func _setup_player_spritesheet():
+	var p_path = "res://data/player/base.tres"
+	if ResourceLoader.exists(p_path):
+		current_player_res = load(p_path) as PlayerData
+	if current_player_res:
+		_apply_unit_visuals(player_sprite, current_player_res)
+		return
 	var idle_tex = load("res://assets/player/base_idle.png")
 	if idle_tex:
 		player_sprite.texture = idle_tex
-		player_sprite.hframes = 8
-		player_sprite.vframes = 1
+		player_sprite.hframes = 6
+		player_sprite.vframes = 6
 		player_sprite.scale = Vector2(1.0, 1.0)
 		player_sprite.offset.y = sprite_feet_offset
-		_animate_unit(player_sprite, 8, 0.12)
+		_start_unit_animation(player_sprite, 8, 0.12)
 
 func _setup_enemy_portrait():
 	var e_path = ""
@@ -705,9 +747,9 @@ func _setup_enemy_portrait():
 				_apply_unit_visuals(enemy_sprite, current_enemy_res)
 
 
-func _animate_unit(sprite: Sprite2D, total: int, speed: float):
+func _animate_unit(sprite: Sprite2D, total: int, speed: float, anim_token: int):
 	var frame = 0; var dir = 1
-	while sprite and is_inside_tree():
+	while sprite and is_inside_tree() and int(sprite.get_meta("anim_token", -1)) == anim_token:
 		sprite.frame = frame
 		if total > 1:
 			if frame >= total - 1: dir = -1
@@ -715,24 +757,68 @@ func _animate_unit(sprite: Sprite2D, total: int, speed: float):
 			frame += dir
 		await get_tree().create_timer(speed).timeout
 
+func _start_unit_animation(sprite: Sprite2D, total: int, speed: float):
+	if not sprite:
+		return
+	var next_token = int(sprite.get_meta("anim_token", 0)) + 1
+	sprite.set_meta("anim_token", next_token)
+	_animate_unit(sprite, max(1, total), max(0.01, speed), next_token)
+
 func _apply_unit_visuals(sprite: Sprite2D, res: Resource):
 	if not sprite or not res: return
 	var sheet = res.get("idle_sheet")
 	if sheet:
-		sprite.texture = sheet
-		
-		var h = res.get("hframes")
-		sprite.hframes = h if h != null else 8
-		var v = res.get("vframes")
-		sprite.vframes = v if v != null else 1
-		
-		# Set to 2x size (1.0 scale)
-		sprite.scale = Vector2(1.0, 1.0)
-		
-		var total = res.get("total_frames")
-		var speed = res.get("frame_speed")
-		_animate_unit(sprite, total if total != null else 8, speed if speed != null else 0.1)
+		_apply_unit_sheet(sprite, res, sheet)
+		_start_unit_animation(sprite, _get_unit_total_frames(res), _get_unit_frame_speed(res))
 		_update_character_placement()
+
+func _apply_unit_sheet(sprite: Sprite2D, res: Resource, sheet: Texture2D):
+	if not sprite or not res or not sheet:
+		return
+	sprite.texture = sheet
+	var h = res.get("hframes")
+	sprite.hframes = h if h != null else 8
+	var v = res.get("vframes")
+	sprite.vframes = v if v != null else 1
+	sprite.scale = Vector2(1.0, 1.0)
+	sprite.offset.y = sprite_feet_offset
+
+func _get_unit_total_frames(res: Resource) -> int:
+	var total = res.get("total_frames")
+	return total if total != null else 8
+
+func _get_unit_frame_speed(res: Resource) -> float:
+	var speed = res.get("frame_speed")
+	return speed if speed != null else 0.1
+
+func _play_unit_sheet_temporarily(sprite: Sprite2D, res: Resource, sheet_key: String, duration: float = ACTION_ANIM_DURATION):
+	if not sprite or not res:
+		return
+	var action_sheet = res.get(sheet_key)
+	if not action_sheet:
+		return
+	_apply_unit_sheet(sprite, res, action_sheet)
+	_start_unit_animation(sprite, _get_unit_total_frames(res), _get_unit_frame_speed(res))
+	_queue_unit_idle_restore(sprite, res, duration)
+
+func _queue_unit_idle_restore(sprite: Sprite2D, res: Resource, duration: float):
+	if not sprite or not res:
+		return
+	var next_restore_token = int(sprite.get_meta("restore_token", 0)) + 1
+	sprite.set_meta("restore_token", next_restore_token)
+	_restore_unit_idle_after_delay(sprite, res, duration, next_restore_token)
+
+func _restore_unit_idle_after_delay(sprite: Sprite2D, res: Resource, duration: float, restore_token: int):
+	await get_tree().create_timer(max(0.01, duration)).timeout
+	if not is_inside_tree() or not sprite:
+		return
+	if int(sprite.get_meta("restore_token", -1)) != restore_token:
+		return
+	var idle_sheet = res.get("idle_sheet")
+	if not idle_sheet:
+		return
+	_apply_unit_sheet(sprite, res, idle_sheet)
+	_start_unit_animation(sprite, _get_unit_total_frames(res), _get_unit_frame_speed(res))
 		
 func setup_board():
 	_clear_keyboard_card_selection()
@@ -845,11 +931,30 @@ func _apply_room_data(res: RoomData):
 		var floor_path = "res://assets/rooms/floor/%s_floor.png" % biome.to_lower()
 		if ResourceLoader.exists(floor_path):
 			floor_rect.texture = load(floor_path)
+			floor_rect.stretch_mode = TextureRect.STRETCH_SCALE
 			floor_rect.visible = true
+			_fit_floor_to_container_width()
 		else:
 			# Fallback if specific file is missing
 			print("[BattleScene] Floor texture missing: ", floor_path)
 			floor_rect.visible = false
+
+func _on_viewport_resized():
+	_fit_floor_to_container_width()
+	_update_character_placement()
+
+func _fit_floor_to_container_width():
+	if not floor_rect or not floor_rect.texture:
+		return
+	var view_size = get_viewport_rect().size
+	if view_size.x <= 0.0:
+		return
+	var tex_size = floor_rect.texture.get_size()
+	if tex_size.x <= 0.0:
+		return
+	var scaled_height = (view_size.x / tex_size.x) * tex_size.y
+	floor_rect.offset_top = -scaled_height
+	floor_rect.offset_bottom = 0.0
 
 
 func _update_character_placement():
@@ -900,3 +1005,21 @@ func _debug_win():
 
 func _debug_lose():
 	get_tree().call_deferred("change_scene_to_file", "res://features/ui/RunSummary.tscn")
+
+func _fade_to_black_and_change_scene(scene_path: String):
+	var fade_layer = CanvasLayer.new()
+	fade_layer.layer = 100
+	add_child(fade_layer)
+	
+	var fade_rect = ColorRect.new()
+	fade_rect.color = Color(0, 0, 0, 0)
+	fade_rect.anchors_preset = Control.PRESET_FULL_RECT
+	fade_rect.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	fade_rect.grow_vertical = Control.GROW_DIRECTION_BOTH
+	fade_layer.add_child(fade_rect)
+	
+	var tween = create_tween()
+	tween.tween_property(fade_rect, "color:a", 1.0, 0.6)
+	await tween.finished
+	if is_inside_tree():
+		get_tree().change_scene_to_file(scene_path)

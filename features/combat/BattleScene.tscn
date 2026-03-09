@@ -38,10 +38,10 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -200.0
+offset_top = -183.0
 grow_horizontal = 2
 grow_vertical = 0
-expand_mode = 1
+expand_mode = 3
 stretch_mode = 1
 
 [node name="CharacterLayer" type="Node2D" parent="." unique_id=21350627]
