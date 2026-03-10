@@ -11,15 +11,18 @@
 [ext_resource type="Texture2D" uid="uid://dcqygwjoauoc6" path="res://assets/cards/back_icon/card_back_rare_icon.png" id="9_i_rar"]
 [ext_resource type="Texture2D" uid="uid://bw8sbxt207tiw" path="res://assets/cards/back_icon/card_back_epic_icon.png" id="10_i_epi"]
 [ext_resource type="Texture2D" uid="uid://bvsbv4147wm64" path="res://assets/cards/back_icon/card_back_unique_icon.png" id="11_i_uni"]
-[ext_resource type="Texture2D" uid="uid://ba7nogpukyw1b" path="res://assets/cards/front/card_front.png" id="12_f_gen"]
-[ext_resource type="Texture2D" uid="uid://birb56t4hdxau" path="res://assets/cards/front/card_front_attack.png" id="13_f_atk"]
-[ext_resource type="Texture2D" uid="uid://qah3a71y153o" path="res://assets/cards/front/card_front_defend.png" id="14_f_def"]
-[ext_resource type="Texture2D" uid="uid://c25cadfjfriml" path="res://assets/cards/front/card_front_heal.png" id="15_f_hea"]
-[ext_resource type="Texture2D" uid="uid://qku3bwles7ue" path="res://assets/cards/front/card_front_prepare.png" id="17_f_pre"]
-[ext_resource type="Texture2D" uid="uid://rpngrkqupmdt" path="res://assets/cards/front/card_front_trap.png" id="18_f_tra"]
-
-[sub_resource type="Resource" id="Resource_6spob"]
-metadata/__load_path__ = "res://assets/cards/front/card_front_spell.png"
+[ext_resource type="Texture2D" uid="uid://d2mmbuxm4hln2" path="res://assets/cards/front/card_front.png" id="12_f_gen"]
+[ext_resource type="Texture2D" uid="uid://i10ky2qx63s5" path="res://assets/cards/front/card_front_common.png" id="14_f_com"]
+[ext_resource type="Texture2D" uid="uid://birb56t4hdxau" path="res://assets/cards/front/card_front_attack.png" id="15_f_atk"]
+[ext_resource type="Texture2D" uid="uid://qah3a71y153o" path="res://assets/cards/front/card_front_defend.png" id="16_f_dfd"]
+[ext_resource type="Texture2D" uid="uid://c25cadfjfriml" path="res://assets/cards/front/card_front_heal.png" id="17_f_hea"]
+[ext_resource type="Texture2D" uid="uid://ofcl11ypqxta" path="res://assets/cards/front/card_front_spell.png" id="18_f_spl"]
+[ext_resource type="Texture2D" uid="uid://qku3bwles7ue" path="res://assets/cards/front/card_front_prepare.png" id="19_f_pre"]
+[ext_resource type="Texture2D" uid="uid://rpngrkqupmdt" path="res://assets/cards/front/card_front_trap.png" id="20_f_trp"]
+[ext_resource type="Texture2D" uid="uid://bna1xt4kpye7w" path="res://assets/cards/front/card_front_attack_icon.png" id="21_i_atk"]
+[ext_resource type="Texture2D" uid="uid://4psbxtyd4civ" path="res://assets/cards/front/card_front_defend_icon.png" id="22_i_dfd"]
+[ext_resource type="Texture2D" uid="uid://s8udcmd54384" path="res://assets/cards/front/card_front_heal_icon.png" id="23_i_hea"]
+[ext_resource type="Texture2D" uid="uid://ci0mvh30fdfc2" path="res://assets/cards/front/card_front_spell_icon.png" id="24_i_spl"]
 
 [resource]
 script = ExtResource("1_script")
@@ -34,9 +37,14 @@ card_back_rare_icon = ExtResource("9_i_rar")
 card_back_epic_icon = ExtResource("10_i_epi")
 card_back_unique_icon = ExtResource("11_i_uni")
 card_front = ExtResource("12_f_gen")
-card_front_attack = ExtResource("13_f_atk")
-card_front_defend = ExtResource("14_f_def")
-card_front_heal = ExtResource("15_f_hea")
-card_front_spell = SubResource("Resource_6spob")
-card_front_prepare = ExtResource("17_f_pre")
-card_front_trap = ExtResource("18_f_tra")
+card_front_common = ExtResource("14_f_com")
+card_front_attack = ExtResource("15_f_atk")
+card_front_defend = ExtResource("16_f_dfd")
+card_front_heal = ExtResource("17_f_hea")
+card_front_spell = ExtResource("18_f_spl")
+card_front_prepare = ExtResource("19_f_pre")
+card_front_trap = ExtResource("20_f_trp")
+card_front_attack_icon = ExtResource("21_i_atk")
+card_front_defend_icon = ExtResource("22_i_dfd")
+card_front_heal_icon = ExtResource("23_i_hea")
+card_front_spell_icon = ExtResource("24_i_spl")

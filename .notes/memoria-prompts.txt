@@ -898,15 +898,18 @@ do not allow previously turned card to select
 	on a card match, fade in and zoom the card scene on top of the stage 
 	if card scene is currently visible, any click hides the card scene
 
+	battlescene update. 
+	on clicking a face down card (not flipped), do not show the card scene on top of the stage 
+
 ===
 
-battlescene update 
+	battlescene update 
 
-add a text log at bottom of the stage, single line. 
-on clicking the log, expand the on top of stage
-on clicking the log again, hide the log to single line 
-update every battle action to include a log, 
-	
+	add a text log at bottom of the stage, single line. 
+	on clicking the log, expand the on top of stage
+	on clicking the log again, hide the log to single line 
+	update every battle action to include a log, 
+		
 	No cards matched  
 	enemy deals X damage 
 	trap deals X damage 
@@ -917,14 +920,21 @@ update every battle action to include a log,
 	enemy armour negates X damage.
 	you deal X damage 
 	
-	
+	battlescene 
+	add a solid background colour to the terminal log 
+	expand the one line height so the scroll bar is not present when minimised 
+
 ===
 
-battlescene update 
-if scene is run directly for testing in godot (F6)
-load a default player deck for testing, ie. 
-	var player_deck: Array = ["sword", "shield", "heart"]
-	var active_deck: Array = ["sword", "shield", "heart"]
+	battlescene update 
+	if scene is run directly for testing in godot (F6)
+	load a default player deck for testing, ie. 
+		var player_deck: Array = ["sword", "shield", "heart"]
+		var active_deck: Array = ["sword", "shield", "heart"]
+		
+		
+	shorten width of terminal log to be the same as stage 
+		
 	
 ===
 	
@@ -978,3 +988,43 @@ idle
 	
 	36 frames ..  
 	6x6 
+	
+== 
+
+	data loader 
+		prioritise maps for map generator 
+		then rooms / enemies for first biome 
+		then remaining assests  
+
+== 
+
+update card scene so that ImageSpacer and CenterTypeIcon do not push down DescriptionLabel. put CenterTypeIcon in front of the card as an overlay  
+
+
+
+==
+
+	update cardscene 
+	
+	include front template as res:\\assets\cards\front\card_front.png
+	put card image behind front template transparency 
+
+	use a default card image for testing if no resource passed 
+		
+==
+
+	card scene 
+
+	update card scene to use a different card front image based on rarity and type  
+
+	 card_front_{rarity}.png (eg card_front_common)
+	use "default" if not found (card_front_default)
+	
+	based on the card type, place an icon in the card centre between cardimage and descriptionlabel 
+
+	 card_front_{rarity}_{type}.png (eg. card_front_common_attack)  
+
+	use "default" if not found  (card_front_{rarity}_default)
+		
+		
+		

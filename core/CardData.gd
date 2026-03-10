@@ -1,5 +1,4 @@
 extends Node
-class_name CardDatabase
 
 # res://core/CardDatabase.gd
 # The authoritative source for all card data, stats, and visual assets.
