@@ -16,7 +16,7 @@ bg_color = Color(0.8, 0.2, 0.2, 1)
 shadow_color = Color(0.8, 0.2, 0.2, 0.4)
 shadow_size = 2
 
-[node name="BattleScene" type="Node2D" unique_id=2036564962]
+[node name="LogDisplay" type="Node2D" unique_id=2036564962]
 script = ExtResource("1_ltshs")
 
 [node name="EnvironmentLayer" type="CanvasLayer" parent="." unique_id=1521541431]
@@ -221,6 +221,16 @@ theme_override_constants/h_separation = 12
 theme_override_constants/v_separation = 12
 columns = 4
 
+[node name="LogDisplay" type="ScrollContainer" parent="UI/MainLayout/StageLayoutContainer/StageLayout/ArenaCenter" unique_id=1815786291]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="LogBox" type="VBoxContainer" parent="UI/MainLayout/StageLayoutContainer/StageLayout/ArenaCenter/LogDisplay" unique_id=1243222651]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
 [node name="EnemyColumnUI" type="VBoxContainer" parent="UI/MainLayout/StageLayoutContainer/StageLayout" unique_id=1619457614]
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
@@ -286,32 +296,6 @@ horizontal_alignment = 1
 
 [node name="BottomSpacer" type="Control" parent="UI/MainLayout/StageLayoutContainer/StageLayout/EnemyColumnUI" unique_id=8623652]
 custom_minimum_size = Vector2(0, 320)
-layout_mode = 2
-
-[node name="BattleLogRow" type="HBoxContainer" parent="UI/MainLayout" unique_id=948275611]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/separation = 40
-
-[node name="LeftSpacer" type="Control" parent="UI/MainLayout/BattleLogRow" unique_id=313092503]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(290, 0)
-layout_mode = 2
-
-[node name="LogDisplay" type="ScrollContainer" parent="UI/MainLayout/BattleLogRow" unique_id=1815786291]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="LogBox" type="VBoxContainer" parent="UI/MainLayout/BattleLogRow/LogDisplay" unique_id=1243222651]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="RightSpacer" type="Control" parent="UI/MainLayout/BattleLogRow" unique_id=908103933]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(290, 0)
 layout_mode = 2
 
 [node name="DialogOverlay" type="CanvasLayer" parent="." unique_id=931051041]

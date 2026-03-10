@@ -69,24 +69,7 @@ battle scene
 	replace "settings" button with the same menu as world map, ie. press "esc" to load menu. 
 	remove the settings specific logic 
 	
-	
-- [ ] **[WAR-001]** Stat: Base Energy   
-  **Logic:** current_energy is a player stat for how many card guesses 
-    Set current_energy to base_energy at the start of every board shuffle
-    End the player turn after all guesses have been made (current_energy is zero) 
-    
-- [ ] **[WAR-002]** Enemy: Attack | Stagger 
-  **Logic:** current_energy is a player stat for how many card guesses 
-    Enemy attacks if not staggered with attack 
-    Set stagger threshold (zero for basic)
-    Attack equal to damage amount  
 
-- [ ] **[WAR-002]** UI: Battle 
-  **Logic:** Icon over health bar for player, enemy  
-    {sword icon} {base_attack} | {shield icon} {base_armor} 
-
-- [ ] **[WAR-003]** Victory: Assets 
-	update music for victory screen .. 
 === 
 
 update character select 
@@ -151,38 +134,6 @@ map
 	lines drawn correctly between nodes 
 	remove top / bottom scroll
 	
-dialog	
-	npcs 
-	quest ... 
-	
-event scenes 
-	spritemaps for each location ... 
-	
-aesthetic 
-	character screen
-	menu buttons 
-	character portrait
-	
-	
-music
-	add music resource 
-	
-	add music to worldmap biomes 
-	add music to battle 
-	
-	add sfx to cards 
-
-assets 
-
-	map icons 
-		greyscale 
-		
-	player class 
-		players/archivist/archivist_base.tres -> fisher.tres
-		player/idle.ogv -> fisher_idle.png 
-
-	alchemist.tres
-
 
 assets 
 	front card -- same colour as back ... 
@@ -708,3 +659,322 @@ add game progress state. eg.
 == 
 add button to battlescene for development 
 	"win" - ie. finish combat  
+
+==
+
+* gamemanager: player_level refactor. load correct starting stats
+* savemanager: support for battle mode 
+
+===
+
+assets
+
+	barmaid - invert sprite npc direction 
+	stardust - missing background card (missing rarity?)
+
+===
+
+battlescene combat logic 
+if card matched type = "armor"
+add value (eg. 5) to player defense for next round 
+reset armor next time player is attacked 
+
+===
+
+in battlescene, update player armor to defend against trap cards 
+
+in battlescene, when player health is equal to or below zero,
+
+in battle mode (is_battle_mode), trigger end of run, redirecting to runsummary 
+in story mode (!is_battle_mode), trigger a new run, resetting player location to home, resetting health to full and redirecting to worldmap
+
+==
+
+explain why "jar_of_teeth" card damages player, not enemy 
+
+===
+
+disable save in ingamemenu while in battlescene, eventscene 
+
+==
+
+update battlemap scene, _input to allow selection of connected rooms using keyboard arrow keys (up, down, enter)
+ highlight the current selected room with a dark green box 
+ 
+=== 
+
+update battlescene to allow selection of cards using keyboard arrow keys (up, down, enter)
+
+hide outline if arrow keys are not pressed 
+if arrow keys are pressed, show outline of selected card (top left)
+pressing arrow key shows the selected card 
+enter selects one card 
+ reset the outline next turn 
+ 
+== 
+
+battlesceen, fade to black on death  (player hp less than 0)
+update deathscreen to fade in with text and "wake up" button
+
+===
+
+update characterselect scene to place tile horizontally (warrior, scholar, alchemist). make the icons larger, with text underneath icon 
+use fourth panel to summarise the player stats from gamedata on select 
+place "restore identity" button centre bottom. 
+allow arrow keys and enter to select character and confirm selection 
+
+===
+
+update main menu to allow arrow keys (up, down) and enter to select an option 
+ update save game menu to allow up down 
+highlight the current selected option 
+
+==  
+
+Ludo.ai (Sprite Generator):
+	Professional-grade sprite sheets with complex motion.
+	upload a single static image, and its "Motion Transfer" tool will apply a "Sword Slash" or "Shield Block" animation to that specific character.
+	Natively exports as a transparent PNG sprite sheet or a ZIP of individual frames.
+	
+=== 
+	
+	
+save game 
+	don't save game on zero health ... 
+	load game on zero health 
+
+hardcore mode 
+
+==
+
+increase height of savelistpopup modal so that it is behind title and "close" button 
+
+mainmenu, on pressing enter on "continue run", show savelistpopup.  do not automatically close popup. do not select a game 
+
+when using arrow keys, update  scroll position to keep current save file in view   
+
+update mainmenu "battle mode" so that text colour does not change on mouse hover 
+
+pressing escape exits savelistpopup ("close") 
+
+=== 
+
+review project
+update .ai-todo.md with outstanding actions grouped by category (eg. maintenance tasks)
+complete maintenance tasks 
+
+==
+
+add 1.5 seconds after fade to black deathscreen, and 1.5 seconds after fade to white runsummary before transitioning scene
+
+== 
+character select 
+
+	update stats to be represented next icons with text, numbers and icons aligned vertically
+	
+	hp - heart icon 
+	energy - yellow bars (same as to battlescene)
+	attack - sword icon 
+	defense - shield 
+	
+	add button to cancel and return to main menu, 
+	_input ui_cancel (escape) also returns to main menu 
+	
+	add padding to text box 
+
+==
+
+
+
+==
+update eventscene to use same scene settings from battlescene 
+ floor image location, size and fit 
+ player and npc sprite location 
+ player sprite frame settings 
+ 
+
+==
+update ingamemenu so that only the selected button is outlined.
+currently two buttons are outlined when arrow keys are used to select button. 
+when pressing enter, open confirmation dialog box and add small delay. 
+currently the dialog box is being instantly accepted. 
+pause before accepting dialog box   
+
+==
+update characterselect so that heart icon is red, and shield icon is same as characterscreen  
+
+update characterlevelup so that stats use the same icons for hp, attack, defense, energy 
+
+==
+
+update ingamemenu so that using _input arrow keys always outline the selected box  
+pressing _input ui_cancel ('escape') closes ingamemenu ("resume")
+pressing "settings" loads settingsoverlay scene 
+
+	ingamemenu scene. 
+	remove shading when an option button is selected. 
+	keep the outline on the selected button. 
+	do not change shading of other buttons 
+
+== 
+in battlescene, do not allow _input ui_cancel exit to map, if room is not cleared
+
+==
+update battlemap so that maps are not outlined 
+add a repeating tiled background, fit to screen and tiling to the right
+res:\\assets\maps\backgrounds\map_battle_background.png
+==
+
+update battlemap so that past icons are not shaded black 
+limit scroll to only visible map nodes 
+
+==
+
+battlemap scene update. do not show future map nodes not visited, and not adjacent to a visited node 
+draw dotted lines between connected map nodes, add variability so lines are not straight 
+add random variability (x, y) in map node position. increase distance between map nodes 
+
+==
+
+
+==
+
+map asset 
+	lines 
+		longer 
+		dotted line 
+		more variation 
+	
+	map icons 
+		not "straight"
+		remove border on current position 
+	
+	icons ***
+		transparent
+		monochrome 
+	
+	background 
+		cartoon 
+		detailed 
+ 
+	character 
+		icon 
+
+=== 
+
+battlescene animations
+
+	if player attacks, use attack_sheet (eg. base_attack.png)  
+	play for 2 seconds 
+	
+	if player takes damage, use defend_sheet (eg. base_defend.png) 
+	play for 2 second 
+	
+same for enemy sprites 
+
+===
+
+remove scroll to player 
+update map to 3x tall 
+update so that selected rooms are highlighted 
+
+===
+
+battlescene inputs  
+_input arrows only select cards 
+when selecting card, use full grid 
+do not allow previously turned card to select 
+
+===
+
+	battlescene update. 
+	on clicking a flipped card icon, show the full card scene on top of the game board 
+	on a card match, show the full card scene on top of the board 
+	if card scene is currently visible on top of game board, any click hides the card
+
+	battlescene update. 
+	on clicking a unflipped card, do not show the card scene on top of the stage 
+	on clicking a flipped card that is already flipped, show the card scene on top of the stage  
+	on a card match, fade in and zoom the card scene on top of the stage 
+	if card scene is currently visible, any click hides the card scene
+
+===
+
+battlescene update 
+
+add a text log at bottom of the stage, single line. 
+on clicking the log, expand the on top of stage
+on clicking the log again, hide the log to single line 
+update every battle action to include a log, 
+	
+	No cards matched  
+	enemy deals X damage 
+	trap deals X damage 
+	your armour negates X damage 
+	You receive X damage
+
+	X card matched.
+	enemy armour negates X damage.
+	you deal X damage 
+	
+	
+===
+
+battlescene update 
+if scene is run directly for testing in godot (F6)
+load a default player deck for testing, ie. 
+	var player_deck: Array = ["sword", "shield", "heart"]
+	var active_deck: Array = ["sword", "shield", "heart"]
+	
+===
+	
+dialog	
+	npcs 
+	quest ... 
+	
+event scenes 
+	spritemaps for each location ... 
+	
+aesthetic 
+	character screen
+	menu buttons 
+	character portrait
+	
+	
+music
+	add music resource 
+	
+	add music to worldmap biomes 
+	add music to battle 
+	
+	add sfx to cards 
+
+assets 
+
+	map icons 
+		greyscale 
+		
+	player class 
+		players/archivist/archivist_base.tres -> fisher.tres
+		player/idle.ogv -> fisher_idle.png 
+
+	alchemist.tres
+
+===
+
+	battle scene - map 
+	remove duplciates (eg. pickpocket) 
+	
+===
+
+
+attack / defend | high resolution 
+
+	16 frames 
+	1 second 
+	4x4
+	
+idle 
+	
+	36 frames ..  
+	6x6 
