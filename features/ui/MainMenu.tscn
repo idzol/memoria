@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://drj4t8y13pwkt" path="res://features/ui/MainMenu.gd" id="1_menu_script"]
 [ext_resource type="Theme" uid="uid://kw6gdo1dshed" path="res://assets/themes/Minotaur.theme" id="1_uhfsk"]
+[ext_resource type="Theme" path="res://assets/themes/Menu.theme" id="1_menu_modal_theme"]
 [ext_resource type="PackedScene" uid="uid://dm5v8f6r7p2m5" path="res://features/ui/SettingsOverlay.tscn" id="2_settings"]
 [ext_resource type="Texture2D" uid="uid://ki802i37gyb4" path="res://assets/ui/main_background.png" id="3_bg_texture"]
 
@@ -118,6 +119,7 @@ anchor_right = 0.5
 anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("1_menu_modal_theme")
 theme_override_styles/panel = SubResource("StyleBoxFlat_opaque_modal")
 
 [node name="VBox" type="VBoxContainer" parent="NameEntryPopup" unique_id=1328468189]

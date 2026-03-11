@@ -14,6 +14,7 @@ class_name ItemData
 @export var hp: int = 0
 @export var attack: int = 0
 @export var armour: int = 0
+@export var energy: int = 0
 @export var effect: String = "None"
 
 @export_group("Description & Flavor")

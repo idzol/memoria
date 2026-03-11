@@ -231,7 +231,7 @@ func has_item(item_id: String) -> bool:
 	return world_state.items.owned.has(item_id)
 
 func get_item_stat_bonuses() -> Dictionary:
-	var bonuses = {"atk_bonus": 0, "def_bonus": 0, "hp_bonus": 0}
+	var bonuses = {"atk_bonus": 0, "def_bonus": 0, "hp_bonus": 0, "energy_bonus": 0}
 	for item_id in active_items:
 		var path = ITEMS_ROOT + item_id + ".tres"
 		if ResourceLoader.exists(path):
@@ -240,6 +240,7 @@ func get_item_stat_bonuses() -> Dictionary:
 				bonuses.atk_bonus += res.attack
 				bonuses.def_bonus += res.armour
 				bonuses.hp_bonus += res.hp
+				bonuses.energy_bonus += res.energy
 	return bonuses
 
 func recalculate_player_totals():
