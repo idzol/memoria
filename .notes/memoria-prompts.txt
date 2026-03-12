@@ -1003,6 +1003,10 @@ update card scene so that ImageSpacer and CenterTypeIcon do not push down Descri
 
 
 ==
+🪙
+🛡️🧿
+🗡️⚔️
+🧪
 
 	update cardscene 
 	
@@ -1019,6 +1023,16 @@ update card scene so that ImageSpacer and CenterTypeIcon do not push down Descri
 
 	 card_front_{rarity}.png (eg card_front_common)
 	use "default" if not found (card_front_default)
+	
+==
+
+	in characterscreen, add padding to all DECK Title and DeckCount text 
+
+	in deck management, add a horizontal divider with "active deck" above, and "player deck" below the divider.  if a card is selected move it to the active deck. it it is deselected move it to the player deck. if multiple copies of a card exist, stack them with slight overlap 
+
+	add a transparent info text box to the bottom, if player tries to remove more than minimum cards flash and fade "you must have at least X cards in your deck" 
+
+	if player tries to add more than limit items, flash and fade "you may only have X active items"
 	
 	based on the card type, place an icon in the card centre between cardimage and descriptionlabel 
 

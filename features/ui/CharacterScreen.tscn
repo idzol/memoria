@@ -216,6 +216,7 @@ layout_mode = 2
 text = "RETURN TO MAP"
 
 [node name="RightPanel" type="TabContainer" parent="Margin/HBox" unique_id=1492050181]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
