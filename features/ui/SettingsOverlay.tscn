@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://pt7xobls2mhm" path="res://features/ui/Settings.gd" id="1_settings_script"]
 [ext_resource type="Theme" uid="uid://cy1tv88ir10yq" path="res://assets/themes/Greek.theme" id="1_sq774"]
+[ext_resource type="Theme" uid="uid://bf0j8logevc46" path="res://assets/themes/Menu.theme" id="3_0x641"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_settings"]
 bg_color = Color(0.12, 0.12, 0.15, 1)
@@ -37,6 +38,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("3_0x641")
 
 [node name="PanelContainer" type="PanelContainer" parent="CenterContainer" unique_id=21621149]
 custom_minimum_size = Vector2(500, 0)

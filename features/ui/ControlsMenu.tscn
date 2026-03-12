@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://ciht5riqfa7f8"]
 
 [ext_resource type="Script" uid="uid://li57rld50g16" path="res://features/ui/ControlsMenu.gd" id="1_gdscript"]
-[ext_resource type="Theme" uid="uid://cy1tv88ir10yq" path="res://assets/themes/Greek.theme" id="1_leovb"]
+[ext_resource type="Theme" uid="uid://bf0j8logevc46" path="res://assets/themes/Menu.theme" id="1_leovb"]
 
 [node name="ControlsMenu" type="Control" unique_id=878663302]
 layout_mode = 3

@@ -1,8 +1,9 @@
 [gd_scene format=3 uid="uid://c5n80tiagf37k"]
 
-[ext_resource type="Theme" uid="uid://cy1tv88ir10yq" path="res://assets/themes/Greek.theme" id="1_theme"]
+[ext_resource type="Theme" uid="uid://djn7txycnus44" path="res://assets/themes/Card.theme" id="1_jh5h3"]
 [ext_resource type="Script" uid="uid://rgr8malaxgov" path="res://features/ui/CharacterScreen.gd" id="2_logic"]
-[ext_resource type="Texture2D" path="res://assets/ui/character_screen_background.png" id="3_bg"]
+[ext_resource type="Texture2D" uid="uid://dcfoqfk8v76md" path="res://assets/ui/character_screen_background.png" id="3_bg"]
+[ext_resource type="Texture2D" uid="uid://d1wtxvmes5di" path="res://assets/player/base_profile.png" id="4_profile"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_profile"]
 bg_color = Color(0.08, 0.08, 0.1, 0.8)
@@ -26,6 +27,18 @@ bg_color = Color(0.05, 0.05, 0.07, 0.5)
 border_width_bottom = 2
 border_color = Color(0.3, 0.3, 0.35, 1)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_info_toast"]
+bg_color = Color(0, 0, 0, 0.35)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.2)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
 [node name="CharacterScreen" type="Control" unique_id=493011565]
 layout_mode = 3
 anchors_preset = 15
@@ -33,7 +46,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("1_theme")
+theme = ExtResource("1_jh5h3")
 script = ExtResource("2_logic")
 
 [node name="ScreenBackground" type="TextureRect" parent="." unique_id=589832446]
@@ -53,49 +66,65 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = -43.0
+offset_top = -129.0
+offset_right = 46.0
+offset_bottom = 130.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 40
-theme_override_constants/margin_top = 40
-theme_override_constants/margin_right = 40
-theme_override_constants/margin_bottom = 40
+theme_override_constants/margin_left = 120
+theme_override_constants/margin_top = 200
+theme_override_constants/margin_right = 120
+theme_override_constants/margin_bottom = 200
 
 [node name="HBox" type="HBoxContainer" parent="Margin" unique_id=728767513]
 layout_mode = 2
-theme_override_constants/separation = 40
+theme_override_constants/separation = 28
 
 [node name="LeftPanel" type="VBoxContainer" parent="Margin/HBox" unique_id=1407204189]
-custom_minimum_size = Vector2(320, 0)
+custom_minimum_size = Vector2(240, 0)
 layout_mode = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 12
 
 [node name="PortraitFrame" type="Panel" parent="Margin/HBox/LeftPanel" unique_id=236411760]
-custom_minimum_size = Vector2(0, 300)
+custom_minimum_size = Vector2(0, 180)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_profile")
 
-[node name="PortraitIcon" type="Label" parent="Margin/HBox/LeftPanel/PortraitFrame" unique_id=1403634804]
+[node name="PortraitIcon" type="TextureRect" parent="Margin/HBox/LeftPanel/PortraitFrame" unique_id=1403634804]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_font_sizes/font_size = 100
-text = "👤"
-horizontal_alignment = 1
-vertical_alignment = 1
+texture = ExtResource("4_profile")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="Stats" type="VBoxContainer" parent="Margin/HBox/LeftPanel" unique_id=838521998]
 layout_mode = 2
-theme_override_constants/separation = 18
+theme_override_constants/separation = 10
 
-[node name="ClassName" type="Label" parent="Margin/HBox/LeftPanel/Stats" unique_id=273345462]
+[node name="ClassRow" type="HBoxContainer" parent="Margin/HBox/LeftPanel/Stats" unique_id=273345460]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ClassName" type="Label" parent="Margin/HBox/LeftPanel/Stats/ClassRow" unique_id=273345462]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.7, 0.6, 1, 1)
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 24
 text = "The Archivist"
+
+[node name="LevelLabel" type="Label" parent="Margin/HBox/LeftPanel/Stats/ClassRow" unique_id=273345463]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.95, 1)
+theme_override_font_sizes/font_size = 20
+text = "LVL 1"
+horizontal_alignment = 2
 
 [node name="VitalitySection" type="VBoxContainer" parent="Margin/HBox/LeftPanel/Stats" unique_id=1513249116]
 layout_mode = 2
@@ -105,7 +134,6 @@ theme_override_constants/separation = 4
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "VITALITY"
-horizontal_alignment = 1
 
 [node name="HPBar" type="ProgressBar" parent="Margin/HBox/LeftPanel/Stats/VitalitySection" unique_id=1213876998]
 unique_name_in_owner = true
@@ -120,7 +148,7 @@ show_percentage = false
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 14
 text = "100 / 100"
 horizontal_alignment = 1
 
@@ -132,7 +160,6 @@ theme_override_constants/separation = 4
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "MEMORY PROGRESS"
-horizontal_alignment = 1
 
 [node name="XPBar" type="ProgressBar" parent="Margin/HBox/LeftPanel/Stats/MemorySection" unique_id=82235194]
 unique_name_in_owner = true
@@ -147,7 +174,7 @@ show_percentage = false
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 14
 text = "45 / 100"
 horizontal_alignment = 1
 
@@ -175,7 +202,7 @@ text = "Energy: 0"
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.8, 0.2, 1)
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 18
 text = "Gold: 250"
 
 [node name="Spacer" type="Control" parent="Margin/HBox/LeftPanel" unique_id=957205645]
@@ -184,13 +211,15 @@ size_flags_vertical = 3
 
 [node name="BackButton" type="Button" parent="Margin/HBox/LeftPanel" unique_id=290981777]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 60)
+custom_minimum_size = Vector2(0, 46)
 layout_mode = 2
 text = "RETURN TO MAP"
 
 [node name="RightPanel" type="TabContainer" parent="Margin/HBox" unique_id=1492050181]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_tabs")
 current_tab = 0
 
@@ -200,30 +229,88 @@ metadata/_tab_index = 0
 
 [node name="Header" type="HBoxContainer" parent="Margin/HBox/RightPanel/DECK" unique_id=2055867933]
 layout_mode = 2
+theme_override_constants/separation = 16
 
-[node name="Title" type="Label" parent="Margin/HBox/RightPanel/DECK/Header" unique_id=818474652]
+[node name="TitlePadding" type="MarginContainer" parent="Margin/HBox/RightPanel/DECK/Header" unique_id=122201]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 28
-text = "DECK MANAGEMENT"
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 1
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 1
 
-[node name="DeckCount" type="Label" parent="Margin/HBox/RightPanel/DECK/Header" unique_id=297599126]
+[node name="Title" type="Label" parent="Margin/HBox/RightPanel/DECK/Header/TitlePadding" unique_id=818474652]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "ACTIVE DECK"
+
+[node name="CountPadding" type="MarginContainer" parent="Margin/HBox/RightPanel/DECK/Header" unique_id=122202]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 6
+
+[node name="DeckCount" type="Label" parent="Margin/HBox/RightPanel/DECK/Header/CountPadding" unique_id=297599126]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Active Pairs: 0 / 12"
+theme_override_constants/outline_size = 2
+text = "Active Pairs: 0 / 1"
 
 [node name="Scroll" type="ScrollContainer" parent="Margin/HBox/RightPanel/DECK" unique_id=1520441010]
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="DeckGrid" type="GridContainer" parent="Margin/HBox/RightPanel/DECK/Scroll" unique_id=1674428039]
+[node name="DeckSections" type="VBoxContainer" parent="Margin/HBox/RightPanel/DECK/Scroll" unique_id=1674428038]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
+
+[node name="ActiveDeckGrid" type="GridContainer" parent="Margin/HBox/RightPanel/DECK/Scroll/DeckSections" unique_id=1674428039]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/h_separation = 20
-theme_override_constants/v_separation = 30
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 18
 columns = 4
+
+[node name="DeckDivider" type="HSeparator" parent="Margin/HBox/RightPanel/DECK/Scroll/DeckSections" unique_id=1674428040]
+modulate = Color(1, 1, 1, 0.4)
+layout_mode = 2
+
+[node name="PlayerDeckLabelPadding" type="MarginContainer" parent="Margin/HBox/RightPanel/DECK/Scroll/DeckSections" unique_id=1674428045]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 1
+theme_override_constants/margin_bottom = 1
+
+[node name="PlayerDeckLabel" type="Label" parent="Margin/HBox/RightPanel/DECK/Scroll/DeckSections/PlayerDeckLabelPadding" unique_id=1674428041]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "PLAYER DECK"
+
+[node name="PlayerDeckGrid" type="GridContainer" parent="Margin/HBox/RightPanel/DECK/Scroll/DeckSections" unique_id=1674428042]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 18
+columns = 4
+
+[node name="InfoToastBox" type="PanelContainer" parent="Margin/HBox/RightPanel/DECK" unique_id=1674428043]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_info_toast")
+
+[node name="InfoToastLabel" type="Label" parent="Margin/HBox/RightPanel/DECK/InfoToastBox" unique_id=1674428044]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="INVENTORY" type="VBoxContainer" parent="Margin/HBox/RightPanel" unique_id=14733091]
 visible = false
@@ -232,14 +319,29 @@ metadata/_tab_index = 1
 
 [node name="Header" type="HBoxContainer" parent="Margin/HBox/RightPanel/INVENTORY" unique_id=504347329]
 layout_mode = 2
+theme_override_constants/separation = 16
 
-[node name="Title" type="Label" parent="Margin/HBox/RightPanel/INVENTORY/Header" unique_id=1113894160]
+[node name="InventoryTitlePadding" type="MarginContainer" parent="Margin/HBox/RightPanel/INVENTORY/Header" unique_id=504347330]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 28
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 6
+
+[node name="Title" type="Label" parent="Margin/HBox/RightPanel/INVENTORY/Header/InventoryTitlePadding" unique_id=1113894160]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
 text = "EQUIPPED GEAR"
 
-[node name="ItemCount" type="Label" parent="Margin/HBox/RightPanel/INVENTORY/Header" unique_id=417923896]
+[node name="InventoryCountPadding" type="MarginContainer" parent="Margin/HBox/RightPanel/INVENTORY/Header" unique_id=504347331]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 6
+
+[node name="ItemCount" type="Label" parent="Margin/HBox/RightPanel/INVENTORY/Header/InventoryCountPadding" unique_id=417923896]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Equipped: 0 / 3"
@@ -249,10 +351,59 @@ layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="ItemGrid" type="GridContainer" parent="Margin/HBox/RightPanel/INVENTORY/Scroll" unique_id=401325232]
+[node name="ItemSections" type="VBoxContainer" parent="Margin/HBox/RightPanel/INVENTORY/Scroll" unique_id=401325231]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="ActiveItemsLabelPadding" type="MarginContainer" parent="Margin/HBox/RightPanel/INVENTORY/Scroll/ItemSections" unique_id=401325230]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+
+[node name="ActiveItemsLabel" type="Label" parent="Margin/HBox/RightPanel/INVENTORY/Scroll/ItemSections/ActiveItemsLabelPadding" unique_id=401325229]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "ACTIVE ITEMS"
+
+[node name="ActiveItemGrid" type="GridContainer" parent="Margin/HBox/RightPanel/INVENTORY/Scroll/ItemSections" unique_id=401325232]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/h_separation = 20
-theme_override_constants/v_separation = 30
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 18
 columns = 4
+
+[node name="ItemDivider" type="HSeparator" parent="Margin/HBox/RightPanel/INVENTORY/Scroll/ItemSections" unique_id=401325228]
+modulate = Color(1, 1, 1, 0.4)
+layout_mode = 2
+
+[node name="PlayerItemsLabelPadding" type="MarginContainer" parent="Margin/HBox/RightPanel/INVENTORY/Scroll/ItemSections" unique_id=401325227]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+
+[node name="PlayerItemsLabel" type="Label" parent="Margin/HBox/RightPanel/INVENTORY/Scroll/ItemSections/PlayerItemsLabelPadding" unique_id=401325226]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "PLAYER ITEMS"
+
+[node name="PlayerItemGrid" type="GridContainer" parent="Margin/HBox/RightPanel/INVENTORY/Scroll/ItemSections" unique_id=401325225]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 18
+columns = 4
+
+[node name="InventoryInfoToastBox" type="PanelContainer" parent="Margin/HBox/RightPanel/INVENTORY" unique_id=401325224]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_info_toast")
+
+[node name="InventoryInfoToastLabel" type="Label" parent="Margin/HBox/RightPanel/INVENTORY/InventoryInfoToastBox" unique_id=401325223]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+vertical_alignment = 1
