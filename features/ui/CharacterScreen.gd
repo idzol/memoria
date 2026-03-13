@@ -295,7 +295,7 @@ func _on_back_pressed():
 		return
 	
 	if GameManager.is_battle_mode:
-		var next_scene = GameManager.profile_return_scene if GameManager.profile_return_scene != "" else "res://features/map/BattleMap.tscn"
+		var next_scene = GameManager.profile_return_scene if GameManager.profile_return_scene != "" else GameManager.get_active_biome_map_scene_path()
 		GameManager.profile_return_scene = ""
 		get_tree().change_scene_to_file(next_scene)
 	else:
@@ -432,6 +432,9 @@ func _hide_card_preview():
 	_expanded_preview_card = null
 
 func _input(event: InputEvent):
+	if event.is_action_pressed("ui_cancel"):
+		_on_back_pressed()
+		return
 	if _expanded_preview_card == null:
 		return
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:

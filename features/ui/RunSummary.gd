@@ -86,8 +86,7 @@ func _on_exit_pressed():
 		get_tree().change_scene_to_file("res://features/ui/MainMenu.tscn")
 	else:
 		# Story mode: return to the story map at the current biome home
-		GameManager.enter_story_biome(GameManager.player_biome if GameManager.player_biome != "" else "town", true)
-		GameManager.current_hp = GameManager.max_hp
+		GameManager.begin_new_story_run(GameManager.player_biome if GameManager.player_biome != "" else "town")
 		SaveManager.save_mid_run_state()
 		get_tree().change_scene_to_file(GameManager.get_story_map_scene_path())
 

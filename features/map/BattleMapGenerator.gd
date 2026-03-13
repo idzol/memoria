@@ -41,16 +41,20 @@ func generate_battle_map() -> Dictionary:
 		if not _used_room_paths_by_biome.has(biome_key):
 			_used_room_paths_by_biome[biome_key] = {}
 
+		var home_coord = Vector2i(randi_range(0, size - 1), randi_range(0, size - 1))
+
 		for row in range(size):
 			for col in range(size):
 				var node_id = _build_node_id(biome_key, row, col)
 				var room_res = _pick_room_for_biome(biome_key)
 				var fallback_type = _default_room_type_for_grid_position(row, col, size)
-				var node_type = "home" if biome_key == "home" and row == 0 and col == 0 else (room_res.type if room_res else fallback_type)
+				var is_home = home_coord == Vector2i(row, col)
+				var node_type = "home" if is_home else (room_res.type if room_res else fallback_type)
 				var data = {
 					"id": node_id,
 					"name": room_res.room_name if room_res else "%s %d,%d" % [biome_key.capitalize(), row + 1, col + 1],
 					"type": node_type,
+					"base_type": room_res.type if room_res else fallback_type,
 					"biome": biome_key,
 					"biome_index": biome_index,
 					"layer": layer_offset + row,
@@ -58,7 +62,8 @@ func generate_battle_map() -> Dictionary:
 					"difficulty": size,
 					"room_resource_path": room_res.resource_path if room_res else _get_default_room_path_for_biome(biome_key),
 					"initial_dialog": room_res.initial_dialog if room_res else "",
-					"connections": []
+					"connections": [],
+					"is_home": is_home
 				}
 				if room_res and room_res.map_icon:
 					data["custom_icon_path"] = room_res.map_icon.resource_path
@@ -80,7 +85,7 @@ func generate_battle_map() -> Dictionary:
 					source.connections.append(_build_node_id(biome_key, neighbor.x, neighbor.y))
 				map[source_id] = source
 
-		var entry_id = _build_node_id(biome_key, 0, 0)
+		var entry_id = _build_node_id(biome_key, home_coord.x, home_coord.y)
 		var exit_id = _build_node_id(biome_key, size - 1, size - 1)
 		if previous_exit_id != "":
 			map[previous_exit_id].connections.append(entry_id)

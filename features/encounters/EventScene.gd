@@ -65,6 +65,7 @@ func _load_encounter_data():
 	
 	# 3. NPC Logic
 	if current_room_res.npc_id != "":
+		GameManager.mark_npc_met(current_room_res.npc_id)
 		var npc_path = "res://data/npcs/%s.tres" % current_room_res.npc_id
 		if ResourceLoader.exists(npc_path):
 			current_npc_res = load(npc_path) as NPCData
@@ -222,9 +223,4 @@ func _get_floor_midline_y(view_size: Vector2) -> float:
 func _on_exit_pressed():
 
 	# 1. Branching return path
-	if GameManager.is_battle_mode:
-		# Return to the linear testing map
-		get_tree().change_scene_to_file("res://features/map/BattleMap.tscn")
-	else:
-		# Return to the procedural campaign map
-		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+	get_tree().change_scene_to_file(GameManager.get_active_biome_map_scene_path())

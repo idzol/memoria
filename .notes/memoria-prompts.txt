@@ -1146,13 +1146,13 @@ Create four rooms for home / tutorial
 
 ===
 
-WorldMapUI and MapGenerator 
+	WorldMapUI and MapGenerator 
 
-Apply battlemap logic to worldmapui scene 
+	Apply battlemap logic to worldmapui scene 
 
-Rooms that are "complete" remain visible. These rooms are permanently allocated to a location. They  can be revisited without triggering the boss room for the biome 
+	Rooms that are "complete" remain visible. These rooms are permanently allocated to a location. They  can be revisited without triggering the boss room for the biome 
 
-Track the complete status of each room based on the complete conditions for each room
+	Track the complete status of each room based on the complete conditions for each room
 
 ===
 
@@ -1191,11 +1191,55 @@ Enemy intent. Update scene to show the next card played by the enemy. Play the e
 
 ===
 
-cards / items 
-	sort by "power" 
-	update enemy mapping to card / item rewards  
-	balance cards by enemy 
+	refactor battlemap and worldmap, into a single scene (worldmap)
+	use battlemap as the base UI for map, menu, room icons, dotted lines and movement 
+	keep branching logic for is_battle_mode is true (battle mode) or false (story mode)
+
+	in battlemap, use room type icon for each room: battle, shop etc (res://assets/maps/icon)
+	in worldmap, use room map icon unique for each room (res://assets/rooms/map/). fall back to room type icon, if no room map icon exists
+
+	mapgenerator scene 
+	remove home location (0, 0) and use same, use same home generation as battlemapgenerator
+	in story mode (!is_battle_mode), generate a permanent home location for each biome, that player returns to at end of a run. 
+
+
+
+in the world map (battlemapgenerator, mapgenerator), make the starting position, or home location in each new biome a "home" icon. do not trigger the boss fight while passing through the home location 
+
+in story mode (mapgenerator, !is_battle_mode), use the same map generation logic as battle mode (battlemapgenerator) as a base. 
+
+in story mode, rooms that are "complete" remain visible between runs, and other rooms are randomly reselected each run. These rooms are permanently allocated to a location. They can be revisited without triggering the boss room for the biome. Track the complete status of each room based on the complete conditions for each room
 	
+in story mode, each room resource with have a "complete" condition. eg. player has a card or inventory item, defeats an enemy, discover a room, meet an NPC, gold, level, day or days passed. If complete condition is blank / null, then it cannot be completed and is always randomly selected each run
+
+in story mode, use the room map icon unique for each room (res://assets/rooms/map/). fall back to room type icon, if no room map icon exists. 
+
+===
+
+	main menu, "select name" dialog box input controls. 
+	allow player to confirm name by pressing "enter", or exit to main menu by pressing "escape" (ui_cancel) 
+
+	characterscreen. allow player to exit character screen by pressing "escape" (ui_cancel), returning to worldmap
+
+===
+
+	storymap scene.
+	include a chapter "introduction" for home story, home map summary (2x2, tutorial) before moving to first biome (3x3, town)
+	tile "{biome} story" and "{biome} map summary" horizontally. replace the buttons with the storychapter scene and mapsummary scene. on click, expand the storychapter scene on a gray transparency to provide focus. on clicking mapsummary, go to the biome map. 
+
+	update the mapsummary to be a representation of biome map. in story mode (is_battle_mode), mapsumamry shows the worldmap representation of the biome map (player home, current location, adjacent nodes, completed nodes)
+
+	in battle_mode, if a biome has been completed, show all rooms and the path taken through the run. update gamemanager with a vector representing the path taken through the biome in the current run. 
+
+	in battle mode (is_battle_mode), do not show the storychapter nodes in storymap
+	
+===
+
+cards / item balancing 
+sort by "power" 
+update enemy mapping to card / item rewards  
+balance cards by enemy 
+
 ===
 
 Enemy cards

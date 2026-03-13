@@ -77,3 +77,37 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(1600, 760)
 layout_mode = 2
 theme_override_constants/separation = 28
+
+[node name="FocusOverlay" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="Shade" type="ColorRect" parent="FocusOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.18, 0.18, 0.2, 0.72)
+
+[node name="FocusCenter" type="CenterContainer" parent="FocusOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="FocusContent" type="MarginContainer" parent="FocusOverlay/FocusCenter"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(720, 940)
+layout_mode = 2

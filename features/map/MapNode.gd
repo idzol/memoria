@@ -33,17 +33,8 @@ func setup_biome_node(data: Dictionary, grid_tex: Texture2D, is_cleared: bool, i
 	# 3. Icon Logic
 	if is_revealed:
 		visible = true
-		if is_cleared:
-			# Show specific hand-crafted icon from the Room Resource metadata
-			if data.get("custom_icon_path", "") != "":
-				icon_rect.texture = load(data.custom_icon_path)
-			else:
-				icon_rect.texture = _get_type_icon_texture(data.type)
-			icon_rect.modulate = Color.WHITE
-		else:
-			# Revealed but not cleared: Show generic type icon (Sword, Scroll, etc.)
-			icon_rect.texture = _get_type_icon_texture(data.type)
-			icon_rect.modulate = Color.WHITE
+		icon_rect.texture = _get_node_icon_texture(data)
+		icon_rect.modulate = Color.WHITE
 	else:
 		# Hidden rooms still keep their outline, but suppress iconography until adjacent.
 		icon_rect.texture = null
@@ -121,6 +112,21 @@ func _get_type_icon_texture(type: String) -> Texture2D:
 	
 	# Fallback to mystery icon if type is unknown or texture is null
 	return asset_library.map_icon_mystery
+
+func _get_node_icon_texture(data: Dictionary) -> Texture2D:
+	if str(data.get("type", "")) == "home" or bool(data.get("is_home", false)):
+		return _get_type_icon_texture("home")
+
+	if GameManager.is_battle_mode:
+		return _get_type_icon_texture(str(data.get("type", "mystery")))
+
+	var custom_icon_path = str(data.get("custom_icon_path", ""))
+	if custom_icon_path != "" and ResourceLoader.exists(custom_icon_path):
+		var custom_icon = load(custom_icon_path) as Texture2D
+		if custom_icon:
+			return custom_icon
+
+	return _get_type_icon_texture(str(data.get("type", "mystery")))
 
 func _on_button_pressed():
 	if node_data:

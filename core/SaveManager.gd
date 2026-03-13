@@ -46,6 +46,7 @@ func get_save_list() -> Array:
 
 func save_mid_run_state():
 	if GameManager.player_name == "": return
+	GameManager.refresh_story_room_completions()
 	
 	# AUTHENTICATED PROFILE DATA
 	var run_data = {
@@ -80,6 +81,7 @@ func save_mid_run_state():
 		"world_state": var_to_str(GameManager.world_state),
 		"current_node": var_to_str(GameManager.current_node),
 		"run_map": var_to_str(GameManager.run_map),
+		"biome_run_paths": var_to_str(GameManager.biome_run_paths),
 		"pending_loot": var_to_str(GameManager.pending_loot),
 		"run_loot": var_to_str(GameManager.run_loot),
 		

@@ -172,6 +172,14 @@ func _on_confirm_pressed():
 
 	SignalBus.game_started.emit()
 
+	# Starting a new character should not inherit the previous session's in-memory world.
+	GameManager.run_map = {}
+	GameManager.reset_world_state()
+	GameManager.current_node = {}
+	GameManager.pending_loot = []
+	GameManager.run_loot = []
+	GameManager.completed_nodes = []
+
 	if GameManager.is_battle_mode:
 		GameManager.start_battle_mode()
 	else:

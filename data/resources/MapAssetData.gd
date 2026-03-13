@@ -22,13 +22,3 @@ class_name MapAssetData
 @export var map_abyss_background: Texture2D
 @export var map_void_background: Texture2D
 @export var map_the_core_background: Texture2D
-
-@export_group("Biome Grids")
-@export var map_town_grid: Texture2D
-@export var map_forest_grid: Texture2D
-@export var map_ice_caves_grid: Texture2D
-@export var map_desert_grid: Texture2D
-@export var map_swamp_grid: Texture2D
-@export var map_abyss_grid: Texture2D
-@export var map_void_grid: Texture2D
-@export var map_the_core_grid: Texture2D

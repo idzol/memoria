@@ -22,4 +22,4 @@ func _ready():
 	continue_button.pressed.connect(_on_continue_pressed)
 
 func _on_continue_pressed():
-	get_tree().change_scene_to_file(GameManager.consume_pending_post_battle_scene("res://features/map/WorldMap.tscn"))
+	get_tree().change_scene_to_file(GameManager.consume_pending_post_battle_scene(GameManager.get_active_biome_map_scene_path()))

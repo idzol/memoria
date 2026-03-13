@@ -71,7 +71,16 @@ func _ready():
 	_fade_in_from_white()
 
 func _input(event):
-	if name_entry_popup.visible or confirm_delete_popup.visible:
+	if name_entry_popup.visible:
+		if event.is_action_pressed("ui_accept"):
+			_on_name_confirmed()
+			return
+		if event.is_action_pressed("ui_cancel"):
+			name_entry_popup.visible = false
+			_focus_main_option(_main_selected_index)
+			return
+		return
+	if confirm_delete_popup.visible:
 		return
 	if has_node("%SettingsOverlay") and %SettingsOverlay.visible:
 		return

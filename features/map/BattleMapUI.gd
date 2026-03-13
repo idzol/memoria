@@ -324,7 +324,7 @@ func _attempt_travel(target_id: String):
 	if target_data.is_empty():
 		return
 
-	if _is_backtrack(target_id):
+	if _is_backtrack(target_id) and not _is_home_node(target_data):
 		await _travel_to_boss_node(target_data)
 		return
 
@@ -385,6 +385,9 @@ func _build_boss_node(base_data: Dictionary) -> Dictionary:
 func _is_backtrack(target_id: String) -> bool:
 	var state = GameManager.world_state.rooms.get(target_id, {})
 	return state.get("visited", false) or state.get("cleared", false)
+
+func _is_home_node(node_data: Dictionary) -> bool:
+	return bool(node_data.get("is_home", false)) or str(node_data.get("type", "")) == "home"
 
 func _enter_room(data: Dictionary):
 	GameManager.current_node = data

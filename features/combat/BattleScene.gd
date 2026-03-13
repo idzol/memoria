@@ -219,10 +219,7 @@ func _handle_menu_cancel() -> bool:
 	return true
 
 func _exit_to_overworld_from_battle():
-	if GameManager.is_battle_mode:
-		get_tree().change_scene_to_file("res://features/map/BattleMap.tscn")
-	else:
-		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+	get_tree().change_scene_to_file(GameManager.get_active_biome_map_scene_path())
 
 func _is_current_room_cleared() -> bool:
 	if is_cleared_room:
@@ -692,10 +689,7 @@ func _setup_cleared_room_view():
 	%OptionContainer.add_child(exit_btn)
 
 func _exit_cleared_room():
-	if GameManager.is_battle_mode:
-		get_tree().change_scene_to_file("res://features/map/BattleMap.tscn")
-	else:
-		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+	get_tree().change_scene_to_file(GameManager.get_active_biome_map_scene_path())
 
 func _check_win_loss():
 	if is_battle_over: return
@@ -730,10 +724,8 @@ func _check_win_loss():
 			# Battle mode: show DeathScreen, then RunSummary
 			await _fade_to_black_and_change_scene("res://features/ui/DeathScreen.tscn")
 		else:
-			# Story mode: reset run state, then show DeathScreen, then WorldMap
-			GameManager.reset_to_home()
-			GameManager.current_hp = GameManager.player_hp_total
-			GameManager.current_node = {}
+			# Story mode: return to the current biome's permanent home, then show DeathScreen.
+			GameManager.begin_new_story_run(GameManager.player_biome if GameManager.player_biome != "" else "town")
 			await _fade_to_black_and_change_scene("res://features/ui/DeathScreen.tscn")
 
 
