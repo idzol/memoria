@@ -77,7 +77,14 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
-text = "👤"
+text = "P"
+
+[node name="StoryButton" type="Button" parent="HUD/MarginContainer/VBox/TopHBox" unique_id=333596580]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "S"
 
 [node name="DiscoveryOverlay" parent="HUD" unique_id=529656252 instance=ExtResource("2_discovery")]
 unique_name_in_owner = true

@@ -177,12 +177,12 @@ theme_override_constants/separation = 10
 [node name="HPIcon" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/HPRow"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "\u2764"
+text = "❤️"
 modulate = Color(0.88, 0.24, 0.24, 1)
 [node name="HPLabel" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/HPRow"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
-text = "HP"
+text = "HEALTH"
 
 [node name="HPValue" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/HPRow" unique_id=622500101]
 unique_name_in_owner = true
@@ -200,7 +200,7 @@ theme_override_constants/separation = 10
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
-text = "\u26a1"
+text = "⚡"
 modulate = Color(1, 0.86, 0.35, 1)
 
 [node name="EnergyLabel" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/EnergyRow"]
@@ -223,7 +223,7 @@ theme_override_constants/separation = 10
 [node name="AttackIcon" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/AttackRow"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
-text = "\u2694"
+text = "🗡️"
 
 [node name="AttackLabel" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/AttackRow"]
 layout_mode = 2
@@ -245,7 +245,7 @@ theme_override_constants/separation = 10
 [node name="DefenseIcon" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/DefenseRow"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
-text = "\u26e8"
+text = "🧿"
 
 [node name="DefenseLabel" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/DefenseRow"]
 layout_mode = 2

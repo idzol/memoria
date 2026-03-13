@@ -6,7 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://dj32fgyfd4vo1" path="res://assets/maps/icon/shop.png" id="4_shop"]
 [ext_resource type="Texture2D" uid="uid://bq14diqdgc2j8" path="res://assets/maps/icon/rest.png" id="5_rest"]
 [ext_resource type="Texture2D" uid="uid://bh3b1ta81dava" path="res://assets/maps/icon/event.png" id="6_event"]
-[ext_resource type="Texture2D" uid="uid://ctmdecfkymcot" path="res://assets/maps/icon/sword.png" id="7_boss"]
+[ext_resource type="Texture2D" uid="uid://ctmdecfkymcot" path="res://assets/maps/icon/boss.png" id="7_boss"]
 [ext_resource type="Texture2D" uid="uid://qyksnobseyun" path="res://assets/maps/icon/mystery.png" id="8_mystery"]
 [ext_resource type="Texture2D" uid="uid://dbat5ko8nxhfs" path="res://assets/maps/backgrounds/map_town_background.png" id="9_town_bg"]
 [ext_resource type="Texture2D" uid="uid://b8q6jmoqu5536" path="res://assets/maps/backgrounds/map_forest_background.png" id="10_forest_bg"]

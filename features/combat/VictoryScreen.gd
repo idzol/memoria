@@ -22,5 +22,4 @@ func _ready():
 	continue_button.pressed.connect(_on_continue_pressed)
 
 func _on_continue_pressed():
-	# Return to map to continue the run
-	get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+	get_tree().change_scene_to_file(GameManager.consume_pending_post_battle_scene("res://features/map/WorldMap.tscn"))

@@ -267,7 +267,11 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 3
 
-[node name="ActiveDeckGrid" type="GridContainer" parent="Margin/HBox/RightPanel/DECK/Scroll/DeckSections" unique_id=1674428039]
+[node name="ActiveDeckGridPadding" type="MarginContainer" parent="Margin/HBox/RightPanel/DECK/Scroll/DeckSections" unique_id=1674428037]
+layout_mode = 2
+theme_override_constants/margin_top = 10
+
+[node name="ActiveDeckGrid" type="GridContainer" parent="Margin/HBox/RightPanel/DECK/Scroll/DeckSections/ActiveDeckGridPadding" unique_id=1674428039]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -325,17 +329,18 @@ theme_override_constants/separation = 16
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 6
+theme_override_constants/margin_top = 1
 theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 6
+theme_override_constants/margin_bottom = 1
 
 [node name="Title" type="Label" parent="Margin/HBox/RightPanel/INVENTORY/Header/InventoryTitlePadding" unique_id=1113894160]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "EQUIPPED GEAR"
+theme_override_font_sizes/font_size = 16
+text = "ACTIVE ITEMS"
 
 [node name="InventoryCountPadding" type="MarginContainer" parent="Margin/HBox/RightPanel/INVENTORY/Header" unique_id=504347331]
 layout_mode = 2
+size_flags_horizontal = 8
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 8
@@ -354,18 +359,13 @@ horizontal_scroll_mode = 0
 [node name="ItemSections" type="VBoxContainer" parent="Margin/HBox/RightPanel/INVENTORY/Scroll" unique_id=401325231]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 6
+theme_override_constants/separation = 3
 
-[node name="ActiveItemsLabelPadding" type="MarginContainer" parent="Margin/HBox/RightPanel/INVENTORY/Scroll/ItemSections" unique_id=401325230]
+[node name="ActiveItemGridPadding" type="MarginContainer" parent="Margin/HBox/RightPanel/INVENTORY/Scroll/ItemSections" unique_id=401325233]
 layout_mode = 2
-theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 10
 
-[node name="ActiveItemsLabel" type="Label" parent="Margin/HBox/RightPanel/INVENTORY/Scroll/ItemSections/ActiveItemsLabelPadding" unique_id=401325229]
-layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "ACTIVE ITEMS"
-
-[node name="ActiveItemGrid" type="GridContainer" parent="Margin/HBox/RightPanel/INVENTORY/Scroll/ItemSections" unique_id=401325232]
+[node name="ActiveItemGrid" type="GridContainer" parent="Margin/HBox/RightPanel/INVENTORY/Scroll/ItemSections/ActiveItemGridPadding" unique_id=401325232]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -380,6 +380,8 @@ layout_mode = 2
 [node name="PlayerItemsLabelPadding" type="MarginContainer" parent="Margin/HBox/RightPanel/INVENTORY/Scroll/ItemSections" unique_id=401325227]
 layout_mode = 2
 theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 1
+theme_override_constants/margin_bottom = 1
 
 [node name="PlayerItemsLabel" type="Label" parent="Margin/HBox/RightPanel/INVENTORY/Scroll/ItemSections/PlayerItemsLabelPadding" unique_id=401325226]
 layout_mode = 2

@@ -10,6 +10,7 @@ extends Control
 @onready var node_layer: Node2D = %Nodes
 @onready var background_rect: TextureRect = %MapBackground
 @onready var avatar_button: Button = %AvatarButton
+@onready var story_button: Button = %StoryButton
 
 # Assets & Resources
 var node_scene = preload("res://features/map/MapNode.tscn")
@@ -49,8 +50,8 @@ func _ready():
 		add_child(in_game_menu)
 		in_game_menu.hide()
 
-	# Initial biome load (defaulting to town)
-	load_biome_map("town")
+	var start_biome = GameManager.selected_story_biome if GameManager.selected_story_biome != "" else _get_player_biome()
+	load_biome_map(start_biome)
 	
 	# Music 
 	SignalBus.music_change_requested.emit(AudioData.TRACKS["TOWN"], 1.0)
@@ -70,6 +71,8 @@ func _setup_ui_features():
 	# Avatar Button
 	if avatar_button:
 		avatar_button.pressed.connect(_on_avatar_pressed)
+	if story_button:
+		story_button.pressed.connect(_open_story_map)
 
 func _input(event):
 	# Allow movement via Arrow Keys
@@ -77,6 +80,9 @@ func _input(event):
 	elif event.is_action_pressed("ui_down"): _try_move(Vector2i(0, -1))
 	elif event.is_action_pressed("ui_left"): _try_move(Vector2i(-1, 0))
 	elif event.is_action_pressed("ui_right"): _try_move(Vector2i(1, 0))
+	elif event is InputEventKey and event.pressed and not event.is_echo() and event.keycode == KEY_W:
+		_open_story_map()
+		return
 
 	# Toggle In-Game Menu on Escape
 	if event.is_action_pressed("ui_cancel"):
@@ -96,8 +102,18 @@ func _try_move(dir: Vector2i):
 
 func load_biome_map(biome_id: String):
 	current_biome = biome_id
+	GameManager.set_selected_story_biome(biome_id)
 	_apply_biome_visuals(biome_id)
 	_draw_map(biome_id)
+
+func _get_player_biome() -> String:
+	if GameManager.player_biome != "":
+		return GameManager.player_biome
+	for id in GameManager.run_map:
+		var node = GameManager.run_map[id]
+		if int(node.get("layer", -999)) == GameManager.player_grid_pos.y and int(node.get("column", -999)) == GameManager.player_grid_pos.x:
+			return str(node.get("biome", "town"))
+	return "town"
 
 func _apply_biome_visuals(biome: String):
 	if not map_assets: return
@@ -194,6 +210,8 @@ func _prompt_travel(data: Dictionary):
 		
 	travel_dialog.confirmed.connect(func():
 		GameManager.player_grid_pos = Vector2i(data.column, data.layer)
+		GameManager.player_biome = str(data.get("biome", GameManager.player_biome))
+		GameManager.set_selected_story_biome(GameManager.player_biome)
 		
 		if not GameManager.world_state.rooms.has(data.id):
 			GameManager.world_state.rooms[data.id] = {"visited": true, "cleared": false}
@@ -241,4 +259,9 @@ func _scroll_to_player(is_first_load: bool = false):
 		tween.tween_property(scroll_container, "scroll_vertical", target_scroll, 0.6)
 
 func _on_avatar_pressed():
+	GameManager.profile_return_scene = "res://features/map/WorldMap.tscn"
 	get_tree().change_scene_to_file("res://features/ui/CharacterScreen.tscn")
+
+func _open_story_map():
+	GameManager.set_selected_story_biome(current_biome)
+	get_tree().change_scene_to_file(GameManager.get_story_map_scene_path())

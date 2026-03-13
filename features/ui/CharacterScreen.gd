@@ -2,7 +2,7 @@ extends Control
 
 const CardScene = preload("res://features/combat/Card.tscn")
 
-@onready var right_panel: TabContainer = $"Margin/HBox/RightPanelWrap/RightPanel"
+@onready var right_panel: TabContainer = %RightPanel
 @onready var active_deck_grid = %ActiveDeckGrid
 @onready var player_deck_grid = %PlayerDeckGrid
 @onready var active_item_grid = %ActiveItemGrid
@@ -47,8 +47,10 @@ var _hold_payload: Dictionary = {}
 var _consume_press_instance_id: int = -1
 
 func _ready():
+	# Testing purposes if loaded directly
 	_ensure_default_player_deck()
-	
+	_ensure_default_inventory_deck()
+
 	active_deck_grid.add_theme_constant_override("h_separation", 8)
 	player_deck_grid.add_theme_constant_override("h_separation", 8)
 	active_item_grid.add_theme_constant_override("h_separation", 8)
@@ -73,7 +75,13 @@ func _setup_hold_timer():
 
 func _ensure_default_player_deck():
 	if GameManager.player_deck.is_empty() and GameManager.active_deck.is_empty():
-		GameManager.player_deck = ["sword", "shield", "heart"]
+		GameManager.active_deck = ["sword", "shield", "heart"]
+		GameManager.player_deck = ["sword", "shield", "heart", "heart"]
+
+func _ensure_default_inventory_deck():
+	if GameManager.player_items.is_empty() and GameManager.active_items.is_empty():
+		GameManager.active_items = ["iron_scrap"]
+		GameManager.player_items = ["wood_splinter", "mug_of_ale", "iron_scrap", "iron_scrap"]
 
 func _update_stats_ui():
 	var p_lvl = GameManager.player_level
@@ -86,12 +94,12 @@ func _update_stats_ui():
 	var total_max_hp = GameManager.player_hp_total
 	hp_bar.max_value = total_max_hp
 	hp_bar.value = GameManager.current_hp
-	hp_text.text = "HP %d / %d" % [GameManager.current_hp, total_max_hp]
+	hp_text.text = "❤️ HEALTH %d / %d" % [GameManager.current_hp, total_max_hp]
 	
 	var max_xp = GameData.get_max_xp_for_level(GameManager.player_level)
 	xp_bar.max_value = max_xp
 	xp_bar.value = GameManager.player_xp
-	xp_text.text = "XP %d / %d" % [GameManager.player_xp, max_xp]
+	xp_text.text = "✨ MEMORY %d / %d" % [GameManager.player_xp, max_xp]
 	
 	var attack_bonus = int(totals.get("atk_bonus", 0))
 	var defense_bonus = int(totals.get("def_bonus", 0))
@@ -99,17 +107,17 @@ func _update_stats_ui():
 	var base_energy = int(GameManager.base_energy)
 	var total_energy = base_energy + energy_bonus
 	
-	atk_label.text = "ATTACK: %d (%d+%d)" % [GameManager.player_attack_total, GameManager.player_attack, attack_bonus]
-	def_label.text = "DEFENSE: %d (%d+%d)" % [GameManager.player_defense_total, GameManager.player_defense, defense_bonus]
-	energy_label.text = "ENERGY: %d (%d+%d)" % [total_energy, base_energy, energy_bonus]
-	gold_label.text = "GOLD: %d" % GameManager.gold
+	atk_label.text = "🗡️ ATTACK: %d (%d+%d)" % [GameManager.player_attack_total, GameManager.player_attack, attack_bonus]
+	def_label.text = "🧿 DEFENSE: %d (%d+%d)" % [GameManager.player_defense_total, GameManager.player_defense, defense_bonus]
+	energy_label.text = "⚡ENERGY: %d (%d+%d)" % [total_energy, base_energy, energy_bonus]
+	gold_label.text = "🪙 GOLD: %d" % GameManager.gold
 
 func _populate_deck_tab():
 	_clear_children(active_deck_grid)
 	_clear_children(player_deck_grid)
 	
 	var active_counts = _count_ids(GameManager.active_deck)
-	var reserve_counts = _count_ids(GameManager.player_deck)
+	var reserve_counts = _get_reserve_deck_counts()
 	
 	for card_id in _sorted_keys(active_counts):
 		var card_res = _load_card(card_id)
@@ -126,7 +134,7 @@ func _populate_inventory_tab():
 	_clear_children(player_item_grid)
 	
 	var active_counts = _count_ids(GameManager.active_items)
-	var reserve_counts = _count_ids(GameManager.player_items)
+	var reserve_counts = _get_reserve_item_counts()
 	
 	for item_id in _sorted_keys(active_counts):
 		var item_res = _load_item(item_id)
@@ -149,6 +157,7 @@ func _add_stack_to_grid(container: GridContainer, id: String, res: Resource, cou
 		var back_card = CardScene.instantiate()
 		stack_root.add_child(back_card)
 		_configure_card_ui(back_card, res)
+		_simplify_stack_back_card(back_card)
 		back_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		back_card.modulate = Color(0.85, 0.85, 0.85, 0.55)
 		back_card.position = Vector2((i + 1) * STACK_OFFSET_X, (i + 1) * STACK_OFFSET_Y)
@@ -157,8 +166,7 @@ func _add_stack_to_grid(container: GridContainer, id: String, res: Resource, cou
 	stack_root.add_child(front_card)
 	_configure_card_ui(front_card, res)
 	front_card.position = Vector2.ZERO
-	if source == "player":
-		front_card.modulate = Color(0.72, 0.72, 0.72, 0.95)
+	front_card.modulate = Color.WHITE
 	
 	_connect_card_interactions(front_card, id, mode, source, res)
 	
@@ -166,11 +174,11 @@ func _add_stack_to_grid(container: GridContainer, id: String, res: Resource, cou
 		var qty_label = Label.new()
 		stack_root.add_child(qty_label)
 		qty_label.text = "x%d" % count
-		qty_label.position = Vector2(116, 4)
+		qty_label.position = Vector2(128, -6)
 		qty_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		qty_label.theme_override_font_sizes.font_size = 16
-		qty_label.theme_override_colors.font_color = Color(1.0, 0.95, 0.6, 1.0)
-		qty_label.theme_override_colors.font_outline_color = Color(0, 0, 0, 1)
+		qty_label.add_theme_font_size_override("font_size", 16)
+		qty_label.add_theme_color_override("font_color", Color(1.0, 0.95, 0.6, 1.0))
+		qty_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
 		qty_label.add_theme_constant_override("outline_size", 2)
 
 func _connect_card_interactions(card_ui: Control, id: String, mode: String, source: String, res: Resource):
@@ -197,7 +205,7 @@ func _on_collection_card_pressed(card_ui: Control, id: String, mode: String, sou
 	_hide_card_preview()
 	_cancel_hold()
 	
-	if not _can_transfer(mode, source, true):
+	if not _can_transfer(mode, source, id, true):
 		return
 	
 	# Requested behavior: when deck is at minimum and action is blocked, no transition plays.
@@ -207,7 +215,7 @@ func _on_collection_card_pressed(card_ui: Control, id: String, mode: String, sou
 		_refresh_after_transfer(mode)
 	)
 
-func _can_transfer(mode: String, source: String, show_feedback: bool) -> bool:
+func _can_transfer(mode: String, source: String, id: String, show_feedback: bool) -> bool:
 	if mode == "deck":
 		var min_required = GameManager.player_level
 		if source == "active":
@@ -216,32 +224,41 @@ func _can_transfer(mode: String, source: String, show_feedback: bool) -> bool:
 					_show_info_toast("You must have at least %d card(s) in your deck." % min_required)
 				return false
 		else:
+			var reserve_counts = _get_reserve_deck_counts()
+			if int(reserve_counts.get(id, 0)) <= 0:
+				if show_feedback:
+					_show_info_toast("No unallocated copy of that card is available.")
+				return false
 			if GameManager.active_deck.size() >= MAX_ACTIVE_DECK_CARDS:
 				if show_feedback:
 					_show_info_toast("Active deck is full (%d cards)." % MAX_ACTIVE_DECK_CARDS)
 				return false
 	elif mode == "item":
 		var max_slots = max(1, GameManager.player_level)
-		if source == "player" and GameManager.active_items.size() >= max_slots:
-			if show_feedback:
-				_show_info_toast("You may only have %d active items." % max_slots)
-			return false
+		if source == "player":
+			var reserve_counts = _get_reserve_item_counts()
+			if int(reserve_counts.get(id, 0)) <= 0:
+				if show_feedback:
+					_show_info_toast("No unallocated copy of that item is available.")
+				return false
+			if GameManager.active_items.size() >= max_slots:
+				if show_feedback:
+					_show_info_toast("You may only have %d active items." % max_slots)
+				return false
 	return true
 
 func _apply_transfer(mode: String, source: String, id: String):
 	if mode == "deck":
 		if source == "active":
-			if _remove_one(GameManager.active_deck, id):
-				GameManager.player_deck.append(id)
+			_remove_one(GameManager.active_deck, id)
 		else:
-			if _remove_one(GameManager.player_deck, id):
+			if _get_available_owned_card_count(id) > 0:
 				GameManager.active_deck.append(id)
 	else:
 		if source == "active":
-			if _remove_one(GameManager.active_items, id):
-				GameManager.player_items.append(id)
+			_remove_one(GameManager.active_items, id)
 		else:
-			if _remove_one(GameManager.player_items, id):
+			if _get_available_owned_item_count(id) > 0:
 				GameManager.active_items.append(id)
 
 func _refresh_after_transfer(mode: String):
@@ -259,7 +276,7 @@ func _refresh_after_transfer(mode: String):
 func _update_counters():
 	var active_deck_size = GameManager.active_deck.size()
 	var min_cards = GameManager.player_level
-	deck_count_label.text = "cards: %d | %d" % [active_deck_size, min_cards]
+	deck_count_label.text = "Pairs: %d | %d" % [active_deck_size, min_cards]
 	if active_deck_size > min_cards:
 		deck_count_label.modulate = Color.GOLD
 	elif active_deck_size == min_cards:
@@ -269,7 +286,7 @@ func _update_counters():
 	
 	var active_item_count = GameManager.active_items.size()
 	var max_items = max(1, GameManager.player_level)
-	item_count_label.text = "Active Items: %d / %d" % [active_item_count, max_items]
+	item_count_label.text = "Equipped: %d / %d" % [active_item_count, max_items]
 	item_count_label.modulate = Color.GOLD if active_item_count >= max_items else Color.WHITE
 
 func _on_back_pressed():
@@ -278,9 +295,13 @@ func _on_back_pressed():
 		return
 	
 	if GameManager.is_battle_mode:
-		get_tree().change_scene_to_file("res://features/map/BattleMap.tscn")
+		var next_scene = GameManager.profile_return_scene if GameManager.profile_return_scene != "" else "res://features/map/BattleMap.tscn"
+		GameManager.profile_return_scene = ""
+		get_tree().change_scene_to_file(next_scene)
 	else:
-		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+		var next_scene = GameManager.profile_return_scene if GameManager.profile_return_scene != "" else GameManager.get_story_map_scene_path()
+		GameManager.profile_return_scene = ""
+		get_tree().change_scene_to_file(next_scene)
 
 func _configure_card_ui(card_ui: Control, res: Resource):
 	card_ui.custom_minimum_size = Vector2(156, 234)
@@ -298,11 +319,50 @@ func _configure_card_ui(card_ui: Control, res: Resource):
 	if card_ui.has_method("_on_pressed") and card_ui.pressed.is_connected(card_ui._on_pressed):
 		card_ui.pressed.disconnect(card_ui._on_pressed)
 
+func _simplify_stack_back_card(card_ui: Control):
+	var card_image = card_ui.get_node_or_null("%CardImage")
+	if card_image:
+		card_image.visible = false
+	var center_type_icon = card_ui.get_node_or_null("%CenterTypeIcon")
+	if center_type_icon:
+		center_type_icon.visible = false
+	var text_overlay = card_ui.get_node_or_null("FrontFace/TextOverlay")
+	if text_overlay:
+		text_overlay.visible = false
+
 func _count_ids(ids: Array) -> Dictionary:
 	var counts := {}
 	for id in ids:
 		counts[id] = int(counts.get(id, 0)) + 1
 	return counts
+
+func _get_reserve_deck_counts() -> Dictionary:
+	var owned_counts = _count_ids(GameManager.player_deck)
+	var active_counts = _count_ids(GameManager.active_deck)
+	var reserve_counts := {}
+	for card_id in owned_counts.keys():
+		var available = int(owned_counts.get(card_id, 0)) - int(active_counts.get(card_id, 0))
+		if available > 0:
+			reserve_counts[card_id] = available
+	return reserve_counts
+
+func _get_available_owned_card_count(card_id: String) -> int:
+	var reserve_counts = _get_reserve_deck_counts()
+	return int(reserve_counts.get(card_id, 0))
+
+func _get_reserve_item_counts() -> Dictionary:
+	var owned_counts = _count_ids(GameManager.player_items)
+	var active_counts = _count_ids(GameManager.active_items)
+	var reserve_counts := {}
+	for item_id in owned_counts.keys():
+		var available = int(owned_counts.get(item_id, 0)) - int(active_counts.get(item_id, 0))
+		if available > 0:
+			reserve_counts[item_id] = available
+	return reserve_counts
+
+func _get_available_owned_item_count(item_id: String) -> int:
+	var reserve_counts = _get_reserve_item_counts()
+	return int(reserve_counts.get(item_id, 0))
 
 func _sorted_keys(dict: Dictionary) -> Array:
 	var keys = dict.keys()

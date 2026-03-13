@@ -57,6 +57,10 @@ func save_mid_run_state():
 		"last_xp_gained": GameManager.last_xp_gained,
 		"pending_level_up": var_to_str(GameManager.pending_level_up),
 		"level_up_return_scene": GameManager.level_up_return_scene,
+		"pending_post_battle_scene": GameManager.pending_post_battle_scene,
+		"player_biome": GameManager.player_biome,
+		"selected_story_biome": GameManager.selected_story_biome,
+		"profile_return_scene": GameManager.profile_return_scene,
 
 		"hp": GameManager.current_hp,
 		"max_hp": GameManager.max_hp,

@@ -1,25 +1,14 @@
 
-AGENTIC
-===
-Google Gemini
-
-OpenAI Codex 
-	try isntall 
-
-
-===
-PROMPT 
-===
-
-floor -> allow unique floor for each background, otherwise default for the biome (eg
+floor -> allow unique floor for each background, otherwise default for the biome
 
 ===
 
-ingamemenu pressing "abandon run"
-trigger runsummary scene and populate values 
-if gamemanager is_battle_mode, then exit to main menu 
-if not is_battle_mode, reset player hp to full and location to home 
+	ingamemenu pressing "abandon run"
+	trigger runsummary scene and populate values 
+	if gamemanager is_battle_mode, then exit to main menu 
+	if not is_battle_mode, reset player hp to full and location to home 
 
+show storymap (read only)
 
 ===
 
@@ -31,23 +20,24 @@ if treasure, load treasure board
 if completed | empty, load empty room 
 
 ===
-on gamemanager start_actual_run and start_battle_mode, update current_hp, max_hp to use gamedata CLASS_STATS to get hp for the correct class. replace current_level variable with player_level for consistency
+
+	on gamemanager start_actual_run and start_battle_mode, update current_hp, max_hp to use gamedata CLASS_STATS to get hp for the correct class. replace current_level variable with player_level for consistency
 
 ===
 
-battle scene - map 
-	remove duplciates (eg. pickpocket) 
+	battle scene - map 
+		remove duplciates (eg. pickpocket) 
 	
 asset cleanup 
-	enemies 
-		reduce hp 
-		adjust xp 
-		
-	player 
-		reduce hp 
-		reduce energy 
+enemies 
+	reduce hp 
+	adjust xp 
+	
+player 
+	reduce hp 
+	reduce energy 
 
-	recreate + audit 
+recreate + audit 
 
 === 
 	
@@ -61,7 +51,6 @@ battle mode
 	load - .. confirm correct map  
 
 ===
-	
 Victory: Assets 
 	update music for victory screen .. 
 	
@@ -220,8 +209,6 @@ links
 
 	https://docs.google.com/spreadsheets/d/1BVhCvmFrrNGUbYFwAzhaRM08_MC3hzlxxKbPdmfMNfs/edit?gid=0#gid=0
 	
-
-
 
 scene selector 
 	1x combat - make sure combat scene is loading the correct enemy and default 
@@ -1040,5 +1027,190 @@ update card scene so that ImageSpacer and CenterTypeIcon do not push down Descri
 
 	use "default" if not found  (card_front_{rarity}_default)
 		
-		
-		
+	
+==
+	
+	characterscreen
+
+	update deck selection so that a card in the active deck, is no longer shown in the player deck, so that duplicate cards are not shown in active deck and player deck.
+
+	allow a scenario where a player has multiple copies of the same card, eg. 2 swords, 1 in active, 1 player deck (not allocated). 
+
+	for duplicate cards, move the multiplier further top right corner of card
+	make first card in the stack opaque, 
+	on stacks of duplicate cards, hide the icons and text of second card so they do not show overlapped below the first card 
+
+	card multiplier is cropping off the top of the ActiveDeckGrid. 
+	add small amount of padding at top of ActiveDeckGrid and activeitemsgrid to avoid cropping of mutiplier 
+	
+
+===
+
+	BattleMap and BattleMapGenerator
+
+	Generate a grid based map. Draw the grid using a grey outline. Depending on the biome, make the grid
+
+	2x2. Home (tutorial)
+	3x3. Town (biome 1) 
+	...
+	10x10. The Core (biome 8)
+
+	Connect all adjacent nodes with dotted line function. Only show adjacent rooms. Hide all nodes and connections not adjacent to player. 
+
+	Populate the map with the icon corresponding to room type 
+
+	Select from the available rooms. Do not use duplicate rooms. If all rooms for a biome have been used, use the default room for that biome (eg. {biome}_default). 
+
+	Shade the current player location with solid green background. Show the selected room with a light green background
+	Select the next room with arrow keys + enter, or double click 
+
+	If returning to previous node trigger the boss room for the biome (eg. {biome}_boss). Dialog prompt. "You have a feeling you have been here before. An intense pain fills your mind as memory floods back" 
+
+
+characterscreen 
+
+update activedeck grid so that as more cards are added, the width between cards is reduced. 
+limit activedeck to one row keeping to one row 
+allow overlapping of cards, but show the card on hover
+..
+	
+
+battlemap scene
+
+	draw the outline of all possible rooms. do not show the icons or connections until adjacent  
+	place the shading (green / light green) behind the map icon. 
+
+
+battlemap scene
+
+	when using arrow keys, the map node highlighted by a border outline can be different to the map node highlighted light green shading. update UI so that the selected room node always has the shading and light green background 
+
+	only show one biome at a time (eg. 2 x 2).  
+	remove "deja vu" dialog box, make it a toast box with same format as characterscreen, red writing
+	on defeating the boss room, move to a random position in the next biome (eg. 3 x 3)
+
+==
+
+as
+==
+
+(Rename world map to area map)
+
+Storymap scene 
+
+	Add a "story" icon next to character profile in battlemap / worldmap, which loads the storymap scene. UI input "w" toggles between story map and a biome map if selected
+
+	The story map is a horizontal row of nodes or "tablets" reflecting each biome as a chapter. Each chapter consists of a "story" scene, and a "map summary" scene. Add new chapters to the right, horizontal scrollbar. In battle mode, hide the "story" node
+
+	Only show unlocked chapters. By default, chapter 1 is unlocked. Once a biome boss for a chapter has been defeated, update gamestate and unlock the next chapter. 
+	 
+	Storychapter scene. 
+	 
+	Create a storychapter scene. The scene is a large tablet, A4 dimensions. Fill 90% of height background for the node is granite texture, title label and large text area. 
+
+	Mapsummary scene 
+
+	Create a mapsummary scene. A4 dimensions. Fill 90% of height. Paint the world / area map for a corresponding chapter, based on player location and complete rooms. On click, load the corresponding area / world map UI. Update world map scene to load different map depending on the selection.
+
+	Update gamestate player location to include which biome they are in. In story mode, at the start of the run / day, load story map. Arrow keys or double click to travel to the selected biome, set player to the "home" location for that biome. 
+
+	When entering a biome for the first itme, place the character in a random square for the biome and make it the "home" location
+
+
+
+===
+
+Run summary
+
+Show a read only version of the StoryMap
+
+== 
+
+Boss room
+
+	On defeating the boss room, update game state that biome has been cleared. 
+	in story mode redirect to a cutscene (placeholder), then storymap scene 
+	in battle mode redirect to storymap scene ...
+	for both modes, update character position to the next biome.  
+
+===
+
+Room assets. 
+
+Update with room type: battle, shop, NPC...
+Allocate a boss for each biome.
+Add room "complete" conditions, eg. Card or Inventory item, defeat an enemy, discover a room, meet an NPC, gold, level, day or days passed. 
+Count total for each biome. 
+Default room for each biome with a list of possible enemies
+Create four rooms for home / tutorial
+
+===
+
+WorldMapUI and MapGenerator 
+
+Apply battlemap logic to worldmapui scene 
+
+Rooms that are "complete" remain visible. These rooms are permanently allocated to a location. They  can be revisited without triggering the boss room for the biome 
+
+Track the complete status of each room based on the complete conditions for each room
+
+===
+
+===
+
+=== 
+
+Language support
+
+Replace text objects with text keys. Update the language file with the English version of the text 
+
+Cutscenes
+Menus
+Dialogs
+Items
+Cards 
+...
+
+===
+
+Battlescene
+
+Status effects. Update combat to include status effects
+
+Freeze. Enemy misses 3 turns, takes 50% more damage
+Vulnerable. Enemy takes 100% damage next 3 turn
+Bleed. Take N damage next 3 turns 
+Reflect. Next damage dealt to player is dealt to enemy 
+Stagger. If enemy is damaged by more than stagger limit, lose the next turn 
+
+Apply any status effects at the start of each turn
+
+Check if enemy is resistant to the status effects 
+
+Enemy intent. Update scene to show the next card played by the enemy. Play the enemy card after player turn. Replace static damage 
+
+===
+
+cards / items 
+	sort by "power" 
+	update enemy mapping to card / item rewards  
+	balance cards by enemy 
+	
+===
+
+Enemy cards
+
+Create enemy cards template. Black background 
+
+Create enemy card resources
+* Attack. Strike, stab, etc..
+* Defend. Fortify, etc..
+* Status cards. 
+   Confuse. Shuffle cards
+   Trap. Add another trap 
+* Wait. No action 
+
+Update enemy asset to include
+* cards used
+* Resistances 
+    

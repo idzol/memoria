@@ -12,6 +12,10 @@ var last_xp_gained: int = 0
 var pending_level_up: Dictionary = {}
 var level_up_return_scene: String = ""
 var run_summary_exit_to_main_menu: bool = false
+var pending_post_battle_scene: String = ""
+var player_biome: String = "town"
+var selected_story_biome: String = "town"
+var profile_return_scene: String = ""
 
 var base_energy: int = 0	# number of guesses start of each board  
 var base_attack: int = 0	
@@ -84,6 +88,7 @@ var world_state = {
 		"highest_floor": 0,
 		"gold": 0
 	},
+	"biomes": {}, # Format: "forest": {"cleared": true, "unlocked": false, "home_node_id": ""}
 	"rooms": {}, # Format: "f1": {"visited": true, "unlocked": true, "cleared": false}
 	"npcs": {},  # Format: "blacksmith": {"wins": 0, "defeats": 0, "relationship": 10, "met": true}
 	"cards": {
@@ -104,6 +109,8 @@ var current_deck: Array:
 # Format: { Vector2i(column, layer): "type_string" }
 var fixed_nodes: Dictionary = {}
 const ITEMS_ROOT = "res://data/items/"
+const STORY_BIOME_ORDER = ["town", "forest", "ice_caves", "desert", "swamp", "abyss", "void", "the_core"]
+const BATTLE_BIOME_ORDER = ["home", "town", "forest", "ice_caves", "desert", "swamp", "abyss", "void", "the_core"]
 
 func _ready():
 	SignalBus.node_selected.connect(_on_node_selected)
@@ -162,6 +169,48 @@ func mark_room_cleared(room_id):
 	SaveManager.save_mid_run_state()
 	prepare_victory_loot(current_node)
 
+func mark_biome_cleared(biome: String):
+	if biome == "":
+		return
+	_ensure_biome_state(biome)
+	world_state.biomes[biome].cleared = true
+
+func unlock_biome(biome: String):
+	if biome == "":
+		return
+	_ensure_biome_state(biome)
+	world_state.biomes[biome].unlocked = true
+
+func is_biome_unlocked(biome: String) -> bool:
+	if biome == "":
+		return false
+	if biome == STORY_BIOME_ORDER[0]:
+		return true
+	return world_state.biomes.has(biome) and world_state.biomes[biome].get("unlocked", false)
+
+func is_biome_cleared(biome: String) -> bool:
+	if biome == "":
+		return false
+	return world_state.biomes.has(biome) and world_state.biomes[biome].get("cleared", false)
+
+func get_unlocked_story_biomes() -> Array[String]:
+	var result: Array[String] = []
+	for biome in STORY_BIOME_ORDER:
+		if is_biome_unlocked(biome):
+			result.append(biome)
+	return result
+
+func set_selected_story_biome(biome: String):
+	if biome == "":
+		return
+	selected_story_biome = biome
+
+func get_story_map_scene_path() -> String:
+	return "res://features/map/StoryMap.tscn"
+
+func get_active_biome_map_scene_path() -> String:
+	return "res://features/map/BattleMap.tscn" if is_battle_mode else "res://features/map/WorldMap.tscn"
+
 func add_player_xp(amount: int) -> Dictionary:
 	var gained = max(0, amount)
 	player_xp += gained
@@ -202,6 +251,16 @@ func _ensure_room_state(room_id: String):
 		return
 	if not world_state.rooms.has(room_id):
 		world_state.rooms[room_id] = {"visited": true, "cleared": false}
+
+func _ensure_biome_state(biome: String):
+	if biome == "":
+		return
+	if not world_state.biomes.has(biome):
+		world_state.biomes[biome] = {"cleared": false, "unlocked": false, "home_node_id": ""}
+	elif not world_state.biomes[biome].has("home_node_id"):
+		world_state.biomes[biome].home_node_id = ""
+	elif not world_state.biomes[biome].has("unlocked"):
+		world_state.biomes[biome].unlocked = false
 
 func record_npc_interaction(npc_id: String, won: bool):
 	if world_state.npcs.has(npc_id):
@@ -291,6 +350,11 @@ func start_battle_mode():
 	gen.queue_free()
 	player_grid_pos = Vector2i(0, 0)
 	world_state.rooms = {}
+	world_state.biomes = {}
+	pending_post_battle_scene = ""
+	player_biome = "town"
+	selected_story_biome = "town"
+	_initialize_story_progression()
 	
 	hide_loading()
 	get_tree().change_scene_to_file("res://features/map/BattleMap.tscn")
@@ -305,8 +369,11 @@ func start_actual_run():
 	last_xp_gained = 0
 	pending_level_up = {}
 	level_up_return_scene = ""
+	pending_post_battle_scene = ""
 	completed_nodes = []
 	player_grid_pos = Vector2i(2, -1) # Ensure player starts at Home
+	player_biome = "town"
+	selected_story_biome = "town"
 	active_deck = ["sword", "shield", "heart"]
 	recalculate_player_totals()
 
@@ -327,14 +394,16 @@ func start_actual_run():
 		gen.progress_updated.connect(_on_gen_progress)
 	
 	run_map = await gen.generate_new_map()
+	world_state.biomes = {}
+	_initialize_story_progression()
+	enter_story_biome("town", true)
 	SaveManager.save_mid_run_state()
 	
 	# 4. Cleanup
 	gen.queue_free()
 	hide_loading()
 
-	# Transition to Intro Cinematic instead of WorldMap directly
-	get_tree().change_scene_to_file("res://features/ui/IntroCinematic.tscn")
+	get_tree().change_scene_to_file(get_story_map_scene_path())
 
 func _on_gen_progress(percent: float, description: String):
 	update_loading(description, percent)
@@ -342,6 +411,8 @@ func _on_gen_progress(percent: float, description: String):
 func reset_to_home():
 	# Standard Home location: Layer -1, Column 2
 	player_grid_pos = Vector2i(2, -1)
+	player_biome = "town"
+	selected_story_biome = "town"
 
 func load_run_from_data(data: Dictionary):
 	is_battle_mode = data.get("is_battle_mode", false)
@@ -352,6 +423,10 @@ func load_run_from_data(data: Dictionary):
 	last_xp_gained = data.get("last_xp_gained", 0)
 	pending_level_up = _decode_variant_field(data, "pending_level_up", {})
 	level_up_return_scene = data.get("level_up_return_scene", "")
+	pending_post_battle_scene = data.get("pending_post_battle_scene", "")
+	player_biome = data.get("player_biome", player_biome)
+	selected_story_biome = data.get("selected_story_biome", player_biome)
+	profile_return_scene = data.get("profile_return_scene", "")
 
 	current_hp = data.get("hp", 100)
 	max_hp = data.get("max_hp", 100)
@@ -367,6 +442,7 @@ func load_run_from_data(data: Dictionary):
 	player_items = data.get("items", [])
 	active_items = data.get("active_items", [])
 	world_state = _decode_variant_field(data, "world_state", world_state)
+	_initialize_story_progression()
 	current_node = _decode_variant_field(data, "current_node", {})
 	run_map = _decode_variant_field(data, "run_map", run_map)
 	pending_loot = _decode_variant_field(data, "pending_loot", [])
@@ -384,7 +460,9 @@ func load_run_from_data(data: Dictionary):
 	if is_battle_mode:
 		get_tree().change_scene_to_file("res://features/map/BattleMap.tscn")
 	else:
-		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+		if selected_story_biome == "":
+			selected_story_biome = player_biome
+		get_tree().change_scene_to_file(get_story_map_scene_path())
 
 func _decode_variant_field(data: Dictionary, key: String, default_value):
 	var raw = data.get(key, default_value)
@@ -392,6 +470,55 @@ func _decode_variant_field(data: Dictionary, key: String, default_value):
 		var decoded = str_to_var(raw)
 		return decoded if decoded != null else default_value
 	return raw
+
+func _initialize_story_progression():
+	for biome in STORY_BIOME_ORDER:
+		_ensure_biome_state(biome)
+	unlock_biome(STORY_BIOME_ORDER[0])
+
+func get_nodes_for_biome(biome: String) -> Array[Dictionary]:
+	var results: Array[Dictionary] = []
+	for raw_key in run_map.keys():
+		var node = run_map[raw_key]
+		if str(node.get("biome", "")) == biome:
+			results.append(node)
+	return results
+
+func _get_run_node_by_id(node_id: String) -> Dictionary:
+	for raw_key in run_map.keys():
+		if str(raw_key) == node_id:
+			return run_map[raw_key]
+	return {}
+
+func get_biome_home_node_id(biome: String) -> String:
+	_ensure_biome_state(biome)
+	return str(world_state.biomes[biome].get("home_node_id", ""))
+
+func set_biome_home_node_id(biome: String, node_id: String):
+	_ensure_biome_state(biome)
+	world_state.biomes[biome].home_node_id = node_id
+
+func enter_story_biome(biome: String, mark_as_home_if_new: bool = true):
+	if biome == "":
+		return
+	unlock_biome(biome)
+	var biome_nodes = get_nodes_for_biome(biome)
+	if biome_nodes.is_empty():
+		return
+	var home_node_id = get_biome_home_node_id(biome)
+	var entry_node: Dictionary = {}
+	if home_node_id != "":
+		entry_node = _get_run_node_by_id(home_node_id)
+	if entry_node.is_empty():
+		entry_node = biome_nodes.pick_random()
+		if mark_as_home_if_new:
+			set_biome_home_node_id(biome, str(entry_node.get("id", "")))
+	player_biome = biome
+	selected_story_biome = biome
+	_set_player_position_from_node(entry_node)
+
+func get_current_story_chapter_index() -> int:
+	return max(0, STORY_BIOME_ORDER.find(selected_story_biome))
 
 
 func _on_node_selected(node_data: Dictionary):
@@ -467,21 +594,101 @@ func prepare_victory_loot(node_data: Dictionary):
 
 
 func _on_combat_won():
-	prepare_victory_loot(current_node)
-	
-	if current_node.has("id"):
-		completed_nodes.append(current_node.id)
-		player_grid_pos = Vector2i(current_node.column, current_node.layer)
-		
-		if world_state.rooms.has(current_node.id):
-			world_state.rooms[current_node.id].cleared = true
-		
+	register_room_victory(current_node, current_hp)
 	SaveManager.save_mid_run_state()
 	
 	if not pending_loot.is_empty():
 		get_tree().change_scene_to_file("res://features/ui/LootScene.tscn")
 	else:
-		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+		get_tree().change_scene_to_file(consume_pending_post_battle_scene(_get_default_overworld_scene()))
+
+func register_room_victory(node_data: Dictionary, remaining_hp: int):
+	current_hp = remaining_hp
+	pending_post_battle_scene = ""
+	prepare_victory_loot(node_data)
+
+	var node_id = str(node_data.get("id", ""))
+	if node_id != "":
+		if not completed_nodes.has(node_id):
+			completed_nodes.append(node_id)
+		_ensure_room_state(node_id)
+		world_state.rooms[node_id].cleared = true
+		world_state.rooms[node_id].visited = true
+
+	if _is_boss_room(node_data):
+		var biome = str(node_data.get("biome", ""))
+		mark_biome_cleared(biome)
+		var next_biome = _get_next_biome_key(biome)
+		unlock_biome(next_biome)
+		_move_player_to_random_next_biome(node_data)
+		pending_post_battle_scene = "res://features/map/BattleMap.tscn" if is_battle_mode else "res://features/ui/BiomeClearCutscene.tscn"
+	else:
+		_set_player_position_from_node(node_data)
+
+	SaveManager.save_mid_run_state()
+
+func consume_pending_post_battle_scene(fallback_scene: String) -> String:
+	var scene = pending_post_battle_scene if pending_post_battle_scene != "" else fallback_scene
+	pending_post_battle_scene = ""
+	return scene
+
+func peek_pending_post_battle_scene(fallback_scene: String) -> String:
+	return pending_post_battle_scene if pending_post_battle_scene != "" else fallback_scene
+
+func _get_default_overworld_scene() -> String:
+	return "res://features/map/BattleMap.tscn" if is_battle_mode else "res://features/map/WorldMap.tscn"
+
+func _is_boss_room(node_data: Dictionary) -> bool:
+	var node_type = str(node_data.get("type", ""))
+	var node_id = str(node_data.get("id", ""))
+	return node_type == "boss" or node_id.ends_with("_boss")
+
+func _set_player_position_from_node(node_data: Dictionary):
+	player_biome = str(node_data.get("biome", player_biome))
+	selected_story_biome = player_biome
+	if is_battle_mode:
+		player_grid_pos = Vector2i(int(node_data.get("layer", 0)), int(node_data.get("column", 0)))
+	else:
+		player_grid_pos = Vector2i(int(node_data.get("column", 0)), int(node_data.get("layer", 0)))
+
+func _move_player_to_random_next_biome(node_data: Dictionary):
+	var current_biome = str(node_data.get("biome", ""))
+	var next_biome = _get_next_biome_key(current_biome)
+	if next_biome == "":
+		_set_player_position_from_node(node_data)
+		return
+
+	var next_biome_nodes: Array[Dictionary] = []
+	for raw_key in run_map.keys():
+		var candidate = run_map[raw_key]
+		if str(candidate.get("biome", "")) == next_biome:
+			next_biome_nodes.append(candidate)
+
+	if next_biome_nodes.is_empty():
+		_set_player_position_from_node(node_data)
+		return
+
+	var next_node = next_biome_nodes.pick_random()
+	if is_battle_mode:
+		if get_biome_home_node_id(next_biome) == "":
+			set_biome_home_node_id(next_biome, str(next_node.get("id", "")))
+		_set_player_position_from_node(next_node)
+		return
+	player_biome = next_biome
+	selected_story_biome = next_biome
+	player_grid_pos = Vector2i(int(next_node.get("column", 0)), int(next_node.get("layer", 0)))
+	if get_biome_home_node_id(next_biome) == "":
+		set_biome_home_node_id(next_biome, str(next_node.get("id", "")))
+
+func _get_next_biome_key(current_biome: String) -> String:
+	var order = BATTLE_BIOME_ORDER if is_battle_mode else STORY_BIOME_ORDER
+	var biome_index = order.find(current_biome)
+	if biome_index == -1:
+		return ""
+	var next_index = biome_index + 1
+	if next_index >= order.size():
+		return ""
+	return str(order[next_index])
 
 func _on_combat_lost():
 	get_tree().call_deferred("change_scene_to_file", "res://features/ui/DeathScreen.tscn")

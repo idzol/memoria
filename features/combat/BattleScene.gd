@@ -702,27 +702,23 @@ func _check_win_loss():
 	
 	if e_hp <= 0:
 		is_battle_over = true
-		GameManager.current_hp = p_hp
+		GameManager.register_room_victory(GameManager.current_node, p_hp)
 		var xp_reward = current_enemy_res.xp_reward if current_enemy_res else 0
 		var xp_result = GameManager.add_player_xp(xp_reward)
-		GameManager.mark_room_cleared(GameManager.current_node.id)
+		var default_victory_scene = "res://features/combat/VictoryScreenBattleMode.tscn" if GameManager.is_battle_mode else "res://features/combat/VictoryScreen.tscn"
+		var return_scene = GameManager.peek_pending_post_battle_scene(default_victory_scene)
 		if xp_result.get("leveled_up", false):
-			GameManager.level_up_return_scene = "res://features/combat/VictoryScreenBattleMode.tscn" if GameManager.is_battle_mode else "res://features/combat/VictoryScreen.tscn"
+			GameManager.level_up_return_scene = GameManager.consume_pending_post_battle_scene(default_victory_scene) if return_scene != default_victory_scene else default_victory_scene
 			await get_tree().create_timer(1.5).timeout
 			if not is_inside_tree():
 				return
 			get_tree().call_deferred("change_scene_to_file", "res://features/ui/CharacterLevelUp.tscn")
 			return
 		
-		# GLOBAL ROUTING: Battle Mode vs standard World Mode
 		await get_tree().create_timer(1.5).timeout
 		if not is_inside_tree():
 			return
-		if GameManager.is_battle_mode:
-			# Experience gain logic could be added here
-			get_tree().call_deferred("change_scene_to_file", "res://features/combat/VictoryScreenBattleMode.tscn")
-		else:
-			get_tree().call_deferred("change_scene_to_file", "res://features/combat/VictoryScreen.tscn")
+		get_tree().call_deferred("change_scene_to_file", GameManager.consume_pending_post_battle_scene(default_victory_scene))
 			
 	elif p_hp <= 0:
 		is_battle_over = true
