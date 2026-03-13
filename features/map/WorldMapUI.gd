@@ -33,13 +33,20 @@ var visible_max_layer: int = 0
 var visible_min_column: int = 0
 var visible_max_column: int = 0
 
-const NODE_HALF_SIZE = Vector2(90, 90)
-const LAYER_SPACING = 240.0
-const ROW_SPACING = 220.0
-const MAP_LEFT_PADDING = 240.0
-const MAP_TOP_PADDING = 220.0
+const BASE_NODE_SIZE = Vector2(180, 180)
+const BASE_LAYER_SPACING = 240.0
+const BASE_ROW_SPACING = 220.0
+const BASE_TOP_PADDING = 120.0
 const DOTTED_COLOR = Color(0.68, 0.68, 0.72, 0.85)
 const BACKTRACK_PROMPT = "You have a feeling you have been here before. An intense pain fills your mind as memory floods back"
+
+var current_node_scale: float = 1.0
+var current_node_size: Vector2 = BASE_NODE_SIZE
+var current_node_half_size: Vector2 = BASE_NODE_SIZE * 0.5
+var current_layer_spacing: float = BASE_LAYER_SPACING
+var current_row_spacing: float = BASE_ROW_SPACING
+var current_left_padding: float = 120.0
+var current_top_padding: float = BASE_TOP_PADDING
 
 func _ready():
 	_setup_ui()
@@ -67,6 +74,10 @@ func _ready():
 
 	SignalBus.music_change_requested.emit(AudioData.TRACKS["TOWN"], 1.0)
 	_scroll_to_player()
+
+func _notification(what):
+	if what == NOTIFICATION_RESIZED and is_inside_tree() and not GameManager.run_map.is_empty():
+		_draw_map()
 
 func _input(event):
 	if get_viewport().is_input_handled():
@@ -103,7 +114,7 @@ func _input(event):
 		_activate_selected_node()
 
 func _setup_ui():
-	scroll_area.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	scroll_area.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll_area.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 
 	if avatar_button:
@@ -152,6 +163,7 @@ func _draw_map():
 	_update_header_labels(current_data)
 	var revealed_set = _build_visible_node_set(current_id, current_biome)
 	_recalculate_map_bounds(current_biome)
+	_update_map_layout_scale()
 	_update_map_content_bounds()
 
 	var grid_tex = _get_biome_grid_texture(current_biome)
@@ -168,6 +180,7 @@ func _draw_map():
 		node_container.add_child(node_ui)
 		var node_pos = _get_node_position(int(data.get("layer", 0)), int(data.get("column", 0)))
 		node_ui.position = node_pos
+		node_ui.scale = Vector2.ONE * current_node_scale
 		node_positions_by_id[node_id] = node_pos
 
 		var is_player_here = node_id == current_id
@@ -201,8 +214,8 @@ func _draw_map():
 				continue
 			drawn_pairs[pair_key] = true
 			_draw_hand_drawn_dotted_line(
-				node_positions_by_id[source_id_str] + NODE_HALF_SIZE,
-				node_positions_by_id[target_id] + NODE_HALF_SIZE
+				node_positions_by_id[source_id_str] + current_node_half_size,
+				node_positions_by_id[target_id] + current_node_half_size
 			)
 
 	_refresh_selection_highlight(current_id)
@@ -239,7 +252,7 @@ func _build_visible_node_set(current_id: String, biome: String) -> Dictionary:
 		if str(data.get("biome", "")) != biome:
 			continue
 		var state = GameManager.world_state.rooms.get(node_id, {})
-		if state.get("visited", false) or state.get("cleared", false) or state.get("completed", false) or str(data.get("type", "")) == "home":
+		if state.get("completed", false):
 			visible_set[node_id] = true
 
 	return visible_set
@@ -521,51 +534,68 @@ func _make_pair_key(a: String, b: String) -> String:
 func _update_map_content_bounds():
 	if not map_content:
 		return
-	var layer_count = max(1, visible_max_layer - visible_min_layer + 1)
 	var row_count = max(1, visible_max_column - visible_min_column + 1)
-	var content_width = float(layer_count) * LAYER_SPACING + (MAP_LEFT_PADDING * 2.0)
-	var content_height = float(row_count) * ROW_SPACING + (MAP_TOP_PADDING * 2.0)
+	var content_height = float(row_count - 1) * current_row_spacing + current_node_size.y + (current_top_padding * 2.0)
 	map_content.custom_minimum_size = Vector2(
-		max(content_width, scroll_area.size.x),
+		scroll_area.size.x,
 		max(content_height, scroll_area.size.y)
 	)
 
 func _get_node_position(layer: int, column: int) -> Vector2:
 	var relative_layer = layer - visible_min_layer
 	var relative_column = column - visible_min_column
+	var content_width = max(scroll_area.size.x, map_content.custom_minimum_size.x)
+	var nodes_span = float(max(0, visible_max_layer - visible_min_layer)) * current_layer_spacing
+	var start_x = max(current_left_padding, (content_width - nodes_span - current_node_size.x) * 0.5)
 	return Vector2(
-		relative_layer * LAYER_SPACING + MAP_LEFT_PADDING,
-		relative_column * ROW_SPACING + MAP_TOP_PADDING
+		relative_layer * current_layer_spacing + start_x,
+		relative_column * current_row_spacing + current_top_padding
 	)
 
 func _draw_hand_drawn_dotted_line(p1: Vector2, p2: Vector2):
 	var dir = (p2 - p1).normalized()
 	var dist = p1.distance_to(p2)
 	var current_dist = 0.0
+	var line_width = max(2.0, 4.0 * current_node_scale)
+	var segment_length = max(6.0, 9.0 * current_node_scale)
+	var segment_gap = max(12.0, 18.0 * current_node_scale)
 	while current_dist < dist:
 		var segment = Line2D.new()
-		segment.width = 4.0
+		segment.width = line_width
 		segment.default_color = DOTTED_COLOR
 		segment.begin_cap_mode = Line2D.LINE_CAP_ROUND
 		segment.end_cap_mode = Line2D.LINE_CAP_ROUND
 		segment.add_point(p1 + dir * current_dist)
-		segment.add_point(p1 + dir * min(current_dist + 9.0, dist))
+		segment.add_point(p1 + dir * min(current_dist + segment_length, dist))
 		lines_container.add_child(segment)
-		current_dist += 18.0
+		current_dist += segment_gap
 
 func _scroll_to_player():
 	await get_tree().process_frame
-	var layer_offset = _get_player_layer() - visible_min_layer
 	var col_offset = _get_player_column() - visible_min_column
-	var target_x = layer_offset * LAYER_SPACING + MAP_LEFT_PADDING - (scroll_area.size.x * 0.5)
-	var target_y = col_offset * ROW_SPACING + MAP_TOP_PADDING - (scroll_area.size.y * 0.5)
-	var max_scroll_x = max(0.0, map_content.custom_minimum_size.x - scroll_area.size.x)
+	var target_y = col_offset * current_row_spacing + current_top_padding - (scroll_area.size.y * 0.5)
 	var max_scroll_y = max(0.0, map_content.custom_minimum_size.y - scroll_area.size.y)
-	target_x = clamp(target_x, 0.0, max_scroll_x)
 	target_y = clamp(target_y, 0.0, max_scroll_y)
 	var tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	tween.tween_property(scroll_area, "scroll_horizontal", int(target_x), 0.35)
-	tween.parallel().tween_property(scroll_area, "scroll_vertical", int(target_y), 0.35)
+	scroll_area.scroll_horizontal = 0
+	tween.tween_property(scroll_area, "scroll_vertical", int(target_y), 0.35)
+
+func _update_map_layout_scale():
+	var layer_count = max(1, visible_max_layer - visible_min_layer + 1)
+	var row_count = max(1, visible_max_column - visible_min_column + 1)
+	var available_width = max(scroll_area.size.x, get_viewport_rect().size.x) - 96.0
+	var available_height = max(scroll_area.size.y, get_viewport_rect().size.y) - 180.0
+	var base_width = float(max(0, layer_count - 1)) * BASE_LAYER_SPACING + BASE_NODE_SIZE.x
+	var base_height = float(max(0, row_count - 1)) * BASE_ROW_SPACING + BASE_NODE_SIZE.y
+	var width_scale = available_width / max(base_width, 1.0)
+	var height_scale = available_height / max(base_height, 1.0)
+	current_node_scale = clamp(min(width_scale, height_scale, 1.0), 0.42, 1.0)
+	current_node_size = BASE_NODE_SIZE * current_node_scale
+	current_node_half_size = current_node_size * 0.5
+	current_layer_spacing = BASE_LAYER_SPACING * current_node_scale
+	current_row_spacing = BASE_ROW_SPACING * current_node_scale
+	current_left_padding = 48.0
+	current_top_padding = max(56.0, BASE_TOP_PADDING * current_node_scale)
 
 func _on_avatar_pressed():
 	GameManager.profile_return_scene = "res://features/map/WorldMap.tscn"

@@ -87,6 +87,13 @@ func _rebuild_chapters():
 			content_row.add_child(_build_story_tile(biome))
 		content_row.add_child(_build_summary_tile(biome))
 
+		if biome == unlocked[unlocked.size() - 1]:
+			var continue_label = Label.new()
+			continue_label.text = "Click to continue"
+			continue_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			continue_label.add_theme_font_size_override("font_size", 16)
+			chapter.add_child(continue_label)
+
 		var spacer = Control.new()
 		spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		chapter.add_child(spacer)

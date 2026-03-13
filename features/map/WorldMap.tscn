@@ -135,7 +135,7 @@ custom_minimum_size = Vector2(70, 70)
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_font_sizes/font_size = 36
-text = "P"
+text = "👤"
 
 [node name="StoryButton" type="Button" parent="TopBar/Margin/HBox/Right" unique_id=1654217282]
 unique_name_in_owner = true
@@ -143,14 +143,14 @@ custom_minimum_size = Vector2(70, 70)
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_font_sizes/font_size = 26
-text = "S"
+text = "📜"
 
 [node name="MenuIconBtn" type="Button" parent="TopBar/Margin/HBox/Right" unique_id=1158006913]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(42, 34)
 layout_mode = 2
 size_flags_vertical = 4
-text = "M"
+text = "☰"
 
 [node name="InfoToastBox" type="PanelContainer" parent="." unique_id=707777001]
 unique_name_in_owner = true

@@ -1202,17 +1202,29 @@ Enemy intent. Update scene to show the next card played by the enemy. Play the e
 	remove home location (0, 0) and use same, use same home generation as battlemapgenerator
 	in story mode (!is_battle_mode), generate a permanent home location for each biome, that player returns to at end of a run. 
 
+	in the world map (battlemapgenerator, mapgenerator), make the starting position, or home location in each new biome a "home" icon. do not trigger the boss fight while passing through the home location 
 
+	in story mode (mapgenerator, !is_battle_mode), use the same map generation logic as battle mode (battlemapgenerator) as a base. 
 
-in the world map (battlemapgenerator, mapgenerator), make the starting position, or home location in each new biome a "home" icon. do not trigger the boss fight while passing through the home location 
+	in story mode, rooms that are "complete" remain visible between runs, and other rooms are randomly reselected each run. These rooms are permanently allocated to a location. They can be revisited without triggering the boss room for the biome. Track the complete status of each room based on the complete conditions for each room
+		
+	in story mode, each room resource with have a "complete" condition. eg. player has a card or inventory item, defeats an enemy, discover a room, meet an NPC, gold, level, day or days passed. If complete condition is blank / null, then it cannot be completed and is always randomly selected each run
 
-in story mode (mapgenerator, !is_battle_mode), use the same map generation logic as battle mode (battlemapgenerator) as a base. 
+	in story mode, use the room map icon unique for each room (res://assets/rooms/map/). fall back to room type icon, if no room map icon exists. 
 
-in story mode, rooms that are "complete" remain visible between runs, and other rooms are randomly reselected each run. These rooms are permanently allocated to a location. They can be revisited without triggering the boss room for the biome. Track the complete status of each room based on the complete conditions for each room
-	
-in story mode, each room resource with have a "complete" condition. eg. player has a card or inventory item, defeats an enemy, discover a room, meet an NPC, gold, level, day or days passed. If complete condition is blank / null, then it cannot be completed and is always randomly selected each run
+===
 
-in story mode, use the room map icon unique for each room (res://assets/rooms/map/). fall back to room type icon, if no room map icon exists. 
+	in worldmap, highlight the current player location map node with a green background. 
+
+	in storymap, user input mouse click on chaptersummary expands the chapter, and mouse click on mapsummary loads biome map. put a label, "click to continue" underneath the latest chapter mapsummary
+
+	make mapsummary a scaled down verison of the actual worldmap 
+
+	remove the map node outline for map node selection. 
+
+	in story mode (!is_battle_mode), only show adjacent rooms to player, and completed rooms
+
+	in worldmap, remove horizontal scroll. scale the room nodes to the screen size. 
 
 ===
 
@@ -1239,6 +1251,7 @@ cards / item balancing
 sort by "power" 
 update enemy mapping to card / item rewards  
 balance cards by enemy 
+remove 
 
 ===
 
@@ -1257,4 +1270,17 @@ Create enemy card resources
 Update enemy asset to include
 * cards used
 * Resistances 
+
+===
+
+enemy resource, update to include loot_power (numeric).
+card resource, update to include card_power (numeric).
+item resource, update to include item_power (numeric).
+victoryscreen. update to provide cards based on loot_power, only providing cards with equal card_power, or item_power
+
+
+===
+
+characterselect 
+active deck seleciton. require minimum number of unique pairs 
     

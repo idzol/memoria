@@ -12,6 +12,7 @@ const ADJACENT_COLOR = Color(0.92, 0.83, 0.4, 1.0)
 const HOME_COLOR = Color(0.47, 0.78, 1.0, 1.0)
 const PLAYER_COLOR = Color(0.3, 0.64, 1.0, 1.0)
 const COMPLETE_COLOR = Color(0.35, 0.78, 0.41, 1.0)
+const PREVIEW_PADDING = Vector2(24, 24)
 
 @export var embedded_mode: bool = false
 @export var show_background: bool = true
@@ -27,6 +28,7 @@ const COMPLETE_COLOR = Color(0.35, 0.78, 0.41, 1.0)
 @onready var preview_layer = %PreviewLayer
 @onready var open_button = %OpenButton
 
+var asset_library: MapAssetData = preload("res://data/map/map_data.tres")
 var display_biome: String = ""
 
 func _ready():
@@ -89,29 +91,35 @@ func _redraw_preview():
 	if nodes.is_empty():
 		return
 
+	var visible_ids = _get_visible_node_ids(biome)
 	var bounds = _get_node_bounds(nodes)
+	var layout = _get_preview_layout(bounds)
 	var positions: Dictionary = {}
 	for node in nodes:
 		var node_id = str(node.get("id", ""))
+		if not visible_ids.has(node_id):
+			continue
 		var layer = int(node.get("layer", 0)) - int(bounds["min_layer"])
 		var col = int(node.get("column", 0)) - int(bounds["min_col"])
-		positions[node_id] = Vector2(layer * MAP_SPACING.x, col * MAP_SPACING.y) + MAP_OFFSET
+		positions[node_id] = Vector2(layer * layout["spacing_x"], col * layout["spacing_y"]) + Vector2(layout["offset_x"], layout["offset_y"])
 
-	_draw_connections(nodes, positions, biome)
+	_draw_connections(nodes, positions, biome, visible_ids, float(layout["icon_scale"]))
 	if GameManager.is_battle_mode and GameManager.is_biome_cleared(biome):
 		_draw_battle_path(biome, positions)
-	_draw_markers(nodes, positions, biome)
+	_draw_markers(nodes, positions, biome, visible_ids, float(layout["icon_scale"]))
 
-func _draw_connections(nodes: Array[Dictionary], positions: Dictionary, biome: String):
+func _draw_connections(nodes: Array[Dictionary], positions: Dictionary, biome: String, visible_ids: Dictionary, icon_scale: float):
 	for node in nodes:
 		var source_id = str(node.get("id", ""))
+		if not visible_ids.has(source_id):
+			continue
 		var source_pos = positions.get(source_id, Vector2.ZERO)
 		for raw_target in node.get("connections", []):
 			var target_id = str(raw_target)
-			if not positions.has(target_id) or source_id > target_id:
+			if not visible_ids.has(target_id) or not positions.has(target_id) or source_id > target_id:
 				continue
 			var line = Line2D.new()
-			line.width = 3.0
+			line.width = max(2.0, 3.0 * icon_scale)
 			line.default_color = _get_connection_color(source_id, target_id, biome)
 			line.add_point(source_pos)
 			line.add_point(positions[target_id])
@@ -135,14 +143,25 @@ func _draw_battle_path(biome: String, positions: Dictionary):
 	if polyline.get_point_count() >= 2:
 		preview_layer.add_child(polyline)
 
-func _draw_markers(nodes: Array[Dictionary], positions: Dictionary, biome: String):
+func _draw_markers(nodes: Array[Dictionary], positions: Dictionary, biome: String, visible_ids: Dictionary, icon_scale: float):
 	for node in nodes:
 		var node_id = str(node.get("id", ""))
-		var marker = ColorRect.new()
-		marker.size = Vector2(18, 18)
-		marker.position = positions[node_id] - Vector2(9, 9)
-		marker.color = _get_node_color(node, biome)
-		preview_layer.add_child(marker)
+		if not visible_ids.has(node_id):
+			continue
+		var marker_bg = ColorRect.new()
+		var marker_size = 18.0 * icon_scale
+		marker_bg.size = Vector2(marker_size, marker_size)
+		marker_bg.position = positions[node_id] - Vector2(marker_size * 0.5, marker_size * 0.5)
+		marker_bg.color = _get_node_color(node, biome)
+		preview_layer.add_child(marker_bg)
+
+		var icon_texture = _get_node_icon_texture(node)
+		if icon_texture:
+			var icon = Sprite2D.new()
+			icon.texture = icon_texture
+			icon.position = positions[node_id]
+			icon.scale = Vector2.ONE * (0.18 * icon_scale)
+			preview_layer.add_child(icon)
 
 func _get_node_color(node: Dictionary, biome: String) -> Color:
 	var node_id = str(node.get("id", ""))
@@ -166,7 +185,7 @@ func _get_node_color(node: Dictionary, biome: String) -> Color:
 func _get_connection_color(source_id: String, target_id: String, biome: String) -> Color:
 	if GameManager.is_battle_mode and GameManager.is_biome_cleared(biome):
 		return Color(0.28, 0.28, 0.32, 0.8)
-	if not GameManager.is_battle_mode and (_is_story_visible(source_id) or _is_story_visible(target_id)):
+	if not GameManager.is_battle_mode and (_is_story_visible(source_id) and _is_story_visible(target_id)):
 		return Color(0.28, 0.28, 0.32, 0.72)
 	return Color(0.18, 0.18, 0.2, 0.35)
 
@@ -188,7 +207,7 @@ func _get_story_adjacent_node_ids(biome: String) -> Array[String]:
 
 func _is_story_visible(node_id: String) -> bool:
 	var state = GameManager.world_state.rooms.get(node_id, {})
-	return state.get("visited", false) or state.get("cleared", false) or state.get("completed", false)
+	return state.get("completed", false)
 
 func _is_player_node(node: Dictionary) -> bool:
 	var layer = int(node.get("layer", -999))
@@ -242,6 +261,74 @@ func _get_node_bounds(nodes: Array[Dictionary]) -> Dictionary:
 		"min_col": min_col,
 		"max_col": max_col
 	}
+
+func _get_preview_layout(bounds: Dictionary) -> Dictionary:
+	var frame_size = preview_frame.size if preview_frame.size != Vector2.ZERO else preview_frame.custom_minimum_size
+	var layer_count = max(1, int(bounds["max_layer"]) - int(bounds["min_layer"]) + 1)
+	var row_count = max(1, int(bounds["max_col"]) - int(bounds["min_col"]) + 1)
+	var usable_width = max(80.0, frame_size.x - (PREVIEW_PADDING.x * 2.0))
+	var usable_height = max(80.0, frame_size.y - (PREVIEW_PADDING.y * 2.0))
+	var base_width = float(max(0, layer_count - 1)) * MAP_SPACING.x + 18.0
+	var base_height = float(max(0, row_count - 1)) * MAP_SPACING.y + 18.0
+	var scale_factor = clamp(min(usable_width / max(base_width, 1.0), usable_height / max(base_height, 1.0), 1.0), 0.32, 1.0)
+	var spacing_x = MAP_SPACING.x * scale_factor
+	var spacing_y = MAP_SPACING.y * scale_factor
+	var content_width = float(max(0, layer_count - 1)) * spacing_x + (18.0 * scale_factor)
+	var content_height = float(max(0, row_count - 1)) * spacing_y + (18.0 * scale_factor)
+	return {
+		"spacing_x": spacing_x,
+		"spacing_y": spacing_y,
+		"icon_scale": scale_factor,
+		"offset_x": (frame_size.x - content_width) * 0.5,
+		"offset_y": (frame_size.y - content_height) * 0.5
+	}
+
+func _get_visible_node_ids(biome: String) -> Dictionary:
+	var visible_ids: Dictionary = {}
+	if GameManager.is_battle_mode and GameManager.is_biome_cleared(biome):
+		for node in GameManager.get_nodes_for_biome(biome):
+			visible_ids[str(node.get("id", ""))] = true
+		return visible_ids
+
+	var current_id = _find_current_node_id(biome)
+	if current_id != "":
+		visible_ids[current_id] = true
+
+	for node_id in _get_story_adjacent_node_ids(biome):
+		visible_ids[node_id] = true
+
+	var home_id = GameManager.get_biome_home_node_id(biome)
+	if home_id != "":
+		visible_ids[home_id] = true
+
+	for node in GameManager.get_nodes_for_biome(biome):
+		var node_id = str(node.get("id", ""))
+		if _is_story_visible(node_id):
+			visible_ids[node_id] = true
+
+	return visible_ids
+
+func _get_type_icon_texture(type: String) -> Texture2D:
+	if not asset_library:
+		return null
+	var property_name = "map_icon_" + type.to_lower()
+	if property_name in asset_library:
+		var tex = asset_library.get(property_name)
+		if tex:
+			return tex
+	return asset_library.map_icon_mystery
+
+func _get_node_icon_texture(node: Dictionary) -> Texture2D:
+	if str(node.get("type", "")) == "home" or bool(node.get("is_home", false)):
+		return _get_type_icon_texture("home")
+	if GameManager.is_battle_mode:
+		return _get_type_icon_texture(str(node.get("type", "mystery")))
+	var custom_icon_path = str(node.get("custom_icon_path", ""))
+	if custom_icon_path != "" and ResourceLoader.exists(custom_icon_path):
+		var custom_icon = load(custom_icon_path) as Texture2D
+		if custom_icon:
+			return custom_icon
+	return _get_type_icon_texture(str(node.get("type", "mystery")))
 
 func _get_biome() -> String:
 	return display_biome if display_biome != "" else GameManager.selected_story_biome

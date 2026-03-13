@@ -47,25 +47,22 @@ func set_highlight_state(is_player_here: bool, is_selected: bool):
 	if not border or not fill:
 		return
 	_apply_base_styles()
-	var border_style = border.get_theme_stylebox("panel") as StyleBoxFlat
 	var fill_style = fill.get_theme_stylebox("panel") as StyleBoxFlat
-	if not border_style or not fill_style:
+	if not fill_style:
 		return
 
 	fill_style.bg_color = Color(0, 0, 0, 0)
-	if is_selected:
-		fill_style.bg_color = Color(0.66, 0.92, 0.66, 0.78)
-
-	border_style.border_color = Color(0.58, 0.58, 0.62, 0.95)
+	if is_player_here:
+		fill_style.bg_color = Color(0.42, 0.84, 0.45, 0.82)
 
 func _apply_base_styles():
 	if border:
-		border.visible = true
+		border.visible = false
 		_ensure_style(border, false)
 		var border_style = border.get_theme_stylebox("panel") as StyleBoxFlat
 		if border_style:
 			border_style.draw_center = false
-			border_style.border_color = Color(0.58, 0.58, 0.62, 0.95)
+			border_style.border_color = Color(0, 0, 0, 0)
 	if fill:
 		fill.visible = true
 		_ensure_style(fill, true)
