@@ -55,6 +55,9 @@ func _rebuild_chapters():
 
 	var unlocked = GameManager.get_unlocked_story_biomes()
 	var show_story = not GameManager.is_battle_mode
+	var viewport_height = get_viewport_rect().size.y
+	var card_height = max(320.0, viewport_height * 0.9)
+	var chapter_height = card_height + 110.0
 	header_label.text = "Story Chapters" if show_story else "Biome Chapters"
 
 	for biome in STORY_ORDER:
@@ -62,7 +65,7 @@ func _rebuild_chapters():
 			continue
 
 		var chapter = VBoxContainer.new()
-		chapter.custom_minimum_size = Vector2(660 if show_story else 320, 720)
+		chapter.custom_minimum_size = Vector2(660 if show_story else 320, chapter_height)
 		chapter.add_theme_constant_override("separation", 18)
 		chapter_row.add_child(chapter)
 
@@ -123,6 +126,7 @@ func _build_story_tile(biome: String) -> Control:
 	chapter_card.embedded_mode = true
 	chapter_card.show_background = false
 	chapter_card.allow_navigation = false
+	chapter_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	chapter_card.set_biome(biome)
 	chapter_card.chapter_pressed.connect(_on_story_tile_pressed)
 	wrapper.add_child(chapter_card)
@@ -134,6 +138,7 @@ func _build_summary_tile(biome: String) -> Control:
 	summary_card.embedded_mode = true
 	summary_card.show_background = false
 	summary_card.allow_navigation = false
+	summary_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	summary_card.set_biome(biome)
 	summary_card.summary_pressed.connect(_on_summary_tile_pressed)
 	wrapper.add_child(summary_card)
@@ -141,8 +146,13 @@ func _build_summary_tile(biome: String) -> Control:
 
 func _build_entry_wrapper(biome: String, kind: String) -> PanelContainer:
 	var wrapper = PanelContainer.new()
-	wrapper.custom_minimum_size = Vector2(310, 360)
+	var card_height = max(320.0, get_viewport_rect().size.y * 0.9)
+	var card_width = card_height * (640.0 / 905.0)
+	wrapper.custom_minimum_size = Vector2(card_width, card_height)
+	wrapper.mouse_filter = Control.MOUSE_FILTER_STOP
 	wrapper.add_theme_stylebox_override("panel", _default_style)
+	wrapper.gui_input.connect(_on_entry_wrapper_input.bind(biome, kind))
+	wrapper.mouse_entered.connect(_select_entry.bind(biome, kind))
 	chapter_entries.append({"panel": wrapper, "biome": biome, "kind": kind})
 	return wrapper
 
@@ -223,6 +233,12 @@ func _select_entry(biome: String, kind: String):
 			selected_index = i
 			break
 	_refresh_entry_styles()
+	_scroll_selected_into_view()
+
+func _on_entry_wrapper_input(event: InputEvent, biome: String, kind: String):
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		_select_entry(biome, kind)
+		_handle_entry_action(biome, kind)
 
 func _open_story_focus(biome: String):
 	if not focus_overlay or not focus_content:

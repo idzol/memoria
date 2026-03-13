@@ -2,18 +2,8 @@ extends Control
 
 signal chapter_pressed(biome: String)
 
-const GRANITE_TEXTURE_PATH = "res://assets/rooms/scene/the_core_red_rock_vault_room.png"
-const STORY_TEXT = {
-	"home": "Introduction\n\nThe first tablets are kept at home, where routines still feel safe and memory has not yet learned to hide. This chapter is a tutorial of familiar rooms, small choices, and the first quiet signs that something underneath the town is shifting.",
-	"town": "The tablets continue in the town where memory first fractures. Faces are familiar, but names refuse to settle.",
-	"forest": "The forest chapter records a canopy of whispers. Every path asks what was forgotten to make the next step possible.",
-	"ice_caves": "In the ice caves, the chapter is preserved in crystal seams. Old truths survive, but only in splinters.",
-	"desert": "The desert tablets speak of heat, distance, and endurance. What remains is what could survive exposure.",
-	"swamp": "The swamp keeps nothing clean. Memory sinks, resurfaces, and returns wearing a different shape.",
-	"abyss": "The abyss chapter is all pressure and silence. Meaning compresses until only the strongest fragments remain.",
-	"void": "Inside the void, absence becomes an archive. Missing pieces leave outlines sharp enough to guide by.",
-	"the_core": "The core keeps the oldest story under layers of force and ash. Reaching it means deciding what should be restored."
-}
+const GRANITE_TEXTURE_PATH = "res://assets/maps/story/tablet_background.png"
+const TABLET_ASPECT_RATIO = 640.0 / 905.0
 
 @export var embedded_mode: bool = false
 @export var show_background: bool = true
@@ -35,7 +25,7 @@ func _ready():
 		granite_rect.texture = load(GRANITE_TEXTURE_PATH)
 		granite_rect.modulate = Color(0.78, 0.78, 0.82, 0.9)
 	_apply_mode()
-	_refresh_content()
+	_refresh_content.call_deferred()
 
 func set_biome(biome: String):
 	display_biome = biome
@@ -58,14 +48,18 @@ func _apply_mode():
 	background_rect.visible = show_background and not embedded_mode
 	continue_button.visible = allow_navigation and not embedded_mode
 	if embedded_mode:
-		custom_minimum_size = Vector2(300, 340)
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var embedded_height = _get_embedded_height()
+		var embedded_width = embedded_height * TABLET_ASPECT_RATIO
+		custom_minimum_size = Vector2(embedded_width, embedded_height)
 		center.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		tablet.custom_minimum_size = Vector2(300, 340)
-		body_label.custom_minimum_size = Vector2(0, 190)
+		tablet.custom_minimum_size = Vector2(embedded_width, embedded_height)
+		body_label.custom_minimum_size = Vector2(0, embedded_height * 0.72)
 		body_label.scroll_active = false
 		body_label.fit_content = false
 		title_label.add_theme_font_size_override("font_size", 24)
 	else:
+		mouse_filter = Control.MOUSE_FILTER_STOP
 		custom_minimum_size = Vector2.ZERO
 		center.mouse_filter = Control.MOUSE_FILTER_PASS
 		tablet.custom_minimum_size = Vector2(640, 905)
@@ -76,15 +70,22 @@ func _apply_mode():
 func _refresh_content():
 	var biome = _get_biome()
 	title_label.text = _get_title_for_biome(biome)
-	body_label.text = STORY_TEXT.get(biome, "The stone remembers more than the traveler does.")
+	body_label.text = LocalizationManager.translate(
+		"story.body.%s" % biome,
+		LocalizationManager.translate("story.body.fallback", "The stone remembers more than the traveler does.")
+	)
 
 func _get_biome() -> String:
 	return display_biome if display_biome != "" else GameManager.selected_story_biome
 
 func _get_title_for_biome(biome: String) -> String:
 	if biome == "home":
-		return "Introduction"
-	return "%s Chronicle" % biome.replace("_", " ").capitalize()
+		return LocalizationManager.translate("story.title.home", "Introduction")
+	var template = LocalizationManager.translate("story.title.default", "{biome} Chronicle")
+	return template.replace("{biome}", biome.replace("_", " ").capitalize())
+
+func _get_embedded_height() -> float:
+	return max(320.0, get_viewport_rect().size.y * 0.9)
 
 func _back_to_story_map():
 	if embedded_mode or not allow_navigation:

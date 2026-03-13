@@ -51,13 +51,13 @@ vertical_alignment = 1
 unique_name_in_owner = true
 custom_minimum_size = Vector2(70, 56)
 layout_mode = 2
-text = "W"
+text = "🗺️"
 
 [node name="AvatarButton" type="Button" parent="TopBar/TopMargin/TopHBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(70, 56)
 layout_mode = 2
-text = "P"
+text = "👤"
 
 [node name="ScrollContainer" type="ScrollContainer" parent="."]
 unique_name_in_owner = true

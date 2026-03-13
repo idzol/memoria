@@ -76,7 +76,7 @@ func _ready():
 	_scroll_to_player()
 
 func _notification(what):
-	if what == NOTIFICATION_RESIZED and is_inside_tree() and not GameManager.run_map.is_empty():
+	if what == NOTIFICATION_RESIZED and is_inside_tree() and node_container and lines_container and map_content and scroll_area and not GameManager.run_map.is_empty():
 		_draw_map()
 
 func _input(event):
@@ -135,6 +135,8 @@ func _toggle_in_game_menu():
 		in_game_menu.open()
 
 func _draw_map():
+	if not node_container or not lines_container or not map_content or not scroll_area:
+		return
 	for n in node_container.get_children():
 		n.queue_free()
 	for l in lines_container.get_children():
@@ -371,7 +373,7 @@ func _attempt_travel(target_id: String):
 	if target_data.is_empty():
 		return
 
-	if GameManager.is_battle_mode and _is_backtrack(target_id) and not _is_home_node(target_data):
+	if _is_backtrack(target_id) and not _is_home_node(target_data):
 		await _travel_to_boss_node(target_data)
 		return
 
@@ -434,8 +436,7 @@ func _build_boss_node(base_data: Dictionary) -> Dictionary:
 	return out
 
 func _is_backtrack(target_id: String) -> bool:
-	var state = GameManager.world_state.rooms.get(target_id, {})
-	return state.get("visited", false) or state.get("cleared", false)
+	return GameManager.has_visited_node_this_run(target_id)
 
 func _is_home_node(node_data: Dictionary) -> bool:
 	return bool(node_data.get("is_home", false)) or str(node_data.get("type", "")) == "home"

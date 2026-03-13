@@ -31,6 +31,7 @@ AssetRegistry="*uid://d3lufu0kcksfy"
 AudioData="*uid://cdny3c8lcfgwf"
 AudioManager="*uid://elew3qdjogf4"
 DataManager="*uid://dvhhaxmgsc0mu"
+LocalizationManager="*res://core/LocalizationManager.gd"
 
 [display]
 

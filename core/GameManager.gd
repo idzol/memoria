@@ -37,6 +37,7 @@ var is_battle_mode: bool = false
 
 # --- Run Progression ---
 var completed_nodes: Array = []
+var current_run_visited_nodes: Array = []
 
 # Combat Stats
 var player_attack: int = 10
@@ -454,6 +455,7 @@ func start_battle_mode():
 	world_state.biomes = {}
 	world_state.enemies = {}
 	pending_post_battle_scene = ""
+	current_run_visited_nodes = []
 	player_biome = "home"
 	selected_story_biome = "home"
 	_initialize_story_progression()
@@ -473,6 +475,7 @@ func start_actual_run():
 	level_up_return_scene = ""
 	pending_post_battle_scene = ""
 	completed_nodes = []
+	current_run_visited_nodes = []
 	player_grid_pos = Vector2i(-99, -99)
 	player_biome = "home"
 	selected_story_biome = "home"
@@ -559,6 +562,7 @@ func load_run_from_data(data: Dictionary):
 	run_loot = _decode_variant_field(data, "run_loot", [])
 	recalculate_player_totals()
 	completed_nodes = data.get("completed_nodes", [])
+	current_run_visited_nodes = _decode_variant_field(data, "current_run_visited_nodes", [])
 	
 	# Restore fixed node data
 	# fixed_nodes = data.get("fixed_nodes", {})
@@ -724,6 +728,7 @@ func begin_new_story_run(return_biome: String = ""):
 	pending_loot = []
 	run_loot = []
 	completed_nodes = []
+	current_run_visited_nodes = []
 	enter_story_biome(return_biome if return_biome != "" else (player_biome if player_biome != "" else "home"), true)
 
 func get_current_story_chapter_index() -> int:
@@ -735,6 +740,11 @@ func get_biome_run_path(biome: String) -> Array:
 	if not biome_run_paths.has(biome):
 		return []
 	return biome_run_paths[biome]
+
+func has_visited_node_this_run(node_id: String) -> bool:
+	if node_id == "":
+		return false
+	return current_run_visited_nodes.has(node_id)
 
 func record_biome_path_step(node_data: Dictionary):
 	var biome = str(node_data.get("biome", ""))
@@ -749,6 +759,9 @@ func record_biome_path_step(node_data: Dictionary):
 func _on_node_selected(node_data: Dictionary):
 	current_node = node_data
 	record_biome_path_step(node_data)
+	var node_id = str(node_data.get("id", ""))
+	if node_id != "" and not current_run_visited_nodes.has(node_id):
+		current_run_visited_nodes.append(node_id)
 	_ensure_room_state(str(node_data.get("id", "")))
 	mark_room_visited(str(node_data.get("id", "")))
 	

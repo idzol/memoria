@@ -10,6 +10,7 @@ extends Control
 @onready var save_scroll: ScrollContainer = %SaveListPopup.get_node("VBox/ScrollContainer")
 @onready var name_input = %NameInput
 @onready var battle_mode_btn = %BattleModeButton
+@onready var language_button = %LanguageButton
 
 # Confirmation Popup for deletion
 @onready var confirm_delete_popup = %ConfirmDeletePopup
@@ -42,6 +43,7 @@ func _ready():
 	%CreditsBtn.pressed.connect(_on_credits_pressed)
 	%ExitButton.pressed.connect(_on_exit_pressed)
 	%BattleModeButton.pressed.connect(_on_battle_mode_clicked)
+	%LanguageButton.pressed.connect(_on_language_pressed)
 
 	# Delete Confirmation connections
 	%ConfirmDeleteBtn.pressed.connect(_on_delete_confirmed)
@@ -58,6 +60,7 @@ func _ready():
 		%ContinueButton,
 		%StartButton,
 		%BattleModeButton,
+		%LanguageButton,
 		%SettingsButton,
 		%ControlsBtn,
 		%CreditsBtn,
@@ -67,6 +70,7 @@ func _ready():
 	for btn in _main_menu_buttons:
 		btn.focus_mode = Control.FOCUS_NONE
 		btn.mouse_entered.connect(_on_main_button_hovered.bind(btn))
+	_refresh_localized_text()
 	_focus_main_option(0)
 	_fade_in_from_white()
 
@@ -152,11 +156,11 @@ func _refresh_continue_button():
 	if saves.is_empty():
 		continue_button.disabled = true
 		continue_button.modulate.a = 0.5
-		continue_button.text = "NO SAVES FOUND"
+		continue_button.text = LocalizationManager.translate("menu.no_saves", "NO SAVES FOUND")
 	else:
 		continue_button.disabled = false
 		continue_button.modulate.a = 1.0
-		continue_button.text = "CONTINUE RUN"
+		continue_button.text = LocalizationManager.translate("menu.continue_run", "CONTINUE RUN")
 		if not continue_button.pressed.is_connected(_on_continue_clicked):
 			continue_button.pressed.connect(_on_continue_clicked)
 
@@ -172,7 +176,7 @@ func _open_name_entry_popup():
 	GameManager.is_battle_mode = _pending_mode_is_battle
 	name_entry_popup.visible = true
 	name_input.text = ""
-	name_input.placeholder_text = "Enter unique name..."
+	name_input.placeholder_text = LocalizationManager.translate("menu.hero_name", "Hero Name...")
 	name_input.grab_focus()
 
 func _on_name_confirmed():
@@ -183,7 +187,7 @@ func _on_name_confirmed():
 	for save in existing_saves:
 		if save.get("player_name", "").to_lower() == p_name.to_lower():
 			name_input.text = ""
-			name_input.placeholder_text = "Name already exists!"
+			name_input.placeholder_text = LocalizationManager.translate("menu.hero_name", "Hero Name...")
 			return
 		
 	GameManager.player_name = p_name
@@ -287,6 +291,28 @@ func _on_exit_pressed():
 	_play_click_sfx()
 	SignalBus.game_exited.emit()
 	get_tree().quit()
+
+func _on_language_pressed():
+	LocalizationManager.cycle_language()
+	_refresh_localized_text()
+
+func _refresh_localized_text():
+	if not is_inside_tree():
+		return
+	%StartButton.text = LocalizationManager.translate("menu.story_mode", "STORY MODE")
+	%BattleModeButton.text = LocalizationManager.translate("menu.battle_mode", "BATTLE MODE")
+	%SettingsButton.text = LocalizationManager.translate("menu.settings", "SETTINGS")
+	%ControlsBtn.text = LocalizationManager.translate("menu.controls", "CONTROLS")
+	%CreditsBtn.text = LocalizationManager.translate("menu.credits", "CREDITS")
+	%ExitButton.text = LocalizationManager.translate("menu.exit", "EXIT")
+	%NameEntryPopup.get_node("VBox/Label").text = LocalizationManager.translate("menu.enter_name", "Enter Your Name")
+	%ConfirmNameBtn.text = LocalizationManager.translate("menu.start", "START")
+	%CancelNameBtn.text = LocalizationManager.translate("menu.cancel", "CANCEL")
+	name_input.placeholder_text = LocalizationManager.translate("menu.hero_name", "Hero Name...")
+	var language_template = LocalizationManager.translate("language.label", "Language: {language}")
+	var language_name = LocalizationManager.get_language_display_name()
+	language_button.text = language_template.replace("{language}", language_name)
+	_refresh_continue_button()
 
 func _play_click_sfx():
 	# Trigger common UI click sound from music.csv (e.g., sfx_207)

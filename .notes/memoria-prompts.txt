@@ -978,10 +978,6 @@ idle
 	
 == 
 
-	data loader 
-		prioritise maps for map generator 
-		then rooms / enemies for first biome 
-		then remaining assests  
 
 == 
 
@@ -1191,6 +1187,14 @@ Enemy intent. Update scene to show the next card played by the enemy. Play the e
 
 ===
 
+	worldmap ui.
+	introduce the node outlines for all map nodes, including those that have not been visited. 
+	ui input, allow mouse click and arrow selection of adjacent nodes. apply light green highlight to the node background on selection.
+	in story mode (!is_battle_mode), update _travel_to_boss_node to trigger when revisiting a previous node.
+
+	worldmap ui.
+	story mode (!is_battle_mode), _travel_to_boss_node triggers on most nodes. battle mode triggers correctly when returning to a previous node. use same node tracking as battle mode, to make sure _is_backtrack is not triggered early in story mode.
+
 	refactor battlemap and worldmap, into a single scene (worldmap)
 	use battlemap as the base UI for map, menu, room icons, dotted lines and movement 
 	keep branching logic for is_battle_mode is true (battle mode) or false (story mode)
@@ -1247,6 +1251,28 @@ Enemy intent. Update scene to show the next card played by the enemy. Play the e
 	
 ===
 
+	storymap
+	update chapter text to be in keys that can be used for translation. 
+	move story_text into a resource / csv file for translation for english, spanish, french, german
+
+	main menu options. 
+	add language as option, default to english 
+
+storymap.
+allow ui input, mouse selection of chapter, map. 
+allow ui input, double click loads  
+update mapsummary to a scaled, minature view of the biome map used by worldmap.
+
+storymap 
+update menu text to text keys, to support language translation 
+
+storymap. 
+
+mapsummary 
+
+==
+
+
 cards / item balancing 
 sort by "power" 
 update enemy mapping to card / item rewards  
@@ -1273,14 +1299,21 @@ Update enemy asset to include
 
 ===
 
+worldmap, story mode (stame 	
+
+UPDATE ASSETS 
+
 enemy resource, update to include loot_power (numeric).
 card resource, update to include card_power (numeric).
 item resource, update to include item_power (numeric).
 victoryscreen. update to provide cards based on loot_power, only providing cards with equal card_power, or item_power
-
 
 ===
 
 characterselect 
 active deck seleciton. require minimum number of unique pairs 
     
+data loader 
+	prioritise maps for map generator 
+	then rooms / enemies for first biome 
+	then remaining assests  

@@ -83,6 +83,12 @@ layout_mode = 2
 size_flags_horizontal = 4
 color = Color(1, 1, 1, 0.18)
 
+[node name="LanguageButton" type="Button" parent="CenterContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 45)
+layout_mode = 2
+text = "Language: English"
+
 [node name="SettingsButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=495069224]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 50)

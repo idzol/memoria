@@ -86,6 +86,7 @@ func save_mid_run_state():
 		"run_loot": var_to_str(GameManager.run_loot),
 		
 		"completed_nodes": GameManager.completed_nodes,
+		"current_run_visited_nodes": var_to_str(GameManager.current_run_visited_nodes),
 		"grid_pos": [GameManager.player_grid_pos.x, GameManager.player_grid_pos.y],
 		
 		"last_saved": Time.get_unix_time_from_system(),
