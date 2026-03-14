@@ -32,6 +32,8 @@ const CardScene = preload("res://features/combat/Card.tscn")
 @onready var info_toast_label = %InfoToastLabel
 @onready var inventory_info_toast_box = %InventoryInfoToastBox
 @onready var inventory_info_toast_label = %InventoryInfoToastLabel
+@onready var tutorial_toast_box = %TutorialToastBox
+@onready var tutorial_toast_label = %TutorialToastLabel
 
 const CARDS_ROOT := "res://data/cards/"
 const ITEMS_ROOT := "res://data/items/"
@@ -593,6 +595,11 @@ func _hide_info_toasts():
 	inventory_info_toast_box.visible = false
 	inventory_info_toast_box.modulate = Color(1, 1, 1, 0)
 	inventory_info_toast_label.text = ""
+	if tutorial_toast_box:
+		tutorial_toast_box.visible = false
+		tutorial_toast_box.modulate = Color(1, 1, 1, 0)
+	if tutorial_toast_label:
+		tutorial_toast_label.text = ""
 
 func _show_info_toast(message: String):
 	_show_info_toast_with_style(message, 1.0, Color(1, 1, 1, 1.0))
@@ -601,7 +608,20 @@ func _show_info_toast_with_style(message: String, duration: float, font_color: C
 	if _info_toast_tween:
 		_info_toast_tween.kill()
 		_hide_info_toasts()
-	
+
+	var is_tutorial_toast = font_color == TUTORIAL_TOAST_COLOR and tutorial_toast_box and tutorial_toast_label
+	if is_tutorial_toast:
+		tutorial_toast_label.text = message
+		tutorial_toast_label.add_theme_color_override("font_color", font_color)
+		tutorial_toast_box.visible = true
+		tutorial_toast_box.modulate = Color(1, 1, 1, 0)
+		_info_toast_tween = create_tween()
+		_info_toast_tween.tween_property(tutorial_toast_box, "modulate:a", 1.0, 0.12)
+		_info_toast_tween.tween_interval(duration)
+		_info_toast_tween.tween_property(tutorial_toast_box, "modulate:a", 0.0, 0.45)
+		_info_toast_tween.finished.connect(_hide_info_toasts)
+		return
+
 	var show_deck_toast = true
 	if right_panel != null:
 		show_deck_toast = right_panel.current_tab == 0

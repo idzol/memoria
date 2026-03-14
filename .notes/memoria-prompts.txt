@@ -1230,9 +1230,6 @@ WORLD MAP
 
 	in worldmap, remove horizontal scroll. scale the room nodes to the screen size. 
 
-story map: two homes 
-home -> dedicated room resource, used once only 
-
 
 
 MAIN MENU 
@@ -1288,14 +1285,25 @@ STORYMAP
 	storymap. 
 	tablet nodes (chaptersummary, mapsummary) should maximise use of scrollcontainer. tablet nodes should not overlap topbar. left edge of the first chapter node (chaptersummary) should not exceed the left edge of the scrollcontainer. left align the first node to left of the scrollcontainer, with padding, and build nodes out to the right. 
 
+	storymap. remove "on mouse over" effects 
+	remove debugging information eg. 
+
+	[StoryMapUI] select_entry { "biome": "home", "kind": "summary", "index": 1 }
+	[StoryMapUI] global_click { "mouse": (901.4272, 129.6657), "hovered": &"home_summary_button", "hovered_type": "Button", "overlay_visible": false, "selected_index": 1 }
+
+
+
 WORLDMAP
 
-worldmap scene 
-replace TrackerText with the current room name.
-reduce MapContent size to MapArea.
-centre map nodes in MapArea.
-Increase map icon size to fill the map node outline.
-Single click on a selected map node to enter the room.
+	worldmap scene.
+	replace TrackerText with the current room name.
+	reduce MapContent size to MapArea.
+	centre map nodes in MapArea.
+	Increase map icon size to fill the map node outline.
+	Single click on a selected map node to enter the room.
+
+	worldmap. introduction biome has two "home" icons on map. 
+	make sure only one mapgenerator only creates one "home" as the player starting location
 
 
 TUTORIAL 
@@ -1312,13 +1320,15 @@ TUTORIAL
 	"to start your journey, click on the first memory"
 	use localization (data/localization/text.csv) for new menu items 
 
+	tutorial tips. 
+	update tutorial toasts to be placed at bottom of screen.
+
 ===
 
 	worldmap 
 	if tutorial tips on, add tutorial popups, click to dismiss 
-	on loading introduction (first chapter)
-	"you start in the safety in your home, a call draws you.
-	 select an adjacent map to to travel"
+	on loading introduction (first chapter), tutorial.home tutorial message is not showing
+	"select an adjacent map to to travel"
 	[use localization (data/localization/text.csv) for new menu items]
 
 ===
@@ -1371,6 +1381,15 @@ TUTORIAL
 ===
 
 
+CHARACTER LEVEL
+	characterlevelup. update level up screen. 
+	use first column to use graphic representation of current and future stats, showing increase per stat. use bars for hp, energy, and numerical for attack, defense using existing icons and conventions. 
+	add updates to minimum number of card pairs required. if player active pairs less than required number of pairs, add the first card .  
+	use the second column for lore for each level. "as memories comes back, you regain your strength. you were more than a fisher, but you cannot place the name"  
+	use localization (data/localization/text.csv) for new menu items 
+		
+	
+	
 LOCALIZATION 
 
 "use localization (data/localization/text.csv) for new menu items"

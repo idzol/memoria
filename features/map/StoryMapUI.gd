@@ -3,7 +3,6 @@ extends Control
 const STORY_CHAPTER_SCENE = preload("res://features/map/StoryChapter.tscn")
 const MAP_SUMMARY_SCENE = preload("res://features/map/MapSummary.tscn")
 const STORY_ORDER = ["home", "town", "forest", "ice_caves", "desert", "swamp", "abyss", "void", "the_core"]
-const DEBUG_STORYMAP_INPUT := true
 const SCROLL_CONTENT_PADDING := 24.0
 const ENTRY_GAP := 18.0
 const CHAPTER_GAP := 28.0
@@ -53,16 +52,6 @@ func _notification(what):
 		_rebuild_chapters()
 
 func _input(event):
-	if DEBUG_STORYMAP_INPUT and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		var viewport = get_viewport()
-		var hovered = viewport.gui_get_hovered_control() if viewport else null
-		_debug_input("global_click", {
-			"mouse": event.position,
-			"hovered": hovered.name if hovered else "<none>",
-			"hovered_type": hovered.get_class() if hovered else "<none>",
-			"overlay_visible": focus_overlay.visible if focus_overlay else false,
-			"selected_index": selected_index
-		})
 	if focus_overlay and focus_overlay.visible:
 		if event.is_action_pressed("ui_cancel"):
 			_close_focus_overlay()
@@ -181,7 +170,6 @@ func _build_entry_wrapper(biome: String, kind: String) -> Button:
 	wrapper.add_theme_stylebox_override("pressed", _default_style)
 	wrapper.add_theme_stylebox_override("focus", _default_style)
 	wrapper.pressed.connect(_on_entry_wrapper_pressed.bind(biome, kind))
-	wrapper.mouse_entered.connect(_select_entry.bind(biome, kind))
 	chapter_entries.append({"button": wrapper, "biome": biome, "kind": kind})
 	return wrapper
 
@@ -251,12 +239,10 @@ func _handle_entry_action(biome: String, kind: String):
 	_open_selected_biome_map()
 
 func _on_story_tile_pressed(biome: String):
-	_debug_input("story_signal", {"biome": biome})
 	_select_entry(biome, "story")
 	_open_story_focus(biome)
 
 func _on_summary_tile_pressed(biome: String):
-	_debug_input("summary_signal", {"biome": biome})
 	_select_entry(biome, "summary")
 	_open_selected_biome_map()
 
@@ -266,12 +252,10 @@ func _select_entry(biome: String, kind: String):
 		if str(entry["biome"]) == biome and str(entry["kind"]) == kind:
 			selected_index = i
 			break
-	_debug_input("select_entry", {"biome": biome, "kind": kind, "index": selected_index})
 	_refresh_entry_styles()
 	_scroll_selected_into_view()
 
 func _on_entry_wrapper_pressed(biome: String, kind: String):
-	_debug_input("wrapper_pressed", {"biome": biome, "kind": kind})
 	_select_entry(biome, kind)
 	GameManager.set_selected_story_biome(biome)
 	if kind == "story":
@@ -282,7 +266,6 @@ func _on_entry_wrapper_pressed(biome: String, kind: String):
 func _open_story_focus(biome: String):
 	if not focus_overlay or not focus_content:
 		return
-	_debug_input("open_story_focus", {"biome": biome})
 	for child in focus_content.get_children():
 		child.queue_free()
 	GameManager.set_selected_story_biome(biome)
@@ -298,14 +281,12 @@ func _open_story_focus(biome: String):
 func _close_focus_overlay(_biome: String = ""):
 	if not focus_overlay:
 		return
-	_debug_input("close_story_focus", {})
 	focus_overlay.visible = false
 	for child in focus_content.get_children():
 		child.queue_free()
 
 func _on_focus_overlay_input(event: InputEvent):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		_debug_input("overlay_click", {"mouse": event.position})
 		_close_focus_overlay()
 
 func _open_selected_biome_map():
@@ -315,7 +296,6 @@ func _open_selected_biome_map():
 		if unlocked.is_empty():
 			return
 		biome = unlocked[0]
-	_debug_input("open_biome_map", {"biome": biome, "battle_mode": GameManager.is_battle_mode})
 	GameManager.set_selected_story_biome(biome)
 	if GameManager.is_battle_mode:
 		var biome_nodes = GameManager.get_nodes_for_biome(biome)
@@ -361,11 +341,6 @@ func _return_to_current_biome_map():
 	if not GameManager.is_battle_mode:
 		GameManager.enter_story_biome(biome, true)
 	get_tree().change_scene_to_file(GameManager.get_active_biome_map_scene_path())
-
-func _debug_input(label: String, details: Dictionary):
-	if not DEBUG_STORYMAP_INPUT:
-		return
-	print("[StoryMapUI] %s %s" % [label, details])
 
 func _mark_input_handled():
 	var viewport = get_viewport()

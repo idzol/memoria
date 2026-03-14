@@ -231,6 +231,8 @@ func _draw_map():
 			)
 
 	_refresh_selection_highlight(current_id)
+	if not GameManager.is_battle_mode:
+		_begin_worldmap_tutorial_if_needed.call_deferred()
 
 func _update_header_labels(current_data: Dictionary):
 	var biome_key = str(current_data.get("biome", "town"))
@@ -244,11 +246,19 @@ func _update_header_labels(current_data: Dictionary):
 	else:
 		phase_label.text = LocalizationManager.translate("worldmap.phase.story", "STORY MAP")
 
-	tracker_text.text = LocalizationManager.format(
-		"worldmap.tracker",
-		{"biome": biome_name, "layer": int(current_data.get("layer", 0)), "column": int(current_data.get("column", 0))},
-		"{biome} [{layer},{column}]"
-	)
+	tracker_text.text = _get_room_display_name(current_data)
+
+func _get_room_display_name(node_data: Dictionary) -> String:
+	var room_path = str(node_data.get("room_resource_path", ""))
+	if room_path != "" and ResourceLoader.exists(room_path):
+		var room_res = load(room_path) as RoomData
+		if room_res and room_res.room_name != "":
+			return room_res.room_name
+	var explicit_name = str(node_data.get("name", ""))
+	if explicit_name != "":
+		return explicit_name
+	var node_type = str(node_data.get("type", "room"))
+	return node_type.replace("_", " ").capitalize()
 
 func _build_visible_node_set(current_id: String, biome: String) -> Dictionary:
 	var visible_set: Dictionary = {}
@@ -363,9 +373,17 @@ func _on_node_clicked(data: Dictionary):
 	var node_id = str(data.get("id", ""))
 	if node_id == "":
 		return
+	var current_id = _find_current_node_id()
+	if node_id == selected_node_id:
+		if node_id == current_id:
+			_enter_room(data)
+			return
+		if adjacent_node_ids.has(node_id):
+			_attempt_travel(node_id)
+			return
 	if adjacent_node_ids.has(node_id):
 		selected_node_id = node_id
-		_refresh_selection_highlight(_find_current_node_id())
+		_refresh_selection_highlight(current_id)
 
 func _on_node_double_clicked(data: Dictionary):
 	var node_id = str(data.get("id", ""))
@@ -556,22 +574,20 @@ func _make_pair_key(a: String, b: String) -> String:
 func _update_map_content_bounds():
 	if not map_content:
 		return
-	var row_count = max(1, visible_max_column - visible_min_column + 1)
-	var content_height = float(row_count - 1) * current_row_spacing + current_node_size.y + (current_top_padding * 2.0)
-	map_content.custom_minimum_size = Vector2(
-		scroll_area.size.x,
-		max(content_height, scroll_area.size.y)
-	)
+	map_content.custom_minimum_size = scroll_area.size
 
 func _get_node_position(layer: int, column: int) -> Vector2:
 	var relative_layer = layer - visible_min_layer
 	var relative_column = column - visible_min_column
 	var content_width = max(scroll_area.size.x, map_content.custom_minimum_size.x)
-	var nodes_span = float(max(0, visible_max_layer - visible_min_layer)) * current_layer_spacing
-	var start_x = max(current_left_padding, (content_width - nodes_span - current_node_size.x) * 0.5)
+	var content_height = max(scroll_area.size.y, map_content.custom_minimum_size.y)
+	var nodes_span_x = float(max(0, visible_max_layer - visible_min_layer)) * current_layer_spacing
+	var nodes_span_y = float(max(0, visible_max_column - visible_min_column)) * current_row_spacing
+	var start_x = (content_width - nodes_span_x - current_node_size.x) * 0.5
+	var start_y = (content_height - nodes_span_y - current_node_size.y) * 0.5
 	return Vector2(
 		relative_layer * current_layer_spacing + start_x,
-		relative_column * current_row_spacing + current_top_padding
+		relative_column * current_row_spacing + start_y
 	)
 
 func _draw_hand_drawn_dotted_line(p1: Vector2, p2: Vector2):
@@ -594,19 +610,14 @@ func _draw_hand_drawn_dotted_line(p1: Vector2, p2: Vector2):
 
 func _scroll_to_player():
 	await get_tree().process_frame
-	var col_offset = _get_player_column() - visible_min_column
-	var target_y = col_offset * current_row_spacing + current_top_padding - (scroll_area.size.y * 0.5)
-	var max_scroll_y = max(0.0, map_content.custom_minimum_size.y - scroll_area.size.y)
-	target_y = clamp(target_y, 0.0, max_scroll_y)
-	var tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	scroll_area.scroll_horizontal = 0
-	tween.tween_property(scroll_area, "scroll_vertical", int(target_y), 0.35)
+	scroll_area.scroll_vertical = 0
 
 func _update_map_layout_scale():
 	var layer_count = max(1, visible_max_layer - visible_min_layer + 1)
 	var row_count = max(1, visible_max_column - visible_min_column + 1)
 	var available_width = max(scroll_area.size.x, get_viewport_rect().size.x) - 96.0
-	var available_height = max(scroll_area.size.y, get_viewport_rect().size.y) - 180.0
+	var available_height = max(scroll_area.size.y, get_viewport_rect().size.y) - 96.0
 	var base_width = float(max(0, layer_count - 1)) * BASE_LAYER_SPACING + BASE_NODE_SIZE.x
 	var base_height = float(max(0, row_count - 1)) * BASE_ROW_SPACING + BASE_NODE_SIZE.y
 	var width_scale = available_width / max(base_width, 1.0)
@@ -616,8 +627,8 @@ func _update_map_layout_scale():
 	current_node_half_size = current_node_size * 0.5
 	current_layer_spacing = BASE_LAYER_SPACING * current_node_scale
 	current_row_spacing = BASE_ROW_SPACING * current_node_scale
-	current_left_padding = 48.0
-	current_top_padding = max(56.0, BASE_TOP_PADDING * current_node_scale)
+	current_left_padding = 0.0
+	current_top_padding = 0.0
 
 func _on_avatar_pressed():
 	GameManager.profile_return_scene = "res://features/map/WorldMap.tscn"

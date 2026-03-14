@@ -278,11 +278,14 @@ func add_player_xp(amount: int) -> Dictionary:
 	if leveled_up:
 		var new_stats = _get_class_stats_for_level(player_level)
 		_apply_level_stats(new_stats)
+		_ensure_minimum_active_pairs_for_level()
 		pending_level_up = {
 			"old_level": start_level,
 			"new_level": player_level,
 			"old_stats": start_stats,
-			"new_stats": new_stats
+			"new_stats": new_stats,
+			"required_pairs": player_level,
+			"active_pairs": active_deck.size()
 		}
 		SignalBus.level_up.emit(player_level)
 
@@ -672,6 +675,19 @@ func _apply_home_type_to_node(node_id: String):
 	var node = _get_run_node_by_id(node_id)
 	if node.is_empty():
 		return
+	var biome = str(node.get("biome", ""))
+	if biome != "":
+		for raw_key in run_map.keys():
+			var other_id = str(raw_key)
+			var other_node = run_map[raw_key]
+			if str(other_node.get("biome", "")) != biome:
+				continue
+			if other_id == node_id:
+				continue
+			if bool(other_node.get("is_home", false)) or str(other_node.get("type", "")) == "home":
+				other_node["is_home"] = false
+				other_node["type"] = str(other_node.get("base_type", other_node.get("type", "battle")))
+				run_map[other_id] = other_node
 	node["is_home"] = true
 	node["type"] = "home"
 	run_map[node_id] = node
@@ -1073,6 +1089,28 @@ func _apply_level_stats(stats: Dictionary):
 		current_hp += (player_hp_total - old_hp_total)
 	current_hp = clamp(current_hp, 0, player_hp_total)
 	SignalBus.hp_changed.emit(current_hp, player_hp_total)
+
+func _ensure_minimum_active_pairs_for_level():
+	var required_pairs = max(1, player_level)
+	var first_card_id = ""
+	if not active_deck.is_empty():
+		first_card_id = str(active_deck[0])
+	elif not player_deck.is_empty():
+		first_card_id = str(player_deck[0])
+	else:
+		first_card_id = "sword"
+
+	while active_deck.size() < required_pairs:
+		active_deck.append(first_card_id)
+		if _count_occurrences(player_deck, first_card_id) < _count_occurrences(active_deck, first_card_id):
+			player_deck.append(first_card_id)
+
+func _count_occurrences(source: Array, value) -> int:
+	var count = 0
+	for entry in source:
+		if entry == value:
+			count += 1
+	return count
 
 func take_damage(amount: int):
 	current_hp = max(0, current_hp - amount)
