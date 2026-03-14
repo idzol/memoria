@@ -1,0 +1,113 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://assets/themes/Greek.theme" id="1_theme"]
+[ext_resource type="Script" path="res://features/map/StoryMapUI.gd" id="2_logic"]
+
+[node name="StoryMap" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_theme")
+script = ExtResource("2_logic")
+
+[node name="BG" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.05, 0.06, 1)
+
+[node name="TopBar" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+
+[node name="TopMargin" type="MarginContainer" parent="TopBar"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 16
+
+[node name="TopHBox" type="HBoxContainer" parent="TopBar/TopMargin"]
+layout_mode = 2
+
+[node name="HeaderLabel" type="Label" parent="TopBar/TopMargin/TopHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 28
+text = "Story Chapters"
+vertical_alignment = 1
+
+[node name="MapButton" type="Button" parent="TopBar/TopMargin/TopHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(70, 56)
+layout_mode = 2
+text = "🗺️"
+
+[node name="AvatarButton" type="Button" parent="TopBar/TopMargin/TopHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(70, 56)
+layout_mode = 2
+text = "👤"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 110.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 2
+vertical_scroll_mode = 0
+
+[node name="ChapterRow" type="HBoxContainer" parent="ScrollContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(1600, 0)
+layout_mode = 2
+theme_override_constants/separation = 28
+
+[node name="FocusOverlay" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="Shade" type="ColorRect" parent="FocusOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.18, 0.18, 0.2, 0.72)
+
+[node name="FocusCenter" type="CenterContainer" parent="FocusOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="FocusContent" type="MarginContainer" parent="FocusOverlay/FocusCenter"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(720, 940)
+layout_mode = 2

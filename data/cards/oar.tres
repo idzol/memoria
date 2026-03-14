@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "oar"
 name = "Wooden Oar"
+name_es = "Remo de madera"
+name_fr = "Rame en bois"
+name_de = "Holzruder"
 rarity = "uncommon"
 type = "attack"
+card_power = 6
 value = 7
-description = "Blunt rowing tool"
+description = "Deal 7 physical damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

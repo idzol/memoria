@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "void_shard"
 name = "Void Shard"
+name_es = "Lengua amortiguada"
+name_fr = "Langue étouffée"
+name_de = "Gedämpfte Zunge"
 type = "Weapon"
 level = 5
+item_power = 12
 hp = 0
 attack = 30
 armour = 0
 effect = "Annihilate"
 description = "A sliver of the nothingness between worlds."
-ai_prompt = "Cinematic dark fantasy: A jagged black crystal that leaves a trail of static in the air."
+ai_prompt = "Cinematic dark fantasy: A jagged black crystal that leaves a trail of static in the air.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

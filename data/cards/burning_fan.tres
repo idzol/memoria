@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "burning_fan"
 name = "Burning Fan"
+name_es = "Cola de lagarto"
+name_fr = "Queue de lézard"
+name_de = "Eidechsenschwanz"
 rarity = "rare"
 type = "attack_fire"
+card_power = 12
 value = 15
-description = "Waves of heat."
+description = "Deal 15 fire damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

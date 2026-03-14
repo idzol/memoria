@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "stardust"
 name = "Stardust"
+name_es = "Polvo de estrellas"
+name_fr = "Poussière d'étoiles"
+name_de = "Sternenstaub"
 rarity = "uncommon"
-type = "charge"
+type = "prepare"
+card_power = 7
 value = 0
 description = "Power from the stars"
 special_effect = "Charge"

@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "lily_shield"
 name = "Lily Pad Shield"
+name_es = "Escudo de nenúfar"
+name_fr = "Bouclier de nénuphar"
+name_de = "Seerosenblattschild"
 rarity = "uncommon"
 type = "armor"
+card_power = 6
 value = 4
-description = "Lightweight nature block"
+description = "Add 4 armor until next damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

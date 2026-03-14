@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "the_kibisis"
 name = "The Kibisis"
+name_es = "El Arca de Dánae"
+name_fr = "L'Arche de Danaé"
+name_de = "Die Arche der Danaë"
 type = "Utility"
 level = 7
+item_power = 16
 hp = 0
 attack = 0
 armour = 0
 effect = "Infinite"
 description = "A burlap bag with infinite storage."
-ai_prompt = "Cinematic dark fantasy: A simple burlap bag embroidered with gold threads in an Ouroboros pattern, glowing purple interior."
+ai_prompt = "Cinematic dark fantasy: A simple burlap bag embroidered with gold threads in an Ouroboros pattern, glowing purple interior.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "moss_cloak"
 name = "Moss Cloak"
+name_es = "Capa de musgo"
+name_fr = "Cape de mousse"
+name_de = "Moosmantel"
 rarity = "uncommon"
 type = "armor"
+card_power = 6
 value = 5
-description = "Blends into the swamp"
+description = "Add 5 armor until next damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "ice_shard"
 name = "Ice Shard"
+name_es = "Pico de escalada"
+name_fr = "Piolet d'escalade"
+name_de = "Kletterpickel"
 type = "Weapon"
 level = 4
+item_power = 8
 hp = 0
 attack = 18
 armour = 0
 effect = "Chill"
 description = "A projectile made of eternal frost."
-ai_prompt = "Cinematic dark fantasy: A floating icicle that radiates a constant freezing aura."
+ai_prompt = "Cinematic dark fantasy: A floating icicle that radiates a constant freezing aura.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "lucky_rabbit_foot"
 name = "Lucky Rabbit Foot"
+name_es = "Polvo de hadas"
+name_fr = "Poussière de fée"
+name_de = "Feenstaub"
 type = "Utility"
 level = 4
+item_power = 8
 hp = 0
 attack = 0
 armour = 0
 effect = "Luck"
 description = "A charm that wards off misfortune."
-ai_prompt = "Cinematic dark fantasy: A small, soft white paw on a silver chain."
+ai_prompt = "Cinematic dark fantasy: A small, soft white paw on a silver chain.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

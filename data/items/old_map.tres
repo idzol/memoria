@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "old_map"
 name = "Old Map"
+name_es = "Escudo de hierro"
+name_fr = "Bouclier de fer"
+name_de = "Eisenschild"
 type = "Utility"
 level = 4
+item_power = 7
 hp = 0
 attack = 0
 armour = 0
 effect = "Guide"
 description = "A parchment showing hidden dungeon paths."
-ai_prompt = "Cinematic dark fantasy: A yellowed scroll with hand-drawn ink and blood stains."
+ai_prompt = "Cinematic dark fantasy: A yellowed scroll with hand-drawn ink and blood stains.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

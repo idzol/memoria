@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "caduceus_fragment"
 name = "Caduceus Fragment"
+name_es = "Punta de Tridente"
+name_fr = "Pointe du Trident"
+name_de = "Dreizackspitze"
 type = "Material"
 level = 7
+item_power = 17
 hp = 30
 attack = 0
 armour = 0
 effect = "Heal"
 description = "A golden staff fragment with silver serpents."
-ai_prompt = "Cinematic dark fantasy: A piece of a golden staff with two silver serpents coiled around it, glowing with healing energy."
+ai_prompt = "Cinematic dark fantasy: A piece of a golden staff with two silver serpents coiled around it, glowing with healing energy.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

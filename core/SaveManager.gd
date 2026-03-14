@@ -46,6 +46,7 @@ func get_save_list() -> Array:
 
 func save_mid_run_state():
 	if GameManager.player_name == "": return
+	GameManager.refresh_story_room_completions()
 	
 	# AUTHENTICATED PROFILE DATA
 	var run_data = {
@@ -57,6 +58,10 @@ func save_mid_run_state():
 		"last_xp_gained": GameManager.last_xp_gained,
 		"pending_level_up": var_to_str(GameManager.pending_level_up),
 		"level_up_return_scene": GameManager.level_up_return_scene,
+		"pending_post_battle_scene": GameManager.pending_post_battle_scene,
+		"player_biome": GameManager.player_biome,
+		"selected_story_biome": GameManager.selected_story_biome,
+		"profile_return_scene": GameManager.profile_return_scene,
 
 		"hp": GameManager.current_hp,
 		"max_hp": GameManager.max_hp,
@@ -76,10 +81,12 @@ func save_mid_run_state():
 		"world_state": var_to_str(GameManager.world_state),
 		"current_node": var_to_str(GameManager.current_node),
 		"run_map": var_to_str(GameManager.run_map),
+		"biome_run_paths": var_to_str(GameManager.biome_run_paths),
 		"pending_loot": var_to_str(GameManager.pending_loot),
 		"run_loot": var_to_str(GameManager.run_loot),
 		
 		"completed_nodes": GameManager.completed_nodes,
+		"current_run_visited_nodes": var_to_str(GameManager.current_run_visited_nodes),
 		"grid_pos": [GameManager.player_grid_pos.x, GameManager.player_grid_pos.y],
 		
 		"last_saved": Time.get_unix_time_from_system(),

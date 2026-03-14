@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "vine"
 name = "Vine"
+name_es = "Enredadera"
+name_fr = "Liane"
+name_de = "Ranke"
 type = "Utility"
 level = 1
+item_power = 1
 hp = 0
 attack = 2
 armour = 0
 effect = "Binds"
 description = "A length of sturdy, thorny forest vine."
-ai_prompt = "Cinematic dark fantasy: A coil of green vine with long, sharp black thorns."
+ai_prompt = "Cinematic dark fantasy: A coil of green vine with long, sharp black thorns.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

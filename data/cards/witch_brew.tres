@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "witch_brew"
 name = "Witch Brew"
+name_es = "Brebaje de bruja"
+name_fr = "Potion de sorcière"
+name_de = "Hexengebräu"
 rarity = "uncommon"
 type = "heal"
+card_power = 5
 value = 20
-description = "Tastes like swamp water"
+description = "Restore 20 health"
 special_effect = "Random"
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "climbing_pick"
 name = "Climbing Pick"
+name_es = "Mineral de plata"
+name_fr = "Minerai d'argent"
+name_de = "Silbererz"
 type = "Utility"
 level = 4
+item_power = 9
 hp = 0
 attack = 8
 armour = 0
 effect = "Scale"
 description = "A tool for ascending steep rock faces."
-ai_prompt = "Cinematic dark fantasy: A small iron hammer with a curved, sharp beak."
+ai_prompt = "Cinematic dark fantasy: A small iron hammer with a curved, sharp beak.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

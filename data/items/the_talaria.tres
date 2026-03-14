@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "the_talaria"
 name = "The Talaria"
+name_es = "El Kibisis"
+name_fr = "La Kibisis"
+name_de = "Die Kibisis"
 type = "Utility"
 level = 7
+item_power = 16
 hp = 0
 attack = 0
 armour = 5
 effect = "Haste"
 description = "Winged sandals with golden light."
-ai_prompt = "Cinematic dark fantasy: Classic Greek sandals with three small wings on each heel, bursting with golden light sparks."
+ai_prompt = "Cinematic dark fantasy: Classic Greek sandals with three small wings on each heel, bursting with golden light sparks.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

@@ -11,7 +11,7 @@
 [ext_resource type="Texture2D" uid="uid://dcqygwjoauoc6" path="res://assets/cards/back_icon/card_back_rare_icon.png" id="9_i_rar"]
 [ext_resource type="Texture2D" uid="uid://bw8sbxt207tiw" path="res://assets/cards/back_icon/card_back_epic_icon.png" id="10_i_epi"]
 [ext_resource type="Texture2D" uid="uid://bvsbv4147wm64" path="res://assets/cards/back_icon/card_back_unique_icon.png" id="11_i_uni"]
-[ext_resource type="Texture2D" uid="uid://d2mmbuxm4hln2" path="res://assets/cards/front/card_front.png" id="12_f_gen"]
+[ext_resource type="Texture2D" uid="uid://celd3t8dgsch8" path="res://assets/cards/front/card_front.png" id="12_f_gen"]
 [ext_resource type="Texture2D" uid="uid://i10ky2qx63s5" path="res://assets/cards/front/card_front_common.png" id="14_f_com"]
 [ext_resource type="Texture2D" uid="uid://birb56t4hdxau" path="res://assets/cards/front/card_front_attack.png" id="15_f_atk"]
 [ext_resource type="Texture2D" uid="uid://qah3a71y153o" path="res://assets/cards/front/card_front_defend.png" id="16_f_dfd"]

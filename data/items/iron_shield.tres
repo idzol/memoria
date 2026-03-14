@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "iron_shield"
 name = "Iron Shield"
+name_es = "Moneda extraña"
+name_fr = "Pièce étrange"
+name_de = "Seltsame Münze"
 type = "Shield"
 level = 4
+item_power = 7
 hp = 0
 attack = 0
 armour = 15
 effect = "Block"
 description = "A standard-issue soldier's shield."
-ai_prompt = "Cinematic dark fantasy: A heavy rectangular shield with a central iron boss."
+ai_prompt = "Cinematic dark fantasy: A heavy rectangular shield with a central iron boss.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

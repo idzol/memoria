@@ -219,10 +219,7 @@ func _handle_menu_cancel() -> bool:
 	return true
 
 func _exit_to_overworld_from_battle():
-	if GameManager.is_battle_mode:
-		get_tree().change_scene_to_file("res://features/map/BattleMap.tscn")
-	else:
-		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+	get_tree().change_scene_to_file(GameManager.get_active_biome_map_scene_path())
 
 func _is_current_room_cleared() -> bool:
 	if is_cleared_room:
@@ -528,6 +525,7 @@ func _toggle_grid_interaction(enabled: bool):
 func _process_combat_action(card_id: String):
 	var res = DataManager.get_resource("res://data/cards/" + card_id + ".tres")
 	if not res: return
+	var localized_card_name = LocalizationManager.localized_resource_name(res, res.name)
 	
 	var type = "magical" if card_id in ["frost", "lightning", "bomb", "scroll"] else "physical"
 	
@@ -540,7 +538,7 @@ func _process_combat_action(card_id: String):
 			e_hp = max(0, e_hp - final_dmg)
 			var raw_damage = res.value + (p_atk if type == "physical" else 0)
 			var negated = max(0, raw_damage - final_dmg) if type == "physical" else 0
-			add_log("%s card matched." % res.name)
+			add_log("%s card matched." % localized_card_name)
 			if type == "physical":
 				add_log("Enemy armour negates %d damage." % min(enemy_armor, negated))
 			add_log("You deal %d damage." % final_dmg)
@@ -566,14 +564,14 @@ func _process_combat_action(card_id: String):
 
 		elif res.type == "heal":
 			p_hp = min(GameManager.player_hp_total, p_hp + res.value)
-			add_log("Matched %s: Restored %d HP." % [res.name, res.value])
+			add_log("Matched %s: Restored %d HP." % [localized_card_name, res.value])
 			_flash_unit(%PlayerFlash, Color.SEA_GREEN)
 			SignalBus.battle_intensity_changed.emit(0.5)
 			SignalBus.sfx_triggered.emit(AudioData.SFX["HEAL"])
 
 		elif res.type == "armor":
 			temp_armor_bonus += int(res.value)
-			add_log("Matched %s: +%d armor for the next hit." % [res.name, int(res.value)])
+			add_log("Matched %s: +%d armor for the next hit." % [localized_card_name, int(res.value)])
 			_flash_unit(%PlayerFlash, Color.GOLD)
 			SignalBus.battle_intensity_changed.emit(0.5)
 			SignalBus.sfx_triggered.emit(AudioData.SFX["SHIELD"])
@@ -692,37 +690,30 @@ func _setup_cleared_room_view():
 	%OptionContainer.add_child(exit_btn)
 
 func _exit_cleared_room():
-	if GameManager.is_battle_mode:
-		get_tree().change_scene_to_file("res://features/map/BattleMap.tscn")
-	else:
-		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+	get_tree().change_scene_to_file(GameManager.get_active_biome_map_scene_path())
 
 func _check_win_loss():
 	if is_battle_over: return
 	
 	if e_hp <= 0:
 		is_battle_over = true
-		GameManager.current_hp = p_hp
+		GameManager.register_room_victory(GameManager.current_node, p_hp)
 		var xp_reward = current_enemy_res.xp_reward if current_enemy_res else 0
 		var xp_result = GameManager.add_player_xp(xp_reward)
-		GameManager.mark_room_cleared(GameManager.current_node.id)
+		var default_victory_scene = "res://features/combat/VictoryScreenBattleMode.tscn" if GameManager.is_battle_mode else "res://features/combat/VictoryScreen.tscn"
+		var return_scene = GameManager.peek_pending_post_battle_scene(default_victory_scene)
 		if xp_result.get("leveled_up", false):
-			GameManager.level_up_return_scene = "res://features/combat/VictoryScreenBattleMode.tscn" if GameManager.is_battle_mode else "res://features/combat/VictoryScreen.tscn"
+			GameManager.level_up_return_scene = GameManager.consume_pending_post_battle_scene(default_victory_scene) if return_scene != default_victory_scene else default_victory_scene
 			await get_tree().create_timer(1.5).timeout
 			if not is_inside_tree():
 				return
 			get_tree().call_deferred("change_scene_to_file", "res://features/ui/CharacterLevelUp.tscn")
 			return
 		
-		# GLOBAL ROUTING: Battle Mode vs standard World Mode
 		await get_tree().create_timer(1.5).timeout
 		if not is_inside_tree():
 			return
-		if GameManager.is_battle_mode:
-			# Experience gain logic could be added here
-			get_tree().call_deferred("change_scene_to_file", "res://features/combat/VictoryScreenBattleMode.tscn")
-		else:
-			get_tree().call_deferred("change_scene_to_file", "res://features/combat/VictoryScreen.tscn")
+		get_tree().call_deferred("change_scene_to_file", GameManager.consume_pending_post_battle_scene(default_victory_scene))
 			
 	elif p_hp <= 0:
 		is_battle_over = true
@@ -734,10 +725,8 @@ func _check_win_loss():
 			# Battle mode: show DeathScreen, then RunSummary
 			await _fade_to_black_and_change_scene("res://features/ui/DeathScreen.tscn")
 		else:
-			# Story mode: reset run state, then show DeathScreen, then WorldMap
-			GameManager.reset_to_home()
-			GameManager.current_hp = GameManager.player_hp_total
-			GameManager.current_node = {}
+			# Story mode: return to the current biome's permanent home, then show DeathScreen.
+			GameManager.begin_new_story_run(GameManager.player_biome if GameManager.player_biome != "" else "town")
 			await _fade_to_black_and_change_scene("res://features/ui/DeathScreen.tscn")
 
 

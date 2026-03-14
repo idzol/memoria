@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "obsidian_plate"
 name = "Obsidian Plate"
+name_es = "Singularidad"
+name_fr = "Singularité"
+name_de = "Singularität"
 type = "Armour"
 level = 6
+item_power = 13
 hp = 0
 attack = 0
 armour = 28
 effect = "Fireproof"
 description = "Armour forged from volcanic glass."
-ai_prompt = "Cinematic dark fantasy: A heavy chestplate made of overlapping plates of black volcanic glass."
+ai_prompt = "Cinematic dark fantasy: A heavy chestplate made of overlapping plates of black volcanic glass.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

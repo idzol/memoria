@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "shadow_essence"
 name = "Shadow Essence"
+name_es = "Esencia de sombra"
+name_fr = "Essence d'ombre"
+name_de = "Schattenessenz"
 type = "Material"
 level = 3
+item_power = 2
 hp = 0
 attack = 12
 armour = 0
 effect = "Fear"
 description = "A swirling cloud of dark energy."
-ai_prompt = "Cinematic dark fantasy: A glass vial containing a swirling black mist that seems to consume light."
+ai_prompt = "Cinematic dark fantasy: A glass vial containing a swirling black mist that seems to consume light.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

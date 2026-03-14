@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "iron_scrap"
 name = "Iron Scrap"
+name_es = "Chatarra de hierro"
+name_fr = "Ferraille"
+name_de = "Eisenschrott"
 type = "Material"
 level = 1
+item_power = 1
 hp = 0
 attack = 0
 armour = 2
 effect = "None"
 description = "Rusted bits of discarded iron."
-ai_prompt = "Cinematic dark fantasy: A pile of rusted iron shards and bent nails."
+ai_prompt = "Cinematic dark fantasy: A pile of rusted iron shards and bent nails.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

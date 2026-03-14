@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "molten_core"
 name = "Molten Core"
+name_es = "Corazón antiguo"
+name_fr = "Cœur ancien"
+name_de = "Altes Herz"
 type = "Material"
 level = 6
+item_power = 13
 hp = 0
 attack = 25
 armour = 0
 effect = "Burn"
 description = "The beating heart of a volcano."
-ai_prompt = "Cinematic dark fantasy: A glowing sphere of liquid magma held together by magnetic stones."
+ai_prompt = "Cinematic dark fantasy: A glowing sphere of liquid magma held together by magnetic stones.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

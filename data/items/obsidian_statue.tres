@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "obsidian_statue"
 name = "Obsidian Statue"
+name_es = "Llave de calor"
+name_fr = "Clé de chaleur"
+name_de = "Hitzeschlüssel"
 type = "Treasure"
 level = 6
+item_power = 15
 hp = 0
 attack = 0
 armour = 25
 effect = "Heavy"
 description = "A heavy figure carved from volcanic glass."
-ai_prompt = "Cinematic dark fantasy: A detailed carving of a dragon made of jet-black obsidian."
+ai_prompt = "Cinematic dark fantasy: A detailed carving of a dragon made of jet-black obsidian.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

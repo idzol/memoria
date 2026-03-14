@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "brass_helmet"
 name = "Brass Helmet"
+name_es = "Casco de latón"
+name_fr = "Casque en laiton"
+name_de = "Messinghelm"
 rarity = "uncommon"
 type = "armor"
+card_power = 6
 value = 9
-description = "Protects the noggin"
+description = "Add 9 armor until next damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "titan_hammer"
 name = "Titan Hammer"
+name_es = "Núcleo fundido"
+name_fr = "Noyau fondu"
+name_de = "Geschmolzener Kern"
 type = "Weapon"
 level = 6
+item_power = 13
 hp = 0
 attack = 45
 armour = 0
 effect = "Stun"
 description = "A hammer far too large for mortals."
-ai_prompt = "Cinematic dark fantasy: A colossal stone hammer engraved with lightning bolts and giant runes."
+ai_prompt = "Cinematic dark fantasy: A colossal stone hammer engraved with lightning bolts and giant runes.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "void_scroll"
 name = "Void Scroll"
+name_es = "Esencia mental"
+name_fr = "Essence d'esprit"
+name_de = "Geistessenz"
 type = "Material"
 level = 5
+item_power = 11
 hp = 0
 attack = 25
 armour = 0
 effect = "Erase"
 description = "Parchment that consumes any ink written on it."
-ai_prompt = "Cinematic dark fantasy: A roll of black paper that seems to absorb all nearby light."
+ai_prompt = "Cinematic dark fantasy: A roll of black paper that seems to absorb all nearby light.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

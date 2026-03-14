@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "mug_of_ale"
 name = "Mug of Ale"
+name_es = "Jarra de cerveza"
+name_fr = "Chope de bière"
+name_de = "Krug Bier"
 type = "Consumable"
 level = 1
+item_power = 1
 hp = 5
 attack = 0
 armour = 0
 effect = "Tipsy"
 description = "A frothy mug of village ale."
-ai_prompt = "Cinematic dark fantasy: A wooden mug overflowing with amber ale in a dimly lit tavern."
+ai_prompt = "Cinematic dark fantasy: A wooden mug overflowing with amber ale in a dimly lit tavern.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "medusa's_tear"
 name = "Medusa's Tear"
+name_es = "Fragmento de Atlas"
+name_fr = "Fragment d'Atlas"
+name_de = "Fragment von Atlas"
 type = "Material"
 level = 7
+item_power = 16
 hp = 0
 attack = 20
 armour = 0
 effect = "Petrify"
 description = "A teardrop-emerald in petrified skin."
-ai_prompt = "Cinematic dark fantasy: A teardrop-shaped emerald gemstone encased in petrified snakeskin, pulsing with green light."
+ai_prompt = "Cinematic dark fantasy: A teardrop-shaped emerald gemstone encased in petrified snakeskin, pulsing with green light.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

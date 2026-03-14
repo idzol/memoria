@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://dji7w6lmyb60a"
+
+[deps]
+
+files=["res://scripts/sprites/Enemy.Name.translation", "res://scripts/sprites/Enemy.name.translation", "res://scripts/sprites/Enemy.name.translation", "res://scripts/sprites/Enemy.name.translation", "res://scripts/sprites/Enemy.Type.translation", "res://scripts/sprites/Enemy.Biome.translation", "res://scripts/sprites/Enemy.HP.translation", "res://scripts/sprites/Enemy.Stagger.translation", "res://scripts/sprites/Enemy.Attack.translation", "res://scripts/sprites/Enemy.Armor.translation", "res://scripts/sprites/Enemy.Loot.translation", "res://scripts/sprites/Enemy.loot.translation", "res://scripts/sprites/Enemy.AI.translation", "res://scripts/sprites/Enemy.en.translation", "res://scripts/sprites/Enemy.en.translation", "res://scripts/sprites/Enemy.en.translation"]
+
+source_file="res://scripts/sprites/Enemy.csv"
+dest_files=["res://scripts/sprites/Enemy.Name.translation", "res://scripts/sprites/Enemy.name.translation", "res://scripts/sprites/Enemy.name.translation", "res://scripts/sprites/Enemy.name.translation", "res://scripts/sprites/Enemy.Type.translation", "res://scripts/sprites/Enemy.Biome.translation", "res://scripts/sprites/Enemy.HP.translation", "res://scripts/sprites/Enemy.Stagger.translation", "res://scripts/sprites/Enemy.Attack.translation", "res://scripts/sprites/Enemy.Armor.translation", "res://scripts/sprites/Enemy.Loot.translation", "res://scripts/sprites/Enemy.loot.translation", "res://scripts/sprites/Enemy.AI.translation", "res://scripts/sprites/Enemy.en.translation", "res://scripts/sprites/Enemy.en.translation", "res://scripts/sprites/Enemy.en.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

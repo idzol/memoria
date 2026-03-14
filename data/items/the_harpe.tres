@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "the_harpe"
 name = "The Harpe"
+name_es = "La Égida"
+name_fr = "L'Égide"
+name_de = "Die Aegis"
 type = "Weapon"
 level = 7
+item_power = 16
 hp = 0
 attack = 35
 armour = 0
 effect = "Bleed"
 description = "A curved adamantine sickle-sword, notched and rusted."
-ai_prompt = "Cinematic dark fantasy: A curved adamantine sickle-sword, notched and rusted, leather-wrapped hilt, faint glowing Greek runes."
+ai_prompt = "Cinematic dark fantasy: A curved adamantine sickle-sword, notched and rusted, leather-wrapped hilt, faint glowing Greek runes.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "broken_watch"
 name = "Broken Watch"
+name_es = "Placa de obsidiana"
+name_fr = "Plaque d'obsidienne"
+name_de = "Obsidianplatte"
 type = "Treasure"
 level = 5
+item_power = 13
 hp = 0
 attack = 0
 armour = 0
 effect = "Time"
 description = "A mechanical timepiece that has stopped."
-ai_prompt = "Cinematic dark fantasy: A silver pocket watch with a cracked glass and rusted gears."
+ai_prompt = "Cinematic dark fantasy: A silver pocket watch with a cracked glass and rusted gears.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

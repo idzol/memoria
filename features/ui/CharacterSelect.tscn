@@ -33,9 +33,9 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.52)
 
-[node name="MainVBox" type="VBoxContainer" parent="."]
+[node name="MainVBox" type="VBoxContainer" parent="." unique_id=1972645032]
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = -1
 anchor_left = 0.06
 anchor_top = 0.08
 anchor_right = 0.94
@@ -44,13 +44,13 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 26
 
-[node name="TitleLabel" type="Label" parent="MainVBox"]
+[node name="TitleLabel" type="Label" parent="MainVBox" unique_id=1698833071]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 54
-text = "CHOOSE YOUR IDENTITY"
 horizontal_alignment = 1
 
-[node name="ContentRow" type="HBoxContainer" parent="MainVBox"]
+[node name="ContentRow" type="HBoxContainer" parent="MainVBox" unique_id=1001782394]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 18
@@ -61,13 +61,8 @@ custom_minimum_size = Vector2(240, 420)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="VBox" type="VBoxContainer" parent="MainVBox/ContentRow/WarriorTile"]
+[node name="VBox" type="VBoxContainer" parent="MainVBox/ContentRow/WarriorTile" unique_id=1102618920]
 layout_mode = 2
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
 theme_override_constants/separation = 16
 alignment = 1
 
@@ -79,10 +74,10 @@ size_flags_horizontal = 4
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="WarriorLabel" type="Label" parent="MainVBox/ContentRow/WarriorTile/VBox"]
+[node name="WarriorLabel" type="Label" parent="MainVBox/ContentRow/WarriorTile/VBox" unique_id=885036180]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 30
-text = "WARRIOR"
 horizontal_alignment = 1
 
 [node name="ScholarTile" type="PanelContainer" parent="MainVBox/ContentRow" unique_id=210001002]
@@ -91,13 +86,8 @@ custom_minimum_size = Vector2(240, 420)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="VBox" type="VBoxContainer" parent="MainVBox/ContentRow/ScholarTile"]
+[node name="VBox" type="VBoxContainer" parent="MainVBox/ContentRow/ScholarTile" unique_id=1522491097]
 layout_mode = 2
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
 theme_override_constants/separation = 16
 alignment = 1
 
@@ -109,10 +99,10 @@ size_flags_horizontal = 4
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="ScholarLabel" type="Label" parent="MainVBox/ContentRow/ScholarTile/VBox"]
+[node name="ScholarLabel" type="Label" parent="MainVBox/ContentRow/ScholarTile/VBox" unique_id=1285948417]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 30
-text = "SCHOLAR"
 horizontal_alignment = 1
 
 [node name="AlchemistTile" type="PanelContainer" parent="MainVBox/ContentRow" unique_id=210001003]
@@ -121,13 +111,8 @@ custom_minimum_size = Vector2(240, 420)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="VBox" type="VBoxContainer" parent="MainVBox/ContentRow/AlchemistTile"]
+[node name="VBox" type="VBoxContainer" parent="MainVBox/ContentRow/AlchemistTile" unique_id=1990331905]
 layout_mode = 2
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
 theme_override_constants/separation = 16
 alignment = 1
 
@@ -139,10 +124,10 @@ size_flags_horizontal = 4
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="AlchemistLabel" type="Label" parent="MainVBox/ContentRow/AlchemistTile/VBox"]
+[node name="AlchemistLabel" type="Label" parent="MainVBox/ContentRow/AlchemistTile/VBox" unique_id=1906974369]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 30
-text = "ALCHEMIST"
 horizontal_alignment = 1
 
 [node name="StatsTile" type="PanelContainer" parent="MainVBox/ContentRow" unique_id=210001004]
@@ -151,38 +136,34 @@ custom_minimum_size = Vector2(300, 420)
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="VBox" type="VBoxContainer" parent="MainVBox/ContentRow/StatsTile"]
+[node name="VBox" type="VBoxContainer" parent="MainVBox/ContentRow/StatsTile" unique_id=686545607]
 layout_mode = 2
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
 theme_override_constants/separation = 14
 
-[node name="StatsTitle" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox"]
+[node name="StatsTitle" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox" unique_id=989481519]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 30
-text = "LEVEL 1 STATS"
 horizontal_alignment = 1
 
-[node name="StatsRows" type="VBoxContainer" parent="MainVBox/ContentRow/StatsTile/VBox"]
+[node name="StatsRows" type="VBoxContainer" parent="MainVBox/ContentRow/StatsTile/VBox" unique_id=914203375]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="HPRow" type="HBoxContainer" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows"]
+[node name="HPRow" type="HBoxContainer" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows" unique_id=1236645662]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="HPIcon" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/HPRow"]
+[node name="HPIcon" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/HPRow" unique_id=914082103]
+modulate = Color(0.88, 0.24, 0.24, 1)
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
-text = "\u2764"
-modulate = Color(0.88, 0.24, 0.24, 1)
-[node name="HPLabel" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/HPRow"]
+text = "❤️"
+
+[node name="HPLabel" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/HPRow" unique_id=1984111316]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
-text = "HP"
 
 [node name="HPValue" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/HPRow" unique_id=622500101]
 unique_name_in_owner = true
@@ -192,21 +173,21 @@ theme_override_font_sizes/font_size = 24
 text = "0"
 horizontal_alignment = 2
 
-[node name="EnergyRow" type="HBoxContainer" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows"]
+[node name="EnergyRow" type="HBoxContainer" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows" unique_id=789427446]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="EnergyIcon" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/EnergyRow"]
+[node name="EnergyIcon" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/EnergyRow" unique_id=377177495]
 unique_name_in_owner = true
+modulate = Color(1, 0.86, 0.35, 1)
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
-text = "\u26a1"
-modulate = Color(1, 0.86, 0.35, 1)
+text = "⚡"
 
-[node name="EnergyLabel" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/EnergyRow"]
+[node name="EnergyLabel" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/EnergyRow" unique_id=1347821434]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
-text = "ENERGY"
 
 [node name="EnergyValue" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/EnergyRow" unique_id=622500103]
 unique_name_in_owner = true
@@ -216,19 +197,19 @@ theme_override_font_sizes/font_size = 24
 text = "0"
 horizontal_alignment = 2
 
-[node name="AttackRow" type="HBoxContainer" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows"]
+[node name="AttackRow" type="HBoxContainer" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows" unique_id=361253807]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="AttackIcon" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/AttackRow"]
+[node name="AttackIcon" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/AttackRow" unique_id=145043699]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
-text = "\u2694"
+text = "🗡️"
 
-[node name="AttackLabel" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/AttackRow"]
+[node name="AttackLabel" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/AttackRow" unique_id=1473282165]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
-text = "ATTACK"
 
 [node name="AttackValue" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/AttackRow" unique_id=622500104]
 unique_name_in_owner = true
@@ -238,19 +219,19 @@ theme_override_font_sizes/font_size = 24
 text = "0"
 horizontal_alignment = 2
 
-[node name="DefenseRow" type="HBoxContainer" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows"]
+[node name="DefenseRow" type="HBoxContainer" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows" unique_id=273805382]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="DefenseIcon" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/DefenseRow"]
+[node name="DefenseIcon" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/DefenseRow" unique_id=2082564365]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
-text = "\u26e8"
+text = "🧿"
 
-[node name="DefenseLabel" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/DefenseRow"]
+[node name="DefenseLabel" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/DefenseRow" unique_id=1864165942]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
-text = "DEFENSE"
 
 [node name="DefenseValue" type="Label" parent="MainVBox/ContentRow/StatsTile/VBox/StatsRows/DefenseRow" unique_id=622500105]
 unique_name_in_owner = true
@@ -260,11 +241,11 @@ theme_override_font_sizes/font_size = 24
 text = "0"
 horizontal_alignment = 2
 
-[node name="DescriptionBox" type="PanelContainer" parent="MainVBox/ContentRow/StatsTile/VBox"]
+[node name="DescriptionBox" type="PanelContainer" parent="MainVBox/ContentRow/StatsTile/VBox" unique_id=1384808561]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="DescriptionPadding" type="MarginContainer" parent="MainVBox/ContentRow/StatsTile/VBox/DescriptionBox"]
+[node name="DescriptionPadding" type="MarginContainer" parent="MainVBox/ContentRow/StatsTile/VBox/DescriptionBox" unique_id=163568511]
 layout_mode = 2
 theme_override_constants/margin_left = 14
 theme_override_constants/margin_top = 12
@@ -276,13 +257,12 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_font_sizes/font_size = 22
-text = "Select a class to inspect stats."
 autowrap_mode = 3
 
-[node name="BottomBar" type="CenterContainer" parent="MainVBox"]
+[node name="BottomBar" type="CenterContainer" parent="MainVBox" unique_id=1024779031]
 layout_mode = 2
 
-[node name="BottomButtons" type="HBoxContainer" parent="MainVBox/BottomBar"]
+[node name="BottomButtons" type="HBoxContainer" parent="MainVBox/BottomBar" unique_id=955357780]
 layout_mode = 2
 theme_override_constants/separation = 20
 
@@ -292,7 +272,6 @@ custom_minimum_size = Vector2(360, 92)
 layout_mode = 2
 theme_type_variation = &"HeaderButton"
 theme_override_font_sizes/font_size = 28
-text = "RESTORE IDENTITY"
 
 [node name="CancelBtn" type="Button" parent="MainVBox/BottomBar/BottomButtons" unique_id=1377981205]
 unique_name_in_owner = true
@@ -300,6 +279,3 @@ custom_minimum_size = Vector2(220, 92)
 layout_mode = 2
 theme_type_variation = &"HeaderButton"
 theme_override_font_sizes/font_size = 28
-text = "CANCEL"
-
-

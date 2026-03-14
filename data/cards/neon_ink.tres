@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "neon_ink"
 name = "Neon Ink"
+name_es = "Neon Ink"
+name_fr = "Neon Ink"
+name_de = "Neon Ink"
 rarity = "epic"
 type = "treasure"
+card_power = 15
 value = 35
 description = "Glows in the dark."
 special_effect = ""

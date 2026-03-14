@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "glow_gel"
 name = "Glow Gel"
+name_es = "Esencia del vacío"
+name_fr = "Essence du vide"
+name_de = "Leerenessenz"
 type = "Material"
 level = 4
+item_power = 11
 hp = 0
 attack = 0
 armour = 0
 effect = "Luminescent"
 description = "A jar of thick, glowing jelly."
-ai_prompt = "Cinematic dark fantasy: A glass jar filled with neon blue goo that lights up the dark."
+ai_prompt = "Cinematic dark fantasy: A glass jar filled with neon blue goo that lights up the dark.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

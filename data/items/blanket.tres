@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "blanket"
 name = "Blanket"
+name_es = "Manta"
+name_fr = "Couverture"
+name_de = "Decke"
 type = "Utility"
 level = 2
+item_power = 2
 hp = 5
 attack = 0
 armour = 0
 effect = "Rest"
 description = "A thick wool cover for sleeping."
-ai_prompt = "Cinematic dark fantasy: A heavy, grey fabric roll stained with dirt and travel."
+ai_prompt = "Cinematic dark fantasy: A heavy, grey fabric roll stained with dirt and travel.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

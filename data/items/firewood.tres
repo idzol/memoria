@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "firewood"
 name = "Firewood"
+name_es = "Leña"
+name_fr = "Bois de chauffage"
+name_de = "Brennholz"
 type = "Utility"
 level = 1
+item_power = 1
 hp = 0
 attack = 0
 armour = 0
 effect = "Warmth"
 description = "Logs ready for a campfire."
-ai_prompt = "Cinematic dark fantasy: A bundle of dry, split timber tied with a hemp rope."
+ai_prompt = "Cinematic dark fantasy: A bundle of dry, split timber tied with a hemp rope.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

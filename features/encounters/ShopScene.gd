@@ -94,9 +94,4 @@ func _update_gold_display():
 func _on_leave_pressed():
 	
 	# 1. Branching return path
-	if GameManager.is_battle_mode:
-		# Return to the linear testing map
-		get_tree().change_scene_to_file("res://features/map/BattleMap.tscn")
-	else:
-		# Return to the procedural campaign map
-		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+	get_tree().change_scene_to_file(GameManager.get_active_biome_map_scene_path())

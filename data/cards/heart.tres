@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "heart"
 name = "Health"
+name_es = "Salud"
+name_fr = "Santé"
+name_de = "Gesundheit"
 rarity = "common"
 type = "heal"
+card_power = 1
 value = 15
-description = "Restore HP"
+description = "Restore 15 health"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

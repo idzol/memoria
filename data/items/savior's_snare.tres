@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "savior's_snare"
 name = "Savior's Snare"
+name_es = "Savior's Snare"
+name_fr = "Savior's Snare"
+name_de = "Savior's Snare"
 type = "Utility"
 level = 7
+item_power = 18
 hp = 0
 attack = 10
 armour = 5
 effect = "Trap"
 description = "A sturdy net reinforced with lead weights."
-ai_prompt = "Cinematic dark fantasy: Heavy fishing net, lead weights shaped like fish, golden threads woven into coarse hemp."
+ai_prompt = "Cinematic dark fantasy: Heavy fishing net, lead weights shaped like fish, golden threads woven into coarse hemp.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

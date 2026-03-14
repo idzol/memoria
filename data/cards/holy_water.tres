@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "holy_water"
 name = "Holy Water"
+name_es = "Agua bendita"
+name_fr = "Eau bénite"
+name_de = "Weihwasser"
 rarity = "common"
 type = "heal"
+card_power = 2
 value = 20
-description = "Purifies the soul"
+description = "Restore 20 health"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

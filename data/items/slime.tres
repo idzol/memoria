@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "slime"
 name = "Slime"
+name_es = "Probóscide"
+name_fr = "Trompe"
+name_de = "Rüssel"
 type = "Material"
 level = 3
+item_power = 5
 hp = 0
 attack = 0
 armour = 0
 effect = "Sticky"
 description = "Gooey residue from a dungeon crawler."
-ai_prompt = "Cinematic dark fantasy: A dollop of neon green sludge that slowly dissolves wood."
+ai_prompt = "Cinematic dark fantasy: A dollop of neon green sludge that slowly dissolves wood.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

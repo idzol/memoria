@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "honey"
 name = "Jar of Honey"
+name_es = "Vapor etéreo"
+name_fr = "Vapeur éthérée"
+name_de = "Ätherischer Dampf"
 rarity = "rare"
 type = "heal"
+card_power = 13
 value = 18
-description = "Natural sweetness."
+description = "Restore 18 health"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

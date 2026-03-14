@@ -8,6 +8,9 @@
 [resource]
 script = ExtResource("1_script")
 name = "Brain_Eater"
+name_es = "Devorador de cerebros"
+name_fr = "Dévoreur de cerveau"
+name_de = "Gehirnfresser"
 biome = "void"
 hp = 350
 hframes = 8
@@ -21,6 +24,7 @@ armor = 0
 base_damage = 85
 difficulty_tier = 1
 xp_reward = 20
+loot_power = 7
 gold_min = 0
 gold_max = 0
 item_drops = ["mind_essence"]

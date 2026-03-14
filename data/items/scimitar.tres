@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "scimitar"
 name = "Scimitar"
+name_es = "Casco de latón"
+name_fr = "Casque en laiton"
+name_de = "Messinghelm"
 type = "Weapon"
 level = 4
+item_power = 5
 hp = 0
 attack = 22
 armour = 0
 effect = "Quick"
 description = "A curved blade from the dunes."
-ai_prompt = "Cinematic dark fantasy: A sharp curved scimitar with an obsidian hilt and gold filigree."
+ai_prompt = "Cinematic dark fantasy: A sharp curved scimitar with an obsidian hilt and gold filigree.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

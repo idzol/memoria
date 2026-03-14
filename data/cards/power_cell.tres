@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "power_cell"
 name = "Power Cell"
+name_es = "Power Cell"
+name_fr = "Power Cell"
+name_de = "Power Cell"
 rarity = "unique"
-type = "charge"
+type = "prepare"
+card_power = 18
 value = 0
 description = "Battery energized."
 special_effect = ""

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "trident_tip"
 name = "Trident Tip"
+name_es = "Lágrima del océano"
+name_fr = "Larme de l'océan"
+name_de = "Ozeanträne"
 type = "Weapon"
 level = 4
+item_power = 6
 hp = 0
 attack = 18
 armour = 0
 effect = "Pierce"
 description = "The broken prong of a sea-god's weapon."
-ai_prompt = "Cinematic dark fantasy: A jagged bronze spike covered in barnacles and sea-salt."
+ai_prompt = "Cinematic dark fantasy: A jagged bronze spike covered in barnacles and sea-salt.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "owl_mask"
 name = "Owl Mask"
+name_es = "Colmillo del Conocimiento"
+name_fr = "Croc du Savoir"
+name_de = "Fangzahn des Wissens"
 type = "Armour"
 level = 7
+item_power = 17
 hp = 0
 attack = 10
 armour = 10
 effect = "Intellect"
 description = "A marble mask with blue intellectual energy."
-ai_prompt = "Cinematic dark fantasy: A regal white marble mask of an owl, eyes glowing with bright blue light when worn."
+ai_prompt = "Cinematic dark fantasy: A regal white marble mask of an owl, eyes glowing with bright blue light when worn.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

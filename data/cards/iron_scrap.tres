@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "iron_scrap"
 name = "Iron Scrap"
+name_es = "Cristal de sal"
+name_fr = "Cristal de sel"
+name_de = "Salzkristall"
 rarity = "rare"
 type = "treasure"
+card_power = 13
 value = 8
 description = "Can be smelted."
 special_effect = ""

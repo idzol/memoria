@@ -80,4 +80,4 @@ func _on_reward_selected(id: String):
 		GameManager.active_deck.append(id)
 		
 	SaveManager.save_mid_run_state()
-	get_tree().change_scene_to_file("res://features/map/BattleMap.tscn")
+	get_tree().change_scene_to_file(GameManager.consume_pending_post_battle_scene(GameManager.get_active_biome_map_scene_path()))

@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "singularity"
 name = "Singularity"
+name_es = "Singularity"
+name_fr = "Singularity"
+name_de = "Singularity"
 rarity = "epic"
 type = "trap"
+card_power = 17
 value = 100
-description = "The end of all things."
+description = "Take 100 damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "heavy_boots"
 name = "Heavy Boots"
+name_es = "Botas pesadas"
+name_fr = "Bottes lourdes"
+name_de = "Schwere Stiefel"
 rarity = "common"
 type = "armor"
+card_power = 4
 value = 4
-description = "Protects against floor traps"
+description = "Add 4 armor until next damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

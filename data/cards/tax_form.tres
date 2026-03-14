@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "tax_form"
 name = "Tax Form"
+name_es = "Lágrima congelada"
+name_fr = "Larme gelée"
+name_de = "Gefrorene Träne"
 rarity = "rare"
 type = "trap"
+card_power = 13
 value = 5
-description = "Financial burden."
+description = "Take 5 damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

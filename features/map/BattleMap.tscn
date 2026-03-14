@@ -9,6 +9,18 @@ border_width_bottom = 2
 border_color = Color(0.2, 0.2, 0.25, 1)
 shadow_size = 4
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_info_toast"]
+bg_color = Color(0, 0, 0, 0.35)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.2)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
 [node name="BattleMapUI" type="Control" unique_id=2074116512]
 layout_mode = 3
 anchors_preset = 15
@@ -124,9 +136,40 @@ size_flags_vertical = 4
 theme_override_font_sizes/font_size = 36
 text = "👤"
 
+[node name="StoryButton" type="Button" parent="TopBar/Margin/HBox/Right" unique_id=1654217282]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 26
+text = "📜"
+
 [node name="MenuIconBtn" type="Button" parent="TopBar/Margin/HBox/Right" unique_id=1158006913]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(42, 34)
 layout_mode = 2
 size_flags_vertical = 4
 text = "☰"
+
+[node name="InfoToastBox" type="PanelContainer" parent="." unique_id=707777001]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(420, 34)
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -210.0
+offset_top = 112.0
+offset_right = 210.0
+offset_bottom = 146.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_info_toast")
+
+[node name="InfoToastLabel" type="Label" parent="InfoToastBox" unique_id=707777002]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.35, 0.35, 1)
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+vertical_alignment = 1

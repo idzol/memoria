@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "magic_lamp"
 name = "Magic Lamp"
+name_es = "Disco solar"
+name_fr = "Disque solaire"
+name_de = "Sonnenscheibe"
 type = "Utility"
 level = 6
+item_power = 14
 hp = 0
 attack = 0
 armour = 0
 effect = "Wish"
 description = "A vessel containing a trapped spirit."
-ai_prompt = "Cinematic dark fantasy: An oil lamp made of blackened bronze that hums with power."
+ai_prompt = "Cinematic dark fantasy: An oil lamp made of blackened bronze that hums with power.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

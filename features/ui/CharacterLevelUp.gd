@@ -74,5 +74,5 @@ func _on_continue_pressed():
 	GameManager.pending_level_up = {}
 	GameManager.level_up_return_scene = ""
 	if next_scene == "":
-		next_scene = "res://features/map/BattleMap.tscn" if GameManager.is_battle_mode else "res://features/map/WorldMap.tscn"
+		next_scene = GameManager.get_active_biome_map_scene_path()
 	get_tree().change_scene_to_file(next_scene)

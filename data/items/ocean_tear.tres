@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "ocean_tear"
 name = "Ocean Tear"
+name_es = "Polvo de azufre"
+name_fr = "Poussière de soufre"
+name_de = "Schwefelstaub"
 type = "Treasure"
 level = 4
+item_power = 6
 hp = 0
 attack = 0
 armour = 0
 effect = "Depth"
 description = "A sapphire that contains the weight of the sea."
-ai_prompt = "Cinematic dark fantasy: A deep blue gemstone that drips water even when dry."
+ai_prompt = "Cinematic dark fantasy: A deep blue gemstone that drips water even when dry.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

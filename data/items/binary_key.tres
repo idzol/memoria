@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "binary_key"
 name = "Binary Key"
+name_es = "Tomo oscuro"
+name_fr = "Tome sombre"
+name_de = "Dunkler Band"
 type = "Utility"
 level = 6
+item_power = 14
 hp = 0
 attack = 0
 armour = 0
 effect = "Digital"
 description = "A strange artifact with shifting patterns."
-ai_prompt = "Cinematic dark fantasy: A metal cube that pulses with green light and clicking sounds."
+ai_prompt = "Cinematic dark fantasy: A metal cube that pulses with green light and clicking sounds.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

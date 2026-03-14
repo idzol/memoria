@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "ocean_tear"
 name = "Ocean Tear"
+name_es = "Ocean Tear"
+name_fr = "Ocean Tear"
+name_de = "Ocean Tear"
 rarity = "epic"
 type = "treasure"
+card_power = 16
 value = 85
 description = "Gem from the deep."
 special_effect = ""

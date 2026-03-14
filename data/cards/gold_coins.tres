@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "gold_coins"
 name = "Gold Coins"
+name_es = "Semilla de esmeralda"
+name_fr = "Graine d'émeraude"
+name_de = "Smaragdsamen"
 rarity = "rare"
 type = "treasure"
+card_power = 12
 value = 10
 description = "A small pile."
 special_effect = ""

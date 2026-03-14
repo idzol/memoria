@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "naga_scale"
 name = "Naga Scale"
+name_es = "Escama de naga"
+name_fr = "Écaille de naga"
+name_de = "Nagaschuppe"
 rarity = "uncommon"
 type = "armor"
+card_power = 7
 value = 12
-description = "Legendary serpent skin"
+description = "Add 12 armor until next damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

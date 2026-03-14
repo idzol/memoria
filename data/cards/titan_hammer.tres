@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "titan_hammer"
 name = "Titan Hammer"
+name_es = "Martillo de titán"
+name_fr = "Marteau de titan"
+name_de = "Titanenhammer"
 rarity = "uncommon"
 type = "attack"
+card_power = 8
 value = 40
-description = "God-like strength"
+description = "Deal 40 physical damage"
 special_effect = "Stun"
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

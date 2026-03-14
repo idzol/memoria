@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "singularity"
 name = "Singularity"
+name_es = "Lágrima final"
+name_fr = "Larme finale"
+name_de = "Letzte Träne"
 type = "Utility"
 level = 6
+item_power = 13
 hp = 0
 attack = 100
 armour = 0
 effect = "Void"
 description = "A tiny point of infinite gravity."
-ai_prompt = "Cinematic dark fantasy: A swirling black hole contained within a golden mechanical sphere."
+ai_prompt = "Cinematic dark fantasy: A swirling black hole contained within a golden mechanical sphere.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

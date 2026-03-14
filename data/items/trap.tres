@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "trap"
 name = "Trap"
+name_es = "Mineral"
+name_fr = "Minerai"
+name_de = "Erz"
 type = "Trap"
 level = 3
+item_power = 3
 hp = 0
 attack = 15
 armour = 0
 effect = "Damage"
 description = "A concealed pressure plate with rusted spikes."
-ai_prompt = "Cinematic dark fantasy: A stone slab slightly raised from the floor, hiding mechanical iron jaws."
+ai_prompt = "Cinematic dark fantasy: A stone slab slightly raised from the floor, hiding mechanical iron jaws.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "medusa's_head"
 name = "Medusa's Head"
+name_es = "Fragmento de Caduceo"
+name_fr = "Fragment de Caducée"
+name_de = "Caduceus-Fragment"
 type = "Weapon"
 level = 7
+item_power = 17
 hp = 0
 attack = 50
 armour = 0
 effect = "Stun"
 description = "Decapitated head with writhing serpents."
-ai_prompt = "Cinematic dark fantasy: A burlap bundle that shows a glowing green eye and a writhing snake through a small tear."
+ai_prompt = "Cinematic dark fantasy: A burlap bundle that shows a glowing green eye and a writhing snake through a small tear.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

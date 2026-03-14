@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "electric_gel"
 name = "Electric Gel"
+name_es = "Electric Gel"
+name_fr = "Electric Gel"
+name_de = "Electric Gel"
 rarity = "epic"
 type = "attack_magic"
+card_power = 16
 value = 16
 description = "A shocking surprise."
 special_effect = ""

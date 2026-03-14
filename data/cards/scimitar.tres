@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "scimitar"
 name = "Curved Scimitar"
+name_es = "Cimitarra curva"
+name_fr = "Cimeterre courbe"
+name_de = "Krummsäbel"
 rarity = "common"
 type = "attack"
+card_power = 5
 value = 11
-description = "Swift slashing weapon"
+description = "Deal 11 physical damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

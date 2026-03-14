@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "final_tear"
 name = "Final Tear"
+name_es = "Martillo de titán"
+name_fr = "Marteau de titan"
+name_de = "Titanenhammer"
 type = "Consumable"
 level = 6
+item_power = 13
 hp = 100
 attack = 0
 armour = 0
 effect = "Life"
 description = "The last drop of a dying god."
-ai_prompt = "Cinematic dark fantasy: A single golden droplet hovering in mid-air radiating immense light."
+ai_prompt = "Cinematic dark fantasy: A single golden droplet hovering in mid-air radiating immense light.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

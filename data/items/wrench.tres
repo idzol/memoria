@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "wrench"
 name = "Wrench"
+name_es = "Poción de algas"
+name_fr = "Potion de varech"
+name_de = "Kelptrank"
 type = "Utility"
 level = 4
+item_power = 10
 hp = 0
 attack = 10
 armour = 0
 effect = "Fix"
 description = "A heavy tool for mechanical repairs."
-ai_prompt = "Cinematic dark fantasy: A massive iron tool with adjustable jaws and a long handle."
+ai_prompt = "Cinematic dark fantasy: A massive iron tool with adjustable jaws and a long handle.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

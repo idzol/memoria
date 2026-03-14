@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "rotten_flesh"
 name = "Rotten Flesh"
+name_es = "Lengua amortiguada"
+name_fr = "Langue étouffée"
+name_de = "Gedämpfte Zunge"
 rarity = "rare"
 type = "trap"
+card_power = 14
 value = 12
-description = "Smells of decay."
+description = "Take 12 damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

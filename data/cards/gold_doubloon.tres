@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "gold_doubloon"
 name = "Gold Doubloon"
+name_es = "Gold Doubloon"
+name_fr = "Gold Doubloon"
+name_de = "Gold Doubloon"
 rarity = "epic"
 type = "treasure"
+card_power = 15
 value = 30
 description = "Pirate's treasure."
 special_effect = ""

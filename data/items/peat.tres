@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "peat"
 name = "Peat"
+name_es = "Polvo de luz"
+name_fr = "Poussière de lumière"
+name_de = "Lichtstaub"
 type = "Material"
 level = 3
+item_power = 4
 hp = 0
 attack = 0
 armour = 0
 effect = "Fuel"
 description = "Dried swamp earth that burns slowly."
-ai_prompt = "Cinematic dark fantasy: A dense, dark brick of compressed moss and soil."
+ai_prompt = "Cinematic dark fantasy: A dense, dark brick of compressed moss and soil.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

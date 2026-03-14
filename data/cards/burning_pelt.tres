@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "burning_pelt"
 name = "Burning Pelt"
+name_es = "Burning Pelt"
+name_fr = "Burning Pelt"
+name_de = "Burning Pelt"
 rarity = "unique"
 type = "armor"
+card_power = 18
 value = 10
-description = "Fiery animal hide."
+description = "Add 10 armor until next damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

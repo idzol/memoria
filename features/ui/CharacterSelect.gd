@@ -19,6 +19,15 @@ extends Control
 @onready var energy_value_label = %EnergyValue
 @onready var attack_value_label = %AttackValue
 @onready var defense_value_label = %DefenseValue
+@onready var title_label: Label = %TitleLabel
+@onready var warrior_label: Label = %WarriorLabel
+@onready var scholar_label: Label = %ScholarLabel
+@onready var alchemist_label: Label = %AlchemistLabel
+@onready var stats_title_label: Label = %StatsTitle
+@onready var hp_label: Label = %HPLabel
+@onready var energy_label: Label = %EnergyLabel
+@onready var attack_label: Label = %AttackLabel
+@onready var defense_label: Label = %DefenseLabel
 
 var selected_class: String = ""
 var selected_index: int = 0
@@ -38,6 +47,7 @@ func _ready():
 	_setup_confirm_button_style()
 	_setup_tile_styles()
 	_connect_signals()
+	_refresh_localized_text()
 
 	confirm_btn.disabled = false
 	_select_index(0)
@@ -127,7 +137,7 @@ func _update_tiles_and_icons():
 func _update_stats_summary():
 	var stats = GameData.get_stats(selected_class, 1)
 	if stats.is_empty():
-		description_label.text = "No stats found for selected class."
+		description_label.text = LocalizationManager.translate("character_select.no_stats", "No stats found for selected class.")
 		hp_value_label.text = "0"
 		energy_value_label.text = "0"
 		attack_value_label.text = "0"
@@ -135,7 +145,7 @@ func _update_stats_summary():
 		energy_icon_label.text = ICON_ENERGY
 		return
 
-	var desc = AssetRegistry.CHARACTER_ASSETS.get(selected_class, {}).get("desc", "")
+	var desc = _get_class_description(selected_class)
 	var hp := int(stats.get("max_hp", 0))
 	var energy := int(stats.get("energy", 0))
 	var attack := int(stats.get("player_attack", 0))
@@ -153,7 +163,7 @@ func _on_confirm_pressed():
 	if selected_class == "":
 		return
 
-	GameManager.show_loading("Restoring your identity...")
+	GameManager.show_loading(LocalizationManager.translate("character_select.loading", "Restoring your identity..."))
 	await get_tree().process_frame
 	await get_tree().process_frame
 
@@ -172,6 +182,14 @@ func _on_confirm_pressed():
 
 	SignalBus.game_started.emit()
 
+	# Starting a new character should not inherit the previous session's in-memory world.
+	GameManager.run_map = {}
+	GameManager.reset_world_state()
+	GameManager.current_node = {}
+	GameManager.pending_loot = []
+	GameManager.run_loot = []
+	GameManager.completed_nodes = []
+
 	if GameManager.is_battle_mode:
 		GameManager.start_battle_mode()
 	else:
@@ -180,3 +198,21 @@ func _on_confirm_pressed():
 func _return_to_main_menu():
 	get_tree().change_scene_to_file("res://features/ui/MainMenu.tscn")
 
+func _refresh_localized_text():
+	title_label.text = LocalizationManager.translate("character_select.title", "CHOOSE YOUR IDENTITY")
+	warrior_label.text = LocalizationManager.translate("character_select.class.warrior", "WARRIOR")
+	scholar_label.text = LocalizationManager.translate("character_select.class.scholar", "SCHOLAR")
+	alchemist_label.text = LocalizationManager.translate("character_select.class.alchemist", "ALCHEMIST")
+	stats_title_label.text = LocalizationManager.translate("character_select.stats_title", "LEVEL 1 STATS")
+	hp_label.text = LocalizationManager.translate("character_select.health", "HEALTH")
+	energy_label.text = LocalizationManager.translate("character_select.energy", "ENERGY")
+	attack_label.text = LocalizationManager.translate("character_select.attack", "ATTACK")
+	defense_label.text = LocalizationManager.translate("character_select.defense", "DEFENSE")
+	confirm_btn.text = LocalizationManager.translate("character_select.confirm", "RESTORE IDENTITY")
+	cancel_btn.text = LocalizationManager.translate("menu.cancel", "CANCEL")
+
+func _get_class_description(class_id: String) -> String:
+	return LocalizationManager.translate(
+		"character_select.desc.%s" % class_id,
+		AssetRegistry.CHARACTER_ASSETS.get(class_id, {}).get("desc", "")
+	)

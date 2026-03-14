@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "void_essence"
 name = "Void Essence"
+name_es = "Esencia del vacío"
+name_fr = "Essence du vide"
+name_de = "Leerenessenz"
 rarity = "uncommon"
 type = "attack_magic"
+card_power = 7
 value = 25
 description = "Power from the abyss"
 special_effect = "Weaken"

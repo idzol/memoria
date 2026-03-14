@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "mind_essence"
 name = "Mind Essence"
+name_es = "Mind Essence"
+name_fr = "Mind Essence"
+name_de = "Mind Essence"
 rarity = "epic"
-type = "charge"
+type = "prepare"
+card_power = 16
 value = 0
 description = "Focuses the psyche."
 special_effect = ""

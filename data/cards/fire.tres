@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "fire"
 name = "Fireball"
+name_es = "Bola de fuego"
+name_fr = "Boule de feu"
+name_de = "Feuerball"
 rarity = "common"
 type = "attack_fire"
+card_power = 2
 value = 30
-description = "High Damage"
+description = "Deal 30 fire damage"
 special_effect = "Burn"
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

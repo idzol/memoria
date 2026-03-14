@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "cloud_essence"
 name = "Cloud Essence"
+name_es = "Hierro puro"
+name_fr = "Fer pur"
+name_de = "Reineisen"
 type = "Material"
 level = 5
+item_power = 12
 hp = 0
 attack = 0
 armour = 5
 effect = "Light"
 description = "Weightless gas from the highest peaks."
-ai_prompt = "Cinematic dark fantasy: A glass jar containing a miniature, lightning-filled storm cloud."
+ai_prompt = "Cinematic dark fantasy: A glass jar containing a miniature, lightning-filled storm cloud.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

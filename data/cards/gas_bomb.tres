@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "gas_bomb"
 name = "Gas Bomb"
+name_es = "Bomba de gas"
+name_fr = "Bombe à gaz"
+name_de = "Gasbombe"
 rarity = "uncommon"
 type = "trap"
+card_power = 6
 value = 20
-description = "Noxious fumes"
+description = "Take 20 damage"
 special_effect = "Poison"
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

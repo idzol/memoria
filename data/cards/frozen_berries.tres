@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "frozen_berries"
 name = "Frozen Berries"
+name_es = "Bayas congeladas"
+name_fr = "Baies givrées"
+name_de = "Gefrorene Beeren"
 rarity = "common"
 type = "heal"
+card_power = 4
 value = 6
-description = "A chilling snack"
+description = "Restore 6 health"
 special_effect = "Chill"
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

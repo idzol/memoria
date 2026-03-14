@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "kelp_potion"
 name = "Kelp Potion"
+name_es = "Poción de algas"
+name_fr = "Potion de varech"
+name_de = "Kelptrank"
 rarity = "uncommon"
 type = "heal"
+card_power = 7
 value = 12
-description = "Salty and restorative"
+description = "Restore 12 health"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

@@ -1,8 +1,25 @@
 [gd_scene format=3 uid="uid://ojufy0fup6hb"]
 
-[ext_resource type="Theme" uid="uid://cy1tv88ir10yq" path="res://assets/themes/Greek.theme" id="1_ecjwd"]
-[ext_resource type="Script" uid="uid://dbrsx3v5qfpl3" path="res://features/map/WorldMapUI.gd" id="1_map_ui"]
-[ext_resource type="PackedScene" uid="uid://cgrp3t6npnm06" path="res://features/ui/CardDiscoveryPopup.tscn" id="2_discovery"]
+[ext_resource type="Script" uid="uid://dbrsx3v5qfpl3" path="res://features/map/WorldMapUI.gd" id="1_logic"]
+[ext_resource type="Texture2D" uid="uid://bfnulykm8fhss" path="res://assets/maps/backgrounds/map_battle_background.png" id="2_bg_tex"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_topbar"]
+bg_color = Color(0.05, 0.05, 0.07, 0.95)
+border_width_bottom = 2
+border_color = Color(0.2, 0.2, 0.25, 1)
+shadow_size = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_info_toast"]
+bg_color = Color(0, 0, 0, 0.35)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.2)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
 
 [node name="WorldMap" type="Control" unique_id=1276611377]
 layout_mode = 3
@@ -11,10 +28,18 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("1_ecjwd")
-script = ExtResource("1_map_ui")
+script = ExtResource("1_logic")
 
-[node name="MapBackground" type="TextureRect" parent="." unique_id=1570674147]
+[node name="BG" type="ColorRect" parent="." unique_id=1135685228]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.04, 0.04, 0.05, 1)
+
+[node name="BGTexture" type="TextureRect" parent="." unique_id=1896331260]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -22,10 +47,11 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+texture = ExtResource("2_bg_tex")
 expand_mode = 1
-stretch_mode = 6
+stretch_mode = 1
 
-[node name="ScrollContainer" type="ScrollContainer" parent="." unique_id=1828626332]
+[node name="MapArea" type="ScrollContainer" parent="." unique_id=1521351939]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -33,52 +59,118 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-horizontal_scroll_mode = 3
-vertical_scroll_mode = 2
+vertical_scroll_mode = 0
 
-[node name="MapContent" type="Control" parent="ScrollContainer" unique_id=156022919]
+[node name="MapContent" type="Control" parent="MapArea" unique_id=794470365]
+custom_minimum_size = Vector2(25000, 0)
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="LinesContainer" type="Node2D" parent="MapArea/MapContent" unique_id=745654087]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(1280, 4000)
+
+[node name="NodeContainer" type="Control" parent="MapArea/MapContent" unique_id=1406479564]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TopBar" type="PanelContainer" parent="." unique_id=1383085282]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_topbar")
+
+[node name="Margin" type="MarginContainer" parent="TopBar" unique_id=1573176411]
+layout_mode = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_right = 30
+
+[node name="HBox" type="HBoxContainer" parent="TopBar/Margin" unique_id=1044817495]
+layout_mode = 2
+
+[node name="Left" type="VBoxContainer" parent="TopBar/Margin/HBox" unique_id=1870009080]
+layout_mode = 2
+alignment = 1
+
+[node name="BiomeLabel" type="Label" parent="TopBar/Margin/HBox/Left" unique_id=1790339072]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.7, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "BIOME 1"
+
+[node name="PhaseLabel" type="Label" parent="TopBar/Margin/HBox/Left" unique_id=491569783]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "PHASE 1"
+
+[node name="Center" type="CenterContainer" parent="TopBar/Margin/HBox" unique_id=1371315180]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Lines" type="Node2D" parent="ScrollContainer/MapContent" unique_id=953077382]
+[node name="TrackerText" type="Label" parent="TopBar/Margin/HBox/Center" unique_id=7863294]
 unique_name_in_owner = true
-position = Vector2(640, 3800)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.2, 1)
+theme_override_font_sizes/font_size = 32
+text = "1 - 1"
 
-[node name="Nodes" type="Node2D" parent="ScrollContainer/MapContent" unique_id=700428005]
+[node name="Right" type="HBoxContainer" parent="TopBar/Margin/HBox" unique_id=2005346300]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 2
+
+[node name="AvatarButton" type="Button" parent="TopBar/Margin/HBox/Right" unique_id=1654217281]
 unique_name_in_owner = true
-position = Vector2(640, 3800)
-
-[node name="HUD" type="CanvasLayer" parent="." unique_id=418913051]
-
-[node name="MarginContainer" type="MarginContainer" parent="HUD" unique_id=870140885]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 20
-
-[node name="VBox" type="VBoxContainer" parent="HUD/MarginContainer" unique_id=1698175815]
+custom_minimum_size = Vector2(70, 70)
 layout_mode = 2
-mouse_filter = 2
-
-[node name="TopHBox" type="HBoxContainer" parent="HUD/MarginContainer/VBox" unique_id=1720321095]
-layout_mode = 2
-mouse_filter = 2
-
-[node name="AvatarButton" type="Button" parent="HUD/MarginContainer/VBox/TopHBox" unique_id=333596579]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(80, 80)
-layout_mode = 2
-theme_override_font_sizes/font_size = 40
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 36
 text = "👤"
 
-[node name="DiscoveryOverlay" parent="HUD" unique_id=529656252 instance=ExtResource("2_discovery")]
+[node name="StoryButton" type="Button" parent="TopBar/Margin/HBox/Right" unique_id=1654217282]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 26
+text = "📜"
+
+[node name="MenuIconBtn" type="Button" parent="TopBar/Margin/HBox/Right" unique_id=1158006913]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(42, 34)
+layout_mode = 2
+size_flags_vertical = 4
+text = "☰"
+
+[node name="InfoToastBox" type="PanelContainer" parent="." unique_id=707777001]
 unique_name_in_owner = true
 visible = false
+custom_minimum_size = Vector2(420, 34)
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -210.0
+offset_top = 112.0
+offset_right = 210.0
+offset_bottom = 146.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_info_toast")
+
+[node name="InfoToastLabel" type="Label" parent="InfoToastBox" unique_id=707777002]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.35, 0.35, 1)
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+vertical_alignment = 1

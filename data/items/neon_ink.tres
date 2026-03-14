@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "neon_ink"
 name = "Neon Ink"
+name_es = "Doblón de oro"
+name_fr = "Doublon d'or"
+name_de = "Golddublone"
 type = "Material"
 level = 4
+item_power = 6
 hp = 0
 attack = 0
 armour = 0
 effect = "Glow"
 description = "Glowing fluid extracted from deep-sea creatures."
-ai_prompt = "Cinematic dark fantasy: A jar of ink that illuminates the shadows with a ghostly blue light."
+ai_prompt = "Cinematic dark fantasy: A jar of ink that illuminates the shadows with a ghostly blue light.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "holy_water"
 name = "Holy Water"
+name_es = "Mapa antiguo"
+name_fr = "Vieille carte"
+name_de = "Alte Karte"
 type = "Consumable"
 level = 4
+item_power = 7
 hp = 30
 attack = 0
 armour = 0
 effect = "Purify"
 description = "Water blessed by a high priest."
-ai_prompt = "Cinematic dark fantasy: A crystal flask containing glowing, silver-flecked liquid."
+ai_prompt = "Cinematic dark fantasy: A crystal flask containing glowing, silver-flecked liquid.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

@@ -2,7 +2,7 @@ extends Control
 
 const CardScene = preload("res://features/combat/Card.tscn")
 
-@onready var right_panel: TabContainer = $"Margin/HBox/RightPanelWrap/RightPanel"
+@onready var right_panel: TabContainer = %RightPanel
 @onready var active_deck_grid = %ActiveDeckGrid
 @onready var player_deck_grid = %PlayerDeckGrid
 @onready var active_item_grid = %ActiveItemGrid
@@ -16,12 +16,18 @@ const CardScene = preload("res://features/combat/Card.tscn")
 @onready var hp_text = %HPText
 @onready var xp_bar = %XPBar
 @onready var xp_text = %XPText
+@onready var vitality_label: Label = $Margin/HBox/LeftPanel/Stats/VitalitySection/BarLabel
+@onready var memory_progress_label: Label = $Margin/HBox/LeftPanel/Stats/MemorySection/BarLabel
 
 @onready var atk_label = %AtkLabel
 @onready var def_label = %DefLabel
 @onready var energy_label = %EnergyLabel
 @onready var gold_label = %GoldLabel
 @onready var back_button = %BackButton
+@onready var active_deck_title: Label = $Margin/HBox/RightPanel/DECK/Header/TitlePadding/Title
+@onready var player_deck_title: Label = $Margin/HBox/RightPanel/DECK/Scroll/DeckSections/PlayerDeckLabelPadding/PlayerDeckLabel
+@onready var active_items_title: Label = $Margin/HBox/RightPanel/INVENTORY/Header/InventoryTitlePadding/Title
+@onready var player_items_title: Label = $Margin/HBox/RightPanel/INVENTORY/Scroll/ItemSections/PlayerItemsLabelPadding/PlayerItemsLabel
 @onready var info_toast_box = %InfoToastBox
 @onready var info_toast_label = %InfoToastLabel
 @onready var inventory_info_toast_box = %InventoryInfoToastBox
@@ -47,13 +53,16 @@ var _hold_payload: Dictionary = {}
 var _consume_press_instance_id: int = -1
 
 func _ready():
+	# Testing purposes if loaded directly
 	_ensure_default_player_deck()
-	
+	_ensure_default_inventory_deck()
+
 	active_deck_grid.add_theme_constant_override("h_separation", 8)
 	player_deck_grid.add_theme_constant_override("h_separation", 8)
 	active_item_grid.add_theme_constant_override("h_separation", 8)
 	player_item_grid.add_theme_constant_override("h_separation", 8)
 	
+	_refresh_static_labels()
 	_update_stats_ui()
 	_populate_deck_tab()
 	_populate_inventory_tab()
@@ -73,12 +82,18 @@ func _setup_hold_timer():
 
 func _ensure_default_player_deck():
 	if GameManager.player_deck.is_empty() and GameManager.active_deck.is_empty():
-		GameManager.player_deck = ["sword", "shield", "heart"]
+		GameManager.active_deck = ["sword", "shield", "heart"]
+		GameManager.player_deck = ["sword", "shield", "heart", "heart"]
+
+func _ensure_default_inventory_deck():
+	if GameManager.player_items.is_empty() and GameManager.active_items.is_empty():
+		GameManager.active_items = ["iron_scrap"]
+		GameManager.player_items = ["wood_splinter", "mug_of_ale", "iron_scrap", "iron_scrap"]
 
 func _update_stats_ui():
 	var p_lvl = GameManager.player_level
 	class_label.text = "%s" % GameManager.player_class
-	level_label.text = "LVL %d" % p_lvl
+	level_label.text = LocalizationManager.format("character.level", {"level": p_lvl}, "LVL {level}")
 	
 	GameManager.recalculate_player_totals()
 	var totals = GameManager.get_item_stat_bonuses()
@@ -86,12 +101,20 @@ func _update_stats_ui():
 	var total_max_hp = GameManager.player_hp_total
 	hp_bar.max_value = total_max_hp
 	hp_bar.value = GameManager.current_hp
-	hp_text.text = "HP %d / %d" % [GameManager.current_hp, total_max_hp]
+	hp_text.text = LocalizationManager.format(
+		"character.health",
+		{"current": GameManager.current_hp, "max": total_max_hp},
+		"HEALTH {current} / {max}"
+	)
 	
 	var max_xp = GameData.get_max_xp_for_level(GameManager.player_level)
 	xp_bar.max_value = max_xp
 	xp_bar.value = GameManager.player_xp
-	xp_text.text = "XP %d / %d" % [GameManager.player_xp, max_xp]
+	xp_text.text = LocalizationManager.format(
+		"character.memory",
+		{"current": GameManager.player_xp, "max": max_xp},
+		"MEMORY {current} / {max}"
+	)
 	
 	var attack_bonus = int(totals.get("atk_bonus", 0))
 	var defense_bonus = int(totals.get("def_bonus", 0))
@@ -99,17 +122,29 @@ func _update_stats_ui():
 	var base_energy = int(GameManager.base_energy)
 	var total_energy = base_energy + energy_bonus
 	
-	atk_label.text = "ATTACK: %d (%d+%d)" % [GameManager.player_attack_total, GameManager.player_attack, attack_bonus]
-	def_label.text = "DEFENSE: %d (%d+%d)" % [GameManager.player_defense_total, GameManager.player_defense, defense_bonus]
-	energy_label.text = "ENERGY: %d (%d+%d)" % [total_energy, base_energy, energy_bonus]
-	gold_label.text = "GOLD: %d" % GameManager.gold
+	atk_label.text = LocalizationManager.format(
+		"character.attack",
+		{"total": GameManager.player_attack_total, "base": GameManager.player_attack, "bonus": attack_bonus},
+		"ATTACK: {total} ({base}+{bonus})"
+	)
+	def_label.text = LocalizationManager.format(
+		"character.defense",
+		{"total": GameManager.player_defense_total, "base": GameManager.player_defense, "bonus": defense_bonus},
+		"DEFENSE: {total} ({base}+{bonus})"
+	)
+	energy_label.text = LocalizationManager.format(
+		"character.energy",
+		{"total": total_energy, "base": base_energy, "bonus": energy_bonus},
+		"ENERGY: {total} ({base}+{bonus})"
+	)
+	gold_label.text = LocalizationManager.format("character.gold", {"gold": GameManager.gold}, "GOLD: {gold}")
 
 func _populate_deck_tab():
 	_clear_children(active_deck_grid)
 	_clear_children(player_deck_grid)
 	
 	var active_counts = _count_ids(GameManager.active_deck)
-	var reserve_counts = _count_ids(GameManager.player_deck)
+	var reserve_counts = _get_reserve_deck_counts()
 	
 	for card_id in _sorted_keys(active_counts):
 		var card_res = _load_card(card_id)
@@ -126,7 +161,7 @@ func _populate_inventory_tab():
 	_clear_children(player_item_grid)
 	
 	var active_counts = _count_ids(GameManager.active_items)
-	var reserve_counts = _count_ids(GameManager.player_items)
+	var reserve_counts = _get_reserve_item_counts()
 	
 	for item_id in _sorted_keys(active_counts):
 		var item_res = _load_item(item_id)
@@ -149,6 +184,7 @@ func _add_stack_to_grid(container: GridContainer, id: String, res: Resource, cou
 		var back_card = CardScene.instantiate()
 		stack_root.add_child(back_card)
 		_configure_card_ui(back_card, res)
+		_simplify_stack_back_card(back_card)
 		back_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		back_card.modulate = Color(0.85, 0.85, 0.85, 0.55)
 		back_card.position = Vector2((i + 1) * STACK_OFFSET_X, (i + 1) * STACK_OFFSET_Y)
@@ -157,8 +193,7 @@ func _add_stack_to_grid(container: GridContainer, id: String, res: Resource, cou
 	stack_root.add_child(front_card)
 	_configure_card_ui(front_card, res)
 	front_card.position = Vector2.ZERO
-	if source == "player":
-		front_card.modulate = Color(0.72, 0.72, 0.72, 0.95)
+	front_card.modulate = Color.WHITE
 	
 	_connect_card_interactions(front_card, id, mode, source, res)
 	
@@ -166,11 +201,11 @@ func _add_stack_to_grid(container: GridContainer, id: String, res: Resource, cou
 		var qty_label = Label.new()
 		stack_root.add_child(qty_label)
 		qty_label.text = "x%d" % count
-		qty_label.position = Vector2(116, 4)
+		qty_label.position = Vector2(128, -6)
 		qty_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		qty_label.theme_override_font_sizes.font_size = 16
-		qty_label.theme_override_colors.font_color = Color(1.0, 0.95, 0.6, 1.0)
-		qty_label.theme_override_colors.font_outline_color = Color(0, 0, 0, 1)
+		qty_label.add_theme_font_size_override("font_size", 16)
+		qty_label.add_theme_color_override("font_color", Color(1.0, 0.95, 0.6, 1.0))
+		qty_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
 		qty_label.add_theme_constant_override("outline_size", 2)
 
 func _connect_card_interactions(card_ui: Control, id: String, mode: String, source: String, res: Resource):
@@ -197,7 +232,7 @@ func _on_collection_card_pressed(card_ui: Control, id: String, mode: String, sou
 	_hide_card_preview()
 	_cancel_hold()
 	
-	if not _can_transfer(mode, source, true):
+	if not _can_transfer(mode, source, id, true):
 		return
 	
 	# Requested behavior: when deck is at minimum and action is blocked, no transition plays.
@@ -207,41 +242,68 @@ func _on_collection_card_pressed(card_ui: Control, id: String, mode: String, sou
 		_refresh_after_transfer(mode)
 	)
 
-func _can_transfer(mode: String, source: String, show_feedback: bool) -> bool:
+func _can_transfer(mode: String, source: String, id: String, show_feedback: bool) -> bool:
 	if mode == "deck":
 		var min_required = GameManager.player_level
 		if source == "active":
 			if GameManager.active_deck.size() <= min_required:
 				if show_feedback:
-					_show_info_toast("You must have at least %d card(s) in your deck." % min_required)
+					_show_info_toast(LocalizationManager.format(
+						"character.toast.min_deck_cards",
+						{"count": min_required},
+						"You must have at least {count} card(s) in your deck."
+					))
 				return false
 		else:
+			var reserve_counts = _get_reserve_deck_counts()
+			if int(reserve_counts.get(id, 0)) <= 0:
+				if show_feedback:
+					_show_info_toast(LocalizationManager.translate(
+						"character.toast.no_card_copy",
+						"No unallocated copy of that card is available."
+					))
+				return false
 			if GameManager.active_deck.size() >= MAX_ACTIVE_DECK_CARDS:
 				if show_feedback:
-					_show_info_toast("Active deck is full (%d cards)." % MAX_ACTIVE_DECK_CARDS)
+					_show_info_toast(LocalizationManager.format(
+						"character.toast.deck_full",
+						{"count": MAX_ACTIVE_DECK_CARDS},
+						"Active deck is full ({count} cards)."
+					))
 				return false
 	elif mode == "item":
 		var max_slots = max(1, GameManager.player_level)
-		if source == "player" and GameManager.active_items.size() >= max_slots:
-			if show_feedback:
-				_show_info_toast("You may only have %d active items." % max_slots)
-			return false
+		if source == "player":
+			var reserve_counts = _get_reserve_item_counts()
+			if int(reserve_counts.get(id, 0)) <= 0:
+				if show_feedback:
+					_show_info_toast(LocalizationManager.translate(
+						"character.toast.no_item_copy",
+						"No unallocated copy of that item is available."
+					))
+				return false
+			if GameManager.active_items.size() >= max_slots:
+				if show_feedback:
+					_show_info_toast(LocalizationManager.format(
+						"character.toast.max_active_items",
+						{"count": max_slots},
+						"You may only have {count} active items."
+					))
+				return false
 	return true
 
 func _apply_transfer(mode: String, source: String, id: String):
 	if mode == "deck":
 		if source == "active":
-			if _remove_one(GameManager.active_deck, id):
-				GameManager.player_deck.append(id)
+			_remove_one(GameManager.active_deck, id)
 		else:
-			if _remove_one(GameManager.player_deck, id):
+			if _get_available_owned_card_count(id) > 0:
 				GameManager.active_deck.append(id)
 	else:
 		if source == "active":
-			if _remove_one(GameManager.active_items, id):
-				GameManager.player_items.append(id)
+			_remove_one(GameManager.active_items, id)
 		else:
-			if _remove_one(GameManager.player_items, id):
+			if _get_available_owned_item_count(id) > 0:
 				GameManager.active_items.append(id)
 
 func _refresh_after_transfer(mode: String):
@@ -259,7 +321,11 @@ func _refresh_after_transfer(mode: String):
 func _update_counters():
 	var active_deck_size = GameManager.active_deck.size()
 	var min_cards = GameManager.player_level
-	deck_count_label.text = "cards: %d | %d" % [active_deck_size, min_cards]
+	deck_count_label.text = LocalizationManager.format(
+		"character.pairs",
+		{"current": active_deck_size, "required": min_cards},
+		"Pairs: {current} | {required}"
+	)
 	if active_deck_size > min_cards:
 		deck_count_label.modulate = Color.GOLD
 	elif active_deck_size == min_cards:
@@ -269,18 +335,30 @@ func _update_counters():
 	
 	var active_item_count = GameManager.active_items.size()
 	var max_items = max(1, GameManager.player_level)
-	item_count_label.text = "Active Items: %d / %d" % [active_item_count, max_items]
+	item_count_label.text = LocalizationManager.format(
+		"character.equipped",
+		{"current": active_item_count, "max": max_items},
+		"Equipped: {current} / {max}"
+	)
 	item_count_label.modulate = Color.GOLD if active_item_count >= max_items else Color.WHITE
 
 func _on_back_pressed():
 	if GameManager.active_deck.size() < GameManager.player_level:
-		_show_info_toast("You must have at least %d cards in your deck." % GameManager.player_level)
+		_show_info_toast(LocalizationManager.format(
+			"character.toast.min_deck_exit",
+			{"count": GameManager.player_level},
+			"You must have at least {count} cards in your deck."
+		))
 		return
 	
 	if GameManager.is_battle_mode:
-		get_tree().change_scene_to_file("res://features/map/BattleMap.tscn")
+		var next_scene = GameManager.profile_return_scene if GameManager.profile_return_scene != "" else GameManager.get_active_biome_map_scene_path()
+		GameManager.profile_return_scene = ""
+		get_tree().change_scene_to_file(next_scene)
 	else:
-		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+		var next_scene = GameManager.profile_return_scene if GameManager.profile_return_scene != "" else GameManager.get_story_map_scene_path()
+		GameManager.profile_return_scene = ""
+		get_tree().change_scene_to_file(next_scene)
 
 func _configure_card_ui(card_ui: Control, res: Resource):
 	card_ui.custom_minimum_size = Vector2(156, 234)
@@ -298,11 +376,50 @@ func _configure_card_ui(card_ui: Control, res: Resource):
 	if card_ui.has_method("_on_pressed") and card_ui.pressed.is_connected(card_ui._on_pressed):
 		card_ui.pressed.disconnect(card_ui._on_pressed)
 
+func _simplify_stack_back_card(card_ui: Control):
+	var card_image = card_ui.get_node_or_null("%CardImage")
+	if card_image:
+		card_image.visible = false
+	var center_type_icon = card_ui.get_node_or_null("%CenterTypeIcon")
+	if center_type_icon:
+		center_type_icon.visible = false
+	var text_overlay = card_ui.get_node_or_null("FrontFace/TextOverlay")
+	if text_overlay:
+		text_overlay.visible = false
+
 func _count_ids(ids: Array) -> Dictionary:
 	var counts := {}
 	for id in ids:
 		counts[id] = int(counts.get(id, 0)) + 1
 	return counts
+
+func _get_reserve_deck_counts() -> Dictionary:
+	var owned_counts = _count_ids(GameManager.player_deck)
+	var active_counts = _count_ids(GameManager.active_deck)
+	var reserve_counts := {}
+	for card_id in owned_counts.keys():
+		var available = int(owned_counts.get(card_id, 0)) - int(active_counts.get(card_id, 0))
+		if available > 0:
+			reserve_counts[card_id] = available
+	return reserve_counts
+
+func _get_available_owned_card_count(card_id: String) -> int:
+	var reserve_counts = _get_reserve_deck_counts()
+	return int(reserve_counts.get(card_id, 0))
+
+func _get_reserve_item_counts() -> Dictionary:
+	var owned_counts = _count_ids(GameManager.player_items)
+	var active_counts = _count_ids(GameManager.active_items)
+	var reserve_counts := {}
+	for item_id in owned_counts.keys():
+		var available = int(owned_counts.get(item_id, 0)) - int(active_counts.get(item_id, 0))
+		if available > 0:
+			reserve_counts[item_id] = available
+	return reserve_counts
+
+func _get_available_owned_item_count(item_id: String) -> int:
+	var reserve_counts = _get_reserve_item_counts()
+	return int(reserve_counts.get(item_id, 0))
 
 func _sorted_keys(dict: Dictionary) -> Array:
 	var keys = dict.keys()
@@ -372,6 +489,9 @@ func _hide_card_preview():
 	_expanded_preview_card = null
 
 func _input(event: InputEvent):
+	if event.is_action_pressed("ui_cancel"):
+		_on_back_pressed()
+		return
 	if _expanded_preview_card == null:
 		return
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
@@ -476,3 +596,14 @@ func _show_info_toast(message: String):
 	_info_toast_tween.tween_interval(1.0)
 	_info_toast_tween.tween_property(toast_box, "modulate:a", 0.0, 0.45)
 	_info_toast_tween.finished.connect(_hide_info_toasts)
+
+func _refresh_static_labels():
+	right_panel.set_tab_title(0, LocalizationManager.translate("character.tab.deck", "DECK"))
+	right_panel.set_tab_title(1, LocalizationManager.translate("character.tab.inventory", "INVENTORY"))
+	vitality_label.text = LocalizationManager.translate("character.vitality", "VITALITY")
+	memory_progress_label.text = LocalizationManager.translate("character.memory_progress", "MEMORY PROGRESS")
+	active_deck_title.text = LocalizationManager.translate("character.active_deck", "ACTIVE DECK")
+	player_deck_title.text = LocalizationManager.translate("character.player_deck", "PLAYER DECK")
+	active_items_title.text = LocalizationManager.translate("character.active_items", "ACTIVE ITEMS")
+	player_items_title.text = LocalizationManager.translate("character.player_items", "PLAYER ITEMS")
+	back_button.text = LocalizationManager.translate("character.back_to_map", "RETURN TO MAP")

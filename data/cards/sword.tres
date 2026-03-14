@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "sword"
 name = "Iron Sword"
+name_es = "Espada de hierro"
+name_fr = "Épée de fer"
+name_de = "Eisenschwert"
 rarity = "common"
 type = "attack"
+card_power = 1
 value = 8
-description = "Slash damage"
+description = "Deal 8 physical damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

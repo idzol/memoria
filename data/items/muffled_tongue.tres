@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "muffled_tongue"
 name = "Muffled Tongue"
+name_es = "Fragmento de fuego"
+name_fr = "Éclat de feu"
+name_de = "Feuersplitter"
 type = "Utility"
 level = 5
+item_power = 12
 hp = 0
 attack = 0
 armour = 0
 effect = "Silence"
 description = "A dried tongue that prevents any sound from being made."
-ai_prompt = "Cinematic dark fantasy: A shriveled grey tongue resting in a small, velvet-lined box."
+ai_prompt = "Cinematic dark fantasy: A shriveled grey tongue resting in a small, velvet-lined box.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "venom_vial"
 name = "Venom Vial"
+name_es = "Cimitarra"
+name_fr = "Cimeterre"
+name_de = "Krummsäbel"
 type = "Consumable"
 level = 4
+item_power = 5
 hp = 0
 attack = 18
 armour = 0
 effect = "Poison"
 description = "Potent toxin from a forest beast."
-ai_prompt = "Cinematic dark fantasy: A small vial filled with viscous glowing purple liquid."
+ai_prompt = "Cinematic dark fantasy: A small vial filled with viscous glowing purple liquid.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

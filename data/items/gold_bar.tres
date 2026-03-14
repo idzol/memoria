@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "gold_bar"
 name = "Gold Bar"
+name_es = "Polvo de estrellas"
+name_fr = "Poussière d'étoiles"
+name_de = "Sternenstaub"
 type = "Treasure"
 level = 6
+item_power = 14
 hp = 0
 attack = 0
 armour = 0
 effect = "Fortune"
 description = "A solid brick of pure, heavy gold."
-ai_prompt = "Cinematic dark fantasy: A rectangular ingot of gold stamped with a royal seal."
+ai_prompt = "Cinematic dark fantasy: A rectangular ingot of gold stamped with a royal seal.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

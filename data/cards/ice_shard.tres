@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "ice_shard"
 name = "Ice Shard"
+name_es = "Fragmento de hielo"
+name_fr = "Éclat de glace"
+name_de = "Eissplitter"
 rarity = "common"
 type = "attack_ice"
+card_power = 4
 value = 10
-description = "Frozen projectile"
+description = "Deal 10 ice damage"
 special_effect = "Slow"
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

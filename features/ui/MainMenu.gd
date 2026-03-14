@@ -10,9 +10,13 @@ extends Control
 @onready var save_scroll: ScrollContainer = %SaveListPopup.get_node("VBox/ScrollContainer")
 @onready var name_input = %NameInput
 @onready var battle_mode_btn = %BattleModeButton
+@onready var language_button = %LanguageButton
+@onready var name_toast: PanelContainer = %NameToast
+@onready var name_toast_label: Label = %NameToastLabel
 
 # Confirmation Popup for deletion
 @onready var confirm_delete_popup = %ConfirmDeletePopup
+var _name_toast_tween: Tween
 var _pending_delete_filename: String = ""
 var _pending_mode_is_battle: bool = false
 var _main_menu_buttons: Array[Button] = []
@@ -42,6 +46,7 @@ func _ready():
 	%CreditsBtn.pressed.connect(_on_credits_pressed)
 	%ExitButton.pressed.connect(_on_exit_pressed)
 	%BattleModeButton.pressed.connect(_on_battle_mode_clicked)
+	%LanguageButton.pressed.connect(_on_language_pressed)
 
 	# Delete Confirmation connections
 	%ConfirmDeleteBtn.pressed.connect(_on_delete_confirmed)
@@ -49,6 +54,7 @@ func _ready():
 	
 	# Hide overlays
 	name_entry_popup.visible = false
+	_hide_name_toast()
 	_set_save_list_popup_visible(false)
 	confirm_delete_popup.visible = false
 	if has_node("%SettingsOverlay"):
@@ -58,6 +64,7 @@ func _ready():
 		%ContinueButton,
 		%StartButton,
 		%BattleModeButton,
+		%LanguageButton,
 		%SettingsButton,
 		%ControlsBtn,
 		%CreditsBtn,
@@ -67,11 +74,21 @@ func _ready():
 	for btn in _main_menu_buttons:
 		btn.focus_mode = Control.FOCUS_NONE
 		btn.mouse_entered.connect(_on_main_button_hovered.bind(btn))
+	_refresh_localized_text()
 	_focus_main_option(0)
 	_fade_in_from_white()
 
 func _input(event):
-	if name_entry_popup.visible or confirm_delete_popup.visible:
+	if name_entry_popup.visible:
+		if event.is_action_pressed("ui_accept"):
+			_on_name_confirmed()
+			return
+		if event.is_action_pressed("ui_cancel"):
+			name_entry_popup.visible = false
+			_focus_main_option(_main_selected_index)
+			return
+		return
+	if confirm_delete_popup.visible:
 		return
 	if has_node("%SettingsOverlay") and %SettingsOverlay.visible:
 		return
@@ -143,11 +160,11 @@ func _refresh_continue_button():
 	if saves.is_empty():
 		continue_button.disabled = true
 		continue_button.modulate.a = 0.5
-		continue_button.text = "NO SAVES FOUND"
+		continue_button.text = LocalizationManager.translate("menu.no_saves", "NO SAVES FOUND")
 	else:
 		continue_button.disabled = false
 		continue_button.modulate.a = 1.0
-		continue_button.text = "CONTINUE RUN"
+		continue_button.text = LocalizationManager.translate("menu.continue_run", "CONTINUE RUN")
 		if not continue_button.pressed.is_connected(_on_continue_clicked):
 			continue_button.pressed.connect(_on_continue_clicked)
 
@@ -163,7 +180,8 @@ func _open_name_entry_popup():
 	GameManager.is_battle_mode = _pending_mode_is_battle
 	name_entry_popup.visible = true
 	name_input.text = ""
-	name_input.placeholder_text = "Enter unique name..."
+	name_input.placeholder_text = LocalizationManager.translate("menu.hero_name", "Hero Name...")
+	_hide_name_toast()
 	name_input.grab_focus()
 
 func _on_name_confirmed():
@@ -174,7 +192,13 @@ func _on_name_confirmed():
 	for save in existing_saves:
 		if save.get("player_name", "").to_lower() == p_name.to_lower():
 			name_input.text = ""
-			name_input.placeholder_text = "Name already exists!"
+			name_input.placeholder_text = LocalizationManager.translate("menu.hero_name", "Hero Name...")
+			_show_name_toast(LocalizationManager.format(
+				"menu.name_taken",
+				{"name": p_name},
+				"{name} is already being used."
+			))
+			name_input.grab_focus()
 			return
 		
 	GameManager.player_name = p_name
@@ -211,7 +235,7 @@ func _populate_save_list():
 
 		var mode_label = Label.new()
 		var is_battle = data.get("is_battle_mode", false)
-		mode_label.text = "BATTLE MODE" if is_battle else "STORY MODE"
+		mode_label.text = LocalizationManager.translate("menu.battle_mode", "BATTLE MODE") if is_battle else LocalizationManager.translate("menu.story_mode", "STORY MODE")
 		mode_label.custom_minimum_size = Vector2(130, 50)
 		mode_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		mode_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -222,7 +246,7 @@ func _populate_save_list():
 		var icon = _get_class_icon(data.get("player_class", "Archivist"))
 		var p_name = data.get("player_name", "Unknown")
 		var floor_num = data.get("player_level", data.get("current_level", 1))
-		btn.text = "%s %s | Floor %d" % [icon, p_name, floor_num]
+		btn.text = LocalizationManager.format("menu.save_entry", {"icon": icon, "name": p_name, "floor": floor_num}, "{icon} {name} | Floor {floor}")
 		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		btn.custom_minimum_size.y = 50
 		btn.focus_mode = Control.FOCUS_NONE
@@ -232,7 +256,7 @@ func _populate_save_list():
 		_save_option_buttons.append(btn)
 		
 		var del_btn = Button.new()
-		del_btn.text = " X "
+		del_btn.text = LocalizationManager.translate("menu.delete_short", " X ")
 		del_btn.modulate = Color.INDIAN_RED
 		del_btn.pressed.connect(_on_delete_request.bind(data.filename))
 		hbox.add_child(del_btn)
@@ -278,6 +302,57 @@ func _on_exit_pressed():
 	_play_click_sfx()
 	SignalBus.game_exited.emit()
 	get_tree().quit()
+
+func _on_language_pressed():
+	LocalizationManager.cycle_language()
+	_refresh_localized_text()
+
+func _refresh_localized_text():
+	if not is_inside_tree():
+		return
+	$CenterContainer/VBoxContainer/Title.text = LocalizationManager.translate("menu.title", "MEMORIA")
+	%StartButton.text = LocalizationManager.translate("menu.story_mode", "STORY MODE")
+	%BattleModeButton.text = LocalizationManager.translate("menu.battle_mode", "BATTLE MODE")
+	%SettingsButton.text = LocalizationManager.translate("menu.settings", "SETTINGS")
+	%ControlsBtn.text = LocalizationManager.translate("menu.controls", "CONTROLS")
+	%CreditsBtn.text = LocalizationManager.translate("menu.credits", "CREDITS")
+	%ExitButton.text = LocalizationManager.translate("menu.exit", "EXIT")
+	%NameEntryPopup.get_node("VBox/Label").text = LocalizationManager.translate("menu.enter_name", "Enter Your Name")
+	%ConfirmNameBtn.text = LocalizationManager.translate("menu.start", "START")
+	%CancelNameBtn.text = LocalizationManager.translate("menu.cancel", "CANCEL")
+	$SaveListPopup/VBox/Title.text = LocalizationManager.translate("menu.select_memory", "SELECT A MEMORY")
+	%CloseSavesBtn.text = LocalizationManager.translate("menu.close", "CLOSE")
+	$ConfirmDeletePopup/VBox/Label.text = LocalizationManager.translate("menu.delete_confirm", "Are you sure you want to delete this memory?")
+	%ConfirmDeleteBtn.text = LocalizationManager.translate("menu.delete", "DELETE")
+	%CancelDeleteBtn.text = LocalizationManager.translate("menu.cancel", "CANCEL")
+	name_input.placeholder_text = LocalizationManager.translate("menu.hero_name", "Hero Name...")
+	if name_toast.visible:
+		name_toast_label.text = LocalizationManager.translate("menu.name_taken_generic", "That name is already being used.")
+	var language_template = LocalizationManager.translate("language.label", "Language: {language}")
+	var language_name = LocalizationManager.get_language_display_name()
+	language_button.text = language_template.replace("{language}", language_name)
+	_refresh_continue_button()
+
+func _hide_name_toast():
+	if _name_toast_tween:
+		_name_toast_tween.kill()
+	if name_toast:
+		name_toast.visible = false
+		name_toast.modulate = Color(1, 1, 1, 0)
+	if name_toast_label:
+		name_toast_label.text = ""
+
+func _show_name_toast(message: String):
+	if _name_toast_tween:
+		_name_toast_tween.kill()
+	name_toast_label.text = message
+	name_toast.visible = true
+	name_toast.modulate = Color(1, 1, 1, 0)
+	_name_toast_tween = create_tween()
+	_name_toast_tween.tween_property(name_toast, "modulate:a", 1.0, 0.12)
+	_name_toast_tween.tween_interval(1.6)
+	_name_toast_tween.tween_property(name_toast, "modulate:a", 0.0, 0.3)
+	_name_toast_tween.finished.connect(_hide_name_toast)
 
 func _play_click_sfx():
 	# Trigger common UI click sound from music.csv (e.g., sfx_207)

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "honey"
 name = "Honey"
+name_es = "Miel"
+name_fr = "Miel"
+name_de = "Honig"
 type = "Consumable"
 level = 2
+item_power = 2
 hp = 10
 attack = 0
 armour = 0
 effect = "Stick"
 description = "Thick, golden honey from wild hives."
-ai_prompt = "Cinematic dark fantasy: A clay jar dripping with viscous, glowing amber honey."
+ai_prompt = "Cinematic dark fantasy: A clay jar dripping with viscous, glowing amber honey.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "rotten_flesh"
 name = "Rotten Flesh"
+name_es = "Cristal de sal"
+name_fr = "Cristal de sel"
+name_de = "Salzkristall"
 type = "Trap"
 level = 3
+item_power = 4
 hp = 0
 attack = 0
 armour = 0
 effect = "Sickness"
 description = "Decaying meat that attracts flies and disease."
-ai_prompt = "Cinematic dark fantasy: A pile of grey, dripping meat crawling with necro-parasites."
+ai_prompt = "Cinematic dark fantasy: A pile of grey, dripping meat crawling with necro-parasites.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

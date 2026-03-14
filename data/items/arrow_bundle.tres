@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "arrow_bundle"
 name = "Arrow Bundle"
+name_es = "Pata de conejo de la suerte"
+name_fr = "Patte de lapin chanceuse"
+name_de = "Glückshasenpfote"
 type = "Weapon"
 level = 4
+item_power = 8
 hp = 0
 attack = 12
 armour = 0
 effect = "Ranged"
 description = "A quiver of sharp, fletched arrows."
-ai_prompt = "Cinematic dark fantasy: A leather quiver filled with arrows tipped in obsidian."
+ai_prompt = "Cinematic dark fantasy: A leather quiver filled with arrows tipped in obsidian.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

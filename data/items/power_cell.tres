@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "power_cell"
 name = "Power Cell"
+name_es = "Sabiduría antigua"
+name_fr = "Sagesse ancienne"
+name_de = "Alte Weisheit"
 type = "Utility"
 level = 6
+item_power = 13
 hp = 0
 attack = 0
 armour = 0
 effect = "Charge"
 description = "An ancient device humming with lost energy."
-ai_prompt = "Cinematic dark fantasy: A cylindrical metal tube with glowing blue lines and brass fittings."
+ai_prompt = "Cinematic dark fantasy: A cylindrical metal tube with glowing blue lines and brass fittings.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

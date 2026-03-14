@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "stardust"
 name = "Stardust"
+name_es = "Llave binaria"
+name_fr = "Clé binaire"
+name_de = "Binärschlüssel"
 type = "Material"
 level = 6
+item_power = 14
 hp = 0
 attack = 0
 armour = 0
 effect = "Celestial"
 description = "Powdered remains of a fallen star."
-ai_prompt = "Cinematic dark fantasy: A velvet pouch containing sparkling gold and blue sand."
+ai_prompt = "Cinematic dark fantasy: A velvet pouch containing sparkling gold and blue sand.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

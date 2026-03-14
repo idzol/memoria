@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "ember"
 name = "Ember"
+name_es = "Brasa"
+name_fr = "Braise"
+name_de = "Glut"
 type = "Material"
 level = 2
+item_power = 2
 hp = 0
 attack = 5
 armour = 0
 effect = "Ignite"
 description = "A glowing coal that never fades."
-ai_prompt = "Cinematic dark fantasy: A single red spark hovering inside a protective iron cage."
+ai_prompt = "Cinematic dark fantasy: A single red spark hovering inside a protective iron cage.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

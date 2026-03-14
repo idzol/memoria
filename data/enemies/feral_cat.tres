@@ -8,6 +8,9 @@
 [resource]
 script = ExtResource("1_script")
 name = "Feral_Cat"
+name_es = "Gato feral"
+name_fr = "Chat sauvage"
+name_de = "Wildkatze"
 biome = "town"
 hp = 8
 hframes = 8
@@ -21,6 +24,7 @@ armor = 0
 base_damage = 7
 difficulty_tier = 1
 xp_reward = 20
+loot_power = 1
 gold_min = 0
 gold_max = 0
 item_drops = ["fur"]

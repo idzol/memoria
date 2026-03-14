@@ -155,12 +155,10 @@ func _exit_to_run_summary_main_menu():
 func _end_day_story_mode():
 	if GameManager.is_battle_mode:
 		return
-	GameManager.reset_to_home()
-	GameManager.current_hp = GameManager.player_hp_total
-	GameManager.current_node = {}
+	GameManager.begin_new_story_run(GameManager.player_biome if GameManager.player_biome != "" else "town")
 	SaveManager.save_mid_run_state()
 	get_tree().paused = false
-	get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+	get_tree().change_scene_to_file(GameManager.get_story_map_scene_path())
 
 func _update_save_button_state():
 	var disable_save = _is_save_disabled_in_current_scene()

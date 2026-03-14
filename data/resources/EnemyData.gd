@@ -6,6 +6,9 @@ class_name EnemyData
 
 @export_group("Identity")
 @export var name: String = "Unknown Foe"
+@export var name_es: String = ""
+@export var name_fr: String = ""
+@export var name_de: String = ""
 @export var biome: String = "town"
 
 @export_group("Combat Stats")
@@ -31,6 +34,7 @@ class_name EnemyData
 @export var defend_sound: AudioStream
 
 @export_group("Loot")
+@export var loot_power: int = 0
 @export var gold_min: int = 10
 @export var gold_max: int = 25
 @export var item_drops: Array[String] = []

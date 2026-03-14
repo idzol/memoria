@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "light_dust"
 name = "Light Dust"
+name_es = "Light Dust"
+name_fr = "Light Dust"
+name_de = "Light Dust"
 rarity = "epic"
-type = "charge"
+type = "prepare"
+card_power = 14
 value = 0
 description = "Sparkles with energy."
 special_effect = ""

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "moon_essence"
 name = "Moon Essence"
+name_es = "Hierba curativa"
+name_fr = "Herbe médicinale"
+name_de = "Heilkraut"
 type = "Material"
 level = 4
+item_power = 7
 hp = 0
 attack = 0
 armour = 0
 effect = "Night"
 description = "Captured light from a full moon."
-ai_prompt = "Cinematic dark fantasy: A bottle filled with liquid silver that glows softly."
+ai_prompt = "Cinematic dark fantasy: A bottle filled with liquid silver that glows softly.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

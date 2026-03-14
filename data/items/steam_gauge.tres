@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "steam_gauge"
 name = "Steam Gauge"
+name_es = "Tótem de fuego"
+name_fr = "Totem de feu"
+name_de = "Feuertotem"
 type = "Utility"
 level = 6
+item_power = 15
 hp = 0
 attack = 0
 armour = 0
 effect = "Pressure"
 description = "A dial for monitoring boiler systems."
-ai_prompt = "Cinematic dark fantasy: A circular brass face with a needle and red warning zones."
+ai_prompt = "Cinematic dark fantasy: A circular brass face with a needle and red warning zones.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

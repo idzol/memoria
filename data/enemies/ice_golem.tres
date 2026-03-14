@@ -8,6 +8,9 @@
 [resource]
 script = ExtResource("1_script")
 name = "Ice_Golem"
+name_es = "Golem de hielo"
+name_fr = "Golem de glace"
+name_de = "Eisgolem"
 biome = "ice_caves"
 hp = 80
 hframes = 8
@@ -21,6 +24,7 @@ armor = 8
 base_damage = 12
 difficulty_tier = 1
 xp_reward = 20
+loot_power = 3
 gold_min = 15
 gold_max = 25
 item_drops = ["frost"]

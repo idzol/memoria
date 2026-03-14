@@ -1,8 +1,7 @@
 extends Control
 
 # res://features/map/BattleMapUI.gd
-# Linear map display for Battle Mode.
-# Updated: Hand-drawn centered connection lines and visibility culling.
+# Grid-based battle map UI with one-biome-at-a-time rendering and boss backtrack flow.
 
 @onready var node_container = %NodeContainer
 @onready var lines_container = %LinesContainer
@@ -11,62 +10,59 @@ extends Control
 @onready var tracker_text = %TrackerText
 @onready var scroll_area = %MapArea
 @onready var avatar_button = %AvatarButton
+@onready var story_button = %StoryButton
 @onready var menu_icon_btn = %MenuIconBtn
 @onready var map_content = $MapArea/MapContent
+@onready var info_toast_box = %InfoToastBox
+@onready var info_toast_label = %InfoToastLabel
 
-# Assets & Resources
 var node_scene = preload("res://features/map/MapNode.tscn")
 var in_game_menu_scene = preload("res://features/ui/InGameMenu.tscn")
 
-# Dialogs
-var travel_dialog: ConfirmationDialog
-
-# State
 var in_game_menu = null
+var _info_toast_tween: Tween
+
 var node_widgets_by_id: Dictionary = {}
 var node_positions_by_id: Dictionary = {}
-var reachable_node_ids: Array[String] = []
-var selected_reachable_index: int = -1
+var adjacent_node_ids: Array[String] = []
+var selected_node_id: String = ""
 var visible_min_layer: int = 0
 var visible_max_layer: int = 0
+var visible_min_column: int = 0
+var visible_max_column: int = 0
 
-# Node dimensions from MapNode.tscn to calculate center
 const NODE_HALF_SIZE = Vector2(90, 90)
-const LAYER_SPACING = 360.0
-const ROW_SPACING = 230.0
-const MAP_LEFT_PADDING = 220.0
-const MAP_TOP_PADDING = 300.0
-const JITTER_X_RANGE = 34.0
-const JITTER_Y_RANGE = 28.0
-const SELECTED_BORDER_COLOR = Color(1, 1, 1, 1)
+const LAYER_SPACING = 240.0
+const ROW_SPACING = 220.0
+const MAP_LEFT_PADDING = 240.0
+const MAP_TOP_PADDING = 220.0
+const DOTTED_COLOR = Color(0.68, 0.68, 0.72, 0.85)
+const BACKTRACK_PROMPT = "You have a feeling you have been here before. An intense pain fills your mind as memory floods back"
 
 func _ready():
 	_setup_ui()
 
-	# If map doesn't exist (e.g. direct scene run), generate a temporary one
 	if GameManager.run_map.is_empty():
 		var gen = preload("res://features/map/BattleMapGenerator.gd").new()
 		GameManager.run_map = await gen.generate_battle_map()
 
+	if GameManager.player_grid_pos == Vector2i(-99, -99):
+		GameManager.player_grid_pos = Vector2i(0, 0)
+
 	_draw_map()
 
-	# Instance the In-Game Menu (Esc key)
 	if in_game_menu_scene:
 		in_game_menu = in_game_menu_scene.instantiate()
 		add_child(in_game_menu)
 		in_game_menu.hide()
 
-	# Music 
 	SignalBus.music_change_requested.emit(AudioData.TRACKS["TOWN"], 1.0)
-
 	_scroll_to_player()
-
 
 func _input(event):
 	if get_viewport().is_input_handled():
 		return
 
-	# Toggle In-Game Menu on Escape
 	if event.is_action_pressed("ui_cancel"):
 		if in_game_menu and in_game_menu.visible:
 			if in_game_menu.has_method("handle_cancel"):
@@ -77,226 +73,363 @@ func _input(event):
 			_toggle_in_game_menu()
 		get_viewport().set_input_as_handled()
 		return
-	
+
 	if event.is_echo():
 		return
 	if in_game_menu and in_game_menu.visible:
 		return
-	if travel_dialog and travel_dialog.visible:
+	if event is InputEventKey and event.pressed and not event.is_echo() and event.keycode == KEY_W:
+		_open_story_map()
 		return
-	
-	if event.is_action_pressed("ui_up"):
-		_move_selection(-1)
+
+	if event.is_action_pressed("ui_left"):
+		_move_selection_by_direction(Vector2i(-1, 0))
+	elif event.is_action_pressed("ui_right"):
+		_move_selection_by_direction(Vector2i(1, 0))
+	elif event.is_action_pressed("ui_up"):
+		_move_selection_by_direction(Vector2i(0, -1))
 	elif event.is_action_pressed("ui_down"):
-		_move_selection(1)
+		_move_selection_by_direction(Vector2i(0, 1))
 	elif event.is_action_pressed("ui_accept"):
 		_activate_selected_node()
 
-
 func _setup_ui():
-
-	# MODAL: MOVE CHARACTER
-	travel_dialog = ConfirmationDialog.new()
-	travel_dialog.title = "VENTURE?"
-	travel_dialog.dialog_text = "Confirm you want to travel into the unknown?"
-	travel_dialog.ok_button_text = "YES"
-	add_child(travel_dialog)
-	
 	scroll_area.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
-	scroll_area.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll_area.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 
 	if avatar_button:
 		avatar_button.pressed.connect(_on_avatar_pressed)
-
+	if story_button:
+		story_button.pressed.connect(_open_story_map)
 	if menu_icon_btn:
 		menu_icon_btn.pressed.connect(_toggle_in_game_menu)
 
-func _toggle_in_game_menu():
-	if in_game_menu:
-		if in_game_menu.visible:
-			in_game_menu.close()
-		else:
-			in_game_menu.open()
+	_hide_info_toast()
 
+func _toggle_in_game_menu():
+	if not in_game_menu:
+		return
+	if in_game_menu.visible:
+		in_game_menu.close()
+	else:
+		in_game_menu.open()
 
 func _draw_map():
-	# Clear previous instances
-	for n in node_container.get_children(): n.queue_free()
-	for l in lines_container.get_children(): l.queue_free()
+	for n in node_container.get_children():
+		n.queue_free()
+	for l in lines_container.get_children():
+		l.queue_free()
 	node_widgets_by_id.clear()
 	node_positions_by_id.clear()
-	
-	var map = GameManager.run_map
-	var p_pos = GameManager.player_grid_pos
-	var visible_set: Dictionary = _build_visible_node_set(map)
-	
-	var current_layer = max(0, GameManager.player_grid_pos.x)
-	var biome_num = floor(current_layer / 10.0) + 1
-	var phase_num = (current_layer % 10) + 1
-	
-	tracker_text.text = "%d - %d" % [biome_num, phase_num]
-	biome_label.text = "BIOME %d" % biome_num
-	phase_label.text = "PHASE %d" % phase_num
 
-	visible_min_layer = p_pos.x
-	visible_max_layer = GameManager.player_grid_pos.x
-
-	var visible_ids = visible_set.keys()
-	for id_key in visible_ids:
-		var data_for_bounds = _get_map_entry_by_id(str(id_key))
-		if data_for_bounds.is_empty():
-			continue
-		var layer = int(data_for_bounds.layer)
-		visible_min_layer = min(visible_min_layer, layer)
-		visible_max_layer = max(visible_max_layer, layer)
-
-	_update_map_content_bounds()
-
-	for id_key in visible_ids:
-		var data = _get_map_entry_by_id(str(id_key))
-		if data.is_empty():
-			continue
-		
-		var node_ui = node_scene.instantiate()
-		node_container.add_child(node_ui)
-		
-		# Position node (Forward is Right)
-		var node_pos = _get_node_position(id_key, int(data.layer), int(data.column))
-		node_ui.position = node_pos
-		node_positions_by_id[id_key] = node_pos
-		
-		var is_player_here = (data.layer == p_pos.x and data.column == p_pos.y)
-		var is_reachable = (data.layer == p_pos.x + 1)
-		var is_cleared = GameManager.world_state.rooms.has(id_key) and GameManager.world_state.rooms[id_key].cleared
-		
-		node_ui.setup_biome_node(data, null, is_cleared, is_player_here, true, is_reachable)
-		node_widgets_by_id[id_key] = node_ui
-		var border = node_ui.get_node_or_null("%Border")
-		if border:
-			border.visible = false
-		# Keep all visible nodes readable; do not shade past icons.
-		node_ui.modulate = Color.WHITE
-		
-		node_ui.node_clicked.connect(_on_node_clicked)
-
-	# Draw connections after all node positions are known.
-	for id_key in visible_ids:
-		var data = _get_map_entry_by_id(str(id_key))
-		if data.is_empty():
-			continue
-		if not node_positions_by_id.has(str(id_key)):
-			continue
-		var from_pos: Vector2 = node_positions_by_id[str(id_key)]
-		for target_id in data.get("connections", []):
-			var resolved_target_id = _resolve_map_key(target_id)
-			if resolved_target_id == "":
-				continue
-			if not visible_set.has(resolved_target_id):
-				continue
-			if not node_positions_by_id.has(resolved_target_id):
-				continue
-			_draw_hand_drawn_dotted_line(
-				from_pos + NODE_HALF_SIZE,
-				node_positions_by_id[resolved_target_id] + NODE_HALF_SIZE
-			)
-	
-	_rebuild_keyboard_targets()
-	_refresh_keyboard_selection_highlight()
-
-func _build_visible_node_set(map: Dictionary) -> Dictionary:
-	var visible_set: Dictionary = {}
-	var visited_set: Dictionary = {}
-	
-	# Visited/cleared rooms from persistent world state.
-	for raw_room_id in GameManager.world_state.rooms.keys():
-		var room_id = str(raw_room_id)
-		var state = GameManager.world_state.rooms[raw_room_id]
-		if state.get("visited", false) or state.get("cleared", false):
-			visited_set[room_id] = true
-	
-	# Ensure current player node is always visible.
-	var current_id = _find_current_node_id()
-	if current_id != "":
-		visited_set[current_id] = true
-	
-	# Fallback for fresh runs.
-	if visited_set.is_empty() and map.has("node_0_0"):
-		visited_set["node_0_0"] = true
-	
-	# Always show visited nodes.
-	for visited_id in visited_set.keys():
-		visible_set[str(visited_id)] = true
-	
-	# Show one-hop adjacent nodes:
-	# 1) outgoing from visited nodes
-	# 2) incoming into visited nodes
-	for visited_id in visited_set.keys():
-		var visited_id_str = str(visited_id)
-		var visited_data = _get_map_entry_by_id(visited_id_str)
-		if not visited_data.is_empty():
-			for raw_target_id in visited_data.get("connections", []):
-				var target_id = _resolve_map_key(raw_target_id)
-				if target_id != "":
-					visible_set[target_id] = true
-		for raw_other_id in map.keys():
-			var other_id = str(raw_other_id)
-			var other_data = map[raw_other_id]
-			for raw_conn in other_data.get("connections", []):
-				if _resolve_map_key(raw_conn) == visited_id_str:
-					visible_set[other_id] = true
-					break
-	
-	return visible_set
-
-func _rebuild_keyboard_targets():
-	reachable_node_ids.clear()
-	selected_reachable_index = -1
-	
-	var map = GameManager.run_map
 	var current_id = _find_current_node_id()
 	if current_id == "":
+		current_id = _find_first_node_id()
+		if current_id != "":
+			var first_data = _get_map_entry_by_id(current_id)
+			GameManager.player_grid_pos = Vector2i(int(first_data.layer), int(first_data.column))
+
+	if current_id == "":
 		return
-	
+
 	var current_data = _get_map_entry_by_id(current_id)
 	if current_data.is_empty():
 		return
-	for raw_target_id in current_data.get("connections", []):
-		var target_id = _resolve_map_key(raw_target_id)
-		if target_id == "":
+
+	var current_biome = str(current_data.get("biome", "home"))
+	_rebuild_adjacent_targets(current_id, current_biome)
+	_update_header_labels(current_data)
+	var revealed_set = _build_visible_node_set(current_id, current_biome)
+	_recalculate_map_bounds(current_biome)
+	_update_map_content_bounds()
+
+	for raw_id in GameManager.run_map.keys():
+		var node_id = str(raw_id)
+		var data = _get_map_entry_by_id(node_id)
+		if data.is_empty():
 			continue
-		var target = _get_map_entry_by_id(target_id)
-		if target.is_empty():
+		if str(data.get("biome", "")) != current_biome:
 			continue
-		if int(target.layer) == GameManager.player_grid_pos.x + 1:
-			reachable_node_ids.append(target_id)
-	
-	# Fallback for linear layouts with missing connection metadata.
-	if reachable_node_ids.is_empty():
-		for id in map:
-			var id_key = str(id)
-			var data = _get_map_entry_by_id(id_key)
-			if data.is_empty():
+
+		var node_ui = node_scene.instantiate()
+		node_container.add_child(node_ui)
+		var node_pos = _get_node_position(int(data.layer), int(data.column))
+		node_ui.position = node_pos
+		node_positions_by_id[node_id] = node_pos
+
+		var is_player_here = node_id == current_id
+		var is_selected = node_id == selected_node_id
+		var is_revealed = revealed_set.has(node_id)
+		var state = GameManager.world_state.rooms.get(node_id, {})
+		var is_cleared = state.get("cleared", false)
+
+		node_ui.setup_biome_node(data, null, is_cleared, is_player_here, is_revealed, adjacent_node_ids.has(node_id))
+		if node_ui.has_method("set_highlight_state"):
+			node_ui.set_highlight_state(is_player_here, is_selected)
+		node_widgets_by_id[node_id] = node_ui
+		node_ui.node_clicked.connect(_on_node_clicked)
+		if node_ui.has_signal("node_double_clicked"):
+			node_ui.node_double_clicked.connect(_on_node_double_clicked)
+
+	var drawn_pairs: Dictionary = {}
+	for source_id in revealed_set.keys():
+		var source_id_str = str(source_id)
+		var source_data = _get_map_entry_by_id(source_id_str)
+		if source_data.is_empty() or not node_positions_by_id.has(source_id_str):
+			continue
+		for raw_target_id in source_data.get("connections", []):
+			var target_id = _resolve_map_key(raw_target_id)
+			if target_id == "" or not revealed_set.has(target_id):
 				continue
-			if int(data.layer) == GameManager.player_grid_pos.x + 1:
-				reachable_node_ids.append(id_key)
-	
-	reachable_node_ids.sort_custom(func(a, b):
-		var a_data = _get_map_entry_by_id(a)
-		var b_data = _get_map_entry_by_id(b)
-		if a_data.is_empty() or b_data.is_empty():
-			return a < b
-		return int(a_data.column) < int(b_data.column)
+			if not node_positions_by_id.has(target_id):
+				continue
+			var pair_key = _make_pair_key(source_id_str, target_id)
+			if drawn_pairs.has(pair_key):
+				continue
+			drawn_pairs[pair_key] = true
+			_draw_hand_drawn_dotted_line(
+				node_positions_by_id[source_id_str] + NODE_HALF_SIZE,
+				node_positions_by_id[target_id] + NODE_HALF_SIZE
+			)
+
+	_refresh_selection_highlight(current_id)
+
+func _update_header_labels(current_data: Dictionary):
+	var biome_key = str(current_data.get("biome", "home"))
+	var biome_index = int(current_data.get("biome_index", 0))
+	var grid_size = biome_index + 2
+	var biome_name = biome_key.replace("_", " ").capitalize()
+	biome_label.text = biome_name
+	phase_label.text = LocalizationManager.format("worldmap.phase.grid", {"size": grid_size}, "{size}x{size} GRID")
+	tracker_text.text = LocalizationManager.format(
+		"worldmap.tracker",
+		{"biome": biome_name, "layer": int(current_data.layer), "column": int(current_data.column)},
+		"{biome} [{layer},{column}]"
 	)
-	if not reachable_node_ids.is_empty():
-		selected_reachable_index = 0
+
+func _build_visible_node_set(current_id: String, biome: String) -> Dictionary:
+	var visible_set: Dictionary = {}
+	visible_set[current_id] = true
+	for neighbor_id in _get_adjacent_node_ids(current_id, biome):
+		visible_set[neighbor_id] = true
+	return visible_set
+
+func _recalculate_map_bounds(biome: String):
+	var first = true
+	for raw_id in GameManager.run_map.keys():
+		var node_id = str(raw_id)
+		var data = _get_map_entry_by_id(node_id)
+		if data.is_empty():
+			continue
+		if str(data.get("biome", "")) != biome:
+			continue
+		var layer = int(data.layer)
+		var column = int(data.column)
+		if first:
+			visible_min_layer = layer
+			visible_max_layer = layer
+			visible_min_column = column
+			visible_max_column = column
+			first = false
+		else:
+			visible_min_layer = min(visible_min_layer, layer)
+			visible_max_layer = max(visible_max_layer, layer)
+			visible_min_column = min(visible_min_column, column)
+			visible_max_column = max(visible_max_column, column)
+
+func _rebuild_adjacent_targets(current_id: String, biome: String):
+	adjacent_node_ids = _get_adjacent_node_ids(current_id, biome)
+	if adjacent_node_ids.is_empty():
+		selected_node_id = ""
+		return
+	if selected_node_id == "" or not adjacent_node_ids.has(selected_node_id):
+		selected_node_id = adjacent_node_ids[0]
+
+func _refresh_selection_highlight(current_id: String):
+	for id_key in node_widgets_by_id.keys():
+		var node_ui = node_widgets_by_id[id_key]
+		if not is_instance_valid(node_ui):
+			continue
+		if node_ui.has_method("set_highlight_state"):
+			node_ui.set_highlight_state(id_key == current_id, id_key == selected_node_id)
+
+func _move_selection_by_direction(dir: Vector2i):
+	if adjacent_node_ids.is_empty():
+		return
+	var current_id = _find_current_node_id()
+	if current_id == "":
+		return
+
+	var current_data = _get_map_entry_by_id(current_id)
+	if current_data.is_empty():
+		return
+
+	var origin_id = selected_node_id if selected_node_id != "" else current_id
+	var origin_data = _get_map_entry_by_id(origin_id)
+	if origin_data.is_empty():
+		origin_data = current_data
+
+	var best_id = ""
+	var best_score = INF
+	for candidate_id in adjacent_node_ids:
+		var candidate_data = _get_map_entry_by_id(candidate_id)
+		if candidate_data.is_empty():
+			continue
+		var dx = int(candidate_data.layer) - int(origin_data.layer)
+		var dy = int(candidate_data.column) - int(origin_data.column)
+		if dir.x < 0 and dx >= 0:
+			continue
+		if dir.x > 0 and dx <= 0:
+			continue
+		if dir.y < 0 and dy >= 0:
+			continue
+		if dir.y > 0 and dy <= 0:
+			continue
+		var score = abs(dx) + abs(dy) + (abs(dy) if dir.x != 0 else abs(dx)) * 0.25
+		if score < best_score:
+			best_score = score
+			best_id = candidate_id
+
+	if best_id == "":
+		return
+	selected_node_id = best_id
+	_refresh_selection_highlight(current_id)
+
+func _activate_selected_node():
+	if selected_node_id == "":
+		return
+	_attempt_travel(selected_node_id)
+
+func _on_node_clicked(data: Dictionary):
+	var node_id = str(data.get("id", ""))
+	if node_id == "":
+		return
+	if adjacent_node_ids.has(node_id):
+		selected_node_id = node_id
+		_refresh_selection_highlight(_find_current_node_id())
+
+func _on_node_double_clicked(data: Dictionary):
+	var node_id = str(data.get("id", ""))
+	if node_id == "":
+		return
+	var current_id = _find_current_node_id()
+	if node_id == current_id:
+		_enter_room(data)
+		return
+	if not adjacent_node_ids.has(node_id):
+		return
+	selected_node_id = node_id
+	_attempt_travel(node_id)
+
+func _attempt_travel(target_id: String):
+	if not adjacent_node_ids.has(target_id):
+		return
+	var target_data = _get_map_entry_by_id(target_id)
+	if target_data.is_empty():
+		return
+
+	if _is_backtrack(target_id) and not _is_home_node(target_data):
+		await _travel_to_boss_node(target_data)
+		return
+
+	_travel_to_node(target_data)
+
+func _travel_to_node(target_data: Dictionary):
+	GameManager.player_grid_pos = Vector2i(int(target_data.layer), int(target_data.column))
+	_draw_map()
+	_scroll_to_player()
+	_enter_room(target_data)
+
+func _show_backtrack_toast():
+	if _info_toast_tween:
+		_info_toast_tween.kill()
+	info_toast_label.text = LocalizationManager.translate("worldmap.backtrack_prompt", BACKTRACK_PROMPT)
+	info_toast_box.visible = true
+	info_toast_box.modulate = Color(1, 1, 1, 0)
+	_info_toast_tween = create_tween()
+	_info_toast_tween.tween_property(info_toast_box, "modulate:a", 1.0, 0.12)
+	_info_toast_tween.tween_interval(1.4)
+	_info_toast_tween.tween_property(info_toast_box, "modulate:a", 0.0, 0.4)
+	_info_toast_tween.finished.connect(_hide_info_toast)
+
+func _travel_to_boss_node(target_data: Dictionary):
+	_show_backtrack_toast()
+	await get_tree().create_timer(1.1).timeout
+	GameManager.player_grid_pos = Vector2i(int(target_data.layer), int(target_data.column))
+	_draw_map()
+	_scroll_to_player()
+	_enter_room(_build_boss_node(target_data))
+
+func _hide_info_toast():
+	if info_toast_box:
+		info_toast_box.visible = false
+		info_toast_box.modulate = Color(1, 1, 1, 0)
+	if info_toast_label:
+		info_toast_label.text = ""
+
+func _build_boss_node(base_data: Dictionary) -> Dictionary:
+	var out = base_data.duplicate(true)
+	var biome_key = str(base_data.get("biome", "town"))
+	var source_biome = "town" if biome_key == "home" else biome_key
+	var boss_path = "res://data/rooms/%s/%s_boss.tres" % [source_biome, source_biome]
+	if not ResourceLoader.exists(boss_path):
+		var default_path = "res://data/rooms/%s/%s_default.tres" % [source_biome, source_biome]
+		boss_path = default_path if ResourceLoader.exists(default_path) else "res://data/rooms/default_battle.tres"
+
+	var boss_res = DataManager.get_resource(boss_path)
+	out["id"] = "%s_boss" % str(base_data.get("id", "node"))
+	out["type"] = "boss"
+	out["room_resource_path"] = boss_path
+	out["name"] = boss_res.room_name if boss_res and boss_res is RoomData else "%s Boss" % source_biome.capitalize()
+	out["initial_dialog"] = BACKTRACK_PROMPT
+	if boss_res and boss_res is RoomData and boss_res.map_icon:
+		out["custom_icon_path"] = boss_res.map_icon.resource_path
+	return out
+
+func _is_backtrack(target_id: String) -> bool:
+	var state = GameManager.world_state.rooms.get(target_id, {})
+	return state.get("visited", false) or state.get("cleared", false)
+
+func _is_home_node(node_data: Dictionary) -> bool:
+	return bool(node_data.get("is_home", false)) or str(node_data.get("type", "")) == "home"
+
+func _enter_room(data: Dictionary):
+	GameManager.current_node = data
+	SignalBus.node_selected.emit(data)
+	match str(data.get("type", "battle")):
+		"battle", "boss":
+			get_tree().change_scene_to_file("res://features/combat/BattleScene.tscn")
+		"treasure":
+			get_tree().change_scene_to_file("res://features/encounters/TreasureScene.tscn")
+		"rest":
+			get_tree().change_scene_to_file("res://features/encounters/RestScene.tscn")
+		"event", "home":
+			get_tree().change_scene_to_file("res://features/encounters/EventScene.tscn")
+		"shop":
+			get_tree().change_scene_to_file("res://features/encounters/ShopScene.tscn")
+		_:
+			get_tree().change_scene_to_file("res://features/combat/BattleScene.tscn")
 
 func _find_current_node_id() -> String:
-	var p_pos = GameManager.player_grid_pos
-	for id in GameManager.run_map:
-		var data = GameManager.run_map[id]
-		if int(data.layer) == p_pos.x and int(data.column) == p_pos.y:
-			return str(id)
+	for raw_key in GameManager.run_map.keys():
+		var data = GameManager.run_map[raw_key]
+		if int(data.layer) == GameManager.player_grid_pos.x and int(data.column) == GameManager.player_grid_pos.y:
+			return str(raw_key)
 	return ""
+
+func _find_first_node_id() -> String:
+	var first_id = ""
+	var first_layer = INF
+	var first_col = INF
+	for raw_key in GameManager.run_map.keys():
+		var data = GameManager.run_map[raw_key]
+		var layer = int(data.layer)
+		var col = int(data.column)
+		if layer < first_layer or (layer == first_layer and col < first_col):
+			first_layer = layer
+			first_col = col
+			first_id = str(raw_key)
+	return first_id
 
 func _resolve_map_key(raw_key) -> String:
 	if GameManager.run_map.has(raw_key):
@@ -304,83 +437,57 @@ func _resolve_map_key(raw_key) -> String:
 	var as_string = str(raw_key)
 	if GameManager.run_map.has(as_string):
 		return as_string
-	if as_string.is_valid_int():
-		var as_int = int(as_string)
-		if GameManager.run_map.has(as_int):
-			return str(as_int)
 	return ""
 
 func _get_map_entry_by_id(id_key: String) -> Dictionary:
-	for raw_key in GameManager.run_map:
+	for raw_key in GameManager.run_map.keys():
 		if str(raw_key) == id_key:
 			return GameManager.run_map[raw_key]
 	return {}
 
-func _move_selection(step: int):
-	if reachable_node_ids.is_empty():
-		return
-	selected_reachable_index = posmod(selected_reachable_index + step, reachable_node_ids.size())
-	_refresh_keyboard_selection_highlight()
+func _get_adjacent_node_ids(node_id: String, biome: String) -> Array[String]:
+	var results: Array[String] = []
+	var data = _get_map_entry_by_id(node_id)
+	if data.is_empty():
+		return results
 
-func _activate_selected_node():
-	if reachable_node_ids.is_empty():
-		return
-	if selected_reachable_index < 0 or selected_reachable_index >= reachable_node_ids.size():
-		return
-	var selected_id = reachable_node_ids[selected_reachable_index]
-	var selected_data = _get_map_entry_by_id(selected_id)
-	if selected_data.is_empty():
-		return
-	_on_node_clicked(selected_data)
-
-func _refresh_keyboard_selection_highlight():
-	for id_key in node_widgets_by_id.keys():
-		var node_ui = node_widgets_by_id[id_key]
-		if not is_instance_valid(node_ui):
+	for raw_target_id in data.get("connections", []):
+		var target_id = _resolve_map_key(raw_target_id)
+		if target_id == "":
 			continue
-		var border = node_ui.get_node_or_null("%Border")
-		if border:
-			border.visible = false
+		var target_data = _get_map_entry_by_id(target_id)
+		if target_data.is_empty():
+			continue
+		if str(target_data.get("biome", "")) != biome:
+			continue
+		if not results.has(target_id):
+			results.append(target_id)
 
-	if reachable_node_ids.is_empty():
-		return
-	if selected_reachable_index < 0 or selected_reachable_index >= reachable_node_ids.size():
-		return
-	var selected_id = reachable_node_ids[selected_reachable_index]
-	if not node_widgets_by_id.has(selected_id):
-		return
-	var selected_node = node_widgets_by_id[selected_id]
-	if not is_instance_valid(selected_node):
-		return
-	var selected_border = selected_node.get_node_or_null("%Border")
-	if selected_border:
-		selected_border.visible = true
-		selected_border.modulate = SELECTED_BORDER_COLOR
+	results.sort()
+	return results
+
+func _make_pair_key(a: String, b: String) -> String:
+	return "%s|%s" % [a, b] if a < b else "%s|%s" % [b, a]
 
 func _update_map_content_bounds():
 	if not map_content:
 		return
 	var layer_count = max(1, visible_max_layer - visible_min_layer + 1)
-	var content_width = float(layer_count * LAYER_SPACING + (MAP_LEFT_PADDING * 2.0))
-	var viewport_width = max(1.0, scroll_area.size.x)
-	map_content.custom_minimum_size.x = max(content_width, viewport_width)
-
-func _get_node_position(id_key: String, layer: int, column: int) -> Vector2:
-	var relative_layer = layer - visible_min_layer
-	var jitter = _get_node_jitter(id_key)
-	return Vector2(
-		relative_layer * LAYER_SPACING + MAP_LEFT_PADDING + jitter.x,
-		column * ROW_SPACING + MAP_TOP_PADDING + jitter.y
+	var row_count = max(1, visible_max_column - visible_min_column + 1)
+	var content_width = float(layer_count) * LAYER_SPACING + (MAP_LEFT_PADDING * 2.0)
+	var content_height = float(row_count) * ROW_SPACING + (MAP_TOP_PADDING * 2.0)
+	map_content.custom_minimum_size = Vector2(
+		max(content_width, scroll_area.size.x),
+		max(content_height, scroll_area.size.y)
 	)
 
-func _get_node_jitter(id_key: String) -> Vector2:
-	var base_hash = hash("battle_map_jitter_" + id_key)
-	var x_seed = abs(base_hash % 997)
-	var y_seed = abs((int(base_hash / 997)) % 991)
-	var x = (float(x_seed) / 996.0) * (JITTER_X_RANGE * 2.0) - JITTER_X_RANGE
-	var y = (float(y_seed) / 990.0) * (JITTER_Y_RANGE * 2.0) - JITTER_Y_RANGE
-	return Vector2(x, y)
-
+func _get_node_position(layer: int, column: int) -> Vector2:
+	var relative_layer = layer - visible_min_layer
+	var relative_column = column - visible_min_column
+	return Vector2(
+		relative_layer * LAYER_SPACING + MAP_LEFT_PADDING,
+		relative_column * ROW_SPACING + MAP_TOP_PADDING
+	)
 
 func _draw_hand_drawn_dotted_line(p1: Vector2, p2: Vector2):
 	var dir = (p2 - p1).normalized()
@@ -388,87 +495,38 @@ func _draw_hand_drawn_dotted_line(p1: Vector2, p2: Vector2):
 	var current_dist = 0.0
 	while current_dist < dist:
 		var segment = Line2D.new()
-		segment.width = 6.0
-		segment.default_color = Color(0.2, 0.12, 0.05, 0.8)
+		segment.width = 4.0
+		segment.default_color = DOTTED_COLOR
 		segment.begin_cap_mode = Line2D.LINE_CAP_ROUND
-		var jitter_s = Vector2(randf_range(-3, 3), randf_range(-3, 3))
-		var jitter_e = Vector2(randf_range(-3, 3), randf_range(-3, 3))
-		segment.add_point(p1 + dir * current_dist + jitter_s)
-		segment.add_point(p1 + dir * min(current_dist + 10.0, dist) + jitter_e)
+		segment.end_cap_mode = Line2D.LINE_CAP_ROUND
+		segment.add_point(p1 + dir * current_dist)
+		segment.add_point(p1 + dir * min(current_dist + 9.0, dist))
 		lines_container.add_child(segment)
-		current_dist += 22.0
-
-
-func _draw_line(p1: Vector2, p2: Vector2, layer_diff: int):
-	var line = Line2D.new()
-	line.width = 6.0
-	# Dotted Brown Hand-Drawn Color
-	line.default_color = Color(0.35, 0.22, 0.1, 0.6) 
-	line.begin_cap_mode = Line2D.LINE_CAP_ROUND
-	line.end_cap_mode = Line2D.LINE_CAP_ROUND
-	line.joint_mode = Line2D.LINE_JOINT_ROUND
-	
-	# Hand-drawn variation logic
-	var segments = 12
-	for i in range(segments + 1):
-		var t = float(i) / segments
-		var pos = p1.lerp(p2, t)
-		
-		# Jitter intermediate points to create a "sketched" look
-		if i > 0 and i < segments:
-			var jitter = Vector2(randf_range(-6, 6), randf_range(-6, 6))
-			pos += jitter
-			
-		line.add_point(pos)
-	
-	# Hide lines if source node is blacked out
-	if layer_diff >= 2: 
-		line.default_color.a = 0.0
-	
-	lines_container.add_child(line)
-
-func _on_node_clicked(data: Dictionary):
-	var clicked_id = str(data.get("id", ""))
-	if clicked_id != "":
-		var idx = reachable_node_ids.find(clicked_id)
-		if idx != -1:
-			selected_reachable_index = idx
-			_refresh_keyboard_selection_highlight()
-	
-	var p_pos = GameManager.player_grid_pos
-	if data.layer == p_pos.x and data.column == p_pos.y:
-		_enter_room(data)
-		return
-	if data.layer != p_pos.x + 1:
-		return
-
-	# travel_dialog.dialog_text = "VENTURE?"
-	for c in travel_dialog.confirmed.get_connections(): travel_dialog.confirmed.disconnect(c.callable)
-	travel_dialog.confirmed.connect(func():
-		GameManager.player_grid_pos = Vector2i(data.layer, data.column)
-		_draw_map()
-		_scroll_to_player()
-		_enter_room(data)
-	)
-	travel_dialog.popup_centered()
-
-func _enter_room(data: Dictionary):
-	GameManager.current_node = data
-	SignalBus.node_selected.emit(data)
-	match data.type:
-		"battle": get_tree().change_scene_to_file("res://features/combat/BattleScene.tscn")
-		"treasure": get_tree().change_scene_to_file("res://features/encounters/TreasureScene.tscn")
-		"rest": get_tree().change_scene_to_file("res://features/encounters/RestScene.tscn")
-		"event": get_tree().change_scene_to_file("res://features/encounters/EventScene.tscn")
+		current_dist += 18.0
 
 func _scroll_to_player():
 	await get_tree().process_frame
-	var relative_layer = GameManager.player_grid_pos.x - visible_min_layer
-	var target_x = (relative_layer * LAYER_SPACING) - (size.x / 2.0) + MAP_LEFT_PADDING
-	var max_scroll = max(0.0, map_content.custom_minimum_size.x - scroll_area.size.x)
-	target_x = clamp(target_x, 0.0, max_scroll)
+	var layer_offset = GameManager.player_grid_pos.x - visible_min_layer
+	var col_offset = GameManager.player_grid_pos.y - visible_min_column
+	var target_x = layer_offset * LAYER_SPACING + MAP_LEFT_PADDING - (scroll_area.size.x * 0.5)
+	var target_y = col_offset * ROW_SPACING + MAP_TOP_PADDING - (scroll_area.size.y * 0.5)
+	var max_scroll_x = max(0.0, map_content.custom_minimum_size.x - scroll_area.size.x)
+	var max_scroll_y = max(0.0, map_content.custom_minimum_size.y - scroll_area.size.y)
+	target_x = clamp(target_x, 0.0, max_scroll_x)
+	target_y = clamp(target_y, 0.0, max_scroll_y)
 	var tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	tween.tween_property(scroll_area, "scroll_horizontal", int(max(0, target_x)), 0.5)
+	tween.tween_property(scroll_area, "scroll_horizontal", int(target_x), 0.35)
+	tween.parallel().tween_property(scroll_area, "scroll_vertical", int(target_y), 0.35)
 
 func _on_avatar_pressed():
+	GameManager.profile_return_scene = "res://features/map/BattleMap.tscn"
 	get_tree().change_scene_to_file("res://features/ui/CharacterScreen.tscn")
+
+func _open_story_map():
+	var current_id = _find_current_node_id()
+	if current_id != "":
+		var current_data = _get_map_entry_by_id(current_id)
+		if not current_data.is_empty():
+			var biome = str(current_data.get("biome", GameManager.selected_story_biome))
+			GameManager.set_selected_story_biome("town" if biome == "home" else biome)
+	get_tree().change_scene_to_file(GameManager.get_story_map_scene_path())

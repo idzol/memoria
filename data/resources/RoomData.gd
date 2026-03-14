@@ -20,6 +20,7 @@ class_name RoomData
 
 @export_group("Rewards")
 @export var loot_list: Array[String] = []
+@export var complete_condition: Dictionary = {}
 
 @export_group("Visuals")
 ## Icon used on the World Map (res://assets/room/{biome}/{id}_map.png)

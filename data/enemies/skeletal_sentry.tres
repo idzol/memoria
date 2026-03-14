@@ -8,6 +8,9 @@
 [resource]
 script = ExtResource("1_script")
 name = "Skeletal_Sentry"
+name_es = "Centinela esquelético"
+name_fr = "Sentinelle squelettique"
+name_de = "Skelettwache"
 biome = "forest"
 hp = 25
 hframes = 8
@@ -21,6 +24,7 @@ armor = 0
 base_damage = 5
 difficulty_tier = 1
 xp_reward = 20
+loot_power = 2
 gold_min = 2
 gold_max = 8
 item_drops = ["skull"]

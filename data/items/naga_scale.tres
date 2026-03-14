@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "naga_scale"
 name = "Naga Scale"
+name_es = "Hoja del eco"
+name_fr = "Lame d'écho"
+name_de = "Echoklinge"
 type = "Material"
 level = 5
+item_power = 11
 hp = 5
 attack = 0
 armour = 18
 effect = "Water"
 description = "A shimmering iridescent scale."
-ai_prompt = "Cinematic dark fantasy: A large sapphire-colored scale with a pearlescent sheen."
+ai_prompt = "Cinematic dark fantasy: A large sapphire-colored scale with a pearlescent sheen.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

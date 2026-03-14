@@ -8,6 +8,9 @@
 [resource]
 script = ExtResource("1_script")
 name = "Blood_Flyer"
+name_es = "Volador de sangre"
+name_fr = "Volant de sang"
+name_de = "Blutflieger"
 biome = "swamp"
 hp = 80
 hframes = 8
@@ -21,6 +24,7 @@ armor = 0
 base_damage = 42
 difficulty_tier = 1
 xp_reward = 20
+loot_power = 6
 gold_min = 0
 gold_max = 0
 item_drops = ["proboscis"]

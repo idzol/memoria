@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "biolamp"
 name = "Biolamp"
+name_es = "Gel eléctrico"
+name_fr = "Gel électrique"
+name_de = "Elektrisches Gel"
 type = "Utility"
 level = 4
+item_power = 6
 hp = 0
 attack = 0
 armour = 0
 effect = "Vision"
 description = "A living lantern containing glowing moss."
-ai_prompt = "Cinematic dark fantasy: A glass cage with a cluster of luminescent green mushrooms."
+ai_prompt = "Cinematic dark fantasy: A glass cage with a cluster of luminescent green mushrooms.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

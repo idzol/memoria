@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "solar_disc"
 name = "Solar Disc"
+name_es = "Disco solar"
+name_fr = "Disque solaire"
+name_de = "Sonnenscheibe"
 rarity = "uncommon"
 type = "attack_fire"
+card_power = 5
 value = 20
-description = "Radiates pure heat"
+description = "Deal 20 fire damage"
 special_effect = "Burn"
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

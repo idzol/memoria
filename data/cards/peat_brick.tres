@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "peat_brick"
 name = "Peat Brick"
+name_es = "Peat Brick"
+name_fr = "Peat Brick"
+name_de = "Peat Brick"
 rarity = "epic"
 type = "utility"
+card_power = 14
 value = 0
 description = "Good fuel source."
 special_effect = ""

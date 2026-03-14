@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "ore"
 name = "Ore"
+name_es = "Glándula de veneno"
+name_fr = "Glande à venin"
+name_de = "Giftdrüse"
 type = "Material"
 level = 3
+item_power = 3
 hp = 0
 attack = 0
 armour = 10
 effect = "Tough"
 description = "Raw iron ore flecked with strange minerals."
-ai_prompt = "Cinematic dark fantasy: A chunk of dark rock with veins of glowing orange metal."
+ai_prompt = "Cinematic dark fantasy: A chunk of dark rock with veins of glowing orange metal.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

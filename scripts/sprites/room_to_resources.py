@@ -7,25 +7,28 @@ OUTPUT_ROOT = "data/rooms"
 ROOM_SCRIPT_PATH = "res://data/resources/RoomData.gd"
 ASSET_ROOT = "res://assets/rooms"
 
+def normalize_row(row):
+    return {str(key).strip().lower(): value for key, value in row.items()}
+
 def infer_type(row):
-    enemy = row.get('Enemy', '').strip()
-    npc = row.get('NPC ID', '').strip()
-    event = row.get('Event ID', '').strip()
+    enemy = row.get('enemy', '').strip()
+    npc = row.get('npc id', '').strip()
+    event = row.get('event id', '').strip()
     if enemy: return "battle"
     if event or npc: return "event"
     return "lore"
 
 def generate_room_tres(row):
-    room_id = row['ID'].strip()
+    room_id = row['id'].strip()
     if not room_id: return None
     
-    biome = row.get('Region', 'town').strip().lower()
-    name = row.get('Name', 'Unknown Location')
-    dialog = row.get('Dialog', '').replace('"', '\\"')
-    tree_id = row.get('Dialog Tree', '').strip()
-    npc_id = row.get('NPC ID', '').strip()
-    enemy_id = row.get('Enemy', '').strip()
-    loot_raw = row.get('Loot', '').strip()
+    biome = row.get('region', 'town').strip().lower()
+    name = row.get('name', 'Unknown Location')
+    dialog = row.get('dialog', '').replace('"', '\\"')
+    tree_id = row.get('dialog tree', '').strip()
+    npc_id = row.get('npc id', '').strip()
+    enemy_id = row.get('enemy', '').strip()
+    loot_raw = row.get('loot', '').strip()
     
     # Path setup: data/rooms/town/town_village_gate.tres
     out_dir = os.path.join(OUTPUT_ROOT, biome)
@@ -75,8 +78,9 @@ def run():
     count = 0
     with open(CSV_FILE, mode='r', encoding='utf-8') as f:
         reader = csv.DictReader(f)
-        for row in reader:
-            if row.get('ID'):
+        for raw_row in reader:
+            row = normalize_row(raw_row)
+            if row.get('id'):
                 if generate_room_tres(row): count += 1
     print(f"Success! Converted {count} rooms.")
 

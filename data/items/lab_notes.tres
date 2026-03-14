@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "lab_notes"
 name = "Lab Notes"
+name_es = "Mineral de magma"
+name_fr = "Minerai de magma"
+name_de = "Magmaerz"
 type = "Utility"
 level = 6
+item_power = 15
 hp = 0
 attack = 0
 armour = 0
 effect = "Experiment"
 description = "Detailed records of forbidden science."
-ai_prompt = "Cinematic dark fantasy: A stack of papers filled with sketches of monsters and strange formulas."
+ai_prompt = "Cinematic dark fantasy: A stack of papers filled with sketches of monsters and strange formulas.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

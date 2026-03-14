@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "fire_shard"
 name = "Fire Shard"
+name_es = "Esencia de nube"
+name_fr = "Essence de nuage"
+name_de = "Wolkenessenz"
 type = "Material"
 level = 5
+item_power = 12
 hp = 0
 attack = 20
 armour = 0
 effect = "Burn"
 description = "A stone that remains perpetually on fire."
-ai_prompt = "Cinematic dark fantasy: A glowing red ember that never turns to ash."
+ai_prompt = "Cinematic dark fantasy: A glowing red ember that never turns to ash.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

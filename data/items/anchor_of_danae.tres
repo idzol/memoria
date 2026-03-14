@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "anchor_of_danae"
 name = "Anchor of Danae"
+name_es = "Casco de Oscuridad"
+name_fr = "Casque d'Obscurité"
+name_de = "Helm der Finsternis"
 type = "Utility"
 level = 7
+item_power = 17
 hp = 50
 attack = 0
 armour = 0
 effect = "Regen"
 description = "A bronze locket containing a braid of hair."
-ai_prompt = "Cinematic dark fantasy: Small bronze heart locket, containing a braid of golden hair, radiating soft warmth."
+ai_prompt = "Cinematic dark fantasy: Small bronze heart locket, containing a braid of golden hair, radiating soft warmth.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

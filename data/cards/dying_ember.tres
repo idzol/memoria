@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "dying_ember"
 name = "Ember"
+name_es = "Ember"
+name_fr = "Ember"
+name_de = "Ember"
 rarity = "unique"
 type = "attack_fire"
+card_power = 18
 value = 5
-description = "A final flicker."
+description = "Deal 5 fire damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

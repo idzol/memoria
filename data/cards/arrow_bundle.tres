@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "arrow_bundle"
 name = "Arrow Bundle"
+name_es = "Haz de flechas"
+name_fr = "Paquet de flèches"
+name_de = "Pfeilbündel"
 rarity = "common"
 type = "attack"
+card_power = 3
 value = 12
-description = "A volley of sharp tips"
+description = "Deal 12 physical damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

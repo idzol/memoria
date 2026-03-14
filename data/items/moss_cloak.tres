@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "moss_cloak"
 name = "Moss Cloak"
+name_es = "Banjo"
+name_fr = "Banjo"
+name_de = "Banjo"
 type = "Armour"
 level = 4
+item_power = 10
 hp = 0
 attack = 0
 armour = 10
 effect = "Camouflage"
 description = "A mantle woven from living forest moss."
-ai_prompt = "Cinematic dark fantasy: A green-and-brown cloak that seems to blend into the shadows."
+ai_prompt = "Cinematic dark fantasy: A green-and-brown cloak that seems to blend into the shadows.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

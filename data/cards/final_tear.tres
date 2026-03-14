@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "final_tear"
 name = "Final Tear"
+name_es = "Lágrima final"
+name_fr = "Larme finale"
+name_de = "Letzte Träne"
 rarity = "uncommon"
 type = "heal"
+card_power = 7
 value = 50
-description = "Supreme restoration"
+description = "Restore 50 health"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

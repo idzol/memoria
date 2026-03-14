@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "salt_crystal"
 name = "Salt Crystal"
+name_es = "Esencia de nube"
+name_fr = "Essence de nuage"
+name_de = "Wolkenessenz"
 rarity = "rare"
 type = "utility"
+card_power = 14
 value = 2
 description = "Purifying properties."
 special_effect = ""

@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "green_slime"
 name = "Green Slime"
+name_es = "Green Slime"
+name_fr = "Green Slime"
+name_de = "Green Slime"
 rarity = "epic"
 type = "trap"
+card_power = 15
 value = 5
-description = "Sticky and gross."
+description = "Take 5 damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

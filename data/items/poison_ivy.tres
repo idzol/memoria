@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "poison_ivy"
 name = "Poison Ivy"
+name_es = "Hacha de mano"
+name_fr = "Hachette"
+name_de = "Handbeil"
 type = "Trap"
 level = 4
+item_power = 8
 hp = 0
 attack = 0
 armour = 0
 effect = "Itch"
 description = "Vines that cause painful rashes and fever."
-ai_prompt = "Cinematic dark fantasy: A cluster of shiny green leaves with red, pulsating veins."
+ai_prompt = "Cinematic dark fantasy: A cluster of shiny green leaves with red, pulsating veins.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

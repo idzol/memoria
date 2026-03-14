@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "rusty_nail"
 name = "Rusty Nail"
+name_es = "Limo"
+name_fr = "Vase"
+name_de = "Schleim"
 type = "Weapon"
 level = 3
+item_power = 5
 hp = 0
 attack = 6
 armour = 0
 effect = "Infection"
 description = "A long, bent iron nail covered in grime."
-ai_prompt = "Cinematic dark fantasy: A corroded iron spike resting on a bed of old bandages."
+ai_prompt = "Cinematic dark fantasy: A corroded iron spike resting on a bed of old bandages.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

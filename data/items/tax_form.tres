@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "tax_form"
 name = "Tax Form"
+name_es = "Formulario de impuestos"
+name_fr = "Formulaire d'impôt"
+name_de = "Steuerformular"
 type = "Trap"
 level = 2
+item_power = 2
 hp = 0
 attack = 0
 armour = 0
 effect = "Drain"
 description = "A heavy parchment filled with bureaucratic demands."
-ai_prompt = "Cinematic dark fantasy: A weathered scroll with official red wax seals and endless ink scribbles."
+ai_prompt = "Cinematic dark fantasy: A weathered scroll with official red wax seals and endless ink scribbles.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

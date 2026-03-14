@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "electric_gel"
 name = "Electric Gel"
+name_es = "Punta de tridente"
+name_fr = "Pointe de trident"
+name_de = "Dreizackspitze"
 type = "Material"
 level = 4
+item_power = 6
 hp = 0
 attack = 15
 armour = 0
 effect = "Shock"
 description = "Pulsing jelly from an abyssal eel."
-ai_prompt = "Cinematic dark fantasy: A glob of translucent blue slime with visible lightning arcs."
+ai_prompt = "Cinematic dark fantasy: A glob of translucent blue slime with visible lightning arcs.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "sulfur_dust"
 name = "Sulfur Dust"
+name_es = "Hojas afiladas"
+name_fr = "Lames affûtées"
+name_de = "Geschärfte Klingen"
 type = "Material"
 level = 4
+item_power = 7
 hp = 0
 attack = 12
 armour = 0
 effect = "Boom"
 description = "Highly reactive yellow powder."
-ai_prompt = "Cinematic dark fantasy: A spilled pouch of yellow dust with small puffs of smoke."
+ai_prompt = "Cinematic dark fantasy: A spilled pouch of yellow dust with small puffs of smoke.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

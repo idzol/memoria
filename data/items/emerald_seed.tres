@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "emerald_seed"
 name = "Emerald Seed"
+name_es = "Perla"
+name_fr = "Perle"
+name_de = "Perle"
 type = "Material"
 level = 3
+item_power = 3
 hp = 0
 attack = 0
 armour = 0
 effect = "Regen"
 description = "A pulsing green gem that feels alive."
-ai_prompt = "Cinematic dark fantasy: A faceted emerald in the shape of a seed, emitting a soft green aura."
+ai_prompt = "Cinematic dark fantasy: A faceted emerald in the shape of a seed, emitting a soft green aura.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

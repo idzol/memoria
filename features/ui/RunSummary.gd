@@ -85,11 +85,10 @@ func _on_exit_pressed():
 		# Battle mode: return to Main Menu
 		get_tree().change_scene_to_file("res://features/ui/MainMenu.tscn")
 	else:
-		# Story mode: return to world map UI at home with full health
-		GameManager.reset_to_home()
-		GameManager.current_hp = GameManager.max_hp
+		# Story mode: return to the story map at the current biome home
+		GameManager.begin_new_story_run(GameManager.player_biome if GameManager.player_biome != "" else "town")
 		SaveManager.save_mid_run_state()
-		get_tree().change_scene_to_file("res://features/map/WorldMap.tscn")
+		get_tree().change_scene_to_file(GameManager.get_story_map_scene_path())
 
 func _fade_to_white():
 	var fade_layer = CanvasLayer.new()

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "burning_fan"
 name = "Burning Fan"
+name_es = "Gema de azufre"
+name_fr = "Gemme de soufre"
+name_de = "Schwefeledelstein"
 type = "Weapon"
 level = 6
+item_power = 15
 hp = 0
 attack = 18
 armour = 0
 effect = "Wind"
 description = "A folding fan that throws waves of heat."
-ai_prompt = "Cinematic dark fantasy: An ornate fan made of bronze slats that glow with fire."
+ai_prompt = "Cinematic dark fantasy: An ornate fan made of bronze slats that glow with fire.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

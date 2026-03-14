@@ -7,10 +7,14 @@ class_name ItemData
 @export_group("Identity")
 @export var item_id: String = ""
 @export var name: String = "Unknown Item"
+@export var name_es: String = ""
+@export var name_fr: String = ""
+@export var name_de: String = ""
 @export_enum("Material", "Consumable", "Weapon", "Armour", "Utility") var type: String = "Material"
 @export var level: int = 1
 
 @export_group("Combat Stats")
+@export var item_power: int = 0
 @export var hp: int = 0
 @export var attack: int = 0
 @export var armour: int = 0

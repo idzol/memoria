@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "void_scroll"
 name = "Void Scroll"
+name_es = "Void Scroll"
+name_fr = "Void Scroll"
+name_de = "Void Scroll"
 rarity = "epic"
 type = "attack_magic"
+card_power = 16
 value = 28
 description = "Erasure magic."
 special_effect = ""

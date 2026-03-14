@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "ancient_coin"
 name = "Ancient Coin"
+name_es = "Trampa"
+name_fr = "Piège"
+name_de = "Falle"
 type = "Treasure"
 level = 3
+item_power = 3
 hp = 0
 attack = 0
 armour = 0
 effect = "Luck"
 description = "A tarnished gold coin from a fallen empire."
-ai_prompt = "Cinematic dark fantasy: A heavy coin with a hole in the center, depicting a faceless king."
+ai_prompt = "Cinematic dark fantasy: A heavy coin with a hole in the center, depicting a faceless king.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

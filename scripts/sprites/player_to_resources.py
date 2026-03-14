@@ -8,11 +8,14 @@ OUTPUT_ROOT = "data/player"
 PLAYER_SCRIPT_PATH = "res://data/resources/PlayerData.gd"
 PLAYER_ASSET_ROOT = "res://assets/player"
 
+def normalize_row(row):
+    return {str(key).strip().lower(): value for key, value in row.items()}
+
 def generate_player_tres(row):
     """Generates visual progression resources for Player Classes."""
-    entity_id = row['ID'].strip()
-    p_class = row.get('Class', 'Archivist').strip()
-    stage = row.get('Stage', 'base').strip().lower()
+    entity_id = row['id'].strip()
+    p_class = row.get('class', 'Archivist').strip()
+    stage = row.get('stage', 'base').strip().lower()
     
     # NEW LOGIC: Remove class prefix from filename and flatten folder
     # If entity_id is 'archivist_base', filename becomes 'base.tres'
@@ -39,7 +42,7 @@ def generate_player_tres(row):
         'script = ExtResource("1_script")',
         f'player_class = "{p_class}"',
         f'stage = "{stage}"',
-        f'description = "{row.get("Description", "").replace("\"", "\\\"")}"',
+        f'description = "{row.get("description", "").replace("\"", "\\\"")}"',
         'idle_sheet = ExtResource("2_idle")',
         'attack_sheet = ExtResource("3_atk")',
         'defend_sheet = ExtResource("4_def")',
@@ -61,8 +64,9 @@ def run():
     count = 0
     with open(CSV_FILE, mode='r', encoding='utf-8') as f:
         reader = csv.DictReader(f)
-        for row in reader:
-            if row.get('ID'):
+        for raw_row in reader:
+            row = normalize_row(raw_row)
+            if row.get('id'):
                 path = generate_player_tres(row)
                 print(f"Generated: {path}")
                 count += 1

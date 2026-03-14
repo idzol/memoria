@@ -116,14 +116,14 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.7, 0.6, 1, 1)
 theme_override_font_sizes/font_size = 24
-text = "The Archivist"
+text = ""
 
 [node name="LevelLabel" type="Label" parent="Margin/HBox/LeftPanel/Stats/ClassRow" unique_id=273345463]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.8, 0.95, 1)
 theme_override_font_sizes/font_size = 20
-text = "LVL 1"
+text = ""
 horizontal_alignment = 2
 
 [node name="VitalitySection" type="VBoxContainer" parent="Margin/HBox/LeftPanel/Stats" unique_id=1513249116]
@@ -133,7 +133,7 @@ theme_override_constants/separation = 4
 [node name="BarLabel" type="Label" parent="Margin/HBox/LeftPanel/Stats/VitalitySection" unique_id=863238554]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "VITALITY"
+text = ""
 
 [node name="HPBar" type="ProgressBar" parent="Margin/HBox/LeftPanel/Stats/VitalitySection" unique_id=1213876998]
 unique_name_in_owner = true
@@ -149,7 +149,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
 theme_override_font_sizes/font_size = 14
-text = "100 / 100"
+text = ""
 horizontal_alignment = 1
 
 [node name="MemorySection" type="VBoxContainer" parent="Margin/HBox/LeftPanel/Stats" unique_id=306888083]
@@ -159,7 +159,7 @@ theme_override_constants/separation = 4
 [node name="BarLabel" type="Label" parent="Margin/HBox/LeftPanel/Stats/MemorySection" unique_id=1789484469]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "MEMORY PROGRESS"
+text = ""
 
 [node name="XPBar" type="ProgressBar" parent="Margin/HBox/LeftPanel/Stats/MemorySection" unique_id=82235194]
 unique_name_in_owner = true
@@ -175,7 +175,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
 theme_override_font_sizes/font_size = 14
-text = "45 / 100"
+text = ""
 horizontal_alignment = 1
 
 [node name="CombatGrid" type="GridContainer" parent="Margin/HBox/LeftPanel/Stats" unique_id=868348252]
@@ -186,24 +186,24 @@ columns = 2
 [node name="AtkLabel" type="Label" parent="Margin/HBox/LeftPanel/Stats/CombatGrid" unique_id=2077477405]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Attack: 10"
+text = ""
 
 [node name="DefLabel" type="Label" parent="Margin/HBox/LeftPanel/Stats/CombatGrid" unique_id=1258153451]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Defense: 5"
+text = ""
 
 [node name="EnergyLabel" type="Label" parent="Margin/HBox/LeftPanel/Stats/CombatGrid" unique_id=1258153452]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Energy: 0"
+text = ""
 
 [node name="GoldLabel" type="Label" parent="Margin/HBox/LeftPanel/Stats" unique_id=164481232]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.8, 0.2, 1)
 theme_override_font_sizes/font_size = 18
-text = "Gold: 250"
+text = ""
 
 [node name="Spacer" type="Control" parent="Margin/HBox/LeftPanel" unique_id=957205645]
 layout_mode = 2
@@ -213,7 +213,7 @@ size_flags_vertical = 3
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 46)
 layout_mode = 2
-text = "RETURN TO MAP"
+text = ""
 
 [node name="RightPanel" type="TabContainer" parent="Margin/HBox" unique_id=1492050181]
 unique_name_in_owner = true
@@ -242,7 +242,7 @@ theme_override_constants/margin_bottom = 1
 [node name="Title" type="Label" parent="Margin/HBox/RightPanel/DECK/Header/TitlePadding" unique_id=818474652]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "ACTIVE DECK"
+text = ""
 
 [node name="CountPadding" type="MarginContainer" parent="Margin/HBox/RightPanel/DECK/Header" unique_id=122202]
 layout_mode = 2
@@ -255,7 +255,7 @@ theme_override_constants/margin_bottom = 6
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/outline_size = 2
-text = "Active Pairs: 0 / 1"
+text = ""
 
 [node name="Scroll" type="ScrollContainer" parent="Margin/HBox/RightPanel/DECK" unique_id=1520441010]
 layout_mode = 2
@@ -267,7 +267,11 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 3
 
-[node name="ActiveDeckGrid" type="GridContainer" parent="Margin/HBox/RightPanel/DECK/Scroll/DeckSections" unique_id=1674428039]
+[node name="ActiveDeckGridPadding" type="MarginContainer" parent="Margin/HBox/RightPanel/DECK/Scroll/DeckSections" unique_id=1674428037]
+layout_mode = 2
+theme_override_constants/margin_top = 10
+
+[node name="ActiveDeckGrid" type="GridContainer" parent="Margin/HBox/RightPanel/DECK/Scroll/DeckSections/ActiveDeckGridPadding" unique_id=1674428039]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -288,7 +292,7 @@ theme_override_constants/margin_bottom = 1
 [node name="PlayerDeckLabel" type="Label" parent="Margin/HBox/RightPanel/DECK/Scroll/DeckSections/PlayerDeckLabelPadding" unique_id=1674428041]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "PLAYER DECK"
+text = ""
 
 [node name="PlayerDeckGrid" type="GridContainer" parent="Margin/HBox/RightPanel/DECK/Scroll/DeckSections" unique_id=1674428042]
 unique_name_in_owner = true
@@ -325,17 +329,18 @@ theme_override_constants/separation = 16
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 6
+theme_override_constants/margin_top = 1
 theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 6
+theme_override_constants/margin_bottom = 1
 
 [node name="Title" type="Label" parent="Margin/HBox/RightPanel/INVENTORY/Header/InventoryTitlePadding" unique_id=1113894160]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "EQUIPPED GEAR"
+theme_override_font_sizes/font_size = 16
+text = ""
 
 [node name="InventoryCountPadding" type="MarginContainer" parent="Margin/HBox/RightPanel/INVENTORY/Header" unique_id=504347331]
 layout_mode = 2
+size_flags_horizontal = 8
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 8
@@ -344,7 +349,7 @@ theme_override_constants/margin_bottom = 6
 [node name="ItemCount" type="Label" parent="Margin/HBox/RightPanel/INVENTORY/Header/InventoryCountPadding" unique_id=417923896]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Equipped: 0 / 3"
+text = ""
 
 [node name="Scroll" type="ScrollContainer" parent="Margin/HBox/RightPanel/INVENTORY" unique_id=187774426]
 layout_mode = 2
@@ -354,18 +359,13 @@ horizontal_scroll_mode = 0
 [node name="ItemSections" type="VBoxContainer" parent="Margin/HBox/RightPanel/INVENTORY/Scroll" unique_id=401325231]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 6
+theme_override_constants/separation = 3
 
-[node name="ActiveItemsLabelPadding" type="MarginContainer" parent="Margin/HBox/RightPanel/INVENTORY/Scroll/ItemSections" unique_id=401325230]
+[node name="ActiveItemGridPadding" type="MarginContainer" parent="Margin/HBox/RightPanel/INVENTORY/Scroll/ItemSections" unique_id=401325233]
 layout_mode = 2
-theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 10
 
-[node name="ActiveItemsLabel" type="Label" parent="Margin/HBox/RightPanel/INVENTORY/Scroll/ItemSections/ActiveItemsLabelPadding" unique_id=401325229]
-layout_mode = 2
-theme_override_font_sizes/font_size = 16
-text = "ACTIVE ITEMS"
-
-[node name="ActiveItemGrid" type="GridContainer" parent="Margin/HBox/RightPanel/INVENTORY/Scroll/ItemSections" unique_id=401325232]
+[node name="ActiveItemGrid" type="GridContainer" parent="Margin/HBox/RightPanel/INVENTORY/Scroll/ItemSections/ActiveItemGridPadding" unique_id=401325232]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -380,11 +380,13 @@ layout_mode = 2
 [node name="PlayerItemsLabelPadding" type="MarginContainer" parent="Margin/HBox/RightPanel/INVENTORY/Scroll/ItemSections" unique_id=401325227]
 layout_mode = 2
 theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 1
+theme_override_constants/margin_bottom = 1
 
 [node name="PlayerItemsLabel" type="Label" parent="Margin/HBox/RightPanel/INVENTORY/Scroll/ItemSections/PlayerItemsLabelPadding" unique_id=401325226]
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "PLAYER ITEMS"
+text = ""
 
 [node name="PlayerItemGrid" type="GridContainer" parent="Margin/HBox/RightPanel/INVENTORY/Scroll/ItemSections" unique_id=401325225]
 unique_name_in_owner = true

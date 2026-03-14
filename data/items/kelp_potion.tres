@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "kelp_potion"
 name = "Kelp Potion"
+name_es = "Diario mojado"
+name_fr = "Journal mouillé"
+name_de = "Nasses Journal"
 type = "Consumable"
 level = 4
+item_power = 10
 hp = 12
 attack = 0
 armour = 0
 effect = "Amphibian"
 description = "A brew that allows breathing underwater."
-ai_prompt = "Cinematic dark fantasy: A green, salty liquid filled with small pieces of seaweed."
+ai_prompt = "Cinematic dark fantasy: A green, salty liquid filled with small pieces of seaweed.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")
