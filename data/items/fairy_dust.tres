@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "fairy_dust"
 name = "Fairy Dust"
+name_es = "Carne seca"
+name_fr = "Viande séchée"
+name_de = "Trockenfleisch"
 type = "Material"
 level = 4
+item_power = 8
 hp = 0
 attack = 0
 armour = 0
 effect = "Magic"
 description = "Sparkling powder from the fey wild."
-ai_prompt = "Cinematic dark fantasy: A glowing pouch that leaks rainbow-colored light."
+ai_prompt = "Cinematic dark fantasy: A glowing pouch that leaks rainbow-colored light.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

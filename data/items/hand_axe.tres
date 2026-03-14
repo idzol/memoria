@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "hand_axe"
 name = "Hand Axe"
+name_es = "Haz de flechas"
+name_fr = "Paquet de flèches"
+name_de = "Pfeilbündel"
 type = "Weapon"
 level = 4
+item_power = 8
 hp = 0
 attack = 15
 armour = 0
 effect = "Cleave"
 description = "A small, balanced axe for throwing or chopping."
-ai_prompt = "Cinematic dark fantasy: A short wooden handle with a heavy, crescent-shaped iron blade."
+ai_prompt = "Cinematic dark fantasy: A short wooden handle with a heavy, crescent-shaped iron blade.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

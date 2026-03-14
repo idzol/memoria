@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "wet_journal"
 name = "Wet Journal"
+name_es = "Gel brillante"
+name_fr = "Gel luisant"
+name_de = "Leuchtgel"
 type = "Utility"
 level = 4
+item_power = 11
 hp = 0
 attack = 0
 armour = 0
 effect = "History"
 description = "A book salvaged from a sunken wreck."
-ai_prompt = "Cinematic dark fantasy: A leather-bound volume dripping with salt-water and ink."
+ai_prompt = "Cinematic dark fantasy: A leather-bound volume dripping with salt-water and ink.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

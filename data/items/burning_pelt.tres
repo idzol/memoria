@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "burning_pelt"
 name = "Burning Pelt"
+name_es = "Escama de reptil"
+name_fr = "Écaille de reptile"
+name_de = "Reptilienschuppe"
 type = "Armour"
 level = 5
+item_power = 12
 hp = 0
 attack = 5
 armour = 15
 effect = "Heat"
 description = "A fur cloak that radiates intense warmth."
-ai_prompt = "Cinematic dark fantasy: A thick wolf-skin cloak with embers smoldering at the edges."
+ai_prompt = "Cinematic dark fantasy: A thick wolf-skin cloak with embers smoldering at the edges.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

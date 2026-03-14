@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "tangled_vine"
 name = "Tangled Vine"
+name_es = "Doblón de oro"
+name_fr = "Doublon d'or"
+name_de = "Golddublone"
 rarity = "rare"
 type = "trap"
+card_power = 13
 value = 8
-description = "Trips the unwary."
+description = "Take 8 damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

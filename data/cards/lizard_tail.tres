@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "lizard_tail"
 name = "Lizard Tail"
+name_es = "Chatarra de hierro"
+name_fr = "Ferraille"
+name_de = "Eisenschrott"
 rarity = "rare"
 type = "treasure"
+card_power = 12
 value = 3
 description = "Still wiggling."
 special_effect = ""

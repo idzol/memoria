@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "climbing_pick"
 name = "Climbing Pick"
+name_es = "Pico de escalada"
+name_fr = "Piolet d'escalade"
+name_de = "Kletterpickel"
 rarity = "common"
 type = "attack"
+card_power = 4
 value = 9
-description = "Sharp and hooked"
+description = "Deal 9 physical damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

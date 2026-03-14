@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "wooden_flute"
 name = "Wooden Flute"
+name_es = "Flauta de madera"
+name_fr = "Flûte en bois"
+name_de = "Holzflöte"
 type = "Utility"
 level = 1
+item_power = 1
 hp = 0
 attack = 0
 armour = 0
 effect = "Calm"
 description = "A simple instrument for lonely nights."
-ai_prompt = "Cinematic dark fantasy: A polished dark wood pipe with small silver rings."
+ai_prompt = "Cinematic dark fantasy: A polished dark wood flute with small silver rings.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

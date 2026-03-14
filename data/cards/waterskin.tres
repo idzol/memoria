@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "waterskin"
 name = "Waterskin"
+name_es = "Odre"
+name_fr = "Outre"
+name_de = "Trinkschlauch"
 rarity = "common"
 type = "heal"
+card_power = 5
 value = 8
-description = "Refreshing water"
+description = "Restore 8 health"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

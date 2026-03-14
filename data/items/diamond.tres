@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "diamond"
 name = "Diamond"
+name_es = "Célula de energía"
+name_fr = "Pile à combustible"
+name_de = "Energiezelle"
 type = "Treasure"
 level = 6
+item_power = 13
 hp = 0
 attack = 0
 armour = 0
 effect = "Wealth"
 description = "A flawless gemstone of immense value."
-ai_prompt = "Cinematic dark fantasy: A massive, clear diamond that refracts light into rainbows."
+ai_prompt = "Cinematic dark fantasy: A massive, clear diamond that refracts light into rainbows.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

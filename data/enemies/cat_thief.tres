@@ -8,6 +8,9 @@
 [resource]
 script = ExtResource("1_script")
 name = "Cat_Thief"
+name_es = "Ladrón felino"
+name_fr = "Chat-voleur"
+name_de = "Katzendieb"
 biome = "town"
 hp = 15
 hframes = 8
@@ -21,6 +24,7 @@ armor = 0
 base_damage = 8
 difficulty_tier = 1
 xp_reward = 20
+loot_power = 1
 gold_min = 0
 gold_max = 0
 item_drops = ["lockpick"]

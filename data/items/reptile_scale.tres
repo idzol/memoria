@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "reptile_scale"
 name = "Reptile Scale"
+name_es = "Fragmento de memoria"
+name_fr = "Fragment de mémoire"
+name_de = "Erinnerungsfragment"
 type = "Material"
 level = 5
+item_power = 12
 hp = 0
 attack = 0
 armour = 15
 effect = "Durable"
 description = "A single plate from a massive lizard."
-ai_prompt = "Cinematic dark fantasy: A thick, green-and-black scale as large as a man's head."
+ai_prompt = "Cinematic dark fantasy: A thick, green-and-black scale as large as a man's head.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

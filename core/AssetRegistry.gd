@@ -8,17 +8,17 @@ const CHARACTER_ASSETS = {
 	"warrior": {
 		"normal": "res://assets/menu/character/warrior.png",
 		"selected": "res://assets/menu/character/warrior_select.png",
-		"desc": "Relies on physical momentum. Gains energy from movement and scales with high armor."
+		"desc": ""
 	},
 	"scholar": {
 		"normal": "res://assets/menu/character/scholar.png",
 		"selected": "res://assets/menu/character/scholar_select.png",
-		"desc": "Masters of ancient knowledge. High card draw synergy with Scrolls and Tomes."
+		"desc": ""
 	},
 	"alchemist": {
 		"normal": "res://assets/menu/character/alchemist.png",
 		"selected": "res://assets/menu/character/alchemist_select.png",
-		"desc": "Experimental tactician. Transmutes cards into energy and master of status effects."
+		"desc": ""
 	},
 	"background": "res://assets/menu/character/character_select_background.png",
     "confirm_button": "res://assets/menu/character/button.png"

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "glass_shard"
 name = "Glass Shard"
+name_es = "Turba"
+name_fr = "Tourbe"
+name_de = "Torf"
 type = "Weapon"
 level = 3
+item_power = 4
 hp = 0
 attack = 12
 armour = 0
 effect = "Bleed"
 description = "A jagged piece of volcanic glass."
-ai_prompt = "Cinematic dark fantasy: A long, razor-sharp sliver of obsidian reflecting a blood-red light."
+ai_prompt = "Cinematic dark fantasy: A long, razor-sharp sliver of obsidian reflecting a blood-red light.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

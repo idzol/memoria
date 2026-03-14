@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "trident_tip"
 name = "Trident Tip"
+name_es = "Trident Tip"
+name_fr = "Trident Tip"
+name_de = "Trident Tip"
 rarity = "epic"
 type = "attack"
+card_power = 16
 value = 12
-description = "Still sharp enough."
+description = "Deal 12 physical damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

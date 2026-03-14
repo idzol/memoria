@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "overseer_whip"
 name = "Overseer Whip"
+name_es = "Calderilla"
+name_fr = "Pièces de monnaie"
+name_de = "Kleingeld"
 rarity = "rare"
 type = "attack"
+card_power = 12
 value = 18
-description = "Lashes out fiercely."
+description = "Deal 18 physical damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

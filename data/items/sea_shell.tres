@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "sea_shell"
 name = "Sea Shell"
+name_es = "Tridente"
+name_fr = "Trident"
+name_de = "Dreizack"
 type = "Treasure"
 level = 4
+item_power = 10
 hp = 0
 attack = 0
 armour = 0
 effect = "Echo"
 description = "A beautiful spiral from the deep ocean."
-ai_prompt = "Cinematic dark fantasy: A giant pink conch shell that hums with the sound of waves."
+ai_prompt = "Cinematic dark fantasy: A giant pink conch shell that hums with the sound of waves.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

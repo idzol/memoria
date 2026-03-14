@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "the_aegis"
 name = "The Aegis"
+name_es = "Las Talaria"
+name_fr = "Les Talaria"
+name_de = "Die Talaria"
 type = "Shield"
 level = 7
+item_power = 16
 hp = 10
 attack = 0
 armour = 30
 effect = "Reflect"
 description = "A shimmering bronze shield with Medusa's face."
-ai_prompt = "Cinematic dark fantasy: Polished bronze circular shield, a smoky face of a woman with snakes for hair rippling under the surface."
+ai_prompt = "Cinematic dark fantasy: Polished bronze circular shield, a smoky face of a woman with snakes for hair rippling under the surface.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

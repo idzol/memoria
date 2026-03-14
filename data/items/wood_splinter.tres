@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "wood_splinter"
 name = "Wood Splinter"
+name_es = "Astilla de madera"
+name_fr = "Éclat de bois"
+name_de = "Holzsplitter"
 type = "Material"
 level = 1
+item_power = 1
 hp = 0
 attack = 1
 armour = 0
 effect = "None"
 description = "A tiny sharp fragment of wood."
-ai_prompt = "Cinematic dark fantasy: A jagged splinter of dark wood on a stone surface."
+ai_prompt = "Cinematic dark fantasy: A jagged splinter of dark wood on a stone surface.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

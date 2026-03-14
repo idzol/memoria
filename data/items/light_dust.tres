@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "light_dust"
 name = "Light Dust"
+name_es = "Vapor"
+name_fr = "Vapeur"
+name_de = "Dampf"
 type = "Material"
 level = 3
+item_power = 4
 hp = 0
 attack = 0
 armour = 0
 effect = "Blind"
 description = "Sparkling powder from a light-sprite."
-ai_prompt = "Cinematic dark fantasy: A small pouch leaking brilliant white particles that float upwards."
+ai_prompt = "Cinematic dark fantasy: A small pouch leaking brilliant white particles that float upwards.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

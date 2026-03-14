@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "silver_ore"
 name = "Silver Ore"
+name_es = "Odre"
+name_fr = "Outre"
+name_de = "Trinkschlauch"
 type = "Material"
 level = 4
+item_power = 9
 hp = 0
 attack = 0
 armour = 5
 effect = "Purity"
 description = "Rare metal that harms the undead."
-ai_prompt = "Cinematic dark fantasy: A rock with shining silver veins that pulse with white light."
+ai_prompt = "Cinematic dark fantasy: A rock with shining silver veins that pulse with white light.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "proboscis"
 name = "Proboscis"
+name_es = "Vial de veneno"
+name_fr = "Fiole de venin"
+name_de = "Giftfläschchen"
 type = "Weapon"
 level = 3
+item_power = 5
 hp = 0
 attack = 10
 armour = 0
 effect = "Drain"
 description = "The hollow needle-beak of a giant mosquito."
-ai_prompt = "Cinematic dark fantasy: A long, serrated chitinous tube dripping with dark fluid."
+ai_prompt = "Cinematic dark fantasy: A long, serrated chitinous tube dripping with dark fluid.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

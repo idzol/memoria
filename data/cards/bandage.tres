@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "bandage"
 name = "Bandage"
+name_es = "Venda"
+name_fr = "Bandage"
+name_de = "Verband"
 rarity = "common"
 type = "heal"
+card_power = 1
 value = 8
-description = "Small Heal"
+description = "Restore 8 health"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

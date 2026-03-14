@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "royal_signet"
 name = "Royal Signet"
+name_es = "Vial de sanguijuelas"
+name_fr = "Fiole de sangsues"
+name_de = "Blutegelfläschchen"
 type = "Treasure"
 level = 6
+item_power = 14
 hp = 0
 attack = 0
 armour = 10
 effect = "Command"
 description = "A ring that signifies noble blood."
-ai_prompt = "Cinematic dark fantasy: A heavy gold ring set with a massive, blood-red ruby."
+ai_prompt = "Cinematic dark fantasy: A heavy gold ring set with a massive, blood-red ruby.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

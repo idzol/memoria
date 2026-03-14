@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "sand_glass"
 name = "Sand Glass"
+name_es = "Caparazón"
+name_fr = "Carapace"
+name_de = "Panzer"
 type = "Utility"
 level = 3
+item_power = 4
 hp = 0
 attack = 0
 armour = 0
 effect = "Slow"
 description = "An hourglass filled with shifting desert sand."
-ai_prompt = "Cinematic dark fantasy: An ornate brass hourglass where the sand flows upwards."
+ai_prompt = "Cinematic dark fantasy: An ornate brass hourglass where the sand flows upwards.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

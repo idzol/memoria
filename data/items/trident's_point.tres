@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "trident's_point"
 name = "Trident's Point"
+name_es = "Máscara de búho"
+name_fr = "Masque de chouette"
+name_de = "Eulenmaske"
 type = "Weapon"
 level = 7
+item_power = 17
 hp = 0
 attack = 30
 armour = 0
 effect = "Pierce"
 description = "A three-pronged spear corroded by salt."
-ai_prompt = "Cinematic dark fantasy: Massive gleaming celestial bronze trident head attached to a new shaft, dripping with sea water."
+ai_prompt = "Cinematic dark fantasy: Massive gleaming celestial bronze trident head attached to a new shaft, dripping with sea water.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

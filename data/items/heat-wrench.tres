@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "heat-wrench"
 name = "Heat-Wrench"
+name_es = "Abanico ardiente"
+name_fr = "Éventail brûlant"
+name_de = "Brennender Fächer"
 type = "Utility"
 level = 6
+item_power = 15
 hp = 0
 attack = 15
 armour = 0
 effect = "Forge"
 description = "A tool designed for high-temperature work."
-ai_prompt = "Cinematic dark fantasy: A glowing red metal tool with an insulated leather handle."
+ai_prompt = "Cinematic dark fantasy: A glowing red metal tool with an insulated leather handle.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

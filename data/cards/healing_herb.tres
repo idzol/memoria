@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "healing_herb"
 name = "Healing Herb"
+name_es = "Hierba curativa"
+name_fr = "Herbe médicinale"
+name_de = "Heilkraut"
 rarity = "common"
 type = "heal"
+card_power = 3
 value = 12
-description = "Natural forest remedy"
+description = "Restore 12 health"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "fang_of_knowledge"
 name = "Fang of Knowledge"
+name_es = "Cadenas de Sacrificio"
+name_fr = "Chaînes du Sacrifice"
+name_de = "Ketten der Opferung"
 type = "Weapon"
 level = 7
+item_power = 17
 hp = 0
 attack = 25
 armour = 0
 effect = "Poison"
 description = "A sharp, curved tooth dripping with ink."
-ai_prompt = "Cinematic dark fantasy: A foot-long yellowed ivory tooth from a sea monster, dripping with glowing purple ink."
+ai_prompt = "Cinematic dark fantasy: A foot-long yellowed ivory tooth from a sea monster, dripping with glowing purple ink.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "witch_brew"
 name = "Witch Brew"
+name_es = "Bagre"
+name_fr = "Poisson-chat"
+name_de = "Wels"
 type = "Consumable"
 level = 4
+item_power = 9
 hp = 25
 attack = 0
 armour = 0
 effect = "Random"
 description = "A bubbling cauldron of unknown effects."
-ai_prompt = "Cinematic dark fantasy: A wooden bowl filled with a thick, purple soup emitting green sparks."
+ai_prompt = "Cinematic dark fantasy: A wooden bowl filled with a thick, purple soup emitting green sparks.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

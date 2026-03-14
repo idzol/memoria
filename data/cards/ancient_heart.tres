@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "ancient_heart"
 name = "Ancient Heart"
+name_es = "Ancient Heart"
+name_fr = "Ancient Heart"
+name_de = "Ancient Heart"
 rarity = "epic"
 type = "heal"
+card_power = 16
 value = 100
-description = "Beating for eternity."
+description = "Restore 100 health"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

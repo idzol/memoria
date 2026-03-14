@@ -114,6 +114,7 @@ var current_deck: Array:
 # Format: { Vector2i(column, layer): "type_string" }
 var fixed_nodes: Dictionary = {}
 const ITEMS_ROOT = "res://data/items/"
+const CARDS_ROOT = "res://data/cards/"
 const STORY_BIOME_ORDER = ["home", "town", "forest", "ice_caves", "desert", "swamp", "abyss", "void", "the_core"]
 const BATTLE_BIOME_ORDER = ["home", "town", "forest", "ice_caves", "desert", "swamp", "abyss", "void", "the_core"]
 
@@ -252,6 +253,8 @@ func set_selected_story_biome(biome: String):
 	if biome == "":
 		return
 	selected_story_biome = biome
+	if DataManager and DataManager.has_method("prioritize_story_assets"):
+		DataManager.prioritize_story_assets(selected_story_biome)
 
 func get_story_map_scene_path() -> String:
 	return "res://features/map/StoryMap.tscn"
@@ -647,6 +650,8 @@ func enter_story_biome(biome: String, mark_as_home_if_new: bool = true):
 			_apply_home_type_to_node(str(entry_node.get("id", "")))
 	player_biome = biome
 	selected_story_biome = biome
+	if DataManager and DataManager.has_method("prioritize_story_assets"):
+		DataManager.prioritize_story_assets(player_biome)
 	_set_player_position_from_node(entry_node)
 
 func _pick_random_story_biome_home_node_id(biome: String) -> String:
@@ -790,7 +795,9 @@ func prepare_victory_loot(node_data: Dictionary):
 					
 					# FIXED: Handle Nil enemy_res to prevent property access crash
 					if enemy_res:
-						enemy_loot_pool += enemy_res.item_drops
+						var power_reward = _roll_power_matched_loot(enemy_res.loot_power)
+						if not power_reward.is_empty():
+							enemy_loot_pool.append(power_reward)
 						enemy_loot_pool.append({
 							"id": "gold", 
 							"min": enemy_res.gold_min, 
@@ -819,17 +826,76 @@ func prepare_victory_loot(node_data: Dictionary):
 			reward = {
 				"id": item_id, 
 				"amount": amount, 
-				"name": str(amount) + " " + item_id.replace("_", " ").capitalize()
+				"name": _get_reward_display_name(item_id, amount)
 			}
 			
 			if item_id == "gold":
 				gold += amount
 				world_state.global.gold = gold
 			else:
-				add_item(item_id)
+				if bool(item_def.get("is_card", false)):
+					add_card_to_collection(item_id)
+				else:
+					add_item(item_id)
 		
 		pending_loot.append(reward)
 		run_loot.append(reward)
+
+func _roll_power_matched_loot(loot_power: int) -> Dictionary:
+	if loot_power <= 0:
+		return {}
+	var pool = _get_rewards_matching_power(loot_power)
+	if pool.is_empty():
+		return {}
+	return pool.pick_random()
+
+func _get_rewards_matching_power(target_power: int) -> Array[Dictionary]:
+	var pool: Array[Dictionary] = []
+	pool.append_array(_collect_power_rewards_from_dir(CARDS_ROOT, target_power, true))
+	pool.append_array(_collect_power_rewards_from_dir(ITEMS_ROOT, target_power, false))
+	return pool
+
+func _collect_power_rewards_from_dir(root: String, target_power: int, is_card: bool) -> Array[Dictionary]:
+	var rewards: Array[Dictionary] = []
+	if not DirAccess.dir_exists_absolute(root):
+		return rewards
+	var dir = DirAccess.open(root)
+	if dir == null:
+		return rewards
+	dir.list_dir_begin()
+	var file_name = dir.get_next()
+	while file_name != "":
+		if not dir.current_is_dir() and file_name.ends_with(".tres"):
+			var resource_path = "%s/%s" % [root, file_name]
+			var resource = load(resource_path)
+			if resource:
+				var power = int(resource.card_power if is_card else resource.item_power)
+				if power == target_power:
+					var reward_id = str(resource.card_id if is_card else resource.item_id)
+					rewards.append({
+						"id": reward_id,
+						"min": 1,
+						"max": 1,
+						"is_card": is_card
+					})
+		file_name = dir.get_next()
+	dir.list_dir_end()
+	return rewards
+
+func _get_reward_display_name(item_id: String, amount: int) -> String:
+	if item_id == "gold":
+		return str(amount) + " " + item_id.replace("_", " ").capitalize()
+	var card_path = "%s/%s.tres" % [CARDS_ROOT, item_id]
+	if ResourceLoader.exists(card_path):
+		var card_res = load(card_path) as CardData
+		if card_res:
+			return LocalizationManager.localized_resource_name(card_res, card_res.name)
+	var item_path = "%s/%s.tres" % [ITEMS_ROOT, item_id]
+	if ResourceLoader.exists(item_path):
+		var item_res = load(item_path) as ItemData
+		if item_res:
+			return LocalizationManager.localized_resource_name(item_res, item_res.name)
+	return item_id.replace("_", " ").capitalize()
 
 
 func _on_combat_won():
@@ -867,7 +933,7 @@ func register_room_victory(node_data: Dictionary, remaining_hp: int):
 		var next_biome = _get_next_biome_key(biome)
 		unlock_biome(next_biome)
 		_move_player_to_random_next_biome(node_data)
-		pending_post_battle_scene = get_active_biome_map_scene_path() if is_battle_mode else "res://features/ui/BiomeClearCutscene.tscn"
+		pending_post_battle_scene = get_active_biome_map_scene_path() if is_battle_mode else get_story_map_scene_path()
 	else:
 		_set_player_position_from_node(node_data)
 

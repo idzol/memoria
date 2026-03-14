@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "void_essence"
 name = "Void Essence"
+name_es = "Escama de naga"
+name_fr = "Écaille de naga"
+name_de = "Nagaschuppe"
 type = "Material"
 level = 5
+item_power = 11
 hp = 0
 attack = 28
 armour = 0
 effect = "Curse"
 description = "Pure darkness from the abyss."
-ai_prompt = "Cinematic dark fantasy: A floating orb of crackling violet energy and shadow."
+ai_prompt = "Cinematic dark fantasy: A floating orb of crackling violet energy and shadow.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

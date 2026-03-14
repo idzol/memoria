@@ -230,11 +230,15 @@ func _update_header_labels(current_data: Dictionary):
 	if GameManager.is_battle_mode:
 		var biome_index = int(current_data.get("biome_index", 0))
 		var grid_size = biome_index + 2
-		phase_label.text = "%dx%d GRID" % [grid_size, grid_size]
+		phase_label.text = LocalizationManager.format("worldmap.phase.grid", {"size": grid_size}, "{size}x{size} GRID")
 	else:
-		phase_label.text = "STORY MAP"
+		phase_label.text = LocalizationManager.translate("worldmap.phase.story", "STORY MAP")
 
-	tracker_text.text = "%s [%d,%d]" % [biome_name, int(current_data.get("layer", 0)), int(current_data.get("column", 0))]
+	tracker_text.text = LocalizationManager.format(
+		"worldmap.tracker",
+		{"biome": biome_name, "layer": int(current_data.get("layer", 0)), "column": int(current_data.get("column", 0))},
+		"{biome} [{layer},{column}]"
+	)
 
 func _build_visible_node_set(current_id: String, biome: String) -> Dictionary:
 	var visible_set: Dictionary = {}
@@ -390,7 +394,7 @@ func _travel_to_node(target_data: Dictionary):
 func _show_backtrack_toast():
 	if _info_toast_tween:
 		_info_toast_tween.kill()
-	info_toast_label.text = BACKTRACK_PROMPT
+	info_toast_label.text = LocalizationManager.translate("worldmap.backtrack_prompt", BACKTRACK_PROMPT)
 	info_toast_box.visible = true
 	info_toast_box.modulate = Color(1, 1, 1, 0)
 	_info_toast_tween = create_tween()

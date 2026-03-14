@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "sulfur"
 name = "Sulfur"
+name_es = "Esencia de eco"
+name_fr = "Essence d'écho"
+name_de = "Echoessenz"
 type = "Material"
 level = 4
+item_power = 6
 hp = 0
 attack = 8
 armour = 0
 effect = "Explode"
 description = "Yellow mineral that smells of brimstone."
-ai_prompt = "Cinematic dark fantasy: A pile of bright yellow powder with small crackling embers."
+ai_prompt = "Cinematic dark fantasy: A pile of bright yellow powder with small crackling embers.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

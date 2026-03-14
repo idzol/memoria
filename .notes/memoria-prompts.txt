@@ -1249,42 +1249,87 @@ Enemy intent. Update scene to show the next card played by the enemy. Play the e
 
 	in battle mode (is_battle_mode), do not show the storychapter nodes in storymap
 	
-===
+	
+STORYMAP
 
 	storymap
-	update chapter text to be in keys that can be used for translation. 
-	move story_text into a resource / csv file for translation for english, spanish, french, german
+	storymap.
+	allow ui input, mouse selection of chapter, map. 
+	allow ui input, clicking on the selected mapsummary loads the corresponding map biome
+	update mapsummary to a scaled, minature view of the biome map used by worldmap.
+
+	storymap. ui input, mouse click on the mapsummary node loads the corresponding map biome.
+	mapsummary. draw worldmap, map nodes to fit within the tablet node (eg. 2x2 with minified map icons)
+
+	storymap. ui input, mouse click on the mapsummary node should load the corresponding worldmap. check why mouseclick on mapsummary node would not work. 
+	mapsummary. draw representation of worldmap biome (2x2, 3x3... 10x10) within the tablet node without using map icons. highlight home node as blue, and visited nodes (is_battle_mode) or completed nodes (!is_battle_mode) as green in a minified grid.
+
+
+	storymap. increase tablet nodes to be 90% of viewport height. 
+	mapsummary.  make nodes aligned to centre of tablet, currently below tablet. 
+	
+	storymap. increase tablet nodes to be 90% of viewport height. 
+		
+	storymap. reintroduce the chaptersummary tablet. each chapter / biome has a chapter summary, followed by a map node. 
+	on loading story mode (!is_battle_mode) or completing a biome, load the storymap scene
+
+	storymap. reintroduce the storychapter tablet. deach chapter / biome has a chapter summary, followed by a map node. on loading story mode (!is_battle_mode) or completing a biome, load the storymap scene
+
+	storymap. delete chaptersummary and replace with storychapter as the scene used by storymap. delete chaptersummary
+	main menu. pop up toast if user name has already been used / selected for story mode or battle mode
+
+storymap. on maximising chaptersummary, clicking anywhere should remove the zoomed in version and return to storymap scene. chaptersummary, increase text size and use Menu.theme.
+
+
+LOCALIZATION 
 
 	main menu options. 
 	add language as option, default to english 
 
-storymap.
-allow ui input, mouse selection of chapter, map. 
-allow ui input, double click loads  
-update mapsummary to a scaled, minature view of the biome map used by worldmap.
+	update chapter text to be in keys that can be used for translation. 
+	move story_text into a resource / csv file for translation for english, spanish, french, german
 
-storymap 
-update menu text to text keys, to support language translation 
+	review all text strings, update to use language keys and move english text into data/localization/text.csv, include other translations 
 
-storymap. 
+	chacterscreen. review all text strings, update to use language keys and move english text into data/localization/text.csv, include other translations 
 
-mapsummary 
+	chacterselect. review all text strings, update to use language keys and move english text into data/localization/text.csv, include other translations 
 
-==
+card assets: language support 
+
+room assets: language support 
+
+WORLD MAP
+
+story map: two homes 
+home -> dedicated room resource, used once only 
 
 
-cards / item balancing 
-sort by "power" 
-update enemy mapping to card / item rewards  
-balance cards by enemy 
-remove 
+BATTLE SCENE 
 
-===
+Create a dotted outline for enemy card, or "intent" and last player card matched 
+When a player card is matched, the expanded card fly out effect to the player card matched 
+clicking on the player card matched, gives an expanded view of the card 
 
-Enemy cards
+Update enemy resource to include "enemy_cards". 
+Select next enemy card based on enemy card power, eg. likelihood of appearing is inverse of card power, normalised for total cards in deck. 
 
+	1 - 1/1		100%	 
+	2 - 1/2		50% 
+	3 - 1/3 	33% 
+	4 - 1/4		25% 
+	5 - 1/5		20%		 
+	6 - 1/5 	16%
+	7 -	1/5 	14%
+
+On enemy turn, play the enemy card. Fly in card from the enemy intent. Click outside of the card, or return to scene in 1 second  
+Play the effects from the enemy card (attack, armour, wait)
+
+
+ASSETS - enemy cards 
+
+Enemy cards | intent 
 Create enemy cards template. Black background 
-
 Create enemy card resources
 * Attack. Strike, stab, etc..
 * Defend. Fortify, etc..
@@ -1297,16 +1342,24 @@ Update enemy asset to include
 * cards used
 * Resistances 
 
-===
 
-worldmap, story mode (stame 	
+ASSETS 
 
-UPDATE ASSETS 
+update all assets
+	export csv 
+ 
+	enemy resource, update to include loot_power (numeric), and localization of name (spanish, french, german). assume the existing name name is in english. update scripts/sprites/npc_to_resource.py script to extract translate these additional fields from csv 
 
-enemy resource, update to include loot_power (numeric).
-card resource, update to include card_power (numeric).
-item resource, update to include item_power (numeric).
-victoryscreen. update to provide cards based on loot_power, only providing cards with equal card_power, or item_power
+	card resource, update to include card_power (numeric), and localization of name to spanish, french, german (name_). assume the existing name name is in english. update scripts/sprites/card_to_resource.py script to extract translate these additional fields from csv 
+
+	item resource, update to include item_power (numeric), and localization of name to spanish, french, german (name_). assume the existing name name is in english. update scripts/sprites/card_to_resource.py script to extract translate these additional fields from csv 
+
+	victoryscreen. update so that victory provides cards based on loot_power, only providing cards with equal card_power, or item_power
+
+storymap ui input is slow or unresponsive to mouseclicks.
+allow arrow and enter to expand a chaptersummary or select a biome / mapsummary.
+allow single mouse click to expand chaptersummary, and select mapsummary. 
+allow escape to minimise expanded chaptersummary, or  return to current biome / map
 
 ===
 

@@ -70,11 +70,11 @@ offset_top = 110.0
 grow_horizontal = 2
 grow_vertical = 2
 horizontal_scroll_mode = 2
-vertical_scroll_mode = 3
+vertical_scroll_mode = 0
 
 [node name="ChapterRow" type="HBoxContainer" parent="ScrollContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(1600, 760)
+custom_minimum_size = Vector2(1600, 0)
 layout_mode = 2
 theme_override_constants/separation = 28
 

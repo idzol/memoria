@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "molten_core"
 name = "Molten Core"
+name_es = "Molten Core"
+name_fr = "Molten Core"
+name_de = "Molten Core"
 rarity = "unique"
-type = "charge"
+type = "prepare"
+card_power = 18
 value = 0
 description = "Pulsing heat."
 special_effect = ""

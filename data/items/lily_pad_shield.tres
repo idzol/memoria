@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "lily_pad_shield"
 name = "Lily Pad Shield"
+name_es = "Capa de musgo"
+name_fr = "Cape de mousse"
+name_de = "Moosmantel"
 type = "Shield"
 level = 4
+item_power = 9
 hp = 0
 attack = 0
 armour = 8
 effect = "Float"
 description = "A dried plant that is surprisingly tough."
-ai_prompt = "Cinematic dark fantasy: A massive, circular green leaf reinforced with leather straps."
+ai_prompt = "Cinematic dark fantasy: A massive, circular green leaf reinforced with leather straps.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

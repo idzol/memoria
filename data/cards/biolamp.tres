@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "biolamp"
 name = "Biolamp"
+name_es = "Biolamp"
+name_fr = "Biolamp"
+name_de = "Biolamp"
 rarity = "epic"
 type = "utility"
+card_power = 16
 value = 0
 description = "A living lantern."
 special_effect = ""

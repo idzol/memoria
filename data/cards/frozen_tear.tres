@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "frozen_tear"
 name = "Frozen Tear"
+name_es = "Llave maestra"
+name_fr = "Passe-partout"
+name_de = "Generalschlüssel"
 rarity = "rare"
 type = "treasure"
+card_power = 14
 value = 40
 description = "Cold sorrow."
 special_effect = ""

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "sharpened_blades"
 name = "Sharpened Blades"
+name_es = "Sello de la ciudad"
+name_fr = "Sceau de la ville"
+name_de = "Stadtsiegel"
 type = "Utility"
 level = 4
+item_power = 7
 hp = 0
 attack = 10
 armour = 0
 effect = "Slay"
 description = "A kit for maintaining weapon edges."
-ai_prompt = "Cinematic dark fantasy: A leather roll with whetstones, oil, and various polishing cloths."
+ai_prompt = "Cinematic dark fantasy: A leather roll with whetstones, oil, and various polishing cloths.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

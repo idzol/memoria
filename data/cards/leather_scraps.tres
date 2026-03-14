@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "leather_scraps"
 name = "Leather Scraps"
+name_es = "Retales de cuero"
+name_fr = "Chutes de cuir"
+name_de = "Lederreste"
 rarity = "common"
 type = "armor"
+card_power = 3
 value = 3
-description = "Basic protection bits"
+description = "Add 3 armor until next damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

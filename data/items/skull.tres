@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "skull"
 name = "Skull"
+name_es = "Calavera"
+name_fr = "Crâne"
+name_de = "Schädel"
 type = "Material"
 level = 2
+item_power = 2
 hp = 0
 attack = 4
 armour = 0
 effect = "Terror"
 description = "A bleached human skull etched with runes."
-ai_prompt = "Cinematic dark fantasy: A hollow white skull sitting on dark velvet, eye sockets glowing faintly."
+ai_prompt = "Cinematic dark fantasy: A hollow white skull sitting on dark velvet, eye sockets glowing faintly.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "venom_vial"
 name = "Venom Vial"
+name_es = "Vial de veneno"
+name_fr = "Fiole de venin"
+name_de = "Giftfläschchen"
 rarity = "uncommon"
 type = "attack"
+card_power = 5
 value = 15
-description = "Apply to your blade"
+description = "Deal 15 physical damage"
 special_effect = "Poison"
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

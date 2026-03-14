@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "jar_of_teeth"
 name = "Jar of Teeth"
+name_es = "Tarro de dientes"
+name_fr = "Bocal de dents"
+name_de = "Gefäß mit Zähnen"
 rarity = "uncommon"
 type = "trap"
+card_power = 5
 value = 12
-description = "Spooky and sharp"
+description = "Take 12 damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

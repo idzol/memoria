@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "golden_bandage"
 name = "Golden Bandage"
+name_es = "Reloj de arena"
+name_fr = "Sablier"
+name_de = "Sandglas"
 type = "Consumable"
 level = 3
+item_power = 4
 hp = 40
 attack = 0
 armour = 0
 effect = "Mend"
 description = "A silk bandage woven with gold threads."
-ai_prompt = "Cinematic dark fantasy: A roll of fine white fabric shimmering with gold embroidery."
+ai_prompt = "Cinematic dark fantasy: A roll of fine white fabric shimmering with gold embroidery.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

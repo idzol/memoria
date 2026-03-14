@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "banjo"
 name = "Banjo"
+name_es = "Medalla oxidada"
+name_fr = "Médaille rouillée"
+name_de = "Rostige Medaille"
 type = "Utility"
 level = 4
+item_power = 10
 hp = 0
 attack = 0
 armour = 0
 effect = "Music"
 description = "A stringed instrument for upbeat tunes."
-ai_prompt = "Cinematic dark fantasy: A circular wooden body with a stretched skin and five strings."
+ai_prompt = "Cinematic dark fantasy: A circular wooden body with a stretched skin and five strings.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

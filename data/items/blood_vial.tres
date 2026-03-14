@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "blood_vial"
 name = "Blood Vial"
+name_es = "Clavo oxidado"
+name_fr = "Clou rouillé"
+name_de = "Rostiger Nagel"
 type = "Material"
 level = 3
+item_power = 5
 hp = 0
 attack = 5
 armour = 0
 effect = "Sanguine"
 description = "A vial of concentrated essence."
-ai_prompt = "Cinematic dark fantasy: A crystal vial filled with thick, dark red liquid that never settles."
+ai_prompt = "Cinematic dark fantasy: A crystal vial filled with thick, dark red liquid that never settles.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "solar_disc"
 name = "Solar Disc"
+name_es = "Sello real"
+name_fr = "Sceau royal"
+name_de = "Königliches Siegel"
 type = "Utility"
 level = 6
+item_power = 14
 hp = 0
 attack = 20
 armour = 0
 effect = "Sunlight"
 description = "A gold plate that reflects the sun's power."
-ai_prompt = "Cinematic dark fantasy: A perfectly circular gold disc that blinds anyone who looks at it."
+ai_prompt = "Cinematic dark fantasy: A perfectly circular gold disc that blinds anyone who looks at it.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

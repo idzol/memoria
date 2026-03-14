@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "giant_club"
 name = "Giant Club"
+name_es = "Fragmento de hielo"
+name_fr = "Éclat de glace"
+name_de = "Eissplitter"
 type = "Weapon"
 level = 4
+item_power = 8
 hp = 0
 attack = 25
 armour = 0
 effect = "Smash"
 description = "A massive tree limb used as a bludgeon."
-ai_prompt = "Cinematic dark fantasy: A gnarled wood trunk studded with rusted iron spikes."
+ai_prompt = "Cinematic dark fantasy: A gnarled wood trunk studded with rusted iron spikes.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

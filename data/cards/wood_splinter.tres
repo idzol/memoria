@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "wood_splinter"
 name = "Wood Splinter"
+name_es = "Ganzúa"
+name_fr = "Crochet"
+name_de = "Dietrich"
 rarity = "rare"
 type = "trap"
+card_power = 12
 value = 2
-description = "Small but annoying."
+description = "Take 2 damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

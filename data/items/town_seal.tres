@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "town_seal"
 name = "Town Seal"
+name_es = "Agua bendita"
+name_fr = "Eau bénite"
+name_de = "Weihwasser"
 type = "Utility"
 level = 4
+item_power = 7
 hp = 0
 attack = 0
 armour = 0
 effect = "Authority"
 description = "A wax stamp used for official business."
-ai_prompt = "Cinematic dark fantasy: A heavy gold signet with a crest depicting a walled city."
+ai_prompt = "Cinematic dark fantasy: A heavy gold signet with a crest depicting a walled city.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

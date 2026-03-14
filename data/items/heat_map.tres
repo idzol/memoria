@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "heat_map"
 name = "Heat Map"
+name_es = "Estatua de obsidiana"
+name_fr = "Statue d'obsidienne"
+name_de = "Obsidianstatue"
 type = "Utility"
 level = 6
+item_power = 15
 hp = 0
 attack = 0
 armour = 0
 effect = "Survey"
 description = "A parchment that shows thermal signatures."
-ai_prompt = "Cinematic dark fantasy: A glowing orange map with shifting blobs of red and yellow."
+ai_prompt = "Cinematic dark fantasy: A glowing orange map with shifting blobs of red and yellow.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

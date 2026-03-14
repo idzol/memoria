@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "ancient_wisdom"
 name = "Ancient Wisdom"
+name_es = "Sabiduría antigua"
+name_fr = "Sagesse ancienne"
+name_de = "Alte Weisheit"
 rarity = "common"
-type = "charge"
+type = "prepare"
+card_power = 5
 value = 0
 description = "Unlocks potential"
 special_effect = "Charge"

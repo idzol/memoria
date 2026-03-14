@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "venom_gland"
 name = "Venom Gland"
+name_es = "Lágrima del océano"
+name_fr = "Larme de l'océan"
+name_de = "Ozeanträne"
 rarity = "rare"
 type = "attack"
+card_power = 14
 value = 13
-description = "Raw natural toxin."
+description = "Deal 13 physical damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

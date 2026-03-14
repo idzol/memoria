@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "healing_herb"
 name = "Healing Herb"
+name_es = "Hiedra venenosa"
+name_fr = "Lierre vénéneux"
+name_de = "Giftefeu"
 type = "Consumable"
 level = 4
+item_power = 7
 hp = 20
 attack = 0
 armour = 0
 effect = "Heal"
 description = "Wild leaves with medicinal properties."
-ai_prompt = "Cinematic dark fantasy: A bundle of dried green leaves tied with a leather cord."
+ai_prompt = "Cinematic dark fantasy: A bundle of dried green leaves tied with a leather cord.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

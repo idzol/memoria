@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "chisel"
 name = "Stone Chisel"
+name_es = "Cincel de piedra"
+name_fr = "Ciseau à pierre"
+name_de = "Steinmeißel"
 rarity = "common"
 type = "attack"
+card_power = 4
 value = 5
-description = "Fine precision tool"
+description = "Deal 5 physical damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

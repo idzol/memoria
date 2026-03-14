@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "trident"
 name = "Sea Trident"
+name_es = "Tridente marino"
+name_fr = "Trident de mer"
+name_de = "Meeresdreizack"
 rarity = "uncommon"
 type = "attack"
+card_power = 6
 value = 16
-description = "Lord of the waves"
+description = "Deal 16 physical damage"
 special_effect = "Pierce"
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

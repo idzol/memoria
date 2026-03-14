@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "glass_shard"
 name = "Glass Shard"
+name_es = "Polvo de azufre"
+name_fr = "Poussière de soufre"
+name_de = "Schwefelstaub"
 rarity = "rare"
 type = "attack"
+card_power = 14
 value = 9
-description = "Don't cut yourself."
+description = "Deal 9 physical damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

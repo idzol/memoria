@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "helm_of_darkness"
 name = "Helm of Darkness"
+name_es = "Cabeza de Medusa"
+name_fr = "Tête de Méduse"
+name_de = "Medusas Kopf"
 type = "Armour"
 level = 7
+item_power = 17
 hp = 0
 attack = 0
 armour = 25
 effect = "Stealth"
 description = "An obsidian-black helmet shimmering with smoke."
-ai_prompt = "Cinematic dark fantasy: Sleek obsidian helmet with a skull faceplate, edges of the helmet blurred as if phasing out of reality."
+ai_prompt = "Cinematic dark fantasy: Sleek obsidian helmet with a skull faceplate, edges of the helmet blurred as if phasing out of reality.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

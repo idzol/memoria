@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "heavy_boots"
 name = "Heavy Boots"
+name_es = "Botas pesadas"
+name_fr = "Bottes lourdes"
+name_de = "Schwere Stiefel"
 type = "Armour"
 level = 2
+item_power = 2
 hp = 0
 attack = 2
 armour = 8
 effect = "Weight"
 description = "Thick leather boots with iron soles."
-ai_prompt = "Cinematic dark fantasy: Rugged mud-stained leather boots with heavy metal reinforcements."
+ai_prompt = "Cinematic dark fantasy: Rugged mud-stained leather boots with heavy metal reinforcements.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

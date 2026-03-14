@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "dried_meat"
 name = "Dried Meat"
+name_es = "Carne seca"
+name_fr = "Viande séchée"
+name_de = "Trockenfleisch"
 rarity = "common"
 type = "heal"
+card_power = 4
 value = 15
-description = "Salty dungeon rations"
+description = "Restore 15 health"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

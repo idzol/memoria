@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "ale"
 name = "Mug of Ale"
+name_es = "Jarra de cerveza"
+name_fr = "Chope de bière"
+name_de = "Krug Bier"
 rarity = "common"
 type = "heal"
+card_power = 2
 value = 5
-description = "A bit of liquid courage"
+description = "Restore 5 health"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

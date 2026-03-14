@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "pure_iron"
 name = "Pure Iron"
+name_es = "Pure Iron"
+name_fr = "Pure Iron"
+name_de = "Pure Iron"
 rarity = "unique"
 type = "armor"
+card_power = 17
 value = 14
-description = "Refined protection."
+description = "Add 14 armor until next damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

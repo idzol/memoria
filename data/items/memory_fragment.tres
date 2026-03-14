@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "memory_fragment"
 name = "Memory Fragment"
+name_es = "Reloj roto"
+name_fr = "Montre cassée"
+name_de = "Zerbrochene Uhr"
 type = "Utility"
 level = 5
+item_power = 12
 hp = 0
 attack = 0
 armour = 0
 effect = "Past"
 description = "A shimmering shard of a forgotten thought."
-ai_prompt = "Cinematic dark fantasy: A floating crystalline sliver that shows a different face to everyone."
+ai_prompt = "Cinematic dark fantasy: A floating crystalline sliver that shows a different face to everyone.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

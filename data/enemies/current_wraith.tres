@@ -8,6 +8,9 @@
 [resource]
 script = ExtResource("1_script")
 name = "Current_Wraith"
+name_es = "Espectro de la corriente"
+name_fr = "Spectre du courant"
+name_de = "Strömungsgeist"
 biome = "abyss"
 hp = 200
 hframes = 8
@@ -21,6 +24,7 @@ armor = 0
 base_damage = 62
 difficulty_tier = 1
 xp_reward = 20
+loot_power = 7
 gold_min = 0
 gold_max = 0
 item_drops = ["ocean_tear"]

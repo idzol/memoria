@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "eye_of_the_graeae"
 name = "Eye of the Graeae"
+name_es = "Lágrima de Medusa"
+name_fr = "Larme de Méduse"
+name_de = "Medusas Träne"
 type = "Utility"
 level = 7
+item_power = 16
 hp = 0
 attack = 5
 armour = 0
 effect = "Reveal"
 description = "A translucent stone that projects light."
-ai_prompt = "Cinematic dark fantasy: A cataract-clouded glass orb that projects a beam of pure white light, held in a bronze hand-mount."
+ai_prompt = "Cinematic dark fantasy: A cataract-clouded glass orb that projects a beam of pure white light, held in a bronze hand-mount.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "dried_meat"
 name = "Dried Meat"
+name_es = "Brújula antigua"
+name_fr = "Vieux compas"
+name_de = "Alter Kompass"
 type = "Consumable"
 level = 4
+item_power = 8
 hp = 15
 attack = 0
 armour = 0
 effect = "Restore"
 description = "Salty rations for long journeys."
-ai_prompt = "Cinematic dark fantasy: Strips of dark, cured meat wrapped in parchment."
+ai_prompt = "Cinematic dark fantasy: Strips of dark, cured meat wrapped in parchment.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

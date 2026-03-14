@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "dark_mirror"
 name = "Dark Mirror"
+name_es = "Datos corruptos"
+name_fr = "Données corrompues"
+name_de = "Korrupte Daten"
 type = "Utility"
 level = 5
+item_power = 11
 hp = 0
 attack = 0
 armour = 0
 effect = "Reflect"
 description = "A glass that shows the viewer's darkest fears."
-ai_prompt = "Cinematic dark fantasy: A black hand-mirror with a frame made of twisted bone."
+ai_prompt = "Cinematic dark fantasy: A black hand-mirror with a frame made of twisted bone.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "chains_of_sacrifice"
 name = "Chains of Sacrifice"
+name_es = "Pluma de Pegaso"
+name_fr = "Plume de Pégase"
+name_de = "Pegasusfeder"
 type = "Utility"
 level = 7
+item_power = 17
 hp = 0
 attack = 15
 armour = 15
 effect = "Bind"
 description = "Glowing silver chains that extend as if alive."
-ai_prompt = "Cinematic dark fantasy: Heavy silver chains that glow with an ethereal light, pulsating as if they have a heartbeat."
+ai_prompt = "Cinematic dark fantasy: Heavy silver chains that glow with an ethereal light, pulsating as if they have a heartbeat.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

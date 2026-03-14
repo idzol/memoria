@@ -7,10 +7,14 @@ class_name CardData
 @export_group("Identity")
 @export var card_id: String = ""
 @export var name: String = "Unknown Card"
+@export var name_es: String = ""
+@export var name_fr: String = ""
+@export var name_de: String = ""
 @export_enum("common", "uncommon", "rare", "epic", "unique") var rarity: String = "common"
 @export_enum("attack", "armor", "heal", "trap", "utility", "charge", "treasure") var type: String = "attack"
 
 @export_group("Stats & Effects")
+@export var card_power: int = 0
 @export var value: int = 0
 @export_multiline var description: String = ""
 @export var special_effect: String = ""

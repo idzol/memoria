@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "trident"
 name = "Trident"
+name_es = "Perla negra"
+name_fr = "Perle noire"
+name_de = "Schwarze Perle"
 type = "Weapon"
 level = 4
+item_power = 10
 hp = 0
 attack = 22
 armour = 0
 effect = "Pierce"
 description = "A three-pronged spear for fishing or war."
-ai_prompt = "Cinematic dark fantasy: A long wooden shaft topped with a polished steel trident."
+ai_prompt = "Cinematic dark fantasy: A long wooden shaft topped with a polished steel trident.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

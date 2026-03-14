@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "stolen_memory"
 name = "Stolen Memory"
+name_es = "Notas de laboratorio"
+name_fr = "Notes de laboratoire"
+name_de = "Labornotizen"
 type = "Utility"
 level = 6
+item_power = 15
 hp = 0
 attack = 0
 armour = 0
 effect = "Secret"
 description = "A jar containing a voice that isn't yours."
-ai_prompt = "Cinematic dark fantasy: A glass jar where a faint, ghostly face can be seen whispering."
+ai_prompt = "Cinematic dark fantasy: A glass jar where a faint, ghostly face can be seen whispering.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

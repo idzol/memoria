@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "emerald_seed"
 name = "Emerald Seed"
+name_es = "Tinta de neón"
+name_fr = "Encre néon"
+name_de = "Neon-Tinte"
 rarity = "rare"
 type = "treasure"
+card_power = 13
 value = 60
 description = "Grows into wealth."
 special_effect = ""

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "jar_of_teeth"
 name = "Jar of Teeth"
+name_es = "Brebaje de bruja"
+name_fr = "Potion de sorcière"
+name_de = "Hexengebräu"
 type = "Material"
 level = 4
+item_power = 9
 hp = 0
 attack = 12
 armour = 0
 effect = "Bite"
 description = "A collection of fangs from various monsters."
-ai_prompt = "Cinematic dark fantasy: A glass jar filled with yellowed teeth that occasionally rattle."
+ai_prompt = "Cinematic dark fantasy: A glass jar filled with yellowed teeth that occasionally rattle.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "mind_essence"
 name = "Mind Essence"
+name_es = "Llave maestra"
+name_fr = "Passe-partout"
+name_de = "Generalschlüssel"
 type = "Material"
 level = 5
+item_power = 11
 hp = 0
 attack = 0
 armour = 0
 effect = "Focus"
 description = "The psychic residue of a scholar."
-ai_prompt = "Cinematic dark fantasy: A floating pink nebula contained within a silver headpiece."
+ai_prompt = "Cinematic dark fantasy: A floating pink nebula contained within a silver headpiece.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

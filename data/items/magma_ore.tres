@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "magma_ore"
 name = "Magma Ore"
+name_es = "Manómetro de vapor"
+name_fr = "Jauge de vapeur"
+name_de = "Dampfanzeige"
 type = "Material"
 level = 6
+item_power = 15
 hp = 0
 attack = 0
 armour = 20
 effect = "Heat"
 description = "Rock that contains liquid fire."
-ai_prompt = "Cinematic dark fantasy: A jagged black stone with veins of glowing, liquid magma."
+ai_prompt = "Cinematic dark fantasy: A jagged black stone with veins of glowing, liquid magma.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

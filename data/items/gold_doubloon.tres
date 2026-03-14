@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "gold_doubloon"
 name = "Gold Doubloon"
+name_es = "Aceite de ballena"
+name_fr = "Huile de baleine"
+name_de = "Walöl"
 type = "Treasure"
 level = 4
+item_power = 6
 hp = 0
 attack = 0
 armour = 0
 effect = "Greed"
 description = "A heavy gold coin with a pirate's curse."
-ai_prompt = "Cinematic dark fantasy: A scratched gold coin showing a skull wearing a crown."
+ai_prompt = "Cinematic dark fantasy: A scratched gold coin showing a skull wearing a crown.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "fire_totem"
 name = "Fire Totem"
+name_es = "Mapa térmico"
+name_fr = "Carte thermique"
+name_de = "Hitzekarte"
 type = "Utility"
 level = 6
+item_power = 15
 hp = 0
 attack = 25
 armour = 0
 effect = "Flame"
 description = "A wooden carving that summons fire."
-ai_prompt = "Cinematic dark fantasy: A charred wooden figure of a phoenix with glowing amber eyes."
+ai_prompt = "Cinematic dark fantasy: A charred wooden figure of a phoenix with glowing amber eyes.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

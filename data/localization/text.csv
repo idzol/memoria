@@ -4,6 +4,7 @@ language.english,English,Espanol,Anglais,Englisch
 language.spanish,Spanish,Espanol,Espagnol,Spanisch
 language.french,French,Frances,Francais,Franzosisch
 language.german,German,Aleman,Allemand,Deutsch
+menu.title,MEMORIA,MEMORIA,MEMORIA,MEMORIA
 menu.continue_run,CONTINUE RUN,CONTINUAR PARTIDA,CONTINUER,WEITERSPIELEN
 menu.no_saves,NO SAVES FOUND,SIN PARTIDAS,SAUVEGARDE ABSENTE,KEINE SPIELSTANDE
 menu.story_mode,STORY MODE,MODO HISTORIA,MODE HISTOIRE,GESCHICHTSMODUS
@@ -12,10 +13,74 @@ menu.settings,SETTINGS,AJUSTES,PARAMETRES,EINSTELLUNGEN
 menu.controls,CONTROLS,CONTROLES,COMMANDES,STEUERUNG
 menu.credits,CREDITS,CREDITOS,CREDITS,CREDITS
 menu.exit,EXIT,SALIR,QUITTER,BEENDEN
+menu.select_memory,SELECT A MEMORY,SELECCIONA UN RECUERDO,SELECTIONNER UNE MEMOIRE,ERINNERUNG AUSWAHLEN
+menu.close,CLOSE,CERRAR,FERMER,SCHLIESSEN
+menu.delete,DELETE,ELIMINAR,SUPPRIMER,LOSCHEN
+menu.delete_short," X "," X "," X "," X "
+menu.delete_confirm,Are you sure you want to delete this memory?,Estas seguro de que quieres borrar este recuerdo ?,Etes-vous sur de vouloir supprimer cette memoire ?,Mochtest du diese Erinnerung wirklich loschen?
+menu.save_entry,"{icon} {name} | Floor {floor}","{icon} {name} | Piso {floor}","{icon} {name} | Etage {floor}","{icon} {name} | Ebene {floor}"
 menu.enter_name,Enter Your Name,Introduce tu nombre,Entrez votre nom,Gib deinen Namen ein
 menu.hero_name,Hero Name...,Nombre del heroe...,Nom du heros...,Heldenname...
+menu.name_taken,{name} is already being used.,{name} ya esta en uso.,{name} est deja utilise.,{name} wird bereits verwendet.
+menu.name_taken_generic,That name is already being used.,Ese nombre ya esta en uso.,Ce nom est deja utilise.,Dieser Name wird bereits verwendet.
 menu.start,START,EMPEZAR,COMMENCER,STARTEN
 menu.cancel,CANCEL,CANCELAR,ANNULER,ABBRECHEN
+common.back,Back,Atras,Retour,Zuruck
+character_select.title,CHOOSE YOUR IDENTITY,ELIGE TU IDENTIDAD,CHOISISSEZ VOTRE IDENTITE,WAHLE DEINE IDENTITAT
+character_select.class.warrior,WARRIOR,GUERRERO,GUERRIER,KRIEGER
+character_select.class.scholar,SCHOLAR,ERUDITO,ERUDIT,GELEHRTER
+character_select.class.alchemist,ALCHEMIST,ALQUIMISTA,ALCHIMISTE,ALCHEMIST
+character_select.stats_title,LEVEL 1 STATS,ESTADISTICAS DE NIVEL 1,STATISTIQUES NIVEAU 1,WERTE AUF STUFE 1
+character_select.health,HEALTH,SALUD,SANTE,GESUNDHEIT
+character_select.energy,ENERGY,ENERGIA,ENERGIE,ENERGIE
+character_select.attack,ATTACK,ATAQUE,ATTAQUE,ANGRIFF
+character_select.defense,DEFENSE,DEFENSA,DEFENSE,VERTEIDIGUNG
+character_select.confirm,RESTORE IDENTITY,RECUPERAR IDENTIDAD,RESTAURER L'IDENTITE,IDENTITAT WIEDERHERSTELLEN
+character_select.loading,Restoring your identity...,Recuperando tu identidad...,Restauration de votre identite...,Deine Identitat wird wiederhergestellt...
+character_select.no_stats,No stats found for selected class.,No se encontraron estadisticas para la clase seleccionada.,Aucune statistique trouvee pour la classe selectionnee.,Keine Werte fur die ausgewahlte Klasse gefunden.
+character_select.desc.warrior,Relies on physical momentum. Gains energy from movement and scales with high armor.,Se apoya en el impulso fisico. Gana energia con el movimiento y mejora con armadura alta.,S'appuie sur l'elan physique. Gagne de l'energie en bougeant et progresse avec une armure elevee.,Verlasst sich auf korperlichen Schwung. Gewinnt Energie durch Bewegung und skaliert mit hoher Rustung.
+character_select.desc.scholar,Masters of ancient knowledge. High card draw synergy with Scrolls and Tomes.,Maestros del conocimiento antiguo. Gran sinergia de robo con Pergaminos y Tomos.,Maitres du savoir ancien. Grande synergie de pioche avec les parchemins et les tomes.,Meister uralten Wissens. Starke Zieh-Synergien mit Schriftrollen und Folianten.
+character_select.desc.alchemist,Experimental tactician. Transmutes cards into energy and masters status effects.,Tactico experimental. Transmuta cartas en energia y domina los efectos de estado.,Tacticien experimental. Transmute les cartes en energie et maitrise les effets d'etat.,Experimenteller Taktiker. Wandelt Karten in Energie um und beherrscht Statuseffekte.
+character.tab.deck,DECK,MAZO,PAQUET,DECK
+character.tab.inventory,INVENTORY,INVENTARIO,INVENTAIRE,INVENTAR
+character.level,LVL {level},NVL {level},NIV {level},STUFE {level}
+character.health,HEALTH {current} / {max},SALUD {current} / {max},SANTE {current} / {max},GESUNDHEIT {current} / {max}
+character.memory,MEMORY {current} / {max},MEMORIA {current} / {max},MEMOIRE {current} / {max},ERINNERUNG {current} / {max}
+character.attack,ATTACK: {total} ({base}+{bonus}),ATAQUE: {total} ({base}+{bonus}),ATTAQUE : {total} ({base}+{bonus}),ANGRIFF: {total} ({base}+{bonus})
+character.defense,DEFENSE: {total} ({base}+{bonus}),DEFENSA: {total} ({base}+{bonus}),DEFENSE : {total} ({base}+{bonus}),VERTEIDIGUNG: {total} ({base}+{bonus})
+character.energy,ENERGY: {total} ({base}+{bonus}),ENERGIA: {total} ({base}+{bonus}),ENERGIE : {total} ({base}+{bonus}),ENERGIE: {total} ({base}+{bonus})
+character.gold,GOLD: {gold},ORO: {gold},OR : {gold},GOLD: {gold}
+character.vitality,VITALITY,VITALIDAD,VITALITE,VITALITAT
+character.memory_progress,MEMORY PROGRESS,PROGRESO DE MEMORIA,PROGRESSION DE MEMOIRE,ERINNERUNGSFORTSCHRITT
+character.active_deck,ACTIVE DECK,MAZO ACTIVO,PAQUET ACTIF,AKTIVES DECK
+character.player_deck,PLAYER DECK,MAZO DEL JUGADOR,PAQUET DU JOUEUR,SPIELERDECK
+character.active_items,ACTIVE ITEMS,OBJETOS ACTIVOS,OBJETS ACTIFS,AKTIVE GEGENSTANDE
+character.player_items,PLAYER ITEMS,OBJETOS DEL JUGADOR,OBJETS DU JOUEUR,SPIELERGEGENSTANDE
+character.pairs,"Pairs: {current} | {required}","Parejas: {current} | {required}","Paires : {current} | {required}","Paare: {current} | {required}"
+character.equipped,Equipped: {current} / {max},Equipado: {current} / {max},Equipe : {current} / {max},Ausgerustet: {current} / {max}
+character.back_to_map,RETURN TO MAP,VOLVER AL MAPA,RETOUR A LA CARTE,ZUR KARTE ZURUCK
+character.toast.min_deck_cards,You must have at least {count} card(s) in your deck.,Debes tener al menos {count} carta(s) en tu mazo.,Vous devez avoir au moins {count} carte(s) dans votre paquet.,Du musst mindestens {count} Karte(n) in deinem Deck haben.
+character.toast.no_card_copy,No unallocated copy of that card is available.,No hay una copia libre de esa carta.,Aucune copie libre de cette carte n'est disponible.,Keine freie Kopie dieser Karte ist verfugbar.
+character.toast.deck_full,Active deck is full ({count} cards).,El mazo activo esta lleno ({count} cartas).,Le paquet actif est plein ({count} cartes).,Das aktive Deck ist voll ({count} Karten).
+character.toast.no_item_copy,No unallocated copy of that item is available.,No hay una copia libre de ese objeto.,Aucune copie libre de cet objet n'est disponible.,Keine freie Kopie dieses Gegenstands ist verfugbar.
+character.toast.max_active_items,You may only have {count} active items.,Solo puedes tener {count} objetos activos.,Vous ne pouvez avoir que {count} objets actifs.,Du kannst nur {count} aktive Gegenstande haben.
+character.toast.min_deck_exit,You must have at least {count} cards in your deck.,Debes tener al menos {count} cartas en tu mazo.,Vous devez avoir au moins {count} cartes dans votre paquet.,Du musst mindestens {count} Karten in deinem Deck haben.
+storymap.header.story,Story Chapters,Capitulos de historia,Chapitres d'histoire,Geschichtskapitel
+storymap.header.biome,Biome Chapters,Capitulos de bioma,Chapitres de biome,Biomkapitel
+storymap.chapter_number,Chapter {number},Capitulo {number},Chapitre {number},Kapitel {number}
+storymap.click_continue,Click to continue,Haz clic para continuar,Cliquez pour continuer,Klicken zum Fortfahren
+storymap.status.cleared,Cleared,Completado,Termine,Abgeschlossen
+storymap.status.uncleared,Uncleared,Sin completar,Non termine,Nicht abgeschlossen
+mapsummary.title.home,Home Map Summary,Resumen del mapa de hogar,Resume de la carte du foyer,Zusammenfassung der Heimatkarte
+mapsummary.title.default,{biome} Map Summary,Resumen del mapa de {biome},Resume de la carte de {biome},{biome}-Kartenubersicht
+mapsummary.subtitle.battle,Completed biomes reveal every room and the run path.,Los biomas completados muestran todas las salas y la ruta recorrida.,Les biomes termines revelent chaque salle et le chemin parcouru.,Abgeschlossene Biome zeigen alle Raume und den gesamten Pfad.
+mapsummary.subtitle.current_story,"Home, current location, adjacent rooms, and completed rooms are marked.","Hogar, ubicacion actual, salas adyacentes y completadas estan marcadas.","Le foyer, la position actuelle, les salles adjacentes et terminees sont marquees.","Heimat, aktueller Ort, benachbarte und abgeschlossene Raume sind markiert."
+mapsummary.subtitle.story,Permanent rooms stay visible between runs. Select to enter the biome map.,Las salas permanentes siguen visibles entre partidas. Selecciona para entrar al mapa del bioma.,Les salles permanentes restent visibles entre les runs. Selectionnez pour entrer dans la carte du biome.,Permanente Raume bleiben zwischen Durchlaufen sichtbar. Wahlen Sie die Biomkarte.
+mapsummary.open,Open Biome Map,Abrir mapa del bioma,Ouvrir la carte du biome,Biomkarte offnen
+worldmap.phase.grid,{size}x{size} GRID,CUADRICULA {size}x{size},GRILLE {size}x{size},{size}x{size}-RASTER
+worldmap.phase.story,STORY MAP,MAPA DE HISTORIA,CARTE D'HISTOIRE,GESCHICHTSKARTE
+worldmap.tracker,{biome} [{layer},{column}],{biome} [{layer},{column}],{biome} [{layer},{column}],{biome} [{layer},{column}]
+worldmap.backtrack_prompt,"You have a feeling you have been here before. An intense pain fills your mind as memory floods back","Sientes que ya has estado aqui antes. Un dolor intenso invade tu mente mientras los recuerdos regresan","Vous avez l'impression d'etre deja venu ici. Une douleur intense envahit votre esprit tandis que les souvenirs reviennent","Du hast das Gefuhl, schon einmal hier gewesen zu sein. Ein intensiver Schmerz durchzuckt deinen Geist, als die Erinnerungen zuruckkehren"
 story.title.home,Introduction,Introduccion,Introduction,Einfuhrung
 story.title.default,{biome} Chronicle,Cronica de {biome},Chronique de {biome},{biome}-Chronik
 story.body.fallback,The stone remembers more than the traveler does.,La piedra recuerda mas que el viajero.,La pierre se souvient plus que le voyageur.,Der Stein erinnert sich besser als der Reisende.

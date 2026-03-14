@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "fairy_dust"
 name = "Fairy Dust"
+name_es = "Polvo de hadas"
+name_fr = "Poussière de fée"
+name_de = "Feenstaub"
 rarity = "common"
 type = "heal"
+card_power = 3
 value = 25
-description = "Sparkling recovery"
+description = "Restore 25 health"
 special_effect = "Purify"
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

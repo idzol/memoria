@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "potion"
 name = "Potion"
+name_es = "Poción"
+name_fr = "Potion"
+name_de = "Trank"
 rarity = "common"
 type = "heal_large"
+card_power = 2
 value = 30
 description = "Big Heal"
 special_effect = ""

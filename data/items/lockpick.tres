@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "lockpick"
 name = "Lockpick"
+name_es = "Ganzúa"
+name_fr = "Crochet"
+name_de = "Dietrich"
 type = "Utility"
 level = 1
+item_power = 1
 hp = 0
 attack = 0
 armour = 0
 effect = "Open"
 description = "A set of slender tools for bypassing locks."
-ai_prompt = "Cinematic dark fantasy: A leather roll containing various slim iron picks and a tension wrench."
+ai_prompt = "Cinematic dark fantasy: A leather roll containing various slim iron picks and a tension wrench.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

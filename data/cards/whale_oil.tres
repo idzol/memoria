@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "whale_oil"
 name = "Whale Oil"
+name_es = "Whale Oil"
+name_fr = "Whale Oil"
+name_de = "Whale Oil"
 rarity = "epic"
 type = "utility"
+card_power = 15
 value = 0
 description = "Burns for hours."
 special_effect = ""

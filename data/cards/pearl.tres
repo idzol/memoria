@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "pearl"
 name = "White Pearl"
+name_es = "Azufre en bruto"
+name_fr = "Soufre brut"
+name_de = "Rohschwefel"
 rarity = "rare"
 type = "treasure"
+card_power = 13
 value = 100
 description = "Perfectly spherical."
 special_effect = ""

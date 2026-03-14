@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "carapace"
 name = "Carapace"
+name_es = "Carne podrida"
+name_fr = "Chair putréfiée"
+name_de = "Verrottetes Fleisch"
 type = "Armour"
 level = 3
+item_power = 4
 hp = 0
 attack = 0
 armour = 12
 effect = "Hard"
 description = "The outer shell of a giant desert beetle."
-ai_prompt = "Cinematic dark fantasy: A curved plate of iridescent black chitin, incredibly light but strong."
+ai_prompt = "Cinematic dark fantasy: A curved plate of iridescent black chitin, incredibly light but strong.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

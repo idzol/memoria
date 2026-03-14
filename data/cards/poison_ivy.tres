@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "poison_ivy"
 name = "Poison Ivy"
+name_es = "Hiedra venenosa"
+name_fr = "Lierre vénéneux"
+name_de = "Giftefeu"
 rarity = "common"
 type = "trap"
+card_power = 3
 value = 10
-description = "Itches and burns"
+description = "Take 10 damage"
 special_effect = "Poison"
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

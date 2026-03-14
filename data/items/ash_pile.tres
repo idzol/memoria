@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "ash_pile"
 name = "Ash Pile"
+name_es = "Montón de cenizas"
+name_fr = "Tas de cendres"
+name_de = "Aschehaufen"
 type = "Material"
 level = 1
+item_power = 1
 hp = 0
 attack = 0
 armour = 0
 effect = "Dust"
 description = "The remains of a forgotten sacrifice."
-ai_prompt = "Cinematic dark fantasy: A grey heap of ash containing small, charred bone fragments."
+ai_prompt = "Cinematic dark fantasy: A grey heap of ash containing small, charred bone fragments.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "master_key"
 name = "Master Key"
+name_es = "Master Key"
+name_fr = "Master Key"
+name_de = "Master Key"
 rarity = "epic"
 type = "utility"
+card_power = 17
 value = 0
 description = "Opens any lock."
 special_effect = ""

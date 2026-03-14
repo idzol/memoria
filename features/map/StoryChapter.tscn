@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Theme" path="res://assets/themes/Greek.theme" id="1_theme"]
+[ext_resource type="Theme" path="res://assets/themes/Menu.theme" id="1_theme"]
 [ext_resource type="Script" path="res://features/map/StoryChapter.gd" id="2_script"]
 
 [node name="StoryChapter" type="Control"]
@@ -81,6 +81,7 @@ size_flags_vertical = 3
 bbcode_enabled = false
 fit_content = false
 scroll_active = true
+theme_override_font_sizes/normal_font_size = 24
 text = "Story"
 
 [node name="ContinueButton" type="Button" parent="Center/Tablet"]

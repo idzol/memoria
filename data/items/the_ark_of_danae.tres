@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "the_ark_of_danae"
 name = "The Ark of Danae"
+name_es = "Ojo de las Grayas"
+name_fr = "L'Œil des Grées"
+name_de = "Auge der Grauen"
 type = "Utility"
 level = 7
+item_power = 16
 hp = 20
 attack = 0
 armour = 10
 effect = "Protect"
 description = "A weathered cedar chest with rusted iron bands."
-ai_prompt = "Cinematic dark fantasy: Weathered cedar chest, rusted iron bands, carvings of golden rain revealed beneath layers of rot."
+ai_prompt = "Cinematic dark fantasy: Weathered cedar chest, rusted iron bands, carvings of golden rain revealed beneath layers of rot.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "pegasus_quill"
 name = "Pegasus Quill"
+name_es = "Fragmento de Rayo"
+name_fr = "Éclat de Foudre"
+name_de = "Donnerkeilsplitter"
 type = "Material"
 level = 7
+item_power = 18
 hp = 0
 attack = 0
 armour = 0
 effect = "Fly"
 description = "A glowing white primary feather."
-ai_prompt = "Cinematic dark fantasy: A large, stiff white feather that glows with stardust, shimmering with a rainbow oily sheen."
+ai_prompt = "Cinematic dark fantasy: A large, stiff white feather that glows with stardust, shimmering with a rainbow oily sheen.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "stolen_lunch"
 name = "Stolen Lunch"
+name_es = "Almuerzo robado"
+name_fr = "Déjeuner volé"
+name_de = "Gestohlenes Mittagessen"
 type = "Consumable"
 level = 2
+item_power = 2
 hp = 15
 attack = 0
 armour = 0
 effect = "Heal"
 description = "A wrapped bundle of cheese and bread."
-ai_prompt = "Cinematic dark fantasy: A cloth-wrapped bundle of rustic food."
+ai_prompt = "Cinematic dark fantasy: A cloth-wrapped bundle of rustic food.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

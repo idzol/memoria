@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "oak_staff"
 name = "Oak Staff"
+name_es = "Bastón de roble"
+name_fr = "Bâton de chêne"
+name_de = "Eichenstab"
 type = "Weapon"
 level = 3
+item_power = 3
 hp = 0
 attack = 14
 armour = 2
 effect = "Magic"
 description = "A sturdy branch of ancient oak."
-ai_prompt = "Cinematic dark fantasy: A gnarled oak staff topped with a dim blue crystal."
+ai_prompt = "Cinematic dark fantasy: A gnarled oak staff topped with a dim blue crystal.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

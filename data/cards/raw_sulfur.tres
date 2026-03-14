@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "raw_sulfur"
 name = "Raw Sulfur"
+name_es = "Raw Sulfur"
+name_fr = "Raw Sulfur"
+name_de = "Raw Sulfur"
 rarity = "epic"
 type = "utility"
+card_power = 16
 value = 0
 description = "Pungent mineral."
 special_effect = ""

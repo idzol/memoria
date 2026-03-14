@@ -73,6 +73,8 @@ func _apply_mode():
 		preview_frame.custom_minimum_size = Vector2(0, embedded_height * 0.74)
 		title_label.add_theme_font_size_override("font_size", 22)
 		subtitle_label.add_theme_font_size_override("font_size", 14)
+		open_button.text = ""
+		_set_control_tree_mouse_filter(self, Control.MOUSE_FILTER_IGNORE)
 	else:
 		mouse_filter = Control.MOUSE_FILTER_STOP
 		custom_minimum_size = Vector2.ZERO
@@ -80,6 +82,7 @@ func _apply_mode():
 		tablet.custom_minimum_size = Vector2(640, 905)
 		preview_frame.custom_minimum_size = Vector2(0, 620)
 		title_label.add_theme_font_size_override("font_size", 30)
+		open_button.text = LocalizationManager.translate("mapsummary.open", "Open Biome Map")
 
 func _refresh_content():
 	var biome = _get_biome()
@@ -275,15 +278,15 @@ func _get_biome() -> String:
 
 func _get_title_for_biome(biome: String) -> String:
 	if biome == "home":
-		return "Home Map Summary"
-	return "%s Map Summary" % biome.replace("_", " ").capitalize()
+		return LocalizationManager.translate("mapsummary.title.home", "Home Map Summary")
+	return LocalizationManager.format("mapsummary.title.default", {"biome": biome.replace("_", " ").capitalize()}, "{biome} Map Summary")
 
 func _get_subtitle_for_biome(biome: String) -> String:
 	if GameManager.is_battle_mode:
-		return "Completed biomes reveal every room and the run path."
+		return LocalizationManager.translate("mapsummary.subtitle.battle", "Completed biomes reveal every room and the run path.")
 	if biome == GameManager.player_biome:
-		return "Home, current location, adjacent rooms, and completed rooms are marked."
-	return "Permanent rooms stay visible between runs. Select to enter the biome map."
+		return LocalizationManager.translate("mapsummary.subtitle.current_story", "Home, current location, adjacent rooms, and completed rooms are marked.")
+	return LocalizationManager.translate("mapsummary.subtitle.story", "Permanent rooms stay visible between runs. Select to enter the biome map.")
 
 func _open_biome_map():
 	var biome = _get_biome()
@@ -306,3 +309,9 @@ func _open_biome_map():
 	else:
 		GameManager.enter_story_biome(biome, true)
 	get_tree().change_scene_to_file(GameManager.get_active_biome_map_scene_path())
+
+func _set_control_tree_mouse_filter(node: Node, filter_mode: Control.MouseFilter):
+	if node is Control:
+		(node as Control).mouse_filter = filter_mode
+	for child in node.get_children():
+		_set_control_tree_mouse_filter(child, filter_mode)

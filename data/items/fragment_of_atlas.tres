@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "fragment_of_atlas"
 name = "Fragment of Atlas"
+name_es = "Ancla de Dánae"
+name_fr = "Ancre de Danaé"
+name_de = "Anker der Danaë"
 type = "Material"
 level = 7
+item_power = 17
 hp = 0
 attack = 40
 armour = 0
 effect = "Gravity"
 description = "A jagged piece of black granite."
-ai_prompt = "Cinematic dark fantasy: A heavy jagged piece of black granite, humming with gravity, creating a small crater in the ground."
+ai_prompt = "Cinematic dark fantasy: A heavy jagged piece of black granite, humming with gravity, creating a small crater in the ground.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

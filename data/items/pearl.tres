@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "pearl"
 name = "Pearl"
+name_es = "Seda"
+name_fr = "Soie"
+name_de = "Seide"
 type = "Material"
 level = 3
+item_power = 3
 hp = 0
 attack = 0
 armour = 0
 effect = "Focus"
 description = "A lustrous sea pearl containing deep echoes."
-ai_prompt = "Cinematic dark fantasy: A giant white pearl resting inside a jagged, salt-encrusted oyster shell."
+ai_prompt = "Cinematic dark fantasy: A giant white pearl resting inside a jagged, salt-encrusted oyster shell.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

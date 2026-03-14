@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "ancient_heart"
 name = "Ancient Heart"
+name_es = "Diamante"
+name_fr = "Diamant"
+name_de = "Diamant"
 type = "Material"
 level = 6
+item_power = 13
 hp = 50
 attack = 0
 armour = 10
 effect = "Aura"
 description = "A heart that still beats after eons."
-ai_prompt = "Cinematic dark fantasy: A massive stone-encrusted heart pulsing with deep red light."
+ai_prompt = "Cinematic dark fantasy: A massive stone-encrusted heart pulsing with deep red light.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

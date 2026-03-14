@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "bomb"
 name = "Bomb"
+name_es = "Bomba"
+name_fr = "Bombe"
+name_de = "Bombe"
 rarity = "common"
 type = "trap"
+card_power = 2
 value = 25
-description = "Huge Self Dmg"
+description = "Take 25 damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

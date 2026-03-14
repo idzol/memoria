@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "giant_club"
 name = "Giant Club"
+name_es = "Garrote gigante"
+name_fr = "Gourdin géant"
+name_de = "Riesenkeule"
 rarity = "common"
 type = "attack"
+card_power = 4
 value = 18
-description = "Crushing weight"
+description = "Deal 18 physical damage"
 special_effect = "Stun"
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

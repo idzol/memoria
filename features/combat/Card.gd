@@ -63,7 +63,8 @@ func setup(data: CardData):
 
 	card_type = data.card_id
 	
-	if title_label: title_label.text = data.name.to_upper()
+	var localized_name = LocalizationManager.localized_resource_name(data, data.name)
+	if title_label: title_label.text = localized_name.to_upper()
 	if description_label: description_label.text = data.description
 	_ensure_front_text_layout()
 	if card_image_rect: card_image_rect.texture = data.card_image
@@ -76,7 +77,8 @@ func setup(data: CardData):
 func setup_item(data: ItemData):
 	if not data: return
 	card_type = data.item_id
-	if title_label: title_label.text = data.name.to_upper()
+	var localized_name = LocalizationManager.localized_resource_name(data, data.name)
+	if title_label: title_label.text = localized_name.to_upper()
 	
 	# Generate a stat-focused description for items
 	var stat_line = ""

@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "spice_pouch"
 name = "Spice Pouch"
+name_es = "Bolsa de especias"
+name_fr = "Sachet d'épices"
+name_de = "Gewürzbeutel"
 rarity = "common"
 type = "heal"
+card_power = 5
 value = 2
-description = "Adds a little kick"
+description = "Restore 2 health"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

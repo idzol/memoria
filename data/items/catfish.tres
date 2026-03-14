@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "catfish"
 name = "Catfish"
+name_es = "Escudo de nenúfar"
+name_fr = "Bouclier de nénuphar"
+name_de = "Seerosenblattschild"
 type = "Consumable"
 level = 4
+item_power = 9
 hp = 8
 attack = 0
 armour = 0
 effect = "Slippery"
 description = "A muddy fish found in dungeon ponds."
-ai_prompt = "Cinematic dark fantasy: A large, grey fish covered in thick, iridescent slime."
+ai_prompt = "Cinematic dark fantasy: A large, grey fish covered in thick, iridescent slime.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

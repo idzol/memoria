@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "moon_essence"
 name = "Moon Essence"
+name_es = "Esencia lunar"
+name_fr = "Essence de lune"
+name_de = "Mondessenz"
 rarity = "common"
-type = "charge"
+type = "prepare"
+card_power = 3
 value = 0
 description = "Glowing celestial energy"
 special_effect = "Charge"

@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "leech_vial"
 name = "Leech Vial"
+name_es = "Vial de sanguijuelas"
+name_fr = "Fiole de sangsues"
+name_de = "Blutegelfläschchen"
 rarity = "uncommon"
 type = "heal"
+card_power = 6
 value = 10
-description = "Medicinal bloodletting"
+description = "Restore 10 health"
 special_effect = "Lifesteal"
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

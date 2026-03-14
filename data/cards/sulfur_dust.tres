@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "sulfur_dust"
 name = "Sulfur Dust"
+name_es = "Sulfur Dust"
+name_fr = "Sulfur Dust"
+name_de = "Sulfur Dust"
 rarity = "unique"
 type = "utility"
+card_power = 18
 value = 0
 description = "Highly explosive."
 special_effect = ""

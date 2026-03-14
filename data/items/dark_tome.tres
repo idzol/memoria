@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "dark_tome"
 name = "Dark Tome"
+name_es = "Memoria robada"
+name_fr = "Mémoire volée"
+name_de = "Gestohlene Erinnerung"
 type = "Weapon"
 level = 6
+item_power = 14
 hp = 0
 attack = 35
 armour = 0
 effect = "Curse"
 description = "A book of spells that corrupts the reader."
-ai_prompt = "Cinematic dark fantasy: A heavy volume bound in human skin and locked with iron chains."
+ai_prompt = "Cinematic dark fantasy: A heavy volume bound in human skin and locked with iron chains.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

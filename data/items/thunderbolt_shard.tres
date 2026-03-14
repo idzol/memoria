@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "thunderbolt_shard"
 name = "Thunderbolt Shard"
+name_es = "Trampa del Salvador"
+name_fr = "Piège du Sauveur"
+name_de = "Schlinge des Erretters"
 type = "Weapon"
 level = 7
+item_power = 18
 hp = 0
 attack = 45
 armour = 0
 effect = "Shock"
 description = "A jagged crystalline shard of electricity."
-ai_prompt = "Cinematic dark fantasy: A jagged shard of pure electricity, crackling with white and blue sparks, glowing intensely."
+ai_prompt = "Cinematic dark fantasy: A jagged shard of pure electricity, crackling with white and blue sparks, glowing intensely.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "mosquito_proboscis"
 name = "Proboscis"
+name_es = "Proboscis"
+name_fr = "Proboscis"
+name_de = "Proboscis"
 rarity = "epic"
 type = "attack"
+card_power = 15
 value = 6
-description = "Drains life."
+description = "Deal 6 physical damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

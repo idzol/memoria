@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "spare_change"
 name = "Spare Change"
+name_es = "Perla blanca"
+name_fr = "Perle blanche"
+name_de = "Weiße Perle"
 rarity = "rare"
 type = "treasure"
+card_power = 12
 value = 2
 description = "Better than nothing."
 special_effect = ""

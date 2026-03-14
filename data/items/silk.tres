@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "silk"
 name = "Silk"
+name_es = "Escarcha"
+name_fr = "Givre"
+name_de = "Frost"
 type = "Material"
 level = 3
+item_power = 3
 hp = 0
 attack = 0
 armour = 5
 effect = "Soft"
 description = "Strong, shimmering threads from a giant spider."
-ai_prompt = "Cinematic dark fantasy: A spool of silver-white silk that catches the light like liquid metal."
+ai_prompt = "Cinematic dark fantasy: A spool of silver-white silk that catches the light like liquid metal.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

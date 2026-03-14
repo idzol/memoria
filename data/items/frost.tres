@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "frost"
 name = "Frost"
+name_es = "Moneda antigua"
+name_fr = "Pièce ancienne"
+name_de = "Alte Münze"
 type = "Material"
 level = 3
+item_power = 3
 hp = 0
 attack = 10
 armour = 0
 effect = "Freeze"
 description = "A crystal of permanent ice that never melts."
-ai_prompt = "Cinematic dark fantasy: A jagged shard of blue ice surrounded by a constant mist of cold."
+ai_prompt = "Cinematic dark fantasy: A jagged shard of blue ice surrounded by a constant mist of cold.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

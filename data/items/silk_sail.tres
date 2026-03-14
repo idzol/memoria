@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "silk_sail"
 name = "Silk Sail"
+name_es = "Tarro de dientes"
+name_fr = "Bocal de dents"
+name_de = "Gefäß mit Zähnen"
 type = "Utility"
 level = 4
+item_power = 9
 hp = 0
 attack = 0
 armour = 0
 effect = "Swift"
 description = "Lightweight fabric for fast travel."
-ai_prompt = "Cinematic dark fantasy: A massive sheet of shimmering white silk catching the wind."
+ai_prompt = "Cinematic dark fantasy: A massive sheet of shimmering white silk catching the wind.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

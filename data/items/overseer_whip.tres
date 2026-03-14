@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "overseer_whip"
 name = "Overseer Whip"
+name_es = "La Harpe"
+name_fr = "La Harpe"
+name_de = "Die Harpe"
 type = "Weapon"
 level = 6
+item_power = 16
 hp = 0
 attack = 30
 armour = 0
 effect = "Pain"
 description = "A long, barbed whip used for control."
-ai_prompt = "Cinematic dark fantasy: A leather whip braided with silver wire and jagged metal hooks."
+ai_prompt = "Cinematic dark fantasy: A leather whip braided with silver wire and jagged metal hooks.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

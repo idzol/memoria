@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "pure_iron"
 name = "Pure Iron"
+name_es = "Piel ardiente"
+name_fr = "Peau brûlante"
+name_de = "Brennendes Fell"
 type = "Material"
 level = 5
+item_power = 12
 hp = 0
 attack = 0
 armour = 25
 effect = "Unbreakable"
 description = "Metal refined to its absolute limit."
-ai_prompt = "Cinematic dark fantasy: A bar of silver-white iron that rings like a bell when struck."
+ai_prompt = "Cinematic dark fantasy: A bar of silver-white iron that rings like a bell when struck.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

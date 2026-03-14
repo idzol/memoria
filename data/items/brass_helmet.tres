@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "brass_helmet"
 name = "Brass Helmet"
+name_es = "Hierro pesado"
+name_fr = "Fer lourd"
+name_de = "Schwereisen"
 type = "Armour"
 level = 4
+item_power = 5
 hp = 0
 attack = 0
 armour = 15
 effect = "Protect"
 description = "A shining brass headpiece."
-ai_prompt = "Cinematic dark fantasy: A polished brass helmet with a red horsehair crest."
+ai_prompt = "Cinematic dark fantasy: A polished brass helmet with a red horsehair crest.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

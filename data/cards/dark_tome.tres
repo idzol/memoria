@@ -8,8 +8,12 @@
 script = ExtResource("1_script")
 card_id = "dark_tome"
 name = "Dark Tome"
+name_es = "Tomo oscuro"
+name_fr = "Tome sombre"
+name_de = "Dunkler Band"
 rarity = "uncommon"
 type = "attack_magic"
+card_power = 7
 value = 22
 description = "Forbidden knowledge"
 special_effect = "Curse"

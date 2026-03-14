@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "sulfur_gem"
 name = "Sulfur Gem"
+name_es = "Látigo del capataz"
+name_fr = "Fouet de surveillant"
+name_de = "Aufseherpeitsche"
 type = "Treasure"
 level = 6
+item_power = 16
 hp = 0
 attack = 0
 armour = 0
 effect = "Boom"
 description = "A yellow gemstone that is highly unstable."
-ai_prompt = "Cinematic dark fantasy: A faceted yellow crystal that smokes when exposed to air."
+ai_prompt = "Cinematic dark fantasy: A faceted yellow crystal that smokes when exposed to air.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "chisel"
 name = "Chisel"
+name_es = "Cincel"
+name_fr = "Ciseau"
+name_de = "Meißel"
 type = "Weapon"
 level = 1
+item_power = 2
 hp = 0
 attack = 5
 armour = 0
 effect = "Precision"
 description = "A tool for carving stone or bone."
-ai_prompt = "Cinematic dark fantasy: A short iron rod with a flat, razor-sharp edge."
+ai_prompt = "Cinematic dark fantasy: A short iron rod with a flat, razor-sharp edge.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "poison_gland"
 name = "Poison Gland"
+name_es = "Venda dorada"
+name_fr = "Bandage doré"
+name_de = "Goldene Bandage"
 type = "Material"
 level = 3
+item_power = 4
 hp = 0
 attack = 15
 armour = 0
 effect = "Toxin"
 description = "A swollen organ harvested from a venomous creature."
-ai_prompt = "Cinematic dark fantasy: A pulsating, translucent sac filled with bright green fluid."
+ai_prompt = "Cinematic dark fantasy: A pulsating, translucent sac filled with bright green fluid.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

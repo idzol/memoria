@@ -30,6 +30,13 @@ func translate(key: String, fallback: String = "") -> String:
 		return str(entry[DEFAULT_LANGUAGE])
 	return fallback if fallback != "" else key
 
+func format(key: String, placeholders: Dictionary, fallback: String = "") -> String:
+	var text = translate(key, fallback)
+	for raw_placeholder in placeholders.keys():
+		var placeholder = str(raw_placeholder)
+		text = text.replace("{%s}" % placeholder, str(placeholders[raw_placeholder]))
+	return text
+
 func set_language(language_code: String):
 	if not SUPPORTED_LANGUAGES.has(language_code):
 		return
@@ -49,6 +56,26 @@ func get_language_display_name(language_code: String = current_language) -> Stri
 	if key == "":
 		return language_code.to_upper()
 	return translate(key, language_code.to_upper())
+
+func localized_resource_name(resource: Resource, fallback: String = "") -> String:
+	if resource == null:
+		return fallback
+	var raw_english_name = resource.get("name")
+	var english_name = str(raw_english_name) if raw_english_name != null and str(raw_english_name) != "" else fallback
+	match current_language:
+		"es":
+			var raw_es_name = resource.get("name_es")
+			var es_name = str(raw_es_name) if raw_es_name != null else ""
+			return es_name if es_name != "" else english_name
+		"fr":
+			var raw_fr_name = resource.get("name_fr")
+			var fr_name = str(raw_fr_name) if raw_fr_name != null else ""
+			return fr_name if fr_name != "" else english_name
+		"de":
+			var raw_de_name = resource.get("name_de")
+			var de_name = str(raw_de_name) if raw_de_name != null else ""
+			return de_name if de_name != "" else english_name
+	return english_name
 
 func _load_translations():
 	_translations.clear()

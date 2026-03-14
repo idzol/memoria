@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "old_compass"
 name = "Old Compass"
+name_es = "Garrote gigante"
+name_fr = "Gourdin géant"
+name_de = "Riesenkeule"
 type = "Utility"
 level = 4
+item_power = 8
 hp = 0
 attack = 0
 armour = 0
 effect = "Path"
 description = "A navigation tool that flickers in magic fields."
-ai_prompt = "Cinematic dark fantasy: A brass pocket-watch case containing a spinning needle."
+ai_prompt = "Cinematic dark fantasy: A brass pocket-watch case containing a spinning needle.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

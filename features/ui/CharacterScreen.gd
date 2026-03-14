@@ -16,12 +16,18 @@ const CardScene = preload("res://features/combat/Card.tscn")
 @onready var hp_text = %HPText
 @onready var xp_bar = %XPBar
 @onready var xp_text = %XPText
+@onready var vitality_label: Label = $Margin/HBox/LeftPanel/Stats/VitalitySection/BarLabel
+@onready var memory_progress_label: Label = $Margin/HBox/LeftPanel/Stats/MemorySection/BarLabel
 
 @onready var atk_label = %AtkLabel
 @onready var def_label = %DefLabel
 @onready var energy_label = %EnergyLabel
 @onready var gold_label = %GoldLabel
 @onready var back_button = %BackButton
+@onready var active_deck_title: Label = $Margin/HBox/RightPanel/DECK/Header/TitlePadding/Title
+@onready var player_deck_title: Label = $Margin/HBox/RightPanel/DECK/Scroll/DeckSections/PlayerDeckLabelPadding/PlayerDeckLabel
+@onready var active_items_title: Label = $Margin/HBox/RightPanel/INVENTORY/Header/InventoryTitlePadding/Title
+@onready var player_items_title: Label = $Margin/HBox/RightPanel/INVENTORY/Scroll/ItemSections/PlayerItemsLabelPadding/PlayerItemsLabel
 @onready var info_toast_box = %InfoToastBox
 @onready var info_toast_label = %InfoToastLabel
 @onready var inventory_info_toast_box = %InventoryInfoToastBox
@@ -56,6 +62,7 @@ func _ready():
 	active_item_grid.add_theme_constant_override("h_separation", 8)
 	player_item_grid.add_theme_constant_override("h_separation", 8)
 	
+	_refresh_static_labels()
 	_update_stats_ui()
 	_populate_deck_tab()
 	_populate_inventory_tab()
@@ -86,7 +93,7 @@ func _ensure_default_inventory_deck():
 func _update_stats_ui():
 	var p_lvl = GameManager.player_level
 	class_label.text = "%s" % GameManager.player_class
-	level_label.text = "LVL %d" % p_lvl
+	level_label.text = LocalizationManager.format("character.level", {"level": p_lvl}, "LVL {level}")
 	
 	GameManager.recalculate_player_totals()
 	var totals = GameManager.get_item_stat_bonuses()
@@ -94,12 +101,20 @@ func _update_stats_ui():
 	var total_max_hp = GameManager.player_hp_total
 	hp_bar.max_value = total_max_hp
 	hp_bar.value = GameManager.current_hp
-	hp_text.text = "❤️ HEALTH %d / %d" % [GameManager.current_hp, total_max_hp]
+	hp_text.text = LocalizationManager.format(
+		"character.health",
+		{"current": GameManager.current_hp, "max": total_max_hp},
+		"HEALTH {current} / {max}"
+	)
 	
 	var max_xp = GameData.get_max_xp_for_level(GameManager.player_level)
 	xp_bar.max_value = max_xp
 	xp_bar.value = GameManager.player_xp
-	xp_text.text = "✨ MEMORY %d / %d" % [GameManager.player_xp, max_xp]
+	xp_text.text = LocalizationManager.format(
+		"character.memory",
+		{"current": GameManager.player_xp, "max": max_xp},
+		"MEMORY {current} / {max}"
+	)
 	
 	var attack_bonus = int(totals.get("atk_bonus", 0))
 	var defense_bonus = int(totals.get("def_bonus", 0))
@@ -107,10 +122,22 @@ func _update_stats_ui():
 	var base_energy = int(GameManager.base_energy)
 	var total_energy = base_energy + energy_bonus
 	
-	atk_label.text = "🗡️ ATTACK: %d (%d+%d)" % [GameManager.player_attack_total, GameManager.player_attack, attack_bonus]
-	def_label.text = "🧿 DEFENSE: %d (%d+%d)" % [GameManager.player_defense_total, GameManager.player_defense, defense_bonus]
-	energy_label.text = "⚡ENERGY: %d (%d+%d)" % [total_energy, base_energy, energy_bonus]
-	gold_label.text = "🪙 GOLD: %d" % GameManager.gold
+	atk_label.text = LocalizationManager.format(
+		"character.attack",
+		{"total": GameManager.player_attack_total, "base": GameManager.player_attack, "bonus": attack_bonus},
+		"ATTACK: {total} ({base}+{bonus})"
+	)
+	def_label.text = LocalizationManager.format(
+		"character.defense",
+		{"total": GameManager.player_defense_total, "base": GameManager.player_defense, "bonus": defense_bonus},
+		"DEFENSE: {total} ({base}+{bonus})"
+	)
+	energy_label.text = LocalizationManager.format(
+		"character.energy",
+		{"total": total_energy, "base": base_energy, "bonus": energy_bonus},
+		"ENERGY: {total} ({base}+{bonus})"
+	)
+	gold_label.text = LocalizationManager.format("character.gold", {"gold": GameManager.gold}, "GOLD: {gold}")
 
 func _populate_deck_tab():
 	_clear_children(active_deck_grid)
@@ -221,17 +248,28 @@ func _can_transfer(mode: String, source: String, id: String, show_feedback: bool
 		if source == "active":
 			if GameManager.active_deck.size() <= min_required:
 				if show_feedback:
-					_show_info_toast("You must have at least %d card(s) in your deck." % min_required)
+					_show_info_toast(LocalizationManager.format(
+						"character.toast.min_deck_cards",
+						{"count": min_required},
+						"You must have at least {count} card(s) in your deck."
+					))
 				return false
 		else:
 			var reserve_counts = _get_reserve_deck_counts()
 			if int(reserve_counts.get(id, 0)) <= 0:
 				if show_feedback:
-					_show_info_toast("No unallocated copy of that card is available.")
+					_show_info_toast(LocalizationManager.translate(
+						"character.toast.no_card_copy",
+						"No unallocated copy of that card is available."
+					))
 				return false
 			if GameManager.active_deck.size() >= MAX_ACTIVE_DECK_CARDS:
 				if show_feedback:
-					_show_info_toast("Active deck is full (%d cards)." % MAX_ACTIVE_DECK_CARDS)
+					_show_info_toast(LocalizationManager.format(
+						"character.toast.deck_full",
+						{"count": MAX_ACTIVE_DECK_CARDS},
+						"Active deck is full ({count} cards)."
+					))
 				return false
 	elif mode == "item":
 		var max_slots = max(1, GameManager.player_level)
@@ -239,11 +277,18 @@ func _can_transfer(mode: String, source: String, id: String, show_feedback: bool
 			var reserve_counts = _get_reserve_item_counts()
 			if int(reserve_counts.get(id, 0)) <= 0:
 				if show_feedback:
-					_show_info_toast("No unallocated copy of that item is available.")
+					_show_info_toast(LocalizationManager.translate(
+						"character.toast.no_item_copy",
+						"No unallocated copy of that item is available."
+					))
 				return false
 			if GameManager.active_items.size() >= max_slots:
 				if show_feedback:
-					_show_info_toast("You may only have %d active items." % max_slots)
+					_show_info_toast(LocalizationManager.format(
+						"character.toast.max_active_items",
+						{"count": max_slots},
+						"You may only have {count} active items."
+					))
 				return false
 	return true
 
@@ -276,7 +321,11 @@ func _refresh_after_transfer(mode: String):
 func _update_counters():
 	var active_deck_size = GameManager.active_deck.size()
 	var min_cards = GameManager.player_level
-	deck_count_label.text = "Pairs: %d | %d" % [active_deck_size, min_cards]
+	deck_count_label.text = LocalizationManager.format(
+		"character.pairs",
+		{"current": active_deck_size, "required": min_cards},
+		"Pairs: {current} | {required}"
+	)
 	if active_deck_size > min_cards:
 		deck_count_label.modulate = Color.GOLD
 	elif active_deck_size == min_cards:
@@ -286,12 +335,20 @@ func _update_counters():
 	
 	var active_item_count = GameManager.active_items.size()
 	var max_items = max(1, GameManager.player_level)
-	item_count_label.text = "Equipped: %d / %d" % [active_item_count, max_items]
+	item_count_label.text = LocalizationManager.format(
+		"character.equipped",
+		{"current": active_item_count, "max": max_items},
+		"Equipped: {current} / {max}"
+	)
 	item_count_label.modulate = Color.GOLD if active_item_count >= max_items else Color.WHITE
 
 func _on_back_pressed():
 	if GameManager.active_deck.size() < GameManager.player_level:
-		_show_info_toast("You must have at least %d cards in your deck." % GameManager.player_level)
+		_show_info_toast(LocalizationManager.format(
+			"character.toast.min_deck_exit",
+			{"count": GameManager.player_level},
+			"You must have at least {count} cards in your deck."
+		))
 		return
 	
 	if GameManager.is_battle_mode:
@@ -539,3 +596,14 @@ func _show_info_toast(message: String):
 	_info_toast_tween.tween_interval(1.0)
 	_info_toast_tween.tween_property(toast_box, "modulate:a", 0.0, 0.45)
 	_info_toast_tween.finished.connect(_hide_info_toasts)
+
+func _refresh_static_labels():
+	right_panel.set_tab_title(0, LocalizationManager.translate("character.tab.deck", "DECK"))
+	right_panel.set_tab_title(1, LocalizationManager.translate("character.tab.inventory", "INVENTORY"))
+	vitality_label.text = LocalizationManager.translate("character.vitality", "VITALITY")
+	memory_progress_label.text = LocalizationManager.translate("character.memory_progress", "MEMORY PROGRESS")
+	active_deck_title.text = LocalizationManager.translate("character.active_deck", "ACTIVE DECK")
+	player_deck_title.text = LocalizationManager.translate("character.player_deck", "PLAYER DECK")
+	active_items_title.text = LocalizationManager.translate("character.active_items", "ACTIVE ITEMS")
+	player_items_title.text = LocalizationManager.translate("character.player_items", "PLAYER ITEMS")
+	back_button.text = LocalizationManager.translate("character.back_to_map", "RETURN TO MAP")

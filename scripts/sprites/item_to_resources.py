@@ -11,9 +11,44 @@ ITEM_SCRIPT_PATH = "res://data/resources/ItemData.gd"
 IMAGE_ROOT = "res://assets/items/full"
 ICON_ROOT = "res://assets/items/icon"
 
+NAME_SPANISH_KEYS = ["name_es", "name_espanol", "namespanish", "spanishname"]
+NAME_FRENCH_KEYS = ["name_fr", "name_french", "namefr", "frenchname"]
+NAME_GERMAN_KEYS = ["name_de", "name_german", "namede", "germanname"]
+ITEM_POWER_KEYS = ["item_power", "itempower", "card_power", "cardpower"]
+
+def normalize_row(row):
+    return {str(key).strip().lower(): value for key, value in row.items()}
+
+def get_first_value(row, keys, default=""):
+    for key in keys:
+        value = row.get(key, "")
+        if value is not None and str(value).strip() != "":
+            return str(value).strip()
+    return default
+
+def gd_string(value):
+    text = "" if value is None else str(value)
+    return '"' + text.replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+def get_localized_names(row):
+    english_name = row.get("name", "Unknown").strip()
+    return {
+        "name": english_name,
+        "name_es": get_first_value(row, NAME_SPANISH_KEYS, english_name),
+        "name_fr": get_first_value(row, NAME_FRENCH_KEYS, english_name),
+        "name_de": get_first_value(row, NAME_GERMAN_KEYS, english_name),
+    }
+
+def get_item_power(row):
+    raw_value = get_first_value(row, ITEM_POWER_KEYS, "0")
+    try:
+        return int(raw_value)
+    except ValueError:
+        return 0
+
 def generate_item_tres(row):
     # 'ID' is now the descriptive slug (e.g., wood_splinter), 'UID' (item_101) is ignored.
-    item_id = row['ID'].strip()
+    item_id = row['id'].strip()
     if not item_id: return None
     
     os.makedirs(OUTPUT_ROOT, exist_ok=True)
@@ -22,6 +57,8 @@ def generate_item_tres(row):
     # Asset conventions
     full_art = f"{IMAGE_ROOT}/{item_id}.png"
     icon_art = f"{ICON_ROOT}/{item_id}_icon.png"
+    names = get_localized_names(row)
+    item_power = get_item_power(row)
     
     # Header: Script + Image + Icon + Resource
     lines = [
@@ -34,15 +71,19 @@ def generate_item_tres(row):
         '[resource]',
         'script = ExtResource("1_script")',
         f'item_id = "{item_id}"',
-        f'name = "{row.get("Name", "Unknown")}"',
-        f'type = "{row.get("Type", "Material")}"',
-        f'level = {row.get("Level", 1)}',
-        f'hp = {row.get("HP", 0)}',
-        f'attack = {row.get("Attack", 0)}',
-        f'armour = {row.get("Armour", 0)}',
-        f'effect = "{row.get("Effect", "None")}"',
-        f'description = "{row.get("Description", "").replace("\"", "\\\"")}"',
-        f'ai_prompt = "{row.get("AI_Image_Prompt", "").replace("\"", "\\\"")}"',
+        'name = %s' % gd_string(names["name"]),
+        'name_es = %s' % gd_string(names["name_es"]),
+        'name_fr = %s' % gd_string(names["name_fr"]),
+        'name_de = %s' % gd_string(names["name_de"]),
+        f'type = "{row.get("type", "Material")}"',
+        f'level = {row.get("level", 1)}',
+        f'item_power = {item_power}',
+        f'hp = {row.get("hp", 0)}',
+        f'attack = {row.get("attack", 0)}',
+        f'armour = {row.get("armour", 0)}',
+        'effect = %s' % gd_string(row.get("effect", "None")),
+        'description = %s' % gd_string(row.get("description", "")),
+        'ai_prompt = %s' % gd_string(get_first_value(row, ["ai_image_prompt", "ai prompt"], "")),
         'item_image = ExtResource("2_image")',
         'item_icon = ExtResource("3_icon")'
     ]
@@ -59,7 +100,8 @@ def run():
     count = 0
     with open(CSV_FILE, mode='r', encoding='utf-8') as f:
         reader = csv.DictReader(f)
-        for row in reader:
+        for raw_row in reader:
+            row = normalize_row(raw_row)
             # DictReader ignores columns like 'UID' if they aren't explicitly accessed
             path = generate_item_tres(row)
             if path:

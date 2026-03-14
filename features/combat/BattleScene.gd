@@ -525,6 +525,7 @@ func _toggle_grid_interaction(enabled: bool):
 func _process_combat_action(card_id: String):
 	var res = DataManager.get_resource("res://data/cards/" + card_id + ".tres")
 	if not res: return
+	var localized_card_name = LocalizationManager.localized_resource_name(res, res.name)
 	
 	var type = "magical" if card_id in ["frost", "lightning", "bomb", "scroll"] else "physical"
 	
@@ -537,7 +538,7 @@ func _process_combat_action(card_id: String):
 			e_hp = max(0, e_hp - final_dmg)
 			var raw_damage = res.value + (p_atk if type == "physical" else 0)
 			var negated = max(0, raw_damage - final_dmg) if type == "physical" else 0
-			add_log("%s card matched." % res.name)
+			add_log("%s card matched." % localized_card_name)
 			if type == "physical":
 				add_log("Enemy armour negates %d damage." % min(enemy_armor, negated))
 			add_log("You deal %d damage." % final_dmg)
@@ -563,14 +564,14 @@ func _process_combat_action(card_id: String):
 
 		elif res.type == "heal":
 			p_hp = min(GameManager.player_hp_total, p_hp + res.value)
-			add_log("Matched %s: Restored %d HP." % [res.name, res.value])
+			add_log("Matched %s: Restored %d HP." % [localized_card_name, res.value])
 			_flash_unit(%PlayerFlash, Color.SEA_GREEN)
 			SignalBus.battle_intensity_changed.emit(0.5)
 			SignalBus.sfx_triggered.emit(AudioData.SFX["HEAL"])
 
 		elif res.type == "armor":
 			temp_armor_bonus += int(res.value)
-			add_log("Matched %s: +%d armor for the next hit." % [res.name, int(res.value)])
+			add_log("Matched %s: +%d armor for the next hit." % [localized_card_name, int(res.value)])
 			_flash_unit(%PlayerFlash, Color.GOLD)
 			SignalBus.battle_intensity_changed.emit(0.5)
 			SignalBus.sfx_triggered.emit(AudioData.SFX["SHIELD"])

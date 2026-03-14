@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "corrupt_data"
 name = "Corrupt Data"
+name_es = "Fragmento del vacío"
+name_fr = "Éclat du vide"
+name_de = "Leerensplitter"
 type = "Trap"
 level = 5
+item_power = 12
 hp = 0
 attack = 20
 armour = 0
 effect = "Glitch"
 description = "A fragment of reality that has begun to unravel."
-ai_prompt = "Cinematic dark fantasy: A floating geometric shape that flickers and distorts the air."
+ai_prompt = "Cinematic dark fantasy: A floating geometric shape that flickers and distorts the air.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

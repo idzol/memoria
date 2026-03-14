@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "whale_oil"
 name = "Whale Oil"
+name_es = "Azufre"
+name_fr = "Soufre"
+name_de = "Schwefel"
 type = "Utility"
 level = 4
+item_power = 6
 hp = 0
 attack = 0
 armour = 0
 effect = "Burn"
 description = "Refined fat that burns with a hot, blue flame."
-ai_prompt = "Cinematic dark fantasy: A sealed ceramic jug with a wick, smelling of the deep sea."
+ai_prompt = "Cinematic dark fantasy: A sealed ceramic jug with a wick, smelling of the deep sea.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

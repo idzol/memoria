@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "reptile_scale"
 name = "Reptile Scale"
+name_es = "Escama de reptil"
+name_fr = "Écaille de reptile"
+name_de = "Reptilienschuppe"
 rarity = "uncommon"
 type = "armor"
+card_power = 6
 value = 8
-description = "Hardened protection"
+description = "Add 8 armor until next damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

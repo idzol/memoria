@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "blanket"
 name = "Wool Blanket"
+name_es = "Manta de lana"
+name_fr = "Couverture en laine"
+name_de = "Wolldecke"
 rarity = "common"
 type = "heal"
+card_power = 4
 value = 5
-description = "Rest more effectively"
+description = "Restore 5 health"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

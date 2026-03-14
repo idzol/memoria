@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "iron_shield"
 name = "Iron Shield"
+name_es = "Escudo de hierro"
+name_fr = "Bouclier de fer"
+name_de = "Eisenschild"
 rarity = "common"
 type = "armor"
+card_power = 3
 value = 10
-description = "Heavy metal defense"
+description = "Add 10 armor until next damage"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

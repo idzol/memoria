@@ -8,11 +8,14 @@
 [resource]
 script = ExtResource("1_script")
 name = "Pickpocket"
+name_es = "Carterista"
+name_fr = "Pickpocket"
+name_de = "Taschendieb"
 biome = "town"
 hp = 12
-hframes = 4
-vframes = 4
-total_frames = 16
+hframes = 5
+vframes = 5
+total_frames = 25
 frame_speed = 0.1
 idle_sheet = ExtResource("2_idle")
 attack_sheet = ExtResource("3_atk")
@@ -21,6 +24,7 @@ armor = 0
 base_damage = 3
 difficulty_tier = 1
 xp_reward = 20
+loot_power = 1
 gold_min = 5
 gold_max = 15
 item_drops = []

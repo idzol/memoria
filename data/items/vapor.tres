@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "vapor"
 name = "Vapor"
+name_es = "Vial de sangre"
+name_fr = "Fiole de sang"
+name_de = "Blutfläschchen"
 type = "Material"
 level = 3
+item_power = 5
 hp = 0
 attack = 0
 armour = 0
 effect = "Mist"
 description = "A bottled cloud of ethereal gas."
-ai_prompt = "Cinematic dark fantasy: A glass orb filled with swirling violet smoke."
+ai_prompt = "Cinematic dark fantasy: A glass orb filled with swirling violet smoke.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

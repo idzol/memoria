@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "black_pearl"
 name = "Black Pearl"
+name_es = "Llave inglesa"
+name_fr = "Clé"
+name_de = "Schraubenschlüssel"
 type = "Treasure"
 level = 4
+item_power = 10
 hp = 0
 attack = 0
 armour = 0
 effect = "Wealth"
 description = "A rare gem found only in the deepest trenches."
-ai_prompt = "Cinematic dark fantasy: A perfect black sphere that reflects no light."
+ai_prompt = "Cinematic dark fantasy: A perfect black sphere that reflects no light.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

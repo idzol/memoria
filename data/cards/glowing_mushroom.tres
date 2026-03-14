@@ -8,10 +8,14 @@
 script = ExtResource("1_script")
 card_id = "glowing_mushroom"
 name = "Mushroom"
+name_es = "Aceite de ballena"
+name_fr = "Huile de baleine"
+name_de = "Walöl"
 rarity = "rare"
 type = "heal"
+card_power = 13
 value = 7
-description = "Bioluminescent snack."
+description = "Restore 7 health"
 special_effect = ""
 card_image = ExtResource("2_image")
 card_icon = ExtResource("3_icon")

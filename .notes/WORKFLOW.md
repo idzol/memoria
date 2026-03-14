@@ -57,24 +57,36 @@ run test cases
 # Engine - Bosses / Level
 
 
-# Resources - NPCs
+# Resources - NPCs, Enemies, Cards, Rooms 
 
 Data driven resource files from Google sheets (*.csv export) to *.tres files  
 
 ## Update data  
 
-Google Drive > Memoria > NPC 
+Google Sheets > "Assets"
 https://docs.google.com/spreadsheets/d/1MgpBBFfe3s4lEDskU4rbwJQ8lc8gmr7o0pebAP7BaZI/edit?gid=0#gid=0
 
 ## Export CSV 
 
-File Export     NPC.csv 
-Copy            ./.notes/NPC/NPC.csv
+File Export    
+* Card.csv 
+* Item.csv 
+* Player.csv 
+* Room.csv 
+* NPC.csv 
+* Enemy.csv 
 
-## Run translator 
+Copy to ./scripts/sprites/
+
+## Run script 
 
 ```
-python ./.notes/NPC/csv_to_resources.py
+python ./scripts/sprites/card_to_resources.py
+python ./scripts/sprites/enemy_to_resources.py
+python ./scripts/sprites/item_to_resources.py
+python ./scripts/sprites/room_to_resources.py
+python ./scripts/sprites/npc_to_resources.py
+python ./scripts/sprites/player_to_resources.py
 ```
 
 

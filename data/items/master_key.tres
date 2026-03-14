@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "master_key"
 name = "Master Key"
+name_es = "Espejo oscuro"
+name_fr = "Miroir sombre"
+name_de = "Dunkler Spiegel"
 type = "Utility"
 level = 5
+item_power = 11
 hp = 0
 attack = 0
 armour = 0
 effect = "Universal"
 description = "A key that shifts its shape to fit any lock."
-ai_prompt = "Cinematic dark fantasy: A liquid metal key that writhes in the user's hand."
+ai_prompt = "Cinematic dark fantasy: A liquid metal key that writhes in the user's hand.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

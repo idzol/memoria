@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "waterskin"
 name = "Waterskin"
+name_es = "Lupa"
+name_fr = "Loupe"
+name_de = "Vergrößerungsglas"
 type = "Consumable"
 level = 4
+item_power = 9
 hp = 10
 attack = 0
 armour = 0
 effect = "Hydrate"
 description = "A leather bag for carrying fresh water."
-ai_prompt = "Cinematic dark fantasy: A swollen animal-hide bag with a wooden stopper."
+ai_prompt = "Cinematic dark fantasy: A swollen animal-hide bag with a wooden stopper.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

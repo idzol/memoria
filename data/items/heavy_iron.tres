@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "heavy_iron"
 name = "Heavy Iron"
+name_es = "Tinta de neón"
+name_fr = "Encre néon"
+name_de = "Neon-Tinte"
 type = "Armour"
 level = 4
+item_power = 5
 hp = 0
 attack = 0
 armour = 20
 effect = "Sturdy"
 description = "Unrefined blocks of dense metal."
-ai_prompt = "Cinematic dark fantasy: Overlapping plates of crude, dark iron hammered together."
+ai_prompt = "Cinematic dark fantasy: Overlapping plates of crude, dark iron hammered together.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")

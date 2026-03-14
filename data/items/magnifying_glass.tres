@@ -8,13 +8,19 @@
 script = ExtResource("1_script")
 item_id = "magnifying_glass"
 name = "Magnifying Glass"
+name_es = "Vela de seda"
+name_fr = "Voile de soie"
+name_de = "Seidensegel"
 type = "Utility"
 level = 4
+item_power = 9
 hp = 0
 attack = 0
 armour = 0
 effect = "Search"
 description = "A lens for inspecting fine details."
-ai_prompt = "Cinematic dark fantasy: A thick glass circle held in an ornate bronze frame."
+ai_prompt = "Cinematic dark fantasy: A thick glass circle held in an ornate bronze frame.
+
+icon format for role playing game item (160x160). cartoon realism"
 item_image = ExtResource("2_image")
 item_icon = ExtResource("3_icon")
