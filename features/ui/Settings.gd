@@ -7,7 +7,14 @@ extends Control
 @onready var music_slider = $CenterContainer/PanelContainer/MarginContainer/VBoxContainer/VolumeGrid/MusicSlider
 @onready var mode_options = %ModeOptions
 @onready var resolution_options = %ResolutionOptions
+@onready var gameplay_header = %GameplayHeader
+@onready var tutorial_tips_label = %TutorialTipsLabel
+@onready var tutorial_tips_button = %TutorialTipsButton
 @onready var back_button = $CenterContainer/PanelContainer/MarginContainer/VBoxContainer/BackButton
+
+const SETTINGS_PATH := "user://settings.cfg"
+const SETTINGS_SECTION := "gameplay"
+const TUTORIAL_TIPS_KEY := "tutorial_tips"
 
 const RESOLUTION_PRESETS: Array[Vector2i] = [
 	Vector2i(1024, 576),
@@ -39,12 +46,14 @@ var _countdown_seconds_left: int = 0
 var _is_reverting_resolution: bool = false
 var _option_base_style: StyleBoxFlat
 var _option_focus_style: StyleBoxFlat
+var _tutorial_tips_enabled: bool = true
 
 func _ready():
 	# 1. Initialize Audio from global AudioManager settings
 	master_slider.value = AudioManager.get_master_volume()
 	sfx_slider.value = AudioManager.get_sfx_volume()
 	music_slider.value = AudioManager.get_music_volume()
+	_load_tutorial_tips_setting()
 	
 	# 2. Setup Dropdowns
 	_setup_mode_dropdown()
@@ -58,9 +67,12 @@ func _ready():
 	
 	mode_options.item_selected.connect(_on_mode_selected)
 	resolution_options.item_selected.connect(_on_resolution_selected)
+	if tutorial_tips_button:
+		tutorial_tips_button.pressed.connect(_on_tutorial_tips_pressed)
 	
 	back_button.pressed.connect(_save_and_close)
 	_setup_resolution_confirmation_dialog()
+	_refresh_localized_text()
 
 func _input(event):
 	if not visible:
@@ -249,3 +261,37 @@ func _apply_window_mode(mode: int):
 
 func _apply_resolution(target_size: Vector2i):
 	DisplayServer.window_set_size(target_size)
+
+func _on_tutorial_tips_pressed():
+	_tutorial_tips_enabled = not _tutorial_tips_enabled
+	_save_tutorial_tips_setting()
+	_refresh_localized_text()
+
+func _refresh_localized_text():
+	if has_node("%Title"):
+		%Title.text = LocalizationManager.translate("menu.settings", "SETTINGS")
+	if has_node("%AudioHeader"):
+		%AudioHeader.text = LocalizationManager.translate("settings.audio", "Audio")
+	if has_node("%DisplayHeader"):
+		%DisplayHeader.text = LocalizationManager.translate("settings.display", "Display")
+	if gameplay_header:
+		gameplay_header.text = LocalizationManager.translate("settings.gameplay", "Gameplay")
+	if tutorial_tips_label:
+		tutorial_tips_label.text = LocalizationManager.translate("settings.tutorial_tips_label", "Tutorial Tips")
+	if tutorial_tips_button:
+		tutorial_tips_button.text = LocalizationManager.translate("common.on", "On") if _tutorial_tips_enabled else LocalizationManager.translate("common.off", "Off")
+	if back_button:
+		back_button.text = LocalizationManager.translate("menu.close", "CLOSE")
+
+func _load_tutorial_tips_setting():
+	var config = ConfigFile.new()
+	if config.load(SETTINGS_PATH) != OK:
+		_tutorial_tips_enabled = true
+		return
+	_tutorial_tips_enabled = bool(config.get_value(SETTINGS_SECTION, TUTORIAL_TIPS_KEY, true))
+
+func _save_tutorial_tips_setting():
+	var config = ConfigFile.new()
+	config.load(SETTINGS_PATH)
+	config.set_value(SETTINGS_SECTION, TUTORIAL_TIPS_KEY, _tutorial_tips_enabled)
+	config.save(SETTINGS_PATH)

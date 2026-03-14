@@ -866,17 +866,40 @@ func _collect_power_rewards_from_dir(root: String, target_power: int, is_card: b
 	var file_name = dir.get_next()
 	while file_name != "":
 		if not dir.current_is_dir() and file_name.ends_with(".tres"):
+			if file_name.begins_with("_"):
+				file_name = dir.get_next()
+				continue
 			var resource_path = "%s/%s" % [root, file_name]
 			var resource = load(resource_path)
-			if resource:
-				var power = int(resource.card_power if is_card else resource.item_power)
-				if power == target_power:
-					var reward_id = str(resource.card_id if is_card else resource.item_id)
+			if resource == null:
+				push_warning("GameManager: Failed to load reward resource: %s" % resource_path)
+				file_name = dir.get_next()
+				continue
+			if is_card:
+				var card_res := resource as CardData
+				if card_res == null:
+					push_warning("GameManager: Skipping non-CardData resource in card reward pool: %s (%s)" % [resource_path, resource.get_class()])
+					file_name = dir.get_next()
+					continue
+				if int(card_res.card_power) == target_power and card_res.card_id != "":
 					rewards.append({
-						"id": reward_id,
+						"id": str(card_res.card_id),
 						"min": 1,
 						"max": 1,
-						"is_card": is_card
+						"is_card": true
+					})
+			else:
+				var item_res := resource as ItemData
+				if item_res == null:
+					push_warning("GameManager: Skipping non-ItemData resource in item reward pool: %s (%s)" % [resource_path, resource.get_class()])
+					file_name = dir.get_next()
+					continue
+				if int(item_res.item_power) == target_power and item_res.item_id != "":
+					rewards.append({
+						"id": str(item_res.item_id),
+						"min": 1,
+						"max": 1,
+						"is_card": false
 					})
 		file_name = dir.get_next()
 	dir.list_dir_end()

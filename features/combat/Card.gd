@@ -10,7 +10,7 @@ signal card_flipped(card_node)
 #const CardAssetData = preload("res://data/resources/card_asset_data.gd")
 #const CardData = preload("res://data/resources/card_data.gd")
 
-var asset_templates: CardAssetData = preload("res://data/cards/_card_assets.tres")
+var asset_templates: CardAssetData = preload("res://data/card_asset_data.tres")
 
 @onready var back_face = get_node_or_null("%BackFace")
 @onready var front_face = get_node_or_null("%FrontFace")

@@ -4,11 +4,15 @@ language.english,English,Espanol,Anglais,Englisch
 language.spanish,Spanish,Espanol,Espagnol,Spanisch
 language.french,French,Frances,Francais,Franzosisch
 language.german,German,Aleman,Allemand,Deutsch
+common.on,On,Activado,Active,Ein
+common.off,Off,Desactivado,Desactive,Aus
+common.click_to_dismiss,Click to dismiss,Haz clic para cerrar,Cliquez pour fermer,Klicken zum Schliessen
 menu.title,MEMORIA,MEMORIA,MEMORIA,MEMORIA
 menu.continue_run,CONTINUE RUN,CONTINUAR PARTIDA,CONTINUER,WEITERSPIELEN
 menu.no_saves,NO SAVES FOUND,SIN PARTIDAS,SAUVEGARDE ABSENTE,KEINE SPIELSTANDE
 menu.story_mode,STORY MODE,MODO HISTORIA,MODE HISTOIRE,GESCHICHTSMODUS
 menu.battle_mode,BATTLE MODE,MODO BATALLA,MODE BATAILLE,KAMPFMODUS
+menu.tutorial_tips,"Tutorial Tips: {value}","Consejos del tutorial: {value}","Astuces du didacticiel : {value}","Tutorialhinweise: {value}"
 menu.settings,SETTINGS,AJUSTES,PARAMETRES,EINSTELLUNGEN
 menu.controls,CONTROLS,CONTROLES,COMMANDES,STEUERUNG
 menu.credits,CREDITS,CREDITOS,CREDITS,CREDITS
@@ -26,6 +30,10 @@ menu.name_taken_generic,That name is already being used.,Ese nombre ya esta en u
 menu.start,START,EMPEZAR,COMMENCER,STARTEN
 menu.cancel,CANCEL,CANCELAR,ANNULER,ABBRECHEN
 common.back,Back,Atras,Retour,Zuruck
+settings.audio,Audio,Audio,Audio,Audio
+settings.display,Display,Pantalla,Affichage,Anzeige
+settings.gameplay,Gameplay,Jugabilidad,Jouabilite,Spielverhalten
+settings.tutorial_tips_label,Tutorial Tips,Consejos del tutorial,Astuces du didacticiel,Tutorialhinweise
 character_select.title,CHOOSE YOUR IDENTITY,ELIGE TU IDENTIDAD,CHOISISSEZ VOTRE IDENTITE,WAHLE DEINE IDENTITAT
 character_select.class.warrior,WARRIOR,GUERRERO,GUERRIER,KRIEGER
 character_select.class.scholar,SCHOLAR,ERUDITO,ERUDIT,GELEHRTER
@@ -65,9 +73,15 @@ character.toast.deck_full,Active deck is full ({count} cards).,El mazo activo es
 character.toast.no_item_copy,No unallocated copy of that item is available.,No hay una copia libre de ese objeto.,Aucune copie libre de cet objet n'est disponible.,Keine freie Kopie dieses Gegenstands ist verfugbar.
 character.toast.max_active_items,You may only have {count} active items.,Solo puedes tener {count} objetos activos.,Vous ne pouvez avoir que {count} objets actifs.,Du kannst nur {count} aktive Gegenstande haben.
 character.toast.min_deck_exit,You must have at least {count} cards in your deck.,Debes tener al menos {count} cartas en tu mazo.,Vous devez avoir au moins {count} cartes dans votre paquet.,Du musst mindestens {count} Karten in deinem Deck haben.
+character.tutorial.memory_cards,Memory cards are how you interact with the world. You need at a minimum number (1) of unique pairs,Las cartas de memoria son como interactuas con el mundo. Necesitas como minimo (1) pares unicos,Les cartes memoire sont votre facon d'interagir avec le monde. Vous avez besoin d'au moins (1) paire unique,Speicherkarten sind deine Art mit der Welt zu interagieren. Du brauchst mindestens (1) eindeutiges Paar
+character.tutorial.first_item_intro,"Select items, to manage your equipment","Selecciona objetos para gestionar tu equipo","Selectionnez des objets pour gerer votre equipement","Wahle Gegenstande um deine Ausrustung zu verwalten"
+character.tutorial.item_screen,"You can equip a maximum number of items (3) for the quest","Puedes equipar un numero maximo de objetos (3) para la mision","Vous pouvez equiper un nombre maximum d'objets (3) pour la quete","Du kannst fur die Quest maximal (3) Gegenstande ausrusten"
 storymap.header.story,Story Chapters,Capitulos de historia,Chapitres d'histoire,Geschichtskapitel
 storymap.header.biome,Biome Chapters,Capitulos de bioma,Chapitres de biome,Biomkapitel
 storymap.chapter_number,Chapter {number},Capitulo {number},Chapitre {number},Kapitel {number}
+storymap.tutorial.progress,The story map is where we track your progress,El mapa de historia es donde seguimos tu progreso,La carte d'histoire est l'endroit ou nous suivons votre progression,Auf der Story-Karte verfolgen wir deinen Fortschritt
+storymap.tutorial.start,"To start your journey, click on the first memory","Para comenzar tu viaje, haz clic en el primer recuerdo","Pour commencer votre voyage, cliquez sur le premier souvenir","Um deine Reise zu beginnen, klicke auf die erste Erinnerung"
+storymap.tutorial.complete,"Continue to explore the world. Tutorial tips have now been turned off, you can turn them back on in settings. Good luck","Sigue explorando el mundo. Los consejos del tutorial se han desactivado, puedes volver a activarlos en ajustes. Buena suerte","Continuez a explorer le monde. Les astuces du didacticiel ont maintenant ete desactivees, vous pouvez les reactiver dans les parametres. Bonne chance","Erkunde die Welt weiter. Die Tutorialhinweise wurden jetzt ausgeschaltet, du kannst sie in den Einstellungen wieder aktivieren. Viel Gluck"
 storymap.click_continue,Click to continue,Haz clic para continuar,Cliquez pour continuer,Klicken zum Fortfahren
 storymap.status.cleared,Cleared,Completado,Termine,Abgeschlossen
 storymap.status.uncleared,Uncleared,Sin completar,Non termine,Nicht abgeschlossen
@@ -79,7 +93,11 @@ mapsummary.subtitle.story,Permanent rooms stay visible between runs. Select to e
 mapsummary.open,Open Biome Map,Abrir mapa del bioma,Ouvrir la carte du biome,Biomkarte offnen
 worldmap.phase.grid,{size}x{size} GRID,CUADRICULA {size}x{size},GRILLE {size}x{size},{size}x{size}-RASTER
 worldmap.phase.story,STORY MAP,MAPA DE HISTORIA,CARTE D'HISTOIRE,GESCHICHTSKARTE
-worldmap.tracker,{biome} [{layer},{column}],{biome} [{layer},{column}],{biome} [{layer},{column}],{biome} [{layer},{column}]
+worldmap.tracker,"{biome} [{layer},{column}]","{biome} [{layer},{column}]","{biome} [{layer},{column}]","{biome} [{layer},{column}]"
+worldmap.tutorial.home,"You start in the safety in your home, a call draws you.\nSelect an adjacent map to to travel","Empiezas a salvo en tu hogar, pero una llamada te atrae.\nSelecciona un mapa adyacente para viajar","Vous commencez en securite dans votre foyer, mais un appel vous attire.\nSelectionnez une carte adjacente pour voyager","Du beginnst in der Sicherheit deines Zuhauses, doch ein Ruf zieht dich weiter.\nWahle eine benachbarte Karte, um zu reisen"
+worldmap.tutorial.first_card,"As you regain memory, you can strengthen your resolve here",Mientras recuperas memoria puedes fortalecer tu determinacion aqui,A mesure que vous recouvrez la memoire vous pouvez renforcer votre determination ici,Wenn du deine Erinnerung zuruckgewinnst kannst du hier deine Entschlossenheit starken
+worldmap.tutorial.first_item,"As you gain items, you can better equip yourself for the adventure",A medida que consigues objetos puedes equiparte mejor para la aventura,A mesure que vous gagnez des objets vous pouvez mieux vous equiper pour l'aventure,Wenn du Gegenstande findest kannst du dich fur das Abenteuer besser ausrusten
+worldmap.tutorial.explore,Continue to discover the world. Be careful returning to a place you have already been,Sigue descubriendo el mundo. Ten cuidado al volver a un lugar en el que ya has estado,Continuez a decouvrir le monde. Faites attention en revenant dans un lieu ou vous etes deja passe,Setze deine Entdeckung der Welt fort. Sei vorsichtig wenn du an einen Ort zuruckkehrst den du bereits besucht hast
 worldmap.backtrack_prompt,"You have a feeling you have been here before. An intense pain fills your mind as memory floods back","Sientes que ya has estado aqui antes. Un dolor intenso invade tu mente mientras los recuerdos regresan","Vous avez l'impression d'etre deja venu ici. Une douleur intense envahit votre esprit tandis que les souvenirs reviennent","Du hast das Gefuhl, schon einmal hier gewesen zu sein. Ein intensiver Schmerz durchzuckt deinen Geist, als die Erinnerungen zuruckkehren"
 story.title.home,Introduction,Introduccion,Introduction,Einfuhrung
 story.title.default,{biome} Chronicle,Cronica de {biome},Chronique de {biome},{biome}-Chronik

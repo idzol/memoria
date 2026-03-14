@@ -35,6 +35,15 @@ const CardScene = preload("res://features/combat/Card.tscn")
 
 const CARDS_ROOT := "res://data/cards/"
 const ITEMS_ROOT := "res://data/items/"
+const SETTINGS_PATH := "user://settings.cfg"
+const SETTINGS_SECTION := "gameplay"
+const TUTORIAL_TIPS_KEY := "tutorial_tips"
+const TUTORIAL_FLAGS_SECTION := "tutorial_flags"
+const CHARACTER_SCREEN_TUTORIAL_ID := "character_screen_intro"
+const CHARACTER_SCREEN_FIRST_ITEM_TUTORIAL_ID := "character_screen_first_item_intro"
+const CHARACTER_SCREEN_ITEM_SCREEN_TUTORIAL_ID := "character_screen_item_screen_intro"
+const TUTORIAL_TOAST_DURATION := 10.0
+const TUTORIAL_TOAST_COLOR := Color(0.4, 0.7, 1.0, 1.0)
 
 const MAX_ACTIVE_DECK_CARDS := 12
 const STACK_OFFSET_X := 8.0
@@ -51,6 +60,8 @@ var _hold_timer: Timer
 var _hold_card: Control
 var _hold_payload: Dictionary = {}
 var _consume_press_instance_id: int = -1
+var _tutorial_active: bool = false
+var _tutorial_id: String = ""
 
 func _ready():
 	# Testing purposes if loaded directly
@@ -72,6 +83,12 @@ func _ready():
 	
 	if back_button:
 		back_button.pressed.connect(_on_back_pressed)
+	if right_panel:
+		right_panel.tab_changed.connect(_on_tab_changed)
+	_begin_character_tutorial_if_needed.call_deferred()
+
+func _notification(what):
+	pass
 
 func _setup_hold_timer():
 	_hold_timer = Timer.new()
@@ -578,8 +595,12 @@ func _hide_info_toasts():
 	inventory_info_toast_label.text = ""
 
 func _show_info_toast(message: String):
+	_show_info_toast_with_style(message, 1.0, Color(1, 1, 1, 1.0))
+
+func _show_info_toast_with_style(message: String, duration: float, font_color: Color):
 	if _info_toast_tween:
 		_info_toast_tween.kill()
+		_hide_info_toasts()
 	
 	var show_deck_toast = true
 	if right_panel != null:
@@ -588,12 +609,13 @@ func _show_info_toast(message: String):
 	var toast_label = info_toast_label if show_deck_toast else inventory_info_toast_label
 	
 	toast_label.text = message
+	toast_label.add_theme_color_override("font_color", font_color)
 	toast_box.visible = true
 	toast_box.modulate = Color(1, 1, 1, 0)
 	
 	_info_toast_tween = create_tween()
 	_info_toast_tween.tween_property(toast_box, "modulate:a", 1.0, 0.12)
-	_info_toast_tween.tween_interval(1.0)
+	_info_toast_tween.tween_interval(duration)
 	_info_toast_tween.tween_property(toast_box, "modulate:a", 0.0, 0.45)
 	_info_toast_tween.finished.connect(_hide_info_toasts)
 
@@ -607,3 +629,74 @@ func _refresh_static_labels():
 	active_items_title.text = LocalizationManager.translate("character.active_items", "ACTIVE ITEMS")
 	player_items_title.text = LocalizationManager.translate("character.player_items", "PLAYER ITEMS")
 	back_button.text = LocalizationManager.translate("character.back_to_map", "RETURN TO MAP")
+
+func _begin_character_tutorial_if_needed():
+	if _tutorial_active or not _are_tutorial_tips_enabled():
+		return
+	if not _has_seen_tutorial(CHARACTER_SCREEN_TUTORIAL_ID):
+		_show_character_tutorial(
+			CHARACTER_SCREEN_TUTORIAL_ID,
+			LocalizationManager.translate(
+				"character.tutorial.memory_cards",
+				"Memory cards are how you interact with the world. You need at a minimum number (1) of unique pairs"
+			)
+		)
+		return
+	if GameManager.world_state.items.owned.size() > 0 and not _has_seen_tutorial(CHARACTER_SCREEN_FIRST_ITEM_TUTORIAL_ID):
+		_show_character_tutorial(
+			CHARACTER_SCREEN_FIRST_ITEM_TUTORIAL_ID,
+			LocalizationManager.translate(
+				"character.tutorial.first_item_intro",
+				"Select items, to manage your equipment"
+			)
+		)
+		return
+	if GameManager.world_state.items.owned.size() > 0 and right_panel and right_panel.current_tab == 1 and not _has_seen_tutorial(CHARACTER_SCREEN_ITEM_SCREEN_TUTORIAL_ID):
+		_show_character_tutorial(
+			CHARACTER_SCREEN_ITEM_SCREEN_TUTORIAL_ID,
+			LocalizationManager.translate(
+				"character.tutorial.item_screen",
+				"You can equip a maximum number of items (3) for the quest"
+			)
+		)
+
+func _dismiss_character_tutorial():
+	_tutorial_active = false
+	if _info_toast_tween:
+		_info_toast_tween.kill()
+	_hide_info_toasts()
+	if _tutorial_id != "":
+		_set_tutorial_seen(_tutorial_id)
+	_tutorial_id = ""
+	_begin_character_tutorial_if_needed.call_deferred()
+
+func _are_tutorial_tips_enabled() -> bool:
+	var config = ConfigFile.new()
+	if config.load(SETTINGS_PATH) != OK:
+		return true
+	return bool(config.get_value(SETTINGS_SECTION, TUTORIAL_TIPS_KEY, true))
+
+func _has_seen_tutorial(tutorial_id: String) -> bool:
+	var config = ConfigFile.new()
+	if config.load(SETTINGS_PATH) != OK:
+		return false
+	return bool(config.get_value(TUTORIAL_FLAGS_SECTION, tutorial_id, false))
+
+func _set_tutorial_seen(tutorial_id: String):
+	if tutorial_id == "":
+		return
+	var config = ConfigFile.new()
+	config.load(SETTINGS_PATH)
+	config.set_value(TUTORIAL_FLAGS_SECTION, tutorial_id, true)
+	config.save(SETTINGS_PATH)
+
+func _show_character_tutorial(tutorial_id: String, message: String):
+	_tutorial_id = tutorial_id
+	_tutorial_active = true
+	_show_info_toast_with_style(message, TUTORIAL_TOAST_DURATION, TUTORIAL_TOAST_COLOR)
+	_set_tutorial_seen(tutorial_id)
+	_tutorial_active = false
+	_tutorial_id = ""
+
+func _on_tab_changed(_tab: int):
+	_begin_character_tutorial_if_needed()

@@ -39,6 +39,12 @@ const BASE_ROW_SPACING = 220.0
 const BASE_TOP_PADDING = 120.0
 const DOTTED_COLOR = Color(0.68, 0.68, 0.72, 0.85)
 const BACKTRACK_PROMPT = "You have a feeling you have been here before. An intense pain fills your mind as memory floods back"
+const SETTINGS_PATH := "user://settings.cfg"
+const SETTINGS_SECTION := "gameplay"
+const TUTORIAL_TIPS_KEY := "tutorial_tips"
+const TUTORIAL_FLAGS_SECTION := "tutorial_flags"
+const TUTORIAL_TOAST_DURATION := 10.0
+const TUTORIAL_TOAST_COLOR := Color(0.4, 0.7, 1.0, 1.0)
 
 var current_node_scale: float = 1.0
 var current_node_size: Vector2 = BASE_NODE_SIZE
@@ -47,6 +53,9 @@ var current_layer_spacing: float = BASE_LAYER_SPACING
 var current_row_spacing: float = BASE_ROW_SPACING
 var current_left_padding: float = 120.0
 var current_top_padding: float = BASE_TOP_PADDING
+var _tutorial_active: bool = false
+var _tutorial_id: String = ""
+var _tutorial_target_mode: String = "node"
 
 func _ready():
 	_setup_ui()
@@ -74,6 +83,7 @@ func _ready():
 
 	SignalBus.music_change_requested.emit(AudioData.TRACKS["TOWN"], 1.0)
 	_scroll_to_player()
+	_begin_worldmap_tutorial_if_needed.call_deferred()
 
 func _notification(what):
 	if what == NOTIFICATION_RESIZED and is_inside_tree() and node_container and lines_container and map_content and scroll_area and not GameManager.run_map.is_empty():
@@ -392,16 +402,7 @@ func _travel_to_node(target_data: Dictionary):
 	_enter_room(target_data)
 
 func _show_backtrack_toast():
-	if _info_toast_tween:
-		_info_toast_tween.kill()
-	info_toast_label.text = LocalizationManager.translate("worldmap.backtrack_prompt", BACKTRACK_PROMPT)
-	info_toast_box.visible = true
-	info_toast_box.modulate = Color(1, 1, 1, 0)
-	_info_toast_tween = create_tween()
-	_info_toast_tween.tween_property(info_toast_box, "modulate:a", 1.0, 0.12)
-	_info_toast_tween.tween_interval(1.4)
-	_info_toast_tween.tween_property(info_toast_box, "modulate:a", 0.0, 0.4)
-	_info_toast_tween.finished.connect(_hide_info_toast)
+	_show_info_toast(LocalizationManager.translate("worldmap.backtrack_prompt", BACKTRACK_PROMPT), 1.4, Color(0.95, 0.35, 0.35, 1.0))
 
 func _travel_to_boss_node(target_data: Dictionary):
 	_show_backtrack_toast()
@@ -419,6 +420,22 @@ func _hide_info_toast():
 		info_toast_box.modulate = Color(1, 1, 1, 0)
 	if info_toast_label:
 		info_toast_label.text = ""
+
+func _show_info_toast(message: String, duration: float, font_color: Color):
+	if _info_toast_tween:
+		_info_toast_tween.kill()
+	_hide_info_toast()
+	if not info_toast_box or not info_toast_label:
+		return
+	info_toast_label.text = message
+	info_toast_label.add_theme_color_override("font_color", font_color)
+	info_toast_box.visible = true
+	info_toast_box.modulate = Color(1, 1, 1, 0)
+	_info_toast_tween = create_tween()
+	_info_toast_tween.tween_property(info_toast_box, "modulate:a", 1.0, 0.12)
+	_info_toast_tween.tween_interval(duration)
+	_info_toast_tween.tween_property(info_toast_box, "modulate:a", 0.0, 0.4)
+	_info_toast_tween.finished.connect(_hide_info_toast)
 
 func _build_boss_node(base_data: Dictionary) -> Dictionary:
 	var out = base_data.duplicate(true)
@@ -655,3 +672,122 @@ func _get_biome_grid_texture(biome: String) -> Texture2D:
 	if grid_prop in map_assets:
 		return map_assets.get(grid_prop)
 	return null
+
+func _begin_worldmap_tutorial_if_needed():
+	if _tutorial_active or GameManager.is_battle_mode or not _are_tutorial_tips_enabled():
+		return
+	if _get_active_biome() == "home" and not _has_seen_tutorial("worldmap_home_intro"):
+		if adjacent_node_ids.is_empty():
+			return
+		selected_node_id = adjacent_node_ids[0]
+		_refresh_selection_highlight(_find_current_node_id())
+		_show_tutorial_popup(
+			"worldmap_home_intro",
+			LocalizationManager.translate(
+				"worldmap.tutorial.home",
+				"You start in the safety in your home, a call draws you.\nSelect an adjacent map to to travel"
+			),
+			"node"
+		)
+		return
+	if GameManager.world_state.cards.owned.size() > 0 and not _has_seen_tutorial("worldmap_first_card_character"):
+		_show_tutorial_popup(
+			"worldmap_first_card_character",
+			LocalizationManager.translate(
+				"worldmap.tutorial.first_card",
+				"As you regain memory, you can strengthen your resolve here"
+			),
+			"avatar"
+		)
+		return
+	if GameManager.world_state.items.owned.size() > 0 and not _has_seen_tutorial("worldmap_first_item_character"):
+		_show_tutorial_popup(
+			"worldmap_first_item_character",
+			LocalizationManager.translate(
+				"worldmap.tutorial.first_item",
+				"As you gain items, you can better equip yourself for the adventure"
+			),
+			"avatar"
+		)
+		return
+	if not GameManager.is_battle_mode and GameManager.current_run_visited_nodes.size() >= 3 and not _has_seen_tutorial("worldmap_explore_warning"):
+		_show_tutorial_popup(
+			"worldmap_explore_warning",
+			LocalizationManager.translate(
+				"worldmap.tutorial.explore",
+				"Continue to discover the world. Be careful returning to a place you have already been"
+			),
+			"node"
+		)
+
+func _dismiss_tutorial_popup():
+	if _tutorial_id != "":
+		_set_tutorial_seen(_tutorial_id)
+	_tutorial_active = false
+	_tutorial_id = ""
+	_tutorial_target_mode = "node"
+	if _info_toast_tween:
+		_info_toast_tween.kill()
+	_hide_info_toast()
+	if avatar_button:
+		avatar_button.remove_theme_stylebox_override("normal")
+		avatar_button.remove_theme_stylebox_override("hover")
+		avatar_button.remove_theme_stylebox_override("pressed")
+		avatar_button.remove_theme_stylebox_override("focus")
+
+func _are_tutorial_tips_enabled() -> bool:
+	var config = ConfigFile.new()
+	if config.load(SETTINGS_PATH) != OK:
+		return true
+	return bool(config.get_value(SETTINGS_SECTION, TUTORIAL_TIPS_KEY, true))
+
+func _has_seen_tutorial(tutorial_id: String) -> bool:
+	var config = ConfigFile.new()
+	if config.load(SETTINGS_PATH) != OK:
+		return false
+	return bool(config.get_value(TUTORIAL_FLAGS_SECTION, tutorial_id, false))
+
+func _set_tutorial_seen(tutorial_id: String):
+	if tutorial_id == "":
+		return
+	var config = ConfigFile.new()
+	config.load(SETTINGS_PATH)
+	config.set_value(TUTORIAL_FLAGS_SECTION, tutorial_id, true)
+	config.save(SETTINGS_PATH)
+
+func _show_tutorial_popup(tutorial_id: String, message: String, target_mode: String):
+	_dismiss_tutorial_popup()
+	_tutorial_id = tutorial_id
+	_tutorial_target_mode = target_mode
+	_tutorial_active = true
+	if target_mode == "avatar" and avatar_button:
+		var highlight_style = StyleBoxFlat.new()
+		highlight_style.bg_color = Color(0.18, 0.42, 0.2, 0.78)
+		highlight_style.border_width_left = 2
+		highlight_style.border_width_top = 2
+		highlight_style.border_width_right = 2
+		highlight_style.border_width_bottom = 2
+		highlight_style.border_color = Color(0.8, 0.95, 0.82, 1.0)
+		highlight_style.corner_radius_top_left = 12
+		highlight_style.corner_radius_top_right = 12
+		highlight_style.corner_radius_bottom_left = 12
+		highlight_style.corner_radius_bottom_right = 12
+		avatar_button.add_theme_stylebox_override("normal", highlight_style)
+		avatar_button.add_theme_stylebox_override("hover", highlight_style)
+		avatar_button.add_theme_stylebox_override("pressed", highlight_style)
+		avatar_button.add_theme_stylebox_override("focus", highlight_style)
+	_show_info_toast(message, TUTORIAL_TOAST_DURATION, TUTORIAL_TOAST_COLOR)
+	_set_tutorial_seen(tutorial_id)
+	_tutorial_active = false
+	_tutorial_id = ""
+	_tutorial_target_mode = "node"
+	if target_mode == "avatar" and avatar_button:
+		var clear_tween = create_tween()
+		clear_tween.tween_interval(TUTORIAL_TOAST_DURATION)
+		clear_tween.finished.connect(func():
+			if avatar_button:
+				avatar_button.remove_theme_stylebox_override("normal")
+				avatar_button.remove_theme_stylebox_override("hover")
+				avatar_button.remove_theme_stylebox_override("pressed")
+				avatar_button.remove_theme_stylebox_override("focus")
+		)
