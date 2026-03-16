@@ -149,6 +149,14 @@ func _input(event):
 			get_viewport().set_input_as_handled()
 			return
 
+	if day_info_panel and day_info_panel.visible:
+		var is_key_press = event is InputEventKey and event.pressed and not event.is_echo()
+		var is_mouse_click = event is InputEventMouseButton and event.pressed
+		if event.is_action_pressed("ui_cancel") or is_key_press or is_mouse_click:
+			_hide_day_info_panel()
+			get_viewport().set_input_as_handled()
+		return
+
 	if _backtrack_prompt_visible:
 		if event.is_action_pressed("ui_accept") or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
 			_hide_backtrack_dialog()
@@ -156,10 +164,6 @@ func _input(event):
 		return
 
 	if event.is_action_pressed("ui_cancel"):
-		if day_info_panel and day_info_panel.visible:
-			_hide_day_info_panel()
-			get_viewport().set_input_as_handled()
-			return
 		if in_game_menu and in_game_menu.visible:
 			if in_game_menu.has_method("handle_cancel"):
 				in_game_menu.handle_cancel()

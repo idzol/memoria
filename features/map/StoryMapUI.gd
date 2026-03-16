@@ -286,6 +286,11 @@ func _open_story_focus(biome: String):
 		return
 	for child in focus_content.get_children():
 		child.queue_free()
+	var viewport_size = get_viewport_rect().size
+	focus_content.custom_minimum_size = Vector2(
+		focus_content.custom_minimum_size.x,
+		viewport_size.y * 0.95
+	)
 	GameManager.set_selected_story_biome(biome)
 	var chapter_scene = STORY_CHAPTER_SCENE.instantiate()
 	chapter_scene.embedded_mode = false
