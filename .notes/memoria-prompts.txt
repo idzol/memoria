@@ -1199,7 +1199,7 @@ LOG
 
 global log. adjust location to be flush with bottom of screen. align left, bottom and right 
 click on log in battlescene, eventscene to expand 
-new option in settings to toggle on/off 
+add new option in settings to toggle on/off 
 update localization for new menu option (/data/localization) 
 
 
@@ -1406,6 +1406,19 @@ add more random variation to lines, making them more curved between nodes
 replace "P" with character avatar  
 create NPC avatars for discovered rooms .. 
 
+
+characterscreen 
+update "you must have at least {number} unique pairs" logic to be the number of unique cards, not unique pairs. 
+sword, sword, heart = 2.
+sword, heart = 2. 
+sword, sword = 1.
+
+update background to scale / stretch proportionally with the screen. 
+(otherwise replace with tiled background)
+
+battlescene
+update "armour" character flash to overlap character animation and be green 
+click to dismiss enemy card 
 
 
 TUTORIAL 
