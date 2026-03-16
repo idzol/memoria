@@ -195,7 +195,8 @@ func _ready():
 func _input(event):
 	if _is_enemy_intent_preview_visible():
 		if event.is_action_pressed("ui_accept") or event.is_action_pressed("ui_cancel"):
-			_hide_enemy_intent_preview()
+			_request_enemy_intent_preview_dismiss()
+			get_viewport().set_input_as_handled()
 			return
 
 	if is_log_expanded and event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
@@ -542,9 +543,7 @@ func _resolve_turn_end():
 	_clear_keyboard_card_selection()
 	
 	# Flip back any remaining unmatched cards in the current attempt pool
-	for card in flipped_cards:
-		if is_instance_valid(card):
-			card.flip_back()
+	_flip_back_unmatched_face_up_cards()
 	flipped_cards.clear()
 	
 	# CHECK RESHUFFLE: Only if no pairs remain on board (ignoring energy)
@@ -562,9 +561,7 @@ func _post_resolution_check():
 	
 	if GameManager.current_energy <= 0:
 		add_log("Out of energy! Turn ends.")
-		for card in flipped_cards:
-			if is_instance_valid(card):
-				card.flip_back()
+		_flip_back_unmatched_face_up_cards()
 		flipped_cards.clear()
 		
 		await get_tree().create_timer(0.8).timeout
@@ -572,6 +569,7 @@ func _post_resolution_check():
 	elif _should_reshuffle():
 		_trigger_reshuffle()
 	else:
+		_flip_back_unmatched_face_up_cards()
 		can_flip = true
 		_toggle_grid_interaction(true)
 
@@ -579,6 +577,11 @@ func _toggle_grid_interaction(enabled: bool):
 	for card in grid.get_children():
 		if card is TextureButton:
 			card.disabled = not enabled or card.is_matched
+
+func _flip_back_unmatched_face_up_cards():
+	for card in grid.get_children():
+		if card is TextureButton and is_instance_valid(card) and card.is_face_up and not card.is_matched:
+			card.flip_back()
 
 # --- DAMAGE CALCULATION (Extensible) ---
 func _process_combat_action(card_id: String):
@@ -953,11 +956,18 @@ func _play_enemy_intent_preview(card_res: CardData):
 	tween.tween_property(card_view, "global_position", target_pos, 0.25)
 	tween.parallel().tween_property(card_view, "scale", Vector2.ONE, 0.25)
 	await tween.finished
+	if not is_inside_tree() or not is_instance_valid(card_view):
+		_hide_enemy_intent_preview()
+		return
 
 	var elapsed = 0.0
 	while elapsed < ENEMY_INTENT_PREVIEW_SECONDS and not enemy_intent_preview_dismiss_requested and is_inside_tree():
-		await get_tree().create_timer(0.1).timeout
-		elapsed += 0.1
+		await get_tree().create_timer(0.05).timeout
+		elapsed += 0.05
+
+	if not is_inside_tree() or not is_instance_valid(card_view):
+		_hide_enemy_intent_preview()
+		return
 
 	var end_tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
 	end_tween.tween_property(card_view, "global_position", start_rect.get_center() - (target_size * 0.2), 0.22)
@@ -965,6 +975,10 @@ func _play_enemy_intent_preview(card_res: CardData):
 	end_tween.parallel().tween_property(card_view, "modulate:a", 0.0, 0.22)
 	await end_tween.finished
 	_hide_enemy_intent_preview()
+
+func _request_enemy_intent_preview_dismiss():
+	if _is_enemy_intent_preview_visible():
+		enemy_intent_preview_dismiss_requested = true
 
 func _hide_enemy_intent_preview():
 	enemy_intent_preview_dismiss_requested = false
@@ -976,9 +990,8 @@ func _hide_enemy_intent_preview():
 
 func _on_enemy_intent_preview_gui_input(event: InputEvent):
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		if _is_enemy_intent_preview_visible():
-			enemy_intent_preview_dismiss_requested = true
-			get_viewport().set_input_as_handled()
+		_request_enemy_intent_preview_dismiss()
+		get_viewport().set_input_as_handled()
 
 # --- BOARD MANAGEMENT ---
 func _should_reshuffle() -> bool:
