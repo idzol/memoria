@@ -49,6 +49,7 @@ var player_defense_total: int = 5
 var current_node: Dictionary = {}
 var run_map: Dictionary = {} # Stored persistently per run
 var biome_run_paths: Dictionary = {} # Format: "forest": [Vector2i(layer, column), ...]
+var world_map_skew_direction: String = ""
 
 # Tracking player by grid coordinates: x = column (0-4), y = layer (-1 to 19)
 # Home is at Layer -1, Column 2 (Center)
@@ -102,6 +103,10 @@ func get_run_log() -> Array[String]:
 func clear_run_log():
 	run_log.clear()
 	SignalBus.run_log_updated.emit()
+
+func randomize_world_map_skew_direction():
+	var directions = ["up", "down", "left", "right"]
+	world_map_skew_direction = directions[randi() % directions.size()]
 
 # --- PERSISTENT WORLD STATE ---
 # This structure tracks EVERY interaction across the game world.
@@ -517,6 +522,7 @@ func start_battle_mode():
 	current_run_visited_nodes = []
 	player_biome = "home"
 	selected_story_biome = "home"
+	randomize_world_map_skew_direction()
 	_initialize_story_progression()
 	
 	hide_loading()
@@ -540,6 +546,7 @@ func start_actual_run():
 	player_biome = "home"
 	selected_story_biome = "home"
 	biome_run_paths = {}
+	randomize_world_map_skew_direction()
 	active_deck = ["sword", "shield", "heart"]
 	recalculate_player_totals()
 
@@ -619,6 +626,7 @@ func load_run_from_data(data: Dictionary):
 	current_node = _decode_variant_field(data, "current_node", {})
 	run_map = _decode_variant_field(data, "run_map", run_map)
 	biome_run_paths = _decode_variant_field(data, "biome_run_paths", {})
+	world_map_skew_direction = data.get("world_map_skew_direction", "")
 	pending_loot = _decode_variant_field(data, "pending_loot", [])
 	run_loot = _decode_variant_field(data, "run_loot", [])
 	recalculate_player_totals()
@@ -631,6 +639,8 @@ func load_run_from_data(data: Dictionary):
 	
 	var saved_pos = data.get("grid_pos", [2, -1])
 	player_grid_pos = Vector2i(saved_pos[0], saved_pos[1])
+	if world_map_skew_direction == "":
+		randomize_world_map_skew_direction()
 	
 	if is_battle_mode:
 		get_tree().change_scene_to_file(get_active_biome_map_scene_path())

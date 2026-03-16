@@ -15,6 +15,15 @@ menu.battle_mode,BATTLE MODE,MODO BATALLA,MODE BATAILLE,KAMPFMODUS
 menu.tutorial_tips,"Tutorial Tips: {value}","Consejos del tutorial: {value}","Astuces du didacticiel : {value}","Tutorialhinweise: {value}"
 menu.settings,SETTINGS,AJUSTES,PARAMETRES,EINSTELLUNGEN
 menu.controls,CONTROLS,CONTROLES,COMMANDES,STEUERUNG
+controls.move_up,Move Up,Mover Arriba,Monter,Nach Oben
+controls.move_down,Move Down,Mover Abajo,Descendre,Nach Unten
+controls.move_left,Move Left,Mover Izquierda,Aller a gauche,Nach Links
+controls.move_right,Move Right,Mover Derecha,Aller a droite,Nach Rechts
+controls.confirm,Confirm / Select,Confirmar / Seleccionar,Confirmer / Selectionner,Bestatigen / Auswahlen
+controls.cancel,Cancel / Back,Cancelar / Atras,Annuler / Retour,Abbrechen / Zuruck
+controls.menu,Menu,Menu,Menu,Menu
+controls.story_map,Story Map,Cronica,Carte de l'histoire,Story-Karte
+controls.cancel_hint,[ESC] to Close,[ESC] para cerrar,[ESC] pour fermer,[ESC] zum Schliessen
 menu.credits,CREDITS,CREDITOS,CREDITS,CREDITS
 menu.exit,EXIT,SALIR,QUITTER,BEENDEN
 menu.select_memory,SELECT A MEMORY,SELECCIONA UN RECUERDO,SELECTIONNER UNE MEMOIRE,ERINNERUNG AUSWAHLEN
@@ -48,6 +57,7 @@ settings.audio,Audio,Audio,Audio,Audio
 settings.display,Display,Pantalla,Affichage,Anzeige
 settings.gameplay,Gameplay,Jugabilidad,Jouabilite,Spielverhalten
 settings.tutorial_tips_label,Tutorial Tips,Consejos del tutorial,Astuces du didacticiel,Tutorialhinweise
+settings.run_log_label,Global Log,Registro global,Journal global,Globales Protokoll
 character_select.title,CHOOSE YOUR IDENTITY,ELIGE TU IDENTIDAD,CHOISISSEZ VOTRE IDENTITE,WAHLE DEINE IDENTITAT
 character_select.class.warrior,WARRIOR,GUERRERO,GUERRIER,KRIEGER
 character_select.class.scholar,SCHOLAR,ERUDITO,ERUDIT,GELEHRTER
@@ -78,16 +88,16 @@ character.active_deck,ACTIVE DECK,MAZO ACTIVO,PAQUET ACTIF,AKTIVES DECK
 character.player_deck,PLAYER DECK,MAZO DEL JUGADOR,PAQUET DU JOUEUR,SPIELERDECK
 character.active_items,ACTIVE ITEMS,OBJETOS ACTIVOS,OBJETS ACTIFS,AKTIVE GEGENSTANDE
 character.player_items,PLAYER ITEMS,OBJETOS DEL JUGADOR,OBJETS DU JOUEUR,SPIELERGEGENSTANDE
-character.pairs,"Unique Pairs: {current} / {required}","Parejas: {current} | {required}","Paires : {current} | {required}","Paare: {current} | {required}"
+character.pairs,"Unique Cards: {current} / {required}","Cartas unicas: {current} | {required}","Cartes uniques : {current} | {required}","Einzigartige Karten: {current} | {required}"
 character.equipped,Equipped: {current} / {max},Equipado: {current} / {max},Equipe : {current} / {max},Ausgerustet: {current} / {max}
 character.back_to_map,RETURN TO MAP,VOLVER AL MAPA,RETOUR A LA CARTE,ZUR KARTE ZURUCK
-character.toast.min_deck_cards,You must have at least {count} unique pair(s) in your active deck.,Debes tener al menos {count} carta(s) en tu mazo.,Vous devez avoir au moins {count} carte(s) dans votre paquet.,Du musst mindestens {count} Karte(n) in deinem Deck haben.
+character.toast.min_deck_cards,You must have at least {count} unique card(s) in your active deck.,Debes tener al menos {count} carta(s) unicas en tu mazo activo.,Vous devez avoir au moins {count} carte(s) unique(s) dans votre paquet actif.,Du musst mindestens {count} einzigartige Karte(n) in deinem aktiven Deck haben.
 character.toast.no_card_copy,No unallocated copy of that card is available.,No hay una copia libre de esa carta.,Aucune copie libre de cette carte n'est disponible.,Keine freie Kopie dieser Karte ist verfugbar.
 character.toast.deck_full,Active deck is full ({count} cards).,El mazo activo esta lleno ({count} cartas).,Le paquet actif est plein ({count} cartes).,Das aktive Deck ist voll ({count} Karten).
 character.toast.no_item_copy,No unallocated copy of that item is available.,No hay una copia libre de ese objeto.,Aucune copie libre de cet objet n'est disponible.,Keine freie Kopie dieses Gegenstands ist verfugbar.
 character.toast.max_active_items,You may only have {count} active items.,Solo puedes tener {count} objetos activos.,Vous ne pouvez avoir que {count} objets actifs.,Du kannst nur {count} aktive Gegenstande haben.
-character.toast.min_deck_exit,You must have at least {count} unique pairs in your active deck.,Debes tener al menos {count} cartas en tu mazo.,Vous devez avoir au moins {count} cartes dans votre paquet.,Du musst mindestens {count} Karten in deinem Deck haben.
-character.tutorial.memory_cards,Memory cards are how you interact with the world. You need at a minimum number (1) of unique pairs,Las cartas de memoria son como interactuas con el mundo. Necesitas como minimo (1) pares unicos,Les cartes memoire sont votre facon d'interagir avec le monde. Vous avez besoin d'au moins (1) paire unique,Speicherkarten sind deine Art mit der Welt zu interagieren. Du brauchst mindestens (1) eindeutiges Paar
+character.toast.min_deck_exit,You must have at least {count} unique cards in your active deck.,Debes tener al menos {count} cartas unicas en tu mazo activo.,Vous devez avoir au moins {count} cartes uniques dans votre paquet actif.,Du musst mindestens {count} einzigartige Karten in deinem aktiven Deck haben.
+character.tutorial.memory_cards,Memory cards are how you interact with the world. You need at a minimum number (1) of unique cards,Las cartas de memoria son como interactuas con el mundo. Necesitas como minimo (1) cartas unicas,Les cartes memoire sont votre facon d'interagir avec le monde. Vous avez besoin d'au moins (1) carte unique,Speicherkarten sind deine Art mit der Welt zu interagieren. Du brauchst mindestens (1) einzigartige Karte
 character.tutorial.first_item_intro,"Select items, to manage your equipment","Selecciona objetos para gestionar tu equipo","Selectionnez des objets pour gerer votre equipement","Wahle Gegenstande um deine Ausrustung zu verwalten"
 character.tutorial.item_screen,"You can equip a maximum number of items (3) for the quest","Puedes equipar un numero maximo de objetos (3) para la mision","Vous pouvez equiper un nombre maximum d'objets (3) pour la quete","Du kannst fur die Quest maximal (3) Gegenstande ausrusten"
 storymap.header.story,Story Chapters,Capitulos de historia,Chapitres d'histoire,Geschichtskapitel

@@ -46,7 +46,6 @@ extends Node2D
 @onready var dialog_box = $DialogOverlay/VBox
 @onready var dialog_speaker = %DialogSpeaker
 @onready var dialog_text = %DialogText
-@onready var continue_hint = %ContinueHint
 @onready var battle_ui = %UI 
 
 # Unit Visuals
@@ -101,6 +100,7 @@ var enemy_intent_preview_holder: CenterContainer = null
 var active_enemy_intent_preview_card: Control = null
 var current_enemy_intent_card_id: String = ""
 var current_enemy_intent_card_res: CardData = null
+var enemy_intent_preview_dismiss_requested: bool = false
 var is_log_expanded: bool = false
 var log_collapsed_global_rect: Rect2 = Rect2()
 var _active_room_dialog_lines: Array[Dictionary] = []
@@ -119,6 +119,9 @@ const ENEMY_INTENT_PREVIEW_SECONDS = 3.0
 const ENEMY_DEFAULT_CARD_ID = "enemy_default"
 const PLAYER_DISCARD_SIZE = Vector2(150.0, 216.0)
 const ENEMY_INTENT_SIZE = Vector2(150.0, 216.0)
+const SETTINGS_PATH := "user://settings.cfg"
+const SETTINGS_SECTION := "gameplay"
+const RUN_LOG_KEY := "show_run_log"
 const LOG_COLLAPSED_HEIGHT = 32.0
 const LOG_EXPANDED_LINE_COUNT = 10
 const LOG_LINE_HEIGHT = 22.0
@@ -158,8 +161,6 @@ func _ready():
 		in_game_menu.hide()
 	if has_node("%MenuIconBtn"):
 		%MenuIconBtn.pressed.connect(_toggle_in_game_menu)
-	if continue_hint:
-		continue_hint.text = LocalizationManager.translate("dialog.click_continue", "Click to continue")
 	if dialog_speaker:
 		dialog_speaker.text = LocalizationManager.translate("dialog.speaker.narrator", "Narrator")
 
@@ -634,7 +635,7 @@ func _process_combat_action(card_id: String):
 		elif res.type == "armor":
 			temp_armor_bonus += int(res.value)
 			add_log("Matched %s: +%d armor for the next hit." % [localized_card_name, int(res.value)])
-			_flash_unit(%PlayerFlash, Color.GOLD)
+			_flash_unit(%PlayerFlash, Color.SEA_GREEN)
 			SignalBus.battle_intensity_changed.emit(0.5)
 			SignalBus.sfx_triggered.emit(AudioData.SFX["SHIELD"])
 
@@ -705,7 +706,7 @@ func _execute_enemy_card(card_res: CardData):
 			add_log("Enemy reveals %s." % localized_name)
 			add_log("Enemy gains %d armor." % int(card_res.value))
 			_play_unit_sheet_temporarily(enemy_sprite, current_enemy_res, "defend_sheet", ACTION_ANIM_DURATION)
-			_flash_unit(%EnemyFlash, Color.GOLD)
+			_flash_unit(%EnemyFlash, Color.SEA_GREEN)
 		_:
 			add_log("Enemy reveals %s." % localized_name)
 			add_log("Enemy hesitates and does nothing.")
@@ -786,6 +787,7 @@ func _setup_enemy_intent_ui():
 	enemy_intent_preview_root.mouse_filter = Control.MOUSE_FILTER_STOP
 	enemy_intent_preview_root.z_index = 300
 	battle_ui.add_child(enemy_intent_preview_root)
+	enemy_intent_preview_root.gui_input.connect(_on_enemy_intent_preview_gui_input)
 
 	var dimmer = ColorRect.new()
 	dimmer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -937,6 +939,7 @@ func _play_enemy_intent_preview(card_res: CardData):
 	card_view.disabled = false
 
 	enemy_intent_preview_root.visible = true
+	enemy_intent_preview_dismiss_requested = false
 	card_view.top_level = true
 	card_view.z_index = 310
 	var start_rect = enemy_intent_root.get_global_rect() if enemy_intent_root else Rect2(Vector2(960, 40), Vector2(120, 180))
@@ -951,12 +954,8 @@ func _play_enemy_intent_preview(card_res: CardData):
 	tween.parallel().tween_property(card_view, "scale", Vector2.ONE, 0.25)
 	await tween.finished
 
-	var acknowledged = false
-	var acknowledge_preview = func():
-		acknowledged = true
-	card_view.pressed.connect(acknowledge_preview, CONNECT_ONE_SHOT)
 	var elapsed = 0.0
-	while elapsed < ENEMY_INTENT_PREVIEW_SECONDS and not acknowledged and is_inside_tree():
+	while elapsed < ENEMY_INTENT_PREVIEW_SECONDS and not enemy_intent_preview_dismiss_requested and is_inside_tree():
 		await get_tree().create_timer(0.1).timeout
 		elapsed += 0.1
 
@@ -968,11 +967,18 @@ func _play_enemy_intent_preview(card_res: CardData):
 	_hide_enemy_intent_preview()
 
 func _hide_enemy_intent_preview():
+	enemy_intent_preview_dismiss_requested = false
 	if enemy_intent_preview_root:
 		enemy_intent_preview_root.visible = false
 	if active_enemy_intent_preview_card and is_instance_valid(active_enemy_intent_preview_card):
 		active_enemy_intent_preview_card.queue_free()
 	active_enemy_intent_preview_card = null
+
+func _on_enemy_intent_preview_gui_input(event: InputEvent):
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		if _is_enemy_intent_preview_visible():
+			enemy_intent_preview_dismiss_requested = true
+			get_viewport().set_input_as_handled()
 
 # --- BOARD MANAGEMENT ---
 func _should_reshuffle() -> bool:
@@ -1003,11 +1009,37 @@ func _trigger_reshuffle():
 	can_flip = false
 	_toggle_grid_interaction(false)
 	add_log("The path is blocked. Shuffling memories...")
+	await _animate_board_reset_before_reshuffle()
 	await get_tree().create_timer(1.2).timeout
 	if is_inside_tree() and not is_battle_over:
 		setup_board()
 		can_flip = true
 		_toggle_grid_interaction(true)
+
+func _animate_board_reset_before_reshuffle():
+	var face_up_cards: Array = []
+	for card in grid.get_children():
+		if card is TextureButton and is_instance_valid(card) and card.is_face_up:
+			face_up_cards.append(card)
+	if face_up_cards.is_empty():
+		return
+
+	for card in face_up_cards:
+		var tween = create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+		tween.tween_property(card, "scale:x", 0.0, 0.1)
+		tween.tween_callback(func():
+			if not is_instance_valid(card):
+				return
+			card.is_face_up = false
+			if card.front_face:
+				card.front_face.visible = false
+			if card.back_face:
+				card.back_face.visible = true
+			card.z_index = 0
+		)
+		tween.tween_property(card, "scale:x", 1.0, 0.1)
+
+	await get_tree().create_timer(0.22).timeout
 
 # --- UTILS & VISUALS ---
 
@@ -1039,7 +1071,6 @@ func _setup_cleared_room_view():
 	dialog_speaker.text = LocalizationManager.translate("dialog.speaker.narrator", "Narrator")
 	dialog_text.text = LocalizationManager.translate("dialog.room.cleared", "This room has already been cleared.")
 	_append_dialog_log(dialog_speaker.text, dialog_text.text)
-	continue_hint.visible = false
 	_show_exit_cleared_room_button()
 
 func _exit_cleared_room():
@@ -1052,7 +1083,6 @@ func _begin_room_dialog(lines: Array[Dictionary], on_complete: Callable):
 	_room_dialog_on_complete = on_complete
 	for child in %OptionContainer.get_children():
 		child.queue_free()
-	continue_hint.visible = true
 	dialog_overlay.show()
 	_configure_dialog_box(true)
 	_advance_room_dialog()
@@ -1066,7 +1096,6 @@ func _advance_room_dialog():
 	_room_dialog_index += 1
 	if _room_dialog_index >= _active_room_dialog_lines.size():
 		_room_dialog_complete = true
-		continue_hint.visible = false
 		_active_room_dialog_lines.clear()
 		_configure_dialog_box(false)
 		if _room_dialog_on_complete.is_valid():
@@ -1175,6 +1204,7 @@ func add_log(text):
 	GameManager.add_run_log(text)
 
 func _on_run_log_updated():
+	_apply_log_visibility()
 	_rebuild_log_entries()
 
 func _get_log_entry_color(text: String) -> Color:
@@ -1213,6 +1243,7 @@ func _setup_battle_log_ui():
 	log_display.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	log_display.custom_minimum_size.y = LOG_COLLAPSED_HEIGHT
 	is_log_expanded = false
+	_apply_log_visibility()
 	_rebuild_log_entries()
 	_refresh_log_view()
 
@@ -1251,7 +1282,7 @@ func _refresh_log_view():
 		log_display.size = Vector2(viewport_size.x, expanded_height)
 		log_display.global_position = Vector2(
 			0.0,
-			log_collapsed_global_rect.position.y - expanded_height + LOG_COLLAPSED_HEIGHT
+			viewport_size.y - expanded_height
 		)
 	else:
 		_restore_log_to_collapsed_row()
@@ -1290,6 +1321,19 @@ func _is_point_inside_log(global_point: Vector2) -> bool:
 	if not log_display or not log_display.visible:
 		return false
 	return log_display.get_global_rect().has_point(global_point)
+
+func _apply_log_visibility():
+	var enabled = _is_run_log_enabled()
+	if battle_log_row:
+		battle_log_row.visible = enabled
+	if not enabled:
+		is_log_expanded = false
+
+func _is_run_log_enabled() -> bool:
+	var config = ConfigFile.new()
+	if config.load(SETTINGS_PATH) != OK:
+		return true
+	return bool(config.get_value(SETTINGS_SECTION, RUN_LOG_KEY, true))
 	
 func _flash_unit(overlay, color):
 	if not overlay: return
@@ -1303,6 +1347,7 @@ func _setup_player_spritesheet():
 		current_player_res = load(p_path) as PlayerData
 	if current_player_res:
 		_apply_unit_visuals(player_sprite, current_player_res)
+		_sync_flash_overlay(player_sprite, %PlayerFlash)
 		return
 	var idle_tex = load("res://assets/player/base_idle.png")
 	if idle_tex:
@@ -1311,6 +1356,7 @@ func _setup_player_spritesheet():
 		player_sprite.vframes = 6
 		player_sprite.scale = Vector2(1.0, 1.0)
 		player_sprite.offset.y = sprite_feet_offset
+		_sync_flash_overlay(player_sprite, %PlayerFlash)
 		_start_unit_animation(player_sprite, 8, 0.12)
 
 func _setup_enemy_portrait():
@@ -1370,6 +1416,19 @@ func _apply_unit_sheet(sprite: Sprite2D, res: Resource, sheet: Texture2D):
 	sprite.vframes = _get_unit_vframes(res)
 	sprite.scale = Vector2(1.0, 1.0)
 	sprite.offset.y = sprite_feet_offset
+	_sync_flash_overlay(sprite, %PlayerFlash if sprite == player_sprite else %EnemyFlash)
+
+func _sync_flash_overlay(sprite: Sprite2D, overlay: ColorRect):
+	if not sprite or not overlay or not sprite.texture:
+		return
+	var frame_width = float(sprite.texture.get_width()) / float(max(1, sprite.hframes))
+	var frame_height = float(sprite.texture.get_height()) / float(max(1, sprite.vframes))
+	var width_padding = frame_width * 0.08
+	var height_padding = frame_height * 0.08
+	overlay.offset_left = -frame_width * 0.5 - width_padding
+	overlay.offset_top = -frame_height * 0.5 - height_padding
+	overlay.offset_right = frame_width * 0.5 + width_padding
+	overlay.offset_bottom = frame_height * 0.5 + height_padding
 
 func _get_unit_hframes(res: Resource) -> int:
 	var h = int(res.get("hframes")) if res != null else 0

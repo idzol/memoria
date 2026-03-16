@@ -83,6 +83,7 @@ func save_mid_run_state():
 		"current_node": var_to_str(GameManager.current_node),
 		"run_map": var_to_str(GameManager.run_map),
 		"biome_run_paths": var_to_str(GameManager.biome_run_paths),
+		"world_map_skew_direction": GameManager.world_map_skew_direction,
 		"pending_loot": var_to_str(GameManager.pending_loot),
 		"run_loot": var_to_str(GameManager.run_loot),
 		

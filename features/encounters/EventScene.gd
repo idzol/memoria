@@ -19,7 +19,6 @@ extends Control
 @onready var dialog_panel = $UI/SafeZone/StageLayout/NarrativeCenter/DialogPanel
 @onready var dialog_speaker = %DialogSpeaker
 @onready var dialog_text = %DialogText
-@onready var continue_hint = %ContinueHint
 @onready var choice_container = %ChoiceContainer
 @onready var npc_name_label = %NPCName
 @onready var player_sprite = %PlayerSprite
@@ -47,6 +46,9 @@ const LOG_SIDE_SPACER_WIDTH = 0.0
 const LOG_COLOR_PLAYER = Color(0.62, 1.0, 0.62, 1.0)
 const LOG_COLOR_NPC = Color(0.6, 0.75, 1.0, 1.0)
 const LOG_COLOR_NEUTRAL = Color(0.86, 0.86, 0.86, 1.0)
+const SETTINGS_PATH := "user://settings.cfg"
+const SETTINGS_SECTION := "gameplay"
+const RUN_LOG_KEY := "show_run_log"
 
 func _ready():
 	if in_game_menu_scene:
@@ -98,7 +100,6 @@ func _load_encounter_data():
 	
 	# 1. Visuals
 	room_title.text = current_room_res.room_name
-	continue_hint.text = LocalizationManager.translate("dialog.click_continue", "Click to continue")
 	dialog_speaker.text = LocalizationManager.translate("dialog.speaker.narrator", "Narrator")
 	exit_button.text = LocalizationManager.translate("dialog.exit_overworld", "Exit to Overworld")
 	_apply_room_environment(current_room_res)
@@ -142,7 +143,6 @@ func _start_room_dialog():
 	dialog_speaker.text = _get_narrator_name()
 	dialog_text.text = current_npc_res.initial_greeting if current_npc_res else current_room_res.initial_dialog
 	_append_dialog_log(dialog_speaker.text, dialog_text.text)
-	continue_hint.visible = false
 	choice_container.visible = false
 	exit_button.visible = true
 	_configure_dialog_panel(false)
@@ -172,11 +172,9 @@ func _advance_dialog_sequence():
 	dialog_speaker.text = str(line.get("speaker_name", _get_narrator_name()))
 	dialog_text.text = str(line.get("text", ""))
 	_append_dialog_log(dialog_speaker.text, dialog_text.text)
-	continue_hint.visible = true
 
 func _complete_dialog_sequence():
 	_dialog_sequence_complete = true
-	continue_hint.visible = false
 	exit_button.visible = true
 	choice_container.visible = false
 	_configure_dialog_panel(false)
@@ -194,7 +192,6 @@ func _display_dialog_node(tree_id: String, node_id: String):
 	dialog_speaker.text = current_npc_res.name if current_npc_res else _get_narrator_name()
 	dialog_text.text = node.text
 	_append_dialog_log(dialog_speaker.text, dialog_text.text)
-	continue_hint.visible = false
 	choice_container.visible = true
 	exit_button.visible = true
 	_configure_dialog_panel(true)
@@ -339,6 +336,7 @@ func _append_dialog_log(speaker: String, text: String):
 	GameManager.add_run_log("%s: %s" % [speaker, text])
 
 func _on_run_log_updated():
+	_apply_log_visibility()
 	_rebuild_log_entries()
 
 func _get_log_entry_color(text: String) -> Color:
@@ -377,6 +375,7 @@ func _setup_battle_log_ui():
 	log_display.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	log_display.custom_minimum_size.y = LOG_COLLAPSED_HEIGHT
 	is_log_expanded = false
+	_apply_log_visibility()
 	_rebuild_log_entries()
 	_refresh_log_view()
 
@@ -413,7 +412,7 @@ func _refresh_log_view():
 			log_display.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 		var viewport_size = get_viewport_rect().size
 		log_display.size = Vector2(viewport_size.x, expanded_height)
-		log_display.global_position = Vector2(0.0, log_collapsed_global_rect.position.y - expanded_height + LOG_COLLAPSED_HEIGHT)
+		log_display.global_position = Vector2(0.0, viewport_size.y - expanded_height)
 	else:
 		_restore_log_to_collapsed_row()
 	log_display.mouse_filter = Control.MOUSE_FILTER_STOP if is_log_expanded else Control.MOUSE_FILTER_PASS
@@ -451,3 +450,16 @@ func _is_point_inside_log(global_point: Vector2) -> bool:
 	if not log_display or not log_display.visible:
 		return false
 	return log_display.get_global_rect().has_point(global_point)
+
+func _apply_log_visibility():
+	var enabled = _is_run_log_enabled()
+	if battle_log_row:
+		battle_log_row.visible = enabled
+	if not enabled:
+		is_log_expanded = false
+
+func _is_run_log_enabled() -> bool:
+	var config = ConfigFile.new()
+	if config.load(SETTINGS_PATH) != OK:
+		return true
+	return bool(config.get_value(SETTINGS_SECTION, RUN_LOG_KEY, true))

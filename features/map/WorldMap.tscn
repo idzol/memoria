@@ -68,6 +68,7 @@ stretch_mode = 1
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
+offset_top = 100.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
@@ -75,8 +76,12 @@ grow_vertical = 2
 vertical_scroll_mode = 0
 
 [node name="MapContent" type="Control" parent="MapArea" unique_id=794470365]
-custom_minimum_size = Vector2(25000, 0)
-layout_mode = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 size_flags_vertical = 3
 mouse_filter = 2
 
@@ -94,6 +99,7 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="TopBar" type="PanelContainer" parent="." unique_id=1383085282]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 100)
 layout_mode = 1
 anchors_preset = 10
@@ -267,6 +273,65 @@ layout_mode = 2
 autowrap_mode = 3
 text = "Purpose text"
 
+[node name="BacktrackDialog" type="Control" parent="." unique_id=19341011]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dimmer" type="ColorRect" parent="BacktrackDialog"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.02, 0.03, 0.72)
+
+[node name="CenterContainer" type="CenterContainer" parent="BacktrackDialog"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="BacktrackDialog/CenterContainer"]
+custom_minimum_size = Vector2(640, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_day_panel")
+
+[node name="MarginContainer" type="MarginContainer" parent="BacktrackDialog/CenterContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 22
+
+[node name="VBoxContainer" type="VBoxContainer" parent="BacktrackDialog/CenterContainer/PanelContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="BacktrackDialogText" type="Label" parent="BacktrackDialog/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.42, 0.42, 1)
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+autowrap_mode = 3
+text = "You have a feeling you have been here before."
+
+[node name="BacktrackDialogHint" type="Label" parent="BacktrackDialog/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.82, 0.45, 1)
+horizontal_alignment = 1
+text = "Click to continue"
+
 [node name="BattleLogRow" type="HBoxContainer" parent="."]
 unique_name_in_owner = true
 layout_mode = 1
@@ -274,10 +339,7 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 32.0
-offset_top = -84.0
-offset_right = -32.0
-offset_bottom = -36.0
+offset_top = -44.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_constants/separation = 40

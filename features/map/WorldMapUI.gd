@@ -24,6 +24,10 @@ extends Control
 @onready var day_info_deities = %DayInfoDeities
 @onready var day_info_purpose_heading = %DayInfoPurposeHeading
 @onready var day_info_purpose = %DayInfoPurpose
+@onready var backtrack_dialog = %BacktrackDialog
+@onready var backtrack_dialog_text = %BacktrackDialogText
+@onready var backtrack_dialog_hint = %BacktrackDialogHint
+@onready var top_bar = %TopBar
 @onready var battle_log_row = %BattleLogRow
 @onready var log_left_spacer = %LeftSpacer
 @onready var log_box = %LogBox
@@ -55,6 +59,7 @@ const BACKTRACK_PROMPT = "You have a feeling you have been here before. An inten
 const SETTINGS_PATH := "user://settings.cfg"
 const SETTINGS_SECTION := "gameplay"
 const TUTORIAL_TIPS_KEY := "tutorial_tips"
+const RUN_LOG_KEY := "show_run_log"
 const TUTORIAL_FLAGS_SECTION := "tutorial_flags"
 const TUTORIAL_TOAST_DURATION := 10.0
 const TUTORIAL_TOAST_COLOR := Color(0.4, 0.7, 1.0, 1.0)
@@ -81,6 +86,7 @@ var _tutorial_id: String = ""
 var _tutorial_target_mode: String = "node"
 var is_log_expanded: bool = false
 var log_collapsed_global_rect: Rect2 = Rect2()
+var _backtrack_prompt_visible: bool = false
 
 const LOG_COLLAPSED_HEIGHT = 32.0
 const LOG_EXPANDED_LINE_COUNT = 10
@@ -91,6 +97,8 @@ const LOG_SIDE_SPACER_WIDTH = 0.0
 const LOG_COLOR_GOOD = Color(0.62, 1.0, 0.62, 1.0)
 const LOG_COLOR_BAD = Color(1.0, 0.58, 0.58, 1.0)
 const LOG_COLOR_NEUTRAL = Color(0.86, 0.86, 0.86, 1.0)
+const PARALLELOGRAM_ROW_OFFSET_RATIO = 0.5
+const CURVE_SAMPLES = 8
 
 func _ready():
 	_setup_ui()
@@ -112,6 +120,7 @@ func _ready():
 		else:
 			GameManager.reset_to_home()
 
+	_sync_map_area_to_top_bar()
 	_draw_map()
 
 	if in_game_menu_scene:
@@ -125,6 +134,7 @@ func _ready():
 
 func _notification(what):
 	if what == NOTIFICATION_RESIZED and is_inside_tree() and node_container and lines_container and map_content and scroll_area and not GameManager.run_map.is_empty():
+		_sync_map_area_to_top_bar()
 		_draw_map()
 		_refresh_log_view()
 
@@ -138,6 +148,12 @@ func _input(event):
 			_refresh_log_view()
 			get_viewport().set_input_as_handled()
 			return
+
+	if _backtrack_prompt_visible:
+		if event.is_action_pressed("ui_accept") or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
+			_hide_backtrack_dialog()
+			get_viewport().set_input_as_handled()
+		return
 
 	if event.is_action_pressed("ui_cancel"):
 		if day_info_panel and day_info_panel.visible:
@@ -188,6 +204,12 @@ func _setup_ui():
 
 	_hide_info_toast()
 	_hide_day_info_panel()
+	_hide_backtrack_dialog()
+
+func _sync_map_area_to_top_bar():
+	if not scroll_area or not top_bar:
+		return
+	scroll_area.offset_top = top_bar.size.y
 
 func _toggle_in_game_menu():
 	if not in_game_menu:
@@ -432,7 +454,7 @@ func _recalculate_map_bounds(biome: String):
 			visible_max_column = max(visible_max_column, column)
 
 func _rebuild_adjacent_targets(current_id: String, biome: String):
-	adjacent_node_ids = _get_adjacent_node_ids(current_id, biome)
+	adjacent_node_ids = _get_accessible_adjacent_node_ids(current_id, biome)
 	if adjacent_node_ids.is_empty():
 		selected_node_id = ""
 		return
@@ -544,18 +566,31 @@ func _travel_to_node(target_data: Dictionary):
 	_scroll_to_player()
 	_enter_room(target_data)
 
-func _show_backtrack_toast():
-	_show_info_toast(LocalizationManager.translate("worldmap.backtrack_prompt", BACKTRACK_PROMPT), 1.4, Color(0.95, 0.35, 0.35, 1.0))
+func _show_backtrack_dialog():
+	if not backtrack_dialog:
+		return
+	_backtrack_prompt_visible = true
+	backtrack_dialog.visible = true
+	if backtrack_dialog_text:
+		backtrack_dialog_text.text = LocalizationManager.translate("worldmap.backtrack_prompt", BACKTRACK_PROMPT)
+	if backtrack_dialog_hint:
+		backtrack_dialog_hint.text = LocalizationManager.translate("dialog.click_continue", "Click to continue")
 
 func _travel_to_boss_node(target_data: Dictionary):
-	_show_backtrack_toast()
-	await get_tree().create_timer(1.1).timeout
+	_show_backtrack_dialog()
+	while _backtrack_prompt_visible and is_inside_tree():
+		await get_tree().process_frame
 	_set_player_position_from_data(target_data)
 	GameManager.player_biome = str(target_data.get("biome", GameManager.player_biome))
 	GameManager.set_selected_story_biome(GameManager.player_biome)
 	_draw_map()
 	_scroll_to_player()
 	_enter_room(_build_boss_node(target_data))
+
+func _hide_backtrack_dialog():
+	_backtrack_prompt_visible = false
+	if backtrack_dialog:
+		backtrack_dialog.visible = false
 
 func _hide_info_toast():
 	if info_toast_box:
@@ -701,13 +736,29 @@ func _get_adjacent_node_ids(node_id: String, biome: String) -> Array[String]:
 	results.sort()
 	return results
 
+func _get_accessible_adjacent_node_ids(node_id: String, biome: String) -> Array[String]:
+	var results: Array[String] = []
+	for target_id in _get_adjacent_node_ids(node_id, biome):
+		var target_data = _get_map_entry_by_id(target_id)
+		if target_data.is_empty():
+			continue
+		var target_type = str(target_data.get("type", "room"))
+		if target_type == "":
+			continue
+		results.append(target_id)
+	return results
+
 func _make_pair_key(a: String, b: String) -> String:
 	return "%s|%s" % [a, b] if a < b else "%s|%s" % [b, a]
 
 func _update_map_content_bounds():
-	if not map_content:
+	if not map_content or not scroll_area:
 		return
 	map_content.custom_minimum_size = scroll_area.size
+	map_content.size = scroll_area.size
+	if node_container:
+		node_container.custom_minimum_size = scroll_area.size
+		node_container.size = scroll_area.size
 
 func _get_node_position(layer: int, column: int) -> Vector2:
 	var relative_layer = layer - visible_min_layer
@@ -718,28 +769,76 @@ func _get_node_position(layer: int, column: int) -> Vector2:
 	var nodes_span_y = float(max(0, visible_max_column - visible_min_column)) * current_row_spacing
 	var start_x = (content_width - nodes_span_x - current_node_size.x) * 0.5
 	var start_y = (content_height - nodes_span_y - current_node_size.y) * 0.5
-	return Vector2(
+	var base_position = Vector2(
 		relative_layer * current_layer_spacing + start_x,
 		relative_column * current_row_spacing + start_y
 	)
+	return base_position + _get_parallelogram_offset(relative_layer, relative_column)
+
+func _get_parallelogram_offset(relative_layer: int, relative_column: int) -> Vector2:
+	var half_node = current_node_half_size * PARALLELOGRAM_ROW_OFFSET_RATIO
+	match GameManager.world_map_skew_direction:
+		"left":
+			return Vector2(-float(relative_column) * half_node.x, 0.0)
+		"right":
+			return Vector2(float(relative_column) * half_node.x, 0.0)
+		"up":
+			return Vector2(0.0, -float(relative_layer) * half_node.y)
+		"down":
+			return Vector2(0.0, float(relative_layer) * half_node.y)
+		_:
+			return Vector2.ZERO
 
 func _draw_hand_drawn_dotted_line(p1: Vector2, p2: Vector2):
-	var dir = (p2 - p1).normalized()
-	var dist = p1.distance_to(p2)
-	var current_dist = 0.0
-	var line_width = max(2.0, 4.0 * current_node_scale)
-	var segment_length = max(6.0, 9.0 * current_node_scale)
-	var segment_gap = max(12.0, 18.0 * current_node_scale)
-	while current_dist < dist:
+	var points = _build_curved_line_points(p1, p2)
+	for i in range(points.size() - 1):
+		if i % 2 != 0:
+			continue
 		var segment = Line2D.new()
-		segment.width = line_width
+		segment.width = max(2.0, 4.0 * current_node_scale)
 		segment.default_color = DOTTED_COLOR
 		segment.begin_cap_mode = Line2D.LINE_CAP_ROUND
 		segment.end_cap_mode = Line2D.LINE_CAP_ROUND
-		segment.add_point(p1 + dir * current_dist)
-		segment.add_point(p1 + dir * min(current_dist + segment_length, dist))
+		segment.add_point(points[i])
+		segment.add_point(points[i + 1])
 		lines_container.add_child(segment)
-		current_dist += segment_gap
+
+func _build_curved_line_points(p1: Vector2, p2: Vector2) -> Array[Vector2]:
+	var points: Array[Vector2] = []
+	var delta = p2 - p1
+	var distance = max(delta.length(), 1.0)
+	var dir = delta / distance
+	var perpendicular = Vector2(-dir.y, dir.x)
+	var rng = RandomNumberGenerator.new()
+	rng.seed = _make_line_seed(p1, p2)
+	var curve_amount = max(18.0, distance * 0.18)
+	var control_a = p1 + (delta * 0.33) + perpendicular * rng.randf_range(-curve_amount, curve_amount)
+	var control_b = p1 + (delta * 0.66) + perpendicular * rng.randf_range(-curve_amount, curve_amount)
+	for i in range(CURVE_SAMPLES + 1):
+		var t = float(i) / float(CURVE_SAMPLES)
+		var point = _sample_cubic_bezier(p1, control_a, control_b, p2, t)
+		if i > 0 and i < CURVE_SAMPLES:
+			point += perpendicular * sin(t * PI * 2.0) * rng.randf_range(-curve_amount * 0.12, curve_amount * 0.12)
+		points.append(point)
+	return points
+
+func _sample_cubic_bezier(p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2, t: float) -> Vector2:
+	var inv = 1.0 - t
+	return (
+		inv * inv * inv * p0
+		+ 3.0 * inv * inv * t * p1
+		+ 3.0 * inv * t * t * p2
+		+ t * t * t * p3
+	)
+
+func _make_line_seed(p1: Vector2, p2: Vector2) -> int:
+	return hash([
+		int(round(p1.x)),
+		int(round(p1.y)),
+		int(round(p2.x)),
+		int(round(p2.y)),
+		GameManager.world_map_skew_direction
+	])
 
 func _scroll_to_player():
 	await get_tree().process_frame
@@ -937,6 +1036,7 @@ func _show_tutorial_popup(tutorial_id: String, message: String, target_mode: Str
 		)
 
 func _on_run_log_updated():
+	_apply_log_visibility()
 	_rebuild_log_entries()
 
 func _get_log_entry_color(text: String) -> Color:
@@ -975,6 +1075,7 @@ func _setup_battle_log_ui():
 	log_display.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	log_display.custom_minimum_size.y = LOG_COLLAPSED_HEIGHT
 	is_log_expanded = false
+	_apply_log_visibility()
 	_rebuild_log_entries()
 	_refresh_log_view()
 
@@ -1011,7 +1112,7 @@ func _refresh_log_view():
 			log_display.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 		var viewport_size = get_viewport_rect().size
 		log_display.size = Vector2(viewport_size.x, expanded_height)
-		log_display.global_position = Vector2(0.0, log_collapsed_global_rect.position.y - expanded_height + LOG_COLLAPSED_HEIGHT)
+		log_display.global_position = Vector2(0.0, viewport_size.y - expanded_height)
 	else:
 		_restore_log_to_collapsed_row()
 	log_display.mouse_filter = Control.MOUSE_FILTER_STOP if is_log_expanded else Control.MOUSE_FILTER_PASS
@@ -1049,3 +1150,16 @@ func _is_point_inside_log(global_point: Vector2) -> bool:
 	if not log_display or not log_display.visible:
 		return false
 	return log_display.get_global_rect().has_point(global_point)
+
+func _apply_log_visibility():
+	var enabled = _is_run_log_enabled()
+	if battle_log_row:
+		battle_log_row.visible = enabled
+	if not enabled:
+		is_log_expanded = false
+
+func _is_run_log_enabled() -> bool:
+	var config = ConfigFile.new()
+	if config.load(SETTINGS_PATH) != OK:
+		return true
+	return bool(config.get_value(SETTINGS_SECTION, RUN_LOG_KEY, true))

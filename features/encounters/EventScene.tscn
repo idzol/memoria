@@ -70,10 +70,7 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 40.0
-offset_top = -84.0
-offset_right = -40.0
-offset_bottom = -40.0
+offset_top = -44.0
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_constants/separation = 40
@@ -168,13 +165,6 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "The air is still here..."
 autowrap_mode = 3
-
-[node name="ContinueHint" type="Label" parent="UI/SafeZone/StageLayout/NarrativeCenter/DialogPanel/Margin/DialogVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.6, 0.75, 1, 1)
-text = "Click to continue"
-horizontal_alignment = 2
 
 [node name="ChoiceContainer" type="VBoxContainer" parent="UI/SafeZone/StageLayout/NarrativeCenter"]
 unique_name_in_owner = true

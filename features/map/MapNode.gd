@@ -52,13 +52,19 @@ func set_highlight_state(is_player_here: bool, is_selected: bool):
 	if not border_style or not fill_style:
 		return
 
+	var selected_color = Color(0.72, 0.92, 0.72, 0.92)
+	var player_color = Color(0.42, 0.84, 0.45, 0.94)
 	fill_style.bg_color = Color(0, 0, 0, 0)
 	if is_selected:
-		fill_style.bg_color = Color(0.72, 0.92, 0.72, 0.78)
+		fill_style.bg_color = Color(selected_color.r, selected_color.g, selected_color.b, 0.78)
 	if is_player_here:
-		fill_style.bg_color = Color(0.42, 0.84, 0.45, 0.82)
+		fill_style.bg_color = Color(player_color.r, player_color.g, player_color.b, 0.82)
 
 	border_style.border_color = Color(0.58, 0.58, 0.62, 0.92)
+	if is_selected:
+		border_style.border_color = selected_color
+	if is_player_here:
+		border_style.border_color = player_color
 
 func _apply_base_styles():
 	if border:
