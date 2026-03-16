@@ -155,3 +155,7 @@ mouse_filter = 2
 unique_name_in_owner = true
 custom_minimum_size = Vector2(720, 940)
 layout_mode = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 28
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 28

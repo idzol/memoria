@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://b5a0xj2ul16pu"]
 
-[ext_resource type="Theme" uid="uid://cy1tv88ir10yq" path="res://assets/themes/Greek.theme" id="1_j5glx"]
+[ext_resource type="Theme" uid="uid://bf0j8logevc46" path="res://assets/themes/Menu.theme" id="1_j5glx"]
 [ext_resource type="Script" uid="uid://c57vccx8hy237" path="res://features/combat/VictoryScreen.gd" id="1_script"]
 
 [node name="VictoryScreen" type="Control" unique_id=1469019555]

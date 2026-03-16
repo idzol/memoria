@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bgfq5lnp2tmu0"]
 
 [ext_resource type="Script" uid="uid://b4kab8i6m212y" path="res://features/ui/CharacterLevelUp.gd" id="1_logic"]
-[ext_resource type="Theme" uid="uid://cy1tv88ir10yq" path="res://assets/themes/Greek.theme" id="2_theme"]
+[ext_resource type="Theme" uid="uid://bf0j8logevc46" path="res://assets/themes/Menu.theme" id="2_theme"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.08, 0.08, 0.1, 0.94)
@@ -14,20 +14,6 @@ corner_radius_top_left = 10
 corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg"]
-bg_color = Color(0.06, 0.06, 0.08, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_fill"]
-bg_color = Color(0.9, 0.3, 0.3, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
 
 [node name="CharacterLevelUp" type="Control" unique_id=732653605]
 layout_mode = 3
@@ -97,152 +83,13 @@ theme_override_constants/margin_bottom = 24
 layout_mode = 2
 theme_override_constants/separation = 18
 
-[node name="HPRow" type="VBoxContainer" parent="Center/Root/Columns/StatsPanel/StatsMargin/StatsVBox"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="Top" type="HBoxContainer" parent="Center/Root/Columns/StatsPanel/StatsMargin/StatsVBox/HPRow"]
-layout_mode = 2
-
-[node name="HPLabel" type="Label" parent="Center/Root/Columns/StatsPanel/StatsMargin/StatsVBox/HPRow/Top"]
+[node name="StatsTable" type="GridContainer" parent="Center/Root/Columns/StatsPanel/StatsMargin/StatsVBox"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 22
-text = "HP"
-modulate = Color(0.88, 0.24, 0.24, 1)
-
-[node name="HPDelta" type="Label" parent="Center/Root/Columns/StatsPanel/StatsMargin/StatsVBox/HPRow/Top"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.95, 0.6, 1)
-theme_override_font_sizes/font_size = 20
-text = "+0"
-horizontal_alignment = 2
-
-[node name="HPBarOld" type="ProgressBar" parent="Center/Root/Columns/StatsPanel/StatsMargin/StatsVBox/HPRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 18)
-layout_mode = 2
-theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
-theme_override_styles/fill = SubResource("StyleBoxFlat_bar_fill")
-show_percentage = false
-
-[node name="HPBarNew" type="ProgressBar" parent="Center/Root/Columns/StatsPanel/StatsMargin/StatsVBox/HPRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 18)
-layout_mode = 2
-theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
-theme_override_styles/fill = SubResource("StyleBoxFlat_bar_fill")
-show_percentage = false
-
-[node name="EnergyRow" type="VBoxContainer" parent="Center/Root/Columns/StatsPanel/StatsMargin/StatsVBox"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="Top" type="HBoxContainer" parent="Center/Root/Columns/StatsPanel/StatsMargin/StatsVBox/EnergyRow"]
-layout_mode = 2
-
-[node name="EnergyLabel" type="Label" parent="Center/Root/Columns/StatsPanel/StatsMargin/StatsVBox/EnergyRow/Top"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 22
-text = "ENERGY"
-modulate = Color(1, 0.86, 0.35, 1)
-
-[node name="EnergyDelta" type="Label" parent="Center/Root/Columns/StatsPanel/StatsMargin/StatsVBox/EnergyRow/Top"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.95, 0.6, 1)
-theme_override_font_sizes/font_size = 20
-text = "+0"
-horizontal_alignment = 2
-
-[node name="EnergyBarOld" type="ProgressBar" parent="Center/Root/Columns/StatsPanel/StatsMargin/StatsVBox/EnergyRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 18)
-layout_mode = 2
-theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
-theme_override_styles/fill = SubResource("StyleBoxFlat_bar_fill")
-show_percentage = false
-
-[node name="EnergyBarNew" type="ProgressBar" parent="Center/Root/Columns/StatsPanel/StatsMargin/StatsVBox/EnergyRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 18)
-layout_mode = 2
-theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
-theme_override_styles/fill = SubResource("StyleBoxFlat_bar_fill")
-show_percentage = false
-
-[node name="AttackRow" type="HBoxContainer" parent="Center/Root/Columns/StatsPanel/StatsMargin/StatsVBox"]
-layout_mode = 2
-theme_override_constants/separation = 14
-
-[node name="AttackLabel" type="Label" parent="Center/Root/Columns/StatsPanel/StatsMargin/StatsVBox/AttackRow"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "ATTACK"
-
-[node name="AttackValue" type="Label" parent="Center/Root/Columns/StatsPanel/StatsMargin/StatsVBox/AttackRow"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-text = "0 -> 0"
-horizontal_alignment = 2
-
-[node name="AttackDelta" type="Label" parent="Center/Root/Columns/StatsPanel/StatsMargin/StatsVBox/AttackRow"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.95, 0.6, 1)
-text = "+0"
-horizontal_alignment = 2
-
-[node name="DefenseRow" type="HBoxContainer" parent="Center/Root/Columns/StatsPanel/StatsMargin/StatsVBox"]
-layout_mode = 2
-theme_override_constants/separation = 14
-
-[node name="DefenseLabel" type="Label" parent="Center/Root/Columns/StatsPanel/StatsMargin/StatsVBox/DefenseRow"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "DEFENSE"
-
-[node name="DefenseValue" type="Label" parent="Center/Root/Columns/StatsPanel/StatsMargin/StatsVBox/DefenseRow"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-text = "0 -> 0"
-horizontal_alignment = 2
-
-[node name="DefenseDelta" type="Label" parent="Center/Root/Columns/StatsPanel/StatsMargin/StatsVBox/DefenseRow"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.95, 0.6, 1)
-text = "+0"
-horizontal_alignment = 2
-
-[node name="PairsRow" type="HBoxContainer" parent="Center/Root/Columns/StatsPanel/StatsMargin/StatsVBox"]
-layout_mode = 2
-theme_override_constants/separation = 14
-
-[node name="PairsLabel" type="Label" parent="Center/Root/Columns/StatsPanel/StatsMargin/StatsVBox/PairsRow"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "CARD PAIRS"
-
-[node name="PairsValue" type="Label" parent="Center/Root/Columns/StatsPanel/StatsMargin/StatsVBox/PairsRow"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-text = "1 -> 2"
-horizontal_alignment = 2
-
-[node name="PairsDelta" type="Label" parent="Center/Root/Columns/StatsPanel/StatsMargin/StatsVBox/PairsRow"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.45, 0.95, 0.6, 1)
-text = "+1"
-horizontal_alignment = 2
+columns = 4
+theme_override_constants/h_separation = 18
+theme_override_constants/v_separation = 10
 
 [node name="LorePanel" type="PanelContainer" parent="Center/Root/Columns"]
 custom_minimum_size = Vector2(420, 460)

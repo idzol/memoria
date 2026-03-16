@@ -59,6 +59,8 @@ var player_grid_pos: Vector2i = Vector2i(-99, -99)
 
 var pending_loot: Array = []   # Loot from the JUST finished battle
 var run_loot: Array = []       # Cumulative loot from the WHOLE run
+var run_log: Array = []
+const MAX_RUN_LOG_ENTRIES := 200
 
 # --- LOADING SCREEN ---
 var loading_overlay_scene = preload("res://features/ui/LoadingOverlay.tscn")
@@ -81,6 +83,25 @@ func hide_loading():
 	if active_loading_overlay:
 		active_loading_overlay.close()
 		active_loading_overlay = null
+
+func add_run_log(text: String):
+	var entry = text.strip_edges()
+	if entry == "":
+		return
+	run_log.append(entry)
+	while run_log.size() > MAX_RUN_LOG_ENTRIES:
+		run_log.remove_at(0)
+	SignalBus.run_log_updated.emit()
+
+func get_run_log() -> Array[String]:
+	var entries: Array[String] = []
+	for entry in run_log:
+		entries.append(str(entry))
+	return entries
+
+func clear_run_log():
+	run_log.clear()
+	SignalBus.run_log_updated.emit()
 
 # --- PERSISTENT WORLD STATE ---
 # This structure tracks EVERY interaction across the game world.
@@ -152,6 +173,18 @@ func evaluate_condition(condition: Dictionary, context: Dictionary = {}) -> bool
 	if condition.is_empty(): return true
 	
 	match condition.get("type"):
+		"all":
+			for sub_condition in condition.get("conditions", []):
+				if sub_condition is Dictionary and not evaluate_condition(sub_condition, context):
+					return false
+			return true
+		"any":
+			for sub_condition in condition.get("conditions", []):
+				if sub_condition is Dictionary and evaluate_condition(sub_condition, context):
+					return true
+			return false
+		"not":
+			return not evaluate_condition(condition.get("condition", {}), context)
 		"has_item":
 			return world_state.items.owned.has(condition.get("id", ""))
 		"has_card":
@@ -174,8 +207,22 @@ func evaluate_condition(condition: Dictionary, context: Dictionary = {}) -> bool
 			return player_level >= int(condition.get("value", condition.get("level", 1)))
 		"day":
 			return world_state.global.get("current_day", 1) >= int(condition.get("value", condition.get("day", 1)))
+		"day_of_cycle":
+			var cycle_value = int(condition.get("value", condition.get("day", 1)))
+			var current_day = int(world_state.global.get("current_day", 1))
+			var cycle_day = posmod(current_day - 1, 8) + 1
+			return cycle_day == cycle_value
 		"days_passed":
 			return world_state.global.get("days_passed", 0) >= int(condition.get("value", condition.get("days", 0)))
+		"rooms_visited_count":
+			return _matches_numeric_condition(current_run_visited_nodes.size(), condition)
+		"room_visit_count":
+			var room_id = str(condition.get("id", context.get("id", "")))
+			var visit_count = int(world_state.rooms.get(room_id, {}).get("visit_count", 0))
+			return _matches_numeric_condition(visit_count, condition)
+		"run_mode":
+			var mode = str(condition.get("value", condition.get("mode", "story"))).to_lower()
+			return (mode == "battle" and is_battle_mode) or (mode == "story" and not is_battle_mode)
 		"stat_check":
 			return world_state.global.get(condition.stat, 0) >= condition.value
 	return true
@@ -208,6 +255,7 @@ func get_random_room_resource(area_key: String) -> RoomData:
 func mark_room_visited(room_id):
 	_ensure_room_state(room_id)
 	world_state.rooms[room_id].visited = true
+	world_state.rooms[room_id].visit_count = int(world_state.rooms[room_id].get("visit_count", 0)) + 1
 	refresh_story_room_completions()
 
 func mark_room_cleared(room_id):
@@ -285,7 +333,7 @@ func add_player_xp(amount: int) -> Dictionary:
 			"old_stats": start_stats,
 			"new_stats": new_stats,
 			"required_pairs": player_level,
-			"active_pairs": active_deck.size()
+			"active_pairs": get_active_deck_unique_pair_count()
 		}
 		SignalBus.level_up.emit(player_level)
 
@@ -306,18 +354,22 @@ func _ensure_room_state(room_id: String):
 	if room_id == "":
 		return
 	if not world_state.rooms.has(room_id):
-		world_state.rooms[room_id] = {"visited": true, "cleared": false, "completed": false}
-	elif not world_state.rooms[room_id].has("completed"):
+		world_state.rooms[room_id] = {"visited": false, "cleared": false, "completed": false, "visit_count": 0}
+	if not world_state.rooms[room_id].has("completed"):
 		world_state.rooms[room_id].completed = false
+	if not world_state.rooms[room_id].has("visit_count"):
+		world_state.rooms[room_id].visit_count = 0
 
 func _ensure_biome_state(biome: String):
 	if biome == "":
 		return
 	if not world_state.biomes.has(biome):
-		world_state.biomes[biome] = {"cleared": false, "unlocked": false, "home_node_id": ""}
-	elif not world_state.biomes[biome].has("home_node_id"):
+		world_state.biomes[biome] = {"cleared": false, "unlocked": false, "home_node_id": "", "entered": false}
+	if not world_state.biomes[biome].has("home_node_id"):
 		world_state.biomes[biome].home_node_id = ""
-	elif not world_state.biomes[biome].has("unlocked"):
+	if not world_state.biomes[biome].has("entered"):
+		world_state.biomes[biome].entered = false
+	if not world_state.biomes[biome].has("unlocked"):
 		world_state.biomes[biome].unlocked = false
 
 func _ensure_enemy_state(enemy_id: String):
@@ -422,6 +474,7 @@ func start_battle_mode():
 	player_level = 1
 	player_xp = 0
 	last_xp_gained = 0
+	clear_run_log()
 	pending_level_up = {}
 	level_up_return_scene = ""
 	var start_stats = _get_class_stats_for_level(player_level)
@@ -471,6 +524,7 @@ func start_battle_mode():
 
 func start_actual_run():
 	player_level = 1
+	clear_run_log()
 	var start_stats = _get_class_stats_for_level(player_level)
 	_apply_level_stats(start_stats)
 	current_hp = max_hp
@@ -556,6 +610,7 @@ func load_run_from_data(data: Dictionary):
 	player_defense = data.get("player_defense", base_defense)
 	player_deck = data.get("deck", [])
 	active_deck = data.get("active_deck", [])
+	run_log = _decode_variant_field(data, "run_log", [])
 	player_items = data.get("items", [])
 	active_items = data.get("active_items", [])
 	world_state = _decode_variant_field(data, "world_state", world_state)
@@ -631,6 +686,18 @@ func set_biome_home_node_id(biome: String, node_id: String):
 	_ensure_biome_state(biome)
 	world_state.biomes[biome].home_node_id = node_id
 
+func has_entered_story_biome(biome: String) -> bool:
+	if biome == "":
+		return false
+	_ensure_biome_state(biome)
+	return bool(world_state.biomes[biome].get("entered", false))
+
+func mark_story_biome_entered(biome: String):
+	if biome == "":
+		return
+	_ensure_biome_state(biome)
+	world_state.biomes[biome].entered = true
+
 func enter_story_biome(biome: String, mark_as_home_if_new: bool = true):
 	if biome == "":
 		return
@@ -656,6 +723,51 @@ func enter_story_biome(biome: String, mark_as_home_if_new: bool = true):
 	if DataManager and DataManager.has_method("prioritize_story_assets"):
 		DataManager.prioritize_story_assets(player_biome)
 	_set_player_position_from_node(entry_node)
+
+func get_story_biome_home_node(biome: String) -> Dictionary:
+	if biome == "":
+		return {}
+	var home_node_id = get_biome_home_node_id(biome)
+	if home_node_id != "":
+		var entry_node = _get_run_node_by_id(home_node_id)
+		if not entry_node.is_empty():
+			return entry_node
+	return _find_home_node_for_biome(biome)
+
+func get_scene_path_for_room(node_data: Dictionary) -> String:
+	if node_data.is_empty():
+		return get_active_biome_map_scene_path()
+	var room_path = str(node_data.get("room_resource_path", ""))
+	var room_res: RoomData = null
+	if room_path != "" and ResourceLoader.exists(room_path):
+		room_res = load(room_path) as RoomData
+	var room_type = str(node_data.get("type", "battle"))
+	if room_res:
+		room_type = str(room_res.type)
+	match room_type:
+		"battle", "boss":
+			return "res://features/combat/BattleScene.tscn"
+		"rest":
+			return "res://features/encounters/RestScene.tscn"
+		"shop":
+			return "res://features/encounters/ShopScene.tscn"
+		"event", "home", "lore", "npc":
+			return "res://features/encounters/EventScene.tscn"
+		_:
+			return "res://features/combat/BattleScene.tscn"
+
+func open_story_biome_intro_if_needed(biome: String) -> bool:
+	if biome == "" or is_battle_mode or has_entered_story_biome(biome):
+		return false
+	enter_story_biome(biome, true)
+	var home_node = get_story_biome_home_node(biome)
+	if home_node.is_empty():
+		return false
+	mark_story_biome_entered(biome)
+	current_node = home_node
+	SignalBus.node_selected.emit(home_node)
+	get_tree().change_scene_to_file(get_scene_path_for_room(home_node))
+	return true
 
 func _pick_random_story_biome_home_node_id(biome: String) -> String:
 	var biome_nodes = get_nodes_for_biome(biome)
@@ -732,7 +844,7 @@ func _reroll_incomplete_story_rooms_for_new_run():
 		_ensure_room_state(node_id)
 		if world_state.rooms[node_id].get("completed", false):
 			continue
-		world_state.rooms[node_id] = {"visited": false, "cleared": false, "completed": false}
+		world_state.rooms[node_id] = {"visited": false, "cleared": false, "completed": false, "visit_count": 0}
 	refresh_story_room_completions()
 
 func begin_new_story_run(return_biome: String = ""):
@@ -975,6 +1087,8 @@ func register_room_victory(node_data: Dictionary, remaining_hp: int):
 		pending_post_battle_scene = get_active_biome_map_scene_path() if is_battle_mode else get_story_map_scene_path()
 	else:
 		_set_player_position_from_node(node_data)
+		if not is_battle_mode:
+			pending_post_battle_scene = "res://features/encounters/EventScene.tscn"
 
 	SaveManager.save_mid_run_state()
 
@@ -1092,18 +1206,49 @@ func _apply_level_stats(stats: Dictionary):
 
 func _ensure_minimum_active_pairs_for_level():
 	var required_pairs = max(1, player_level)
-	var first_card_id = ""
-	if not active_deck.is_empty():
-		first_card_id = str(active_deck[0])
-	elif not player_deck.is_empty():
-		first_card_id = str(player_deck[0])
-	else:
-		first_card_id = "sword"
+	var fallback_card_ids = ["sword", "shield", "heart"]
 
-	while active_deck.size() < required_pairs:
-		active_deck.append(first_card_id)
-		if _count_occurrences(player_deck, first_card_id) < _count_occurrences(active_deck, first_card_id):
-			player_deck.append(first_card_id)
+	while get_active_deck_unique_pair_count() < required_pairs:
+		var next_pair_id = _find_next_missing_pair_card_id()
+		if next_pair_id == "":
+			for fallback_id in fallback_card_ids:
+				if _count_occurrences(active_deck, fallback_id) < 2:
+					next_pair_id = fallback_id
+					break
+		if next_pair_id == "":
+			break
+		while _count_occurrences(active_deck, next_pair_id) < 2:
+			active_deck.append(next_pair_id)
+			if _count_occurrences(player_deck, next_pair_id) < _count_occurrences(active_deck, next_pair_id):
+				player_deck.append(next_pair_id)
+
+func get_active_deck_unique_pair_count() -> int:
+	return _count_unique_pairs(active_deck)
+
+func _find_next_missing_pair_card_id() -> String:
+	var candidate_ids: Array = []
+	for card_id in player_deck:
+		var text_id = str(card_id)
+		if not candidate_ids.has(text_id):
+			candidate_ids.append(text_id)
+	for card_id in active_deck:
+		var text_id = str(card_id)
+		if not candidate_ids.has(text_id):
+			candidate_ids.append(text_id)
+	for card_id in candidate_ids:
+		if _count_occurrences(active_deck, card_id) < 2:
+			return card_id
+	return ""
+
+func _count_unique_pairs(source: Array) -> int:
+	var counts := {}
+	for entry in source:
+		counts[entry] = int(counts.get(entry, 0)) + 1
+	var total_pairs := 0
+	for count in counts.values():
+		if int(count) >= 2:
+			total_pairs += 1
+	return total_pairs
 
 func _count_occurrences(source: Array, value) -> int:
 	var count = 0
@@ -1111,6 +1256,13 @@ func _count_occurrences(source: Array, value) -> int:
 		if entry == value:
 			count += 1
 	return count
+
+func _matches_numeric_condition(actual: int, condition: Dictionary) -> bool:
+	if condition.has("equals"):
+		return actual == int(condition.get("equals", 0))
+	if condition.has("max"):
+		return actual <= int(condition.get("max", 0))
+	return actual >= int(condition.get("value", condition.get("min", 0)))
 
 func take_damage(amount: int):
 	current_hp = max(0, current_hp - amount)

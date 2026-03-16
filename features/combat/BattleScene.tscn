@@ -347,6 +347,14 @@ theme_override_font_sizes/font_size = 32
 text = "Room Name"
 horizontal_alignment = 1
 
+[node name="DialogSpeaker" type="Label" parent="DialogOverlay/VBox" unique_id=11030021]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.82, 0.45, 1)
+theme_override_font_sizes/font_size = 18
+text = "Narrator"
+horizontal_alignment = 1
+
 [node name="DialogText" type="Label" parent="DialogOverlay/VBox" unique_id=934671793]
 unique_name_in_owner = true
 layout_mode = 2
@@ -354,6 +362,13 @@ theme_override_constants/line_spacing = 5
 text = "Encounter Text..."
 horizontal_alignment = 1
 autowrap_mode = 3
+
+[node name="ContinueHint" type="Label" parent="DialogOverlay/VBox" unique_id=51881204]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.75, 1, 1)
+text = "Click to continue"
+horizontal_alignment = 1
 
 [node name="OptionContainer" type="VBoxContainer" parent="DialogOverlay/VBox" unique_id=529039171]
 unique_name_in_owner = true

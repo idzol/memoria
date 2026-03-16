@@ -6,6 +6,7 @@ const STORY_ORDER = ["home", "town", "forest", "ice_caves", "desert", "swamp", "
 const SCROLL_CONTENT_PADDING := 24.0
 const ENTRY_GAP := 18.0
 const CHAPTER_GAP := 28.0
+const ENTRY_TILE_PADDING := 14.0
 const SETTINGS_PATH := "user://settings.cfg"
 const SETTINGS_SECTION := "gameplay"
 const TUTORIAL_TIPS_KEY := "tutorial_tips"
@@ -89,8 +90,10 @@ func _rebuild_chapters():
 	var available_height = _get_available_scroll_height()
 	var card_height = max(320.0, available_height - (SCROLL_CONTENT_PADDING * 2.0))
 	var card_width = card_height * (640.0 / 905.0)
-	var chapter_width = card_width * (2.0 if show_story else 1.0) + (ENTRY_GAP if show_story else 0.0)
-	var chapter_height = card_height + 24.0
+	var padded_card_width = card_width + (ENTRY_TILE_PADDING * 2.0)
+	var padded_card_height = card_height + (ENTRY_TILE_PADDING * 2.0)
+	var chapter_width = padded_card_width * (2.0 if show_story else 1.0) + (ENTRY_GAP if show_story else 0.0)
+	var chapter_height = padded_card_height + 24.0
 	header_label.text = LocalizationManager.translate("storymap.header.story", "Story Chapters") if show_story else LocalizationManager.translate("storymap.header.biome", "Biome Chapters")
 	chapter_row.custom_minimum_size = Vector2(
 		(chapter_width * unlocked.size()) + (CHAPTER_GAP * max(0, unlocked.size() - 1)),
@@ -132,6 +135,7 @@ func _rebuild_chapters():
 
 func _build_story_tile(biome: String) -> Control:
 	var wrapper = _build_entry_wrapper(biome, "story")
+	var content: MarginContainer = wrapper.get_meta("content")
 	var chapter_card = STORY_CHAPTER_SCENE.instantiate()
 	chapter_card.embedded_mode = true
 	chapter_card.show_background = false
@@ -140,11 +144,12 @@ func _build_story_tile(biome: String) -> Control:
 	chapter_card.title_override = _get_story_tile_title(biome)
 	chapter_card.set_biome(biome)
 	chapter_card.chapter_pressed.connect(_on_story_tile_pressed)
-	wrapper.add_child(chapter_card)
+	content.add_child(chapter_card)
 	return wrapper
 
 func _build_summary_tile(biome: String) -> Control:
 	var wrapper = _build_entry_wrapper(biome, "summary")
+	var content: MarginContainer = wrapper.get_meta("content")
 	var summary_card = MAP_SUMMARY_SCENE.instantiate()
 	summary_card.embedded_mode = true
 	summary_card.show_background = false
@@ -152,7 +157,7 @@ func _build_summary_tile(biome: String) -> Control:
 	summary_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	summary_card.set_biome(biome)
 	summary_card.summary_pressed.connect(_on_summary_tile_pressed)
-	wrapper.add_child(summary_card)
+	content.add_child(summary_card)
 	return wrapper
 
 func _build_entry_wrapper(biome: String, kind: String) -> Button:
@@ -160,7 +165,10 @@ func _build_entry_wrapper(biome: String, kind: String) -> Button:
 	wrapper.name = "%s_%s_button" % [biome, kind]
 	var card_height = max(320.0, _get_available_scroll_height() - (SCROLL_CONTENT_PADDING * 2.0))
 	var card_width = card_height * (640.0 / 905.0)
-	wrapper.custom_minimum_size = Vector2(card_width, card_height)
+	wrapper.custom_minimum_size = Vector2(
+		card_width + (ENTRY_TILE_PADDING * 2.0),
+		card_height + (ENTRY_TILE_PADDING * 2.0)
+	)
 	wrapper.flat = true
 	wrapper.text = ""
 	wrapper.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -170,6 +178,16 @@ func _build_entry_wrapper(biome: String, kind: String) -> Button:
 	wrapper.add_theme_stylebox_override("pressed", _default_style)
 	wrapper.add_theme_stylebox_override("focus", _default_style)
 	wrapper.pressed.connect(_on_entry_wrapper_pressed.bind(biome, kind))
+	var content = MarginContainer.new()
+	content.name = "Content"
+	content.set_anchors_preset(Control.PRESET_FULL_RECT)
+	content.offset_left = ENTRY_TILE_PADDING
+	content.offset_top = ENTRY_TILE_PADDING
+	content.offset_right = -ENTRY_TILE_PADDING
+	content.offset_bottom = -ENTRY_TILE_PADDING
+	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	wrapper.add_child(content)
+	wrapper.set_meta("content", content)
 	chapter_entries.append({"button": wrapper, "biome": biome, "kind": kind})
 	return wrapper
 
@@ -311,6 +329,8 @@ func _open_selected_biome_map():
 		GameManager.player_biome = biome
 		GameManager.player_grid_pos = Vector2i(int(entry_node.get("layer", 0)), int(entry_node.get("column", 0)))
 	else:
+		if GameManager.open_story_biome_intro_if_needed(biome):
+			return
 		GameManager.enter_story_biome(biome, true)
 	get_tree().change_scene_to_file(GameManager.get_active_biome_map_scene_path())
 

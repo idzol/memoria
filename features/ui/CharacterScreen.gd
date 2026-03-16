@@ -265,12 +265,14 @@ func _can_transfer(mode: String, source: String, id: String, show_feedback: bool
 	if mode == "deck":
 		var min_required = GameManager.player_level
 		if source == "active":
-			if GameManager.active_deck.size() <= min_required:
+			var next_active_deck = GameManager.active_deck.duplicate()
+			_remove_one(next_active_deck, id)
+			if _count_unique_pairs(next_active_deck) < min_required:
 				if show_feedback:
 					_show_info_toast(LocalizationManager.format(
 						"character.toast.min_deck_cards",
 						{"count": min_required},
-						"You must have at least {count} card(s) in your deck."
+						"You must have at least {count} unique pair(s) in your active deck."
 					))
 				return false
 		else:
@@ -338,16 +340,16 @@ func _refresh_after_transfer(mode: String):
 	SaveManager.save_mid_run_state()
 
 func _update_counters():
-	var active_deck_size = GameManager.active_deck.size()
+	var active_pair_count = _count_unique_pairs(GameManager.active_deck)
 	var min_cards = GameManager.player_level
 	deck_count_label.text = LocalizationManager.format(
 		"character.pairs",
-		{"current": active_deck_size, "required": min_cards},
-		"Pairs: {current} | {required}"
+		{"current": active_pair_count, "required": min_cards},
+		"Unique Pairs: {current} / {required}"
 	)
-	if active_deck_size > min_cards:
+	if active_pair_count > min_cards:
 		deck_count_label.modulate = Color.GOLD
-	elif active_deck_size == min_cards:
+	elif active_pair_count == min_cards:
 		deck_count_label.modulate = Color.WHITE
 	else:
 		deck_count_label.modulate = Color.TOMATO
@@ -362,11 +364,11 @@ func _update_counters():
 	item_count_label.modulate = Color.GOLD if active_item_count >= max_items else Color.WHITE
 
 func _on_back_pressed():
-	if GameManager.active_deck.size() < GameManager.player_level:
+	if _count_unique_pairs(GameManager.active_deck) < GameManager.player_level:
 		_show_info_toast(LocalizationManager.format(
 			"character.toast.min_deck_exit",
 			{"count": GameManager.player_level},
-			"You must have at least {count} cards in your deck."
+			"You must have at least {count} unique pairs in your active deck."
 		))
 		return
 	
@@ -411,6 +413,14 @@ func _count_ids(ids: Array) -> Dictionary:
 	for id in ids:
 		counts[id] = int(counts.get(id, 0)) + 1
 	return counts
+
+func _count_unique_pairs(ids: Array) -> int:
+	var counts = _count_ids(ids)
+	var total_pairs := 0
+	for count in counts.values():
+		if int(count) >= 2:
+			total_pairs += 1
+	return total_pairs
 
 func _get_reserve_deck_counts() -> Dictionary:
 	var owned_counts = _count_ids(GameManager.player_deck)

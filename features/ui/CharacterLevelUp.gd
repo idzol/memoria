@@ -1,27 +1,11 @@
 extends Control
 
 # res://features/ui/CharacterLevelUp.gd
-# Displays a graphical stat preview and recovered lore after a level up.
+# Displays a numerical stat preview and recovered lore after a level up.
 
 @onready var title_label = %TitleLabel
 @onready var stat_summary_label = %StatSummaryLabel
-@onready var hp_label = %HPLabel
-@onready var hp_bar_old = %HPBarOld
-@onready var hp_bar_new = %HPBarNew
-@onready var hp_delta = %HPDelta
-@onready var energy_label = %EnergyLabel
-@onready var energy_bar_old = %EnergyBarOld
-@onready var energy_bar_new = %EnergyBarNew
-@onready var energy_delta = %EnergyDelta
-@onready var attack_label = %AttackLabel
-@onready var attack_value = %AttackValue
-@onready var attack_delta = %AttackDelta
-@onready var defense_label = %DefenseLabel
-@onready var defense_value = %DefenseValue
-@onready var defense_delta = %DefenseDelta
-@onready var pairs_label = %PairsLabel
-@onready var pairs_value = %PairsValue
-@onready var pairs_delta = %PairsDelta
+@onready var stats_table = %StatsTable
 @onready var lore_title = %LoreTitle
 @onready var lore_body = %LoreBody
 @onready var continue_button = %ContinueButton
@@ -32,6 +16,14 @@ func _ready():
 		_show_fallback_data()
 	else:
 		_apply_level_up_data(data)
+		var new_level = int(data.get("new_level", GameManager.player_level))
+		GameManager.add_run_log(
+			LocalizationManager.format(
+				"log.level_up",
+				{"name": GameManager.player_name if GameManager.player_name != "" else GameManager.player_class, "level": new_level},
+				"{name} leveled up to {level}."
+			)
+		)
 
 	continue_button.pressed.connect(_on_continue_pressed)
 
@@ -53,50 +45,33 @@ func _apply_level_up_data(data: Dictionary):
 		{"old": old_level, "new": new_level},
 		"Level {old} -> Level {new}"
 	)
-
-	_apply_bar_row(
-		hp_label,
-		hp_bar_old,
-		hp_bar_new,
-		hp_delta,
-		"levelup.hp",
-		"HP",
-		int(old_stats.get("max_hp", 0)),
-		int(new_stats.get("max_hp", 0)),
-		Color(0.84, 0.24, 0.24, 1.0),
-		Color(1.0, 0.48, 0.48, 1.0)
-	)
-	_apply_bar_row(
-		energy_label,
-		energy_bar_old,
-		energy_bar_new,
-		energy_delta,
-		"levelup.energy",
-		"ENERGY",
-		int(old_stats.get("energy", 0)),
-		int(new_stats.get("energy", 0)),
-		Color(0.92, 0.72, 0.18, 1.0),
-		Color(1.0, 0.9, 0.38, 1.0)
-	)
-
-	attack_label.text = LocalizationManager.translate("levelup.attack", "ATTACK")
-	_apply_value_row(
-		attack_value,
-		attack_delta,
-		int(old_stats.get("player_attack", 0)),
-		int(new_stats.get("player_attack", 0))
-	)
-
-	defense_label.text = LocalizationManager.translate("levelup.defense", "DEFENSE")
-	_apply_value_row(
-		defense_value,
-		defense_delta,
-		int(old_stats.get("player_defense", 0)),
-		int(new_stats.get("player_defense", 0))
-	)
-
-	pairs_label.text = LocalizationManager.translate("levelup.pairs", "CARD PAIRS")
-	_apply_value_row(pairs_value, pairs_delta, previous_pairs, required_pairs)
+	_populate_stats_table([
+		{
+			"label": LocalizationManager.translate("levelup.hp", "HP"),
+			"old": int(old_stats.get("max_hp", 0)),
+			"new": int(new_stats.get("max_hp", 0))
+		},
+		{
+			"label": LocalizationManager.translate("levelup.energy", "ENERGY"),
+			"old": int(old_stats.get("energy", 0)),
+			"new": int(new_stats.get("energy", 0))
+		},
+		{
+			"label": LocalizationManager.translate("levelup.attack", "ATTACK"),
+			"old": int(old_stats.get("player_attack", 0)),
+			"new": int(new_stats.get("player_attack", 0))
+		},
+		{
+			"label": LocalizationManager.translate("levelup.defense", "DEFENSE"),
+			"old": int(old_stats.get("player_defense", 0)),
+			"new": int(new_stats.get("player_defense", 0))
+		},
+		{
+			"label": LocalizationManager.translate("levelup.pairs", "CARD PAIRS"),
+			"old": previous_pairs,
+			"new": required_pairs
+		}
+	])
 
 	lore_title.text = LocalizationManager.format(
 		"levelup.lore_title",
@@ -127,20 +102,40 @@ func _show_fallback_data():
 		"active_pairs": GameManager.active_deck.size()
 	})
 
-func _apply_bar_row(label_node: Label, old_bar: ProgressBar, new_bar: ProgressBar, delta_label: Label, key: String, fallback: String, old_value: int, new_value: int, old_color: Color, new_color: Color):
-	label_node.text = LocalizationManager.translate(key, fallback)
-	var max_value = max(old_value, new_value, 1)
-	old_bar.max_value = max_value
-	old_bar.value = old_value
-	new_bar.max_value = max_value
-	new_bar.value = new_value
-	old_bar.modulate = old_color
-	new_bar.modulate = new_color
-	delta_label.text = _format_delta(old_value, new_value)
+func _populate_stats_table(rows: Array):
+	if not stats_table:
+		return
+	for child in stats_table.get_children():
+		child.queue_free()
+	_add_stats_header_row()
+	for row in rows:
+		_add_stats_value_row(str(row.get("label", "")), int(row.get("old", 0)), int(row.get("new", 0)))
 
-func _apply_value_row(value_label: Label, delta_label: Label, old_value: int, new_value: int):
-	value_label.text = "%d -> %d" % [old_value, new_value]
-	delta_label.text = _format_delta(old_value, new_value)
+func _add_stats_header_row():
+	_add_table_cell("", HORIZONTAL_ALIGNMENT_LEFT, true, false)
+	_add_table_cell(LocalizationManager.translate("levelup.table.current", "CURRENT"), HORIZONTAL_ALIGNMENT_CENTER, true, true)
+	_add_table_cell(LocalizationManager.translate("levelup.table.next", "NEXT"), HORIZONTAL_ALIGNMENT_CENTER, true, true)
+	_add_table_cell(LocalizationManager.translate("levelup.table.change", "CHANGE"), HORIZONTAL_ALIGNMENT_RIGHT, true, true)
+
+func _add_stats_value_row(label_text: String, old_value: int, new_value: int):
+	_add_table_cell(label_text, HORIZONTAL_ALIGNMENT_LEFT, false, false)
+	_add_table_cell(str(old_value), HORIZONTAL_ALIGNMENT_CENTER, false, false)
+	_add_table_cell(str(new_value), HORIZONTAL_ALIGNMENT_CENTER, false, false)
+	_add_table_cell(_format_delta(old_value, new_value), HORIZONTAL_ALIGNMENT_RIGHT, false, true)
+
+func _add_table_cell(text: String, alignment: HorizontalAlignment, is_header: bool, emphasize: bool):
+	var label = Label.new()
+	label.text = text
+	label.horizontal_alignment = alignment
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	label.custom_minimum_size.y = 34 if is_header else 30
+	label.add_theme_font_size_override("font_size", 18 if is_header else 20)
+	if is_header:
+		label.modulate = Color(0.76, 0.8, 0.9, 1.0)
+	elif emphasize:
+		label.modulate = Color(0.45, 0.95, 0.6, 1.0)
+	stats_table.add_child(label)
 
 func _format_delta(old_value: int, new_value: int) -> String:
 	var delta = new_value - old_value

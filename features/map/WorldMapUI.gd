@@ -7,6 +7,7 @@ extends Control
 @onready var lines_container = %LinesContainer
 @onready var biome_label = %BiomeLabel
 @onready var phase_label = %PhaseLabel
+@onready var day_button = %DayButton
 @onready var tracker_text = %TrackerText
 @onready var scroll_area = %MapArea
 @onready var avatar_button = %AvatarButton
@@ -16,6 +17,18 @@ extends Control
 @onready var info_toast_box = %InfoToastBox
 @onready var info_toast_label = %InfoToastLabel
 @onready var background_texture = %BGTexture
+@onready var day_info_panel = %DayInfoPanel
+@onready var day_info_title = %DayInfoTitle
+@onready var day_info_description = %DayInfoDescription
+@onready var day_info_deities_heading = %DayInfoDeitiesHeading
+@onready var day_info_deities = %DayInfoDeities
+@onready var day_info_purpose_heading = %DayInfoPurposeHeading
+@onready var day_info_purpose = %DayInfoPurpose
+@onready var battle_log_row = %BattleLogRow
+@onready var log_left_spacer = %LeftSpacer
+@onready var log_box = %LogBox
+@onready var log_display = %LogDisplay
+@onready var log_right_spacer = %RightSpacer
 
 var node_scene = preload("res://features/map/MapNode.tscn")
 var in_game_menu_scene = preload("res://features/ui/InGameMenu.tscn")
@@ -45,6 +58,16 @@ const TUTORIAL_TIPS_KEY := "tutorial_tips"
 const TUTORIAL_FLAGS_SECTION := "tutorial_flags"
 const TUTORIAL_TOAST_DURATION := 10.0
 const TUTORIAL_TOAST_COLOR := Color(0.4, 0.7, 1.0, 1.0)
+const CULT_DAY_NAMES := [
+	"Protodia",
+	"Hoplidia",
+	"Tridia",
+	"Tetradia",
+	"Pemptidia",
+	"Hektidia",
+	"Hebdomia",
+	"Ogdoadia"
+]
 
 var current_node_scale: float = 1.0
 var current_node_size: Vector2 = BASE_NODE_SIZE
@@ -56,9 +79,24 @@ var current_top_padding: float = BASE_TOP_PADDING
 var _tutorial_active: bool = false
 var _tutorial_id: String = ""
 var _tutorial_target_mode: String = "node"
+var is_log_expanded: bool = false
+var log_collapsed_global_rect: Rect2 = Rect2()
+
+const LOG_COLLAPSED_HEIGHT = 32.0
+const LOG_EXPANDED_LINE_COUNT = 10
+const LOG_LINE_HEIGHT = 22.0
+const LOG_EXPANDED_PADDING = 12.0
+const LOG_ROW_SEPARATION = 0
+const LOG_SIDE_SPACER_WIDTH = 0.0
+const LOG_COLOR_GOOD = Color(0.62, 1.0, 0.62, 1.0)
+const LOG_COLOR_BAD = Color(1.0, 0.58, 0.58, 1.0)
+const LOG_COLOR_NEUTRAL = Color(0.86, 0.86, 0.86, 1.0)
 
 func _ready():
 	_setup_ui()
+	_setup_battle_log_ui()
+	if not SignalBus.run_log_updated.is_connected(_on_run_log_updated):
+		SignalBus.run_log_updated.connect(_on_run_log_updated)
 
 	if GameManager.run_map.is_empty():
 		if GameManager.is_battle_mode:
@@ -88,12 +126,24 @@ func _ready():
 func _notification(what):
 	if what == NOTIFICATION_RESIZED and is_inside_tree() and node_container and lines_container and map_content and scroll_area and not GameManager.run_map.is_empty():
 		_draw_map()
+		_refresh_log_view()
 
 func _input(event):
 	if get_viewport().is_input_handled():
 		return
 
+	if is_log_expanded and event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		if not _is_point_inside_log(event.position):
+			is_log_expanded = false
+			_refresh_log_view()
+			get_viewport().set_input_as_handled()
+			return
+
 	if event.is_action_pressed("ui_cancel"):
+		if day_info_panel and day_info_panel.visible:
+			_hide_day_info_panel()
+			get_viewport().set_input_as_handled()
+			return
 		if in_game_menu and in_game_menu.visible:
 			if in_game_menu.has_method("handle_cancel"):
 				in_game_menu.handle_cancel()
@@ -133,8 +183,11 @@ func _setup_ui():
 		story_button.pressed.connect(_open_story_map)
 	if menu_icon_btn:
 		menu_icon_btn.pressed.connect(_toggle_in_game_menu)
+	if day_button:
+		day_button.pressed.connect(_toggle_day_info_panel)
 
 	_hide_info_toast()
+	_hide_day_info_panel()
 
 func _toggle_in_game_menu():
 	if not in_game_menu:
@@ -245,8 +298,80 @@ func _update_header_labels(current_data: Dictionary):
 		phase_label.text = LocalizationManager.format("worldmap.phase.grid", {"size": grid_size}, "{size}x{size} GRID")
 	else:
 		phase_label.text = LocalizationManager.translate("worldmap.phase.story", "STORY MAP")
+	_refresh_day_ui()
 
 	tracker_text.text = _get_room_display_name(current_data)
+
+func _refresh_day_ui():
+	if not day_button:
+		return
+	var day_number = _get_current_day_number()
+	var day_index = _get_day_cycle_index(day_number)
+	var day_name = _get_day_name(day_index)
+	day_button.text = LocalizationManager.format(
+		"worldmap.day.button",
+		{"day": day_number, "name": day_name},
+		"Day {day}. {name}"
+	)
+	if day_info_panel and day_info_panel.visible:
+		_populate_day_info(day_number, day_index)
+
+func _get_current_day_number() -> int:
+	return max(1, int(GameManager.world_state.global.get("current_day", 1)))
+
+func _get_day_cycle_index(day_number: int) -> int:
+	return posmod(day_number - 1, CULT_DAY_NAMES.size()) + 1
+
+func _get_day_name(day_index: int) -> String:
+	return LocalizationManager.translate(
+		"worldmap.day.%d.name" % day_index,
+		CULT_DAY_NAMES[clamp(day_index - 1, 0, CULT_DAY_NAMES.size() - 1)]
+	)
+
+func _toggle_day_info_panel():
+	if not day_info_panel:
+		return
+	if day_info_panel.visible:
+		_hide_day_info_panel()
+		return
+	var day_number = _get_current_day_number()
+	var day_index = _get_day_cycle_index(day_number)
+	_populate_day_info(day_number, day_index)
+	day_info_panel.visible = true
+
+func _hide_day_info_panel():
+	if day_info_panel:
+		day_info_panel.visible = false
+
+func _populate_day_info(day_number: int, day_index: int):
+	if not day_info_panel:
+		return
+	var day_name = _get_day_name(day_index)
+	if day_info_title:
+		day_info_title.text = LocalizationManager.format(
+			"worldmap.day.button",
+			{"day": day_number, "name": day_name},
+			"Day {day}. {name}"
+		)
+	if day_info_description:
+		day_info_description.text = LocalizationManager.translate(
+			"worldmap.day.%d.description" % day_index,
+			""
+		)
+	if day_info_deities_heading:
+		day_info_deities_heading.text = LocalizationManager.translate("worldmap.day.deities", "Deities")
+	if day_info_deities:
+		day_info_deities.text = LocalizationManager.translate(
+			"worldmap.day.%d.deities" % day_index,
+			""
+		)
+	if day_info_purpose_heading:
+		day_info_purpose_heading.text = LocalizationManager.translate("worldmap.day.purpose", "Purpose")
+	if day_info_purpose:
+		day_info_purpose.text = LocalizationManager.translate(
+			"worldmap.day.%d.purpose" % day_index,
+			""
+		)
 
 func _get_room_display_name(node_data: Dictionary) -> String:
 	var room_path = str(node_data.get("room_resource_path", ""))
@@ -491,6 +616,14 @@ func _enter_room(data: Dictionary):
 	var room_type = str(data.get("type", "battle"))
 	if room_res:
 		room_type = str(room_res.type)
+	var room_name = room_res.room_name if room_res and room_res.room_name != "" else _get_room_display_name(data)
+	GameManager.add_run_log(
+		LocalizationManager.format(
+			"log.room.enter",
+			{"room": room_name},
+			"Entered {room}."
+		)
+	)
 
 	match room_type:
 		"battle", "boss":
@@ -787,7 +920,7 @@ func _show_tutorial_popup(tutorial_id: String, message: String, target_mode: Str
 		avatar_button.add_theme_stylebox_override("hover", highlight_style)
 		avatar_button.add_theme_stylebox_override("pressed", highlight_style)
 		avatar_button.add_theme_stylebox_override("focus", highlight_style)
-	_show_info_toast(message, TUTORIAL_TOAST_DURATION, TUTORIAL_TOAST_COLOR)
+		_show_info_toast(message, TUTORIAL_TOAST_DURATION, TUTORIAL_TOAST_COLOR)
 	_set_tutorial_seen(tutorial_id)
 	_tutorial_active = false
 	_tutorial_id = ""
@@ -802,3 +935,117 @@ func _show_tutorial_popup(tutorial_id: String, message: String, target_mode: Str
 				avatar_button.remove_theme_stylebox_override("pressed")
 				avatar_button.remove_theme_stylebox_override("focus")
 		)
+
+func _on_run_log_updated():
+	_rebuild_log_entries()
+
+func _get_log_entry_color(text: String) -> Color:
+	var lower = text.to_lower()
+	if "victory" in lower or "leveled up" in lower:
+		return LOG_COLOR_GOOD
+	if "trap" in lower or "receive" in lower or "damage" in lower:
+		return LOG_COLOR_BAD
+	return LOG_COLOR_NEUTRAL
+
+func _setup_battle_log_ui():
+	if not log_display or not battle_log_row:
+		return
+	_apply_log_horizontal_constants()
+	battle_log_row.mouse_filter = Control.MOUSE_FILTER_STOP
+	battle_log_row.custom_minimum_size.y = LOG_COLLAPSED_HEIGHT
+	if not battle_log_row.gui_input.is_connected(_on_battle_log_row_gui_input):
+		battle_log_row.gui_input.connect(_on_battle_log_row_gui_input)
+	log_display.visible = true
+	log_display.z_index = 120
+	log_display.mouse_filter = Control.MOUSE_FILTER_PASS
+	log_display.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	log_display.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	var terminal_bg = StyleBoxFlat.new()
+	terminal_bg.bg_color = Color(0.06, 0.06, 0.06, 1.0)
+	terminal_bg.border_width_left = 2
+	terminal_bg.border_width_top = 2
+	terminal_bg.border_width_right = 2
+	terminal_bg.border_width_bottom = 2
+	terminal_bg.border_color = Color(0.22, 0.22, 0.22, 1.0)
+	terminal_bg.corner_radius_top_left = 4
+	terminal_bg.corner_radius_top_right = 4
+	terminal_bg.corner_radius_bottom_left = 4
+	terminal_bg.corner_radius_bottom_right = 4
+	log_display.add_theme_stylebox_override("panel", terminal_bg)
+	log_display.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	log_display.custom_minimum_size.y = LOG_COLLAPSED_HEIGHT
+	is_log_expanded = false
+	_rebuild_log_entries()
+	_refresh_log_view()
+
+func _rebuild_log_entries():
+	if not log_box:
+		return
+	for child in log_box.get_children():
+		child.queue_free()
+	for entry in GameManager.get_run_log():
+		var lbl = Label.new()
+		lbl.text = "> " + entry
+		lbl.clip_text = true
+		lbl.autowrap_mode = TextServer.AUTOWRAP_OFF
+		lbl.add_theme_color_override("font_color", _get_log_entry_color(entry))
+		log_box.add_child(lbl)
+	_refresh_log_view()
+	call_deferred("_scroll_log_to_latest")
+
+func _on_battle_log_row_gui_input(event: InputEvent):
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		is_log_expanded = not is_log_expanded
+		_refresh_log_view()
+		get_viewport().set_input_as_handled()
+
+func _refresh_log_view():
+	if not log_display:
+		return
+	log_display.visible = true
+	var expanded_height = (LOG_EXPANDED_LINE_COUNT * LOG_LINE_HEIGHT) + LOG_EXPANDED_PADDING
+	if is_log_expanded:
+		if not log_display.top_level:
+			log_collapsed_global_rect = log_display.get_global_rect()
+			log_display.top_level = true
+			log_display.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+		var viewport_size = get_viewport_rect().size
+		log_display.size = Vector2(viewport_size.x, expanded_height)
+		log_display.global_position = Vector2(0.0, log_collapsed_global_rect.position.y - expanded_height + LOG_COLLAPSED_HEIGHT)
+	else:
+		_restore_log_to_collapsed_row()
+	log_display.mouse_filter = Control.MOUSE_FILTER_STOP if is_log_expanded else Control.MOUSE_FILTER_PASS
+	log_display.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO if is_log_expanded else ScrollContainer.SCROLL_MODE_DISABLED
+	if not is_log_expanded:
+		log_display.scroll_vertical = 0
+	for i in range(log_box.get_child_count()):
+		var child = log_box.get_child(i)
+		if child is Label:
+			child.visible = is_log_expanded or i == log_box.get_child_count() - 1
+
+func _scroll_log_to_latest():
+	if not log_display:
+		return
+	var max_vscroll = max(0, int(log_box.size.y - log_display.size.y))
+	log_display.scroll_vertical = max_vscroll
+
+func _restore_log_to_collapsed_row():
+	if not log_display:
+		return
+	log_display.top_level = false
+	log_display.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	log_display.position = Vector2.ZERO
+	log_display.custom_minimum_size = Vector2(0.0, LOG_COLLAPSED_HEIGHT)
+
+func _apply_log_horizontal_constants():
+	if battle_log_row:
+		battle_log_row.add_theme_constant_override("separation", LOG_ROW_SEPARATION)
+	if log_left_spacer:
+		log_left_spacer.custom_minimum_size.x = LOG_SIDE_SPACER_WIDTH
+	if log_right_spacer:
+		log_right_spacer.custom_minimum_size.x = LOG_SIDE_SPACER_WIDTH
+
+func _is_point_inside_log(global_point: Vector2) -> bool:
+	if not log_display or not log_display.visible:
+		return false
+	return log_display.get_global_rect().has_point(global_point)

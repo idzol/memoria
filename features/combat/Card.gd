@@ -27,6 +27,7 @@ var card_type: String = ""
 var is_matched: bool = false
 var is_face_up: bool = false
 const FRONT_ASSETS_ROOT := "res://assets/cards/front/"
+const CARD_BASE_SIZE := Vector2(160.0, 240.0)
 const TYPE_FILE_ALIASES := {
 	"armor": "defend",
 	"utility": "prepare",
@@ -34,16 +35,24 @@ const TYPE_FILE_ALIASES := {
 }
 const TITLE_ORIGINAL_RECT := Rect2(18.0, 15.0, 124.0, 14.0)
 const DESCRIPTION_ORIGINAL_RECT := Rect2(18.0, 166.0, 124.0, 52.0)
+const CARD_IMAGE_ORIGINAL_OFFSETS := Vector4(18.0, 30.0, -18.0, -70.0)
+const CENTER_ICON_ORIGINAL_SIZE := Vector2(28.0, 28.0)
+const CENTER_ICON_ORIGINAL_OFFSETS := Vector4(-14.0, -13.920013, 14.0, 14.079987)
+const TITLE_BASE_FONT_SIZE := 14
+const DESCRIPTION_BASE_FONT_SIZE := 11
+const TITLE_MIN_FONT_SIZE := 8
+const DESCRIPTION_MIN_FONT_SIZE := 7
 
 func _ready():
 	pressed.connect(_on_pressed)
-	resized.connect(_update_pivot)
-	_update_pivot()
+	resized.connect(_on_card_resized)
+	_on_card_resized()
 	mouse_entered.connect(_on_hover.bind(true))
 	mouse_exited.connect(_on_hover.bind(false))
 
-func _update_pivot():
+func _on_card_resized():
 	pivot_offset = size / 2
+	_apply_scaled_front_layout()
 
 func setup(data: CardData):
 	if not data: return
@@ -66,7 +75,7 @@ func setup(data: CardData):
 	var localized_name = LocalizationManager.localized_resource_name(data, data.name)
 	if title_label: title_label.text = localized_name.to_upper()
 	if description_label: description_label.text = data.description
-	_ensure_front_text_layout()
+	_apply_scaled_front_layout()
 	if card_image_rect: card_image_rect.texture = data.card_image
 	if card_icon_rect: card_icon_rect.texture = data.card_icon
 	_apply_center_type_icon(data.type)
@@ -88,7 +97,7 @@ func setup_item(data: ItemData):
 	
 	if description_label: 
 		description_label.text = "[ %s ]\n%s\n%s" % [data.type.to_upper(), stat_line, data.description]
-	_ensure_front_text_layout()
+	_apply_scaled_front_layout()
 	
 	if card_image_rect: 
 		card_image_rect.texture = data.item_image
@@ -96,7 +105,7 @@ func setup_item(data: ItemData):
 	# Items use 'Unique' template style by default for high visibility in inventory
 	if asset_templates:
 		if front_template_rect: 
-			front_template_rect.texture = _resolve_front_template_texture("")
+			front_template_rect.texture = asset_templates.card_front_unique if asset_templates.card_front_unique else _resolve_front_template_texture("unique")
 		if back_template_rect: 
 			back_template_rect.texture = asset_templates.card_back_unique
 	
@@ -124,10 +133,45 @@ func _apply_visual_templates(data: CardData):
 
 	# 2. Front frame by rarity with default fallback.
 	if front_template_rect:
-		front_template_rect.texture = _resolve_front_template_texture(rarity_key)
+		front_template_rect.texture = _resolve_card_front_texture(data)
 	
 	# 3. Center icon by type only, shared across all rarities.
 	_apply_center_type_icon(data.type)
+
+func _resolve_card_front_texture(data: CardData) -> Texture2D:
+	if data == null:
+		return _resolve_front_template_texture("")
+	if _is_enemy_card(data):
+		if asset_templates and asset_templates.card_front_enemy:
+			return asset_templates.card_front_enemy
+		return _resolve_front_template_texture("enemy")
+	var rarity_key = data.rarity.strip_edges().to_lower()
+	if asset_templates:
+		match rarity_key:
+			"common":
+				if asset_templates.card_front_common:
+					return asset_templates.card_front_common
+			"uncommon":
+				if asset_templates.card_front_uncommon:
+					return asset_templates.card_front_uncommon
+			"rare":
+				if asset_templates.card_front_rare:
+					return asset_templates.card_front_rare
+			"epic":
+				if asset_templates.card_front_epic:
+					return asset_templates.card_front_epic
+			"unique":
+				if asset_templates.card_front_unique:
+					return asset_templates.card_front_unique
+		if asset_templates.card_front_default:
+			return asset_templates.card_front_default
+	return _resolve_front_template_texture(rarity_key)
+
+func _is_enemy_card(data: CardData) -> bool:
+	if data == null:
+		return false
+	var normalized_id = data.card_id.strip_edges().to_lower()
+	return normalized_id.begins_with("enemy_")
 
 func _resolve_front_template_texture(rarity_key: String) -> Texture2D:
 	var normalized_rarity = rarity_key.strip_edges().to_lower()
@@ -165,9 +209,34 @@ func _load_first_texture(paths: Array[String]) -> Texture2D:
 			return load(path) as Texture2D
 	return null
 
-func _ensure_front_text_layout():
-	_lock_label_rect(title_label, TITLE_ORIGINAL_RECT)
-	_lock_label_rect(description_label, DESCRIPTION_ORIGINAL_RECT)
+func _apply_scaled_front_layout():
+	var ratio = _get_card_layout_ratio()
+	_lock_label_rect(title_label, _scaled_rect(TITLE_ORIGINAL_RECT, ratio))
+	_lock_label_rect(description_label, _scaled_rect(DESCRIPTION_ORIGINAL_RECT, ratio))
+	if title_label:
+		title_label.add_theme_font_size_override("font_size", max(TITLE_MIN_FONT_SIZE, roundi(float(TITLE_BASE_FONT_SIZE) * ratio)))
+	if description_label:
+		description_label.add_theme_font_size_override("font_size", max(DESCRIPTION_MIN_FONT_SIZE, roundi(float(DESCRIPTION_BASE_FONT_SIZE) * ratio)))
+	if card_image_rect:
+		card_image_rect.offset_left = CARD_IMAGE_ORIGINAL_OFFSETS.x * ratio
+		card_image_rect.offset_top = CARD_IMAGE_ORIGINAL_OFFSETS.y * ratio
+		card_image_rect.offset_right = CARD_IMAGE_ORIGINAL_OFFSETS.z * ratio
+		card_image_rect.offset_bottom = CARD_IMAGE_ORIGINAL_OFFSETS.w * ratio
+	if center_type_icon:
+		var icon_size = CENTER_ICON_ORIGINAL_SIZE * ratio
+		center_type_icon.custom_minimum_size = icon_size
+		center_type_icon.offset_left = CENTER_ICON_ORIGINAL_OFFSETS.x * ratio
+		center_type_icon.offset_top = CENTER_ICON_ORIGINAL_OFFSETS.y * ratio
+		center_type_icon.offset_right = CENTER_ICON_ORIGINAL_OFFSETS.z * ratio
+		center_type_icon.offset_bottom = CENTER_ICON_ORIGINAL_OFFSETS.w * ratio
+
+func _get_card_layout_ratio() -> float:
+	var width_ratio = size.x / CARD_BASE_SIZE.x if CARD_BASE_SIZE.x > 0.0 else 1.0
+	var height_ratio = size.y / CARD_BASE_SIZE.y if CARD_BASE_SIZE.y > 0.0 else 1.0
+	return clamp(min(width_ratio, height_ratio), 0.45, 2.6)
+
+func _scaled_rect(rect: Rect2, ratio: float) -> Rect2:
+	return Rect2(rect.position * ratio, rect.size * ratio)
 
 func _lock_label_rect(label: Label, rect: Rect2):
 	if not label:

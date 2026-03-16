@@ -12,6 +12,7 @@ class_name RoomData
 @export_group("Narrative")
 @export_multiline var initial_dialog: String = "A sense of dread fills the air."
 @export var dialog_tree_id: String = ""
+@export var dialogue: RoomDialogue
 
 @export_group("Encounters")
 @export var enemy_id: String = ""

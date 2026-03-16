@@ -345,6 +345,8 @@ MEMORIA WORKFLOW
 
 ===
 
+BACKGROUNDS 
+
 update run summary with one of three backgrounds 
 	res://assets/ui/end_day_1.png
 	res://assets/ui/end_day_2.png
@@ -803,49 +805,33 @@ pressing "settings" loads settingsoverlay scene
 	keep the outline on the selected button. 
 	do not change shading of other buttons 
 
-== 
-in battlescene, do not allow _input ui_cancel exit to map, if room is not cleared
-
-==
-update battlemap so that maps are not outlined 
-add a repeating tiled background, fit to screen and tiling to the right
-res:\\assets\maps\backgrounds\map_battle_background.png
-==
-
-update battlemap so that past icons are not shaded black 
-limit scroll to only visible map nodes 
-
-==
-
-battlemap scene update. do not show future map nodes not visited, and not adjacent to a visited node 
-draw dotted lines between connected map nodes, add variability so lines are not straight 
-add random variability (x, y) in map node position. increase distance between map nodes 
-
-==
 
 
-==
+BATTLEMAP (legacy)
 
-map asset 
-	lines 
-		longer 
-		dotted line 
-		more variation 
-	
-	map icons 
-		not "straight"
-		remove border on current position 
-	
-	icons ***
-		transparent
-		monochrome 
-	
-	background 
-		cartoon 
-		detailed 
- 
-	character 
-		icon 
+
+	==
+	update battlemap so that maps are not outlined 
+	add a repeating tiled background, fit to screen and tiling to the right
+	res:\\assets\maps\backgrounds\map_battle_background.png
+
+	==
+	update battlemap so that past icons are not shaded black 
+	limit scroll to only visible map nodes 
+
+	==
+
+	battlemap scene update. do not show future map nodes not visited, and not adjacent to a visited node 
+	draw dotted lines between connected map nodes, add variability so lines are not straight 
+	add random variability (x, y) in map node position. increase distance between map nodes 
+
+	==
+
+
+BATTLESCENE 
+
+	in battlescene, do not allow _input ui_cancel exit to map, if room is not cleared
+
 
 === 
 
@@ -1007,7 +993,7 @@ update card scene so that ImageSpacer and CenterTypeIcon do not push down Descri
 	 card_front_{rarity}.png (eg card_front_common)
 	use "default" if not found (card_front_default)
 	
-==
+CHARACTERSCREEN
 
 	in characterscreen, add padding to all DECK Title and DeckCount text 
 
@@ -1062,6 +1048,7 @@ update card scene so that ImageSpacer and CenterTypeIcon do not push down Descri
 
 	If returning to previous node trigger the boss room for the biome (eg. {biome}_boss). Dialog prompt. "You have a feeling you have been here before. An intense pain fills your mind as memory floods back" 
 
+	active deck seleciton. require minimum number of unique pairs 
 
 characterscreen 
 
@@ -1069,16 +1056,15 @@ update activedeck grid so that as more cards are added, the width between cards 
 limit activedeck to one row keeping to one row 
 allow overlapping of cards, but show the card on hover
 ..
+
 	
 
-battlemap scene
+WORLD MAP
 
 	draw the outline of all possible rooms. do not show the icons or connections until adjacent  
 	place the shading (green / light green) behind the map icon. 
 
-
-battlemap scene
-
+==
 	when using arrow keys, the map node highlighted by a border outline can be different to the map node highlighted light green shading. update UI so that the selected room node always has the shading and light green background 
 
 	only show one biome at a time (eg. 2 x 2).  
@@ -1087,12 +1073,7 @@ battlemap scene
 
 ==
 
-as
-==
-
-(Rename world map to area map)
-
-Storymap scene 
+STORYMAP 
 
 	Add a "story" icon next to character profile in battlemap / worldmap, which loads the storymap scene. UI input "w" toggles between story map and a biome map if selected
 
@@ -1112,14 +1093,6 @@ Storymap scene
 
 	When entering a biome for the first itme, place the character in a random square for the biome and make it the "home" location
 
-
-
-===
-
-Run summary
-
-Show a read only version of the StoryMap
-
 == 
 
 Boss room
@@ -1131,12 +1104,120 @@ Boss room
 
 ===
 
-Room assets. 
+	storymap 
+	add padding around nodes (chaptersummary, mapsummary) 
+	add padding around chaptersummary when maximised (zoom)
 
-Update with room type: battle, shop, NPC...
-Allocate a boss for each biome.
+	mapsummary. add a unique subtitle for each chapter. 
+	use localization (data/localization/text.csv)
+
+	storymap. 
+	track if a chapter is being loaded for the first time. 
+	on loading a chapter for the first time, load the roomscene for _home, rather than worldmap 
+
+
+TRANSITIONS 
+	worldmap to storymap
+	storymap to worldmap 
+	battlemap to characterlevelup / victoryscreen
+	battlemap to runsummary 
+
+
+
+SHOPS 
+
+Shop inventory 
+Gold to buy cards ..
+
+
+WORLDMAP 
+		
+	Add day and day name to worldmap scene top bar. eg. "Day 1. Protodia". Click for description, deities worshipped and purpose. 
+		
+	Day,Name,Description,Deities,Purpose
+	1,Protodia,Day of Sovereignty. The start of the civic cycle and the establishment of law.,Zeus,To secure justice in contracts and ensure the stability of the ruling order.
+	2,Hoplidia,Day of Iron. Dedicated to the tools of survival—both the forge and the blade.,Ares & Hephaestus,To petition for physical strength in combat and the durability of manufactured goods.
+	3,Tridia,Day of Counsel. A period for planning, governance, and intellectual labor.,Athena,To gain tactical foresight and the metis (cunning) required for complex crafts.
+	4,Tetradia,Day of Exchange. The primary market day for travelers, heralds, and merchants.,Hermes,To invoke protection on the roads and luck in profit-seeking ventures.
+	5,Pemptidia,Day of the Wild. Focused on the boundaries of the city and the untamed lands.,Artemis,To appease the goddess of the hunt and ensure the safety of livestock from predators.
+	6,Hektidia,Day of Radiance. A day for purification, music, and the cultivation of beauty.,Apollo,To seek healing from plague and inspiration for the civic arts.
+	7,Hebdomia,Day of Concord. Focused on social cohesion, marriage, and diplomatic ties.,Aphrodite,To foster harmony within the household and ensure the success of alliances.
+	8,Ogdoadia,Day of the Abyss. The closing of the week; associated with the sea and the subterranean.,Poseidon & Hades,To prevent earthquakes/shipwrecks and to honor the finality of the ancestors.
+
+	Use data/localization for language 
+
+
+
+REFACTOR 
+
+
+# combine battlescene and eventscene into a new "roomscene" scene. standardise menus and user interface 
+# if room enemy -> battlescene elements 
+# if room npc or !enemy -> eventscene elements 
+	
+standardise the battlescene and eventscene into a new "roomscene" scene. standardise menus and user interface 
+	
+		
+	battlescene. 
+	on defeating an enemy, load victoryscene. if character XP is enough to level up, load characterlevelup scene. 
+	after defeating an enemy and victoryscreen/characterlevelup scenes have completed, redirect to the same room scene with enemy defeated, transitoining from battlescene to an eventscene. 
+
+
+	
+DIALOG 
+
+	explain the dialog system per room. 
+	support extensible logic and localization (language) based on resource structure. create new resource if required.
+	allow conditional dialogs. for example, 
+
+	* on first visit, trigger unique dialog 
+	* on second visit, trigger unique dialog 
+	* on meeting a condition (eg. item, battle, day of week, rooms visited) 
+
+	add a sample dialog on first and second visit of tutorial_home location 
+		
+	* player dialog "test1"
+	* NPC dialog "test2"
+	* player dialog "test3"
+	* NPC dialog "test4"
+
+	add click to continue dialog. minimise dialog box on completion of dialog
+
+
+
+boss toast "you feel "... use dialog box 
+remove blue text "click to contine" 
+
+
+LOG 
+
+	make battle_log_row a global log of events. retain log history between scenes 
+	show log in battlescene, eventscene and worldmap scenes. 
+	update dialog to print to log (player, NPC logs)
+	update worldmap events to print to log (entering room to print to the log) 
+	update battle events to print to log (victory, character levelup)
+
+global log. adjust location to be flush with bottom of screen. align left, bottom and right 
+click on log in battlescene, eventscene to expand 
+new option in settings to toggle on/off 
+update localization for new menu option (/data/localization) 
+
+
+UI GENERAL 
+
+character icon 
+storymap icon 
+...
+
+
+ROOMSCENE 
+
+	Update with room type: battle, shop, NPC...
+	Allocate a boss for each biome.
+
 Add room "complete" conditions, eg. Card or Inventory item, defeat an enemy, discover a room, meet an NPC, gold, level, day or days passed. 
 Count total for each biome. 
+
 Default room for each biome with a list of possible enemies
 Create four rooms for home / tutorial
 
@@ -1151,25 +1232,27 @@ Create four rooms for home / tutorial
 	Track the complete status of each room based on the complete conditions for each room
 
 ===
+RUNSUMMARY 
 
+	Show a read only version of the StoryMap
 ===
 
 === 
 
-Language support
+LOCALIZATION 
 
-Replace text objects with text keys. Update the language file with the English version of the text 
+	Replace text objects with text keys. Update the language file with the English version of the text 
 
-Cutscenes
-Menus
-Dialogs
-Items
-Cards 
-...
+	Cutscenes
+	Menus
+	Dialogs
+	Items
+	Cards 
+	...
 
 ===
 
-Battlescene
+BATTLESCENE
 
 Status effects. Update combat to include status effects
 
@@ -1291,6 +1374,8 @@ STORYMAP
 	[StoryMapUI] select_entry { "biome": "home", "kind": "summary", "index": 1 }
 	[StoryMapUI] global_click { "mouse": (901.4272, 129.6657), "hovered": &"home_summary_button", "hovered_type": "Button", "overlay_visible": false, "selected_index": 1 }
 
+	storymap scene. update embedded mapsummary scene / node to use Menu.theme for text.
+
 
 
 WORLDMAP
@@ -1304,6 +1389,23 @@ WORLDMAP
 
 	worldmap. introduction biome has two "home" icons on map. 
 	make sure only one mapgenerator only creates one "home" as the player starting location
+
+	icons ***
+		transparent
+		monochrome 
+
+	background 
+		cartoon 
+		detailed 
+
+worldmap
+draw map nodes in a parallelogram. choose a random direction for pallelogram each run (up, down, left or right)
+push each row in the agreed direction by half a mapnode 
+add more random variation to lines, making them more curved between nodes 
+
+replace "P" with character avatar  
+create NPC avatars for discovered rooms .. 
+
 
 
 TUTORIAL 
@@ -1367,8 +1469,6 @@ TUTORIAL
 	"continue to discover the world. be careful returning to a place you have already been"
 	use localization (data/localization/text.csv) for new menu items 
 
-
-
 ===
 
 	storymap 
@@ -1380,16 +1480,19 @@ TUTORIAL
 
 ===
 
-
 CHARACTER LEVEL
+
 	characterlevelup. update level up screen. 
 	use first column to use graphic representation of current and future stats, showing increase per stat. use bars for hp, energy, and numerical for attack, defense using existing icons and conventions. 
 	add updates to minimum number of card pairs required. if player active pairs less than required number of pairs, add the first card .  
 	use the second column for lore for each level. "as memories comes back, you regain your strength. you were more than a fisher, but you cannot place the name"  
 	use localization (data/localization/text.csv) for new menu items 
-		
-	
-	
+			
+	characterlevelup. update level up screen. 
+	use first column to use graphic representation of current and future stats, showing increase per stat.
+	use numerical format for all stats in a "from -> to" table format. 
+
+
 LOCALIZATION 
 
 "use localization (data/localization/text.csv) for new menu items"
@@ -1410,35 +1513,62 @@ LOCALIZATION
 	room assets: language support 
 
 
+CARDS
+
+	card scene. 
+	update card scene to use different card front, based on card rarity
+	update card_asset_data to reflect new //assets/cards/front/ images for 
+		card_front_common
+		card_front_uncommon
+		card_front_rare
+		card_front_epic
+		card_front_unique
+		card_front_enemy
+
 
 BATTLE SCENE 
 
-Create a dotted outline for enemy card, or "intent" and last player card matched 
-When a player card is matched, the expanded card fly out effect to the player card matched 
-clicking on the player card matched, gives an expanded view of the card 
+	Battlescene.
+	Create a dotted black outline for enemy card or "intent" on the top right of stagelayoutcontainer
+	Update enemy resource to include "enemy_cards". if "enemy_cards" not defined, use enemy_default.tres
+	Update enemy_to_resource script to include "enemy_cards"
+	Select next enemy card based on enemy card power, eg. likelihood of appearing is inverse of card power, normalised for the total enemy_cards.
+	Show a copy of the next card in the enemy "intent" 
+	On enemy turn, play the enemy card. Fly in card from the intent, and click the card or return to scene in 3 seconds
+	Play the intended effect of the enemy card (attack, armour, do nothing).
+	Once card is minimised play the relevant player_defend, enemy_attack sprite animation.
 
-Update enemy resource to include "enemy_cards". 
-Select next enemy card based on enemy card power, eg. likelihood of appearing is inverse of card power, normalised for total cards in deck. 
 
-	1 - 1/1		100%	 
-	2 - 1/2		50% 
-	3 - 1/3 	33% 
-	4 - 1/4		25% 
-	5 - 1/5		20%		 
-	6 - 1/5 	16%
-	7 -	1/5 	14%
 
-On enemy turn, play the enemy card. Fly in card from the enemy intent. Click outside of the card, or return to scene in 1 second  
-Play the effects from the enemy card (attack, armour, wait)
+	battlescene. 
+	card scene text does not scale well with large, small versions of scene.  adjust so that text scale with card centre. 
+	enemy intent (dotted line) overlaps with menu. make sure it fits in enemycolumn, above statshud 
+	place enemy card for next turn in enemy intent. on enemy turn, fly in the card to centre screen and play that card    
+	 make sure that card is in front of combat stage, not behind grid. 
+	  remove previous enemy card animations 
+
+	battlescene. 
+	remove dotted line from enemy card or "intent". place the box above hud, not below 
+
+	Battlescene.
+	Create a "discard" pile in playercolumnui, above statshud. transparent box
+	When a player card is matched, the expanded card fly out effect to the player card matched 
+
+	battlescene. enemy animation. use hframes, vframes, total_frames from the enemy resource file. 
+	if not defined, fall back to default values 
 
 
 ASSETS - enemy cards 
 
 Enemy cards | intent 
-Create enemy cards template. Black background 
-Create enemy card resources
-* Attack. Strike, stab, etc..
-* Defend. Fortify, etc..
+
+	Create enemy cards template. Black background 
+	Create enemy card resources
+	* Attack. Strike, stab, etc..
+	* Defend. Fortify, etc..
+
+==
+
 * Status cards. 
    Confuse. Shuffle cards
    Trap. Add another trap 
@@ -1469,10 +1599,22 @@ update all assets
 
 ===
 
-characterselect 
-active deck seleciton. require minimum number of unique pairs 
+
+CHARACTERSCREEN 
+	
+	characterscreen
+	active deck seleciton. require minimum number of unique pairs 
     
-data loader 
+
+DATAMANAGER 
+
 	prioritise maps for map generator 
 	then rooms / enemies for first biome 
 	then remaining assests  
+	
+
+FONTS
+
+	characterlevelup scene. update to use menu.theme
+	victoryscreen scene. update to use menu.theme
+

@@ -284,9 +284,10 @@ func _get_title_for_biome(biome: String) -> String:
 func _get_subtitle_for_biome(biome: String) -> String:
 	if GameManager.is_battle_mode:
 		return LocalizationManager.translate("mapsummary.subtitle.battle", "Completed biomes reveal every room and the run path.")
-	if biome == GameManager.player_biome:
-		return LocalizationManager.translate("mapsummary.subtitle.current_story", "Home, current location, adjacent rooms, and completed rooms are marked.")
-	return LocalizationManager.translate("mapsummary.subtitle.story", "Permanent rooms stay visible between runs. Select to enter the biome map.")
+	return LocalizationManager.translate(
+		"mapsummary.subtitle.%s" % biome,
+		LocalizationManager.translate("mapsummary.subtitle.story", "Completed rooms stay visible between runs. Select to enter the biome map.")
+	)
 
 func _open_biome_map():
 	var biome = _get_biome()
@@ -307,6 +308,8 @@ func _open_biome_map():
 		GameManager.player_biome = biome
 		GameManager.player_grid_pos = Vector2i(int(entry_node.get("layer", 0)), int(entry_node.get("column", 0)))
 	else:
+		if GameManager.open_story_biome_intro_if_needed(biome):
+			return
 		GameManager.enter_story_biome(biome, true)
 	get_tree().change_scene_to_file(GameManager.get_active_biome_map_scene_path())
 

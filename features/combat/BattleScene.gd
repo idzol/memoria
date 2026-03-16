@@ -29,6 +29,11 @@ extends Node2D
 @onready var player_def_val = %PlayerDefVal
 @onready var enemy_atk_val = %EnemyAtkVal
 @onready var enemy_def_val = %EnemyDefVal
+@onready var stage_layout_container = %StageLayoutContainer
+@onready var player_column_ui = get_node_or_null("UI/MainLayout/StageLayoutContainer/StageLayout/PlayerColumnUI")
+@onready var player_stats_hud = get_node_or_null("UI/MainLayout/StageLayoutContainer/StageLayout/PlayerColumnUI/StatsHUD")
+@onready var enemy_column_ui = get_node_or_null("UI/MainLayout/StageLayoutContainer/StageLayout/EnemyColumnUI")
+@onready var enemy_stats_hud = get_node_or_null("UI/MainLayout/StageLayoutContainer/StageLayout/EnemyColumnUI/StatsHUD")
 
 # Dynamic HP Bars
 @onready var player_hp_bar = %PlayerHPBar
@@ -38,7 +43,10 @@ extends Node2D
 
 # UI Layers
 @onready var dialog_overlay = %DialogOverlay
+@onready var dialog_box = $DialogOverlay/VBox
+@onready var dialog_speaker = %DialogSpeaker
 @onready var dialog_text = %DialogText
+@onready var continue_hint = %ContinueHint
 @onready var battle_ui = %UI 
 
 # Unit Visuals
@@ -71,6 +79,7 @@ var max_e_hp: int = 1
 var p_atk: int = 0 # Base attack
 var p_def: int = 0 # Base defense
 var temp_armor_bonus: int = 0 # Temporary defense from matched armor cards
+var temp_enemy_armor_bonus: int = 0
 var round_number: int = 1
 var keyboard_selected_card_index: int = -1
 var keyboard_selection_active: bool = false
@@ -79,14 +88,37 @@ var card_preview_layer: CanvasLayer = null
 var card_preview_root: Control = null
 var card_preview_holder: CenterContainer = null
 var active_preview_card: Control = null
+var player_discard_root: Control = null
+var player_discard_frame: Control = null
+var player_discard_card_holder: CenterContainer = null
+var player_discard_card_view: Control = null
+var enemy_intent_root: Control = null
+var enemy_intent_outline: Control = null
+var enemy_intent_card_holder: CenterContainer = null
+var enemy_intent_card_view: Control = null
+var enemy_intent_preview_root: Control = null
+var enemy_intent_preview_holder: CenterContainer = null
+var active_enemy_intent_preview_card: Control = null
+var current_enemy_intent_card_id: String = ""
+var current_enemy_intent_card_res: CardData = null
 var is_log_expanded: bool = false
 var log_collapsed_global_rect: Rect2 = Rect2()
+var _active_room_dialog_lines: Array[Dictionary] = []
+var _room_dialog_index: int = -1
+var _room_dialog_complete: bool = false
+var _room_dialog_on_complete: Callable
+var _dialog_box_expanded_height := 400.0
+var _dialog_box_collapsed_height := 220.0
 
 var active_status_effects = {"player": [], "enemy": []} # e.g. ["vulnerable", "charged"]
 const ENERGY_PIP_FULL = Color(1.0, 0.86, 0.35, 1.0)
 const ENERGY_PIP_EMPTY = Color(0.46, 0.35, 0.08, 1.0)
 const CARD_SELECTION_OUTLINE = "KeyboardCardSelectionOutline"
 const ACTION_ANIM_DURATION = 0.35
+const ENEMY_INTENT_PREVIEW_SECONDS = 3.0
+const ENEMY_DEFAULT_CARD_ID = "enemy_default"
+const PLAYER_DISCARD_SIZE = Vector2(150.0, 216.0)
+const ENEMY_INTENT_SIZE = Vector2(150.0, 216.0)
 const LOG_COLLAPSED_HEIGHT = 32.0
 const LOG_EXPANDED_LINE_COUNT = 10
 const LOG_LINE_HEIGHT = 22.0
@@ -97,6 +129,10 @@ const PREVIEW_AFTER_FLIP_GUARD_MS = 160
 const LOG_COLOR_GOOD = Color(0.62, 1.0, 0.62, 1.0)
 const LOG_COLOR_BAD = Color(1.0, 0.58, 0.58, 1.0)
 const LOG_COLOR_NEUTRAL = Color(0.86, 0.86, 0.86, 1.0)
+const DEFAULT_UNIT_HFRAMES = 8
+const DEFAULT_UNIT_VFRAMES = 1
+const DEFAULT_UNIT_TOTAL_FRAMES = 8
+const DEFAULT_UNIT_FRAME_SPEED = 0.1
 const ENERGY_PIP_CHAR = "▮"
 
 func _ready():
@@ -122,6 +158,10 @@ func _ready():
 		in_game_menu.hide()
 	if has_node("%MenuIconBtn"):
 		%MenuIconBtn.pressed.connect(_toggle_in_game_menu)
+	if continue_hint:
+		continue_hint.text = LocalizationManager.translate("dialog.click_continue", "Click to continue")
+	if dialog_speaker:
+		dialog_speaker.text = LocalizationManager.translate("dialog.speaker.narrator", "Narrator")
 
 	# Debug win / lose connections
 	# if has_node("%DebugWinBtn"): %DebugWinBtn.pressed.connect(_debug_win)
@@ -142,12 +182,21 @@ func _ready():
 	update_ui()
 	_setup_card_selection_style()
 	_setup_card_preview_overlay()
+	_setup_player_discard_ui()
+	_setup_enemy_intent_ui()
 	_setup_battle_log_ui()
+	if not SignalBus.run_log_updated.is_connected(_on_run_log_updated):
+		SignalBus.run_log_updated.connect(_on_run_log_updated)
 	add_log("Battle begins.")
 	_update_character_placement()
 	get_viewport().size_changed.connect(_on_viewport_resized)
 
 func _input(event):
+	if _is_enemy_intent_preview_visible():
+		if event.is_action_pressed("ui_accept") or event.is_action_pressed("ui_cancel"):
+			_hide_enemy_intent_preview()
+			return
+
 	if is_log_expanded and event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		if not _is_point_inside_log(event.position):
 			is_log_expanded = false
@@ -166,6 +215,12 @@ func _input(event):
 		return
 
 	# Dialog overlay: Enter accepts the primary option (e.g. "Enter Combat").
+	if _is_room_dialog_active() and (
+		event.is_action_pressed("ui_accept")
+		or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT)
+	):
+		_advance_room_dialog()
+		return
 	if dialog_overlay and dialog_overlay.visible and event.is_action_pressed("ui_accept"):
 		_activate_dialog_primary_option()
 		return
@@ -330,6 +385,9 @@ func _refresh_keyboard_card_outline():
 	selected_card.add_child(outline)
 
 func _activate_dialog_primary_option():
+	if _is_room_dialog_active():
+		_advance_room_dialog()
+		return
 	if not has_node("%OptionContainer"):
 		return
 	for child in %OptionContainer.get_children():
@@ -362,7 +420,7 @@ func _sync_stat_icons():
 	# Sync Enemy Icons
 	if current_enemy_res:
 		enemy_atk_val.text = str(current_enemy_res.base_damage)
-		enemy_def_val.text = str(current_enemy_res.armor)
+		enemy_def_val.text = str(current_enemy_res.armor + temp_enemy_armor_bonus)
 	
 	# Energy HUD
 	_render_energy_pips()
@@ -457,7 +515,7 @@ func _check_match():
 		
 		c1.is_matched = true; c2.is_matched = true
 		c1.modulate = Color(0.6, 1.2, 0.6); c2.modulate = Color(0.6, 1.2, 0.6)
-		_show_card_preview_for_id(c1.card_type, true)
+		await _show_card_preview_for_id(c1.card_type, true, true)
 		
 		_process_combat_action(c1.card_type)
 		update_ui()
@@ -473,7 +531,7 @@ func _check_match():
 		await get_tree().create_timer(1.0).timeout
 		if not is_inside_tree() or is_battle_over: return
 		
-		_enemy_turn()
+		await _enemy_turn()
 		update_ui()
 		_check_win_loss()
 		_resolve_turn_end()
@@ -533,7 +591,7 @@ func _process_combat_action(card_id: String):
 		if res.type == "attack":
 			_play_unit_sheet_temporarily(player_sprite, current_player_res, "attack_sheet", ACTION_ANIM_DURATION)
 			_play_unit_sheet_temporarily(enemy_sprite, current_enemy_res, "defend_sheet", ACTION_ANIM_DURATION)
-			var enemy_armor = current_enemy_res.armor if current_enemy_res else 0
+			var enemy_armor = (current_enemy_res.armor if current_enemy_res else 0) + temp_enemy_armor_bonus
 			var final_dmg = _calculate_final_damage(res.value, type, "player", "enemy")
 			e_hp = max(0, e_hp - final_dmg)
 			var raw_damage = res.value + (p_atk if type == "physical" else 0)
@@ -541,6 +599,10 @@ func _process_combat_action(card_id: String):
 			add_log("%s card matched." % localized_card_name)
 			if type == "physical":
 				add_log("Enemy armour negates %d damage." % min(enemy_armor, negated))
+				if temp_enemy_armor_bonus > 0:
+					add_log("Enemy guard breaks after the hit.")
+					temp_enemy_armor_bonus = 0
+					_sync_stat_icons()
 			add_log("You deal %d damage." % final_dmg)
 			_flash_unit(%EnemyFlash, Color.CRIMSON)
 			SignalBus.battle_intensity_changed.emit(0.5)
@@ -590,7 +652,7 @@ func _calculate_final_damage(card_val: int, type: String, attacker: String, defe
 		
 	# B. Subtract Defense
 	if defender == "enemy":
-		var arm = current_enemy_res.armor if current_enemy_res else 0
+		var arm = (current_enemy_res.armor if current_enemy_res else 0) + temp_enemy_armor_bonus
 		var res = 0 # Placeholder for enemy magic resist
 		total -= (arm if type == "physical" else res)
 	else:
@@ -607,22 +669,310 @@ func _calculate_final_damage(card_val: int, type: String, attacker: String, defe
 	return max(1, total) # Ensure at least 1 damage is dealt
 
 func _enemy_turn():
-	# Simple enemy attack using the same formula logic
-	# Pass 0 here because _calculate_final_damage already injects enemy base attack.
-	_play_unit_sheet_temporarily(enemy_sprite, current_enemy_res, "attack_sheet", ACTION_ANIM_DURATION)
-	_play_unit_sheet_temporarily(player_sprite, current_player_res, "defend_sheet", ACTION_ANIM_DURATION)
-	var final_dmg = _calculate_final_damage(0, "physical", "enemy", "player")
-	var enemy_raw = int(current_enemy_res.base_damage) if current_enemy_res else final_dmg
-	var enemy_negated = max(0, enemy_raw - final_dmg)
-	p_hp -= final_dmg
-	add_log("Enemy deals %d damage." % enemy_raw)
-	add_log("Your armour negates %d damage." % enemy_negated)
-	add_log("You receive %d damage." % final_dmg)
-	if temp_armor_bonus > 0:
-		add_log("Armor bonus breaks after the hit.")
-		temp_armor_bonus = 0
-		_sync_stat_icons()
-	_flash_unit(%PlayerFlash, Color.CRIMSON)
+	if current_enemy_intent_card_res == null:
+		_roll_next_enemy_intent_card()
+	if current_enemy_intent_card_res == null:
+		return
+	await _play_enemy_intent_preview(current_enemy_intent_card_res)
+	if is_battle_over:
+		return
+	_execute_enemy_card(current_enemy_intent_card_res)
+	_roll_next_enemy_intent_card()
+
+func _execute_enemy_card(card_res: CardData):
+	if card_res == null:
+		return
+	var localized_name = LocalizationManager.localized_resource_name(card_res, card_res.name)
+	match String(card_res.type):
+		"attack":
+			_play_unit_sheet_temporarily(enemy_sprite, current_enemy_res, "attack_sheet", ACTION_ANIM_DURATION)
+			_play_unit_sheet_temporarily(player_sprite, current_player_res, "defend_sheet", ACTION_ANIM_DURATION)
+			var final_dmg = _calculate_final_damage(int(card_res.value), "physical", "enemy", "player")
+			var enemy_raw = int(card_res.value) + (int(current_enemy_res.base_damage) if current_enemy_res else 0)
+			var enemy_negated = max(0, enemy_raw - final_dmg)
+			p_hp = max(0, p_hp - final_dmg)
+			add_log("Enemy reveals %s." % localized_name)
+			add_log("Enemy deals %d damage." % enemy_raw)
+			add_log("Your armour negates %d damage." % enemy_negated)
+			add_log("You receive %d damage." % final_dmg)
+			if temp_armor_bonus > 0:
+				add_log("Armor bonus breaks after the hit.")
+				temp_armor_bonus = 0
+				_sync_stat_icons()
+			_flash_unit(%PlayerFlash, Color.CRIMSON)
+		"armor":
+			temp_enemy_armor_bonus += int(card_res.value)
+			add_log("Enemy reveals %s." % localized_name)
+			add_log("Enemy gains %d armor." % int(card_res.value))
+			_play_unit_sheet_temporarily(enemy_sprite, current_enemy_res, "defend_sheet", ACTION_ANIM_DURATION)
+			_flash_unit(%EnemyFlash, Color.GOLD)
+		_:
+			add_log("Enemy reveals %s." % localized_name)
+			add_log("Enemy hesitates and does nothing.")
+	_sync_stat_icons()
+
+func _get_enemy_card_pool_ids() -> Array[String]:
+	if current_enemy_res and not current_enemy_res.enemy_cards.is_empty():
+		return current_enemy_res.enemy_cards.duplicate()
+	return [ENEMY_DEFAULT_CARD_ID]
+
+func _load_enemy_card_resource(card_id: String) -> CardData:
+	if card_id == "":
+		return null
+	var res_path = "res://data/cards/%s.tres" % card_id
+	if not ResourceLoader.exists(res_path):
+		return null
+	return load(res_path) as CardData
+
+func _roll_next_enemy_intent_card():
+	current_enemy_intent_card_id = ""
+	current_enemy_intent_card_res = null
+	var pool_ids = _get_enemy_card_pool_ids()
+	if pool_ids.is_empty():
+		_refresh_enemy_intent_preview()
+		return
+	var weighted_cards: Array[Dictionary] = []
+	var total_weight = 0.0
+	for card_id in pool_ids:
+		var card_res = _load_enemy_card_resource(str(card_id))
+		if card_res == null:
+			continue
+		var card_power = max(1, int(card_res.card_power))
+		var weight = 1.0 / float(card_power)
+		total_weight += weight
+		weighted_cards.append({"id": str(card_id), "res": card_res, "weight": weight})
+	if weighted_cards.is_empty():
+		_refresh_enemy_intent_preview()
+		return
+	var roll = randf() * total_weight
+	var running = 0.0
+	for entry in weighted_cards:
+		running += float(entry["weight"])
+		if roll <= running:
+			current_enemy_intent_card_id = str(entry["id"])
+			current_enemy_intent_card_res = entry["res"] as CardData
+			break
+	if current_enemy_intent_card_res == null:
+		var fallback = weighted_cards[0]
+		current_enemy_intent_card_id = str(fallback["id"])
+		current_enemy_intent_card_res = fallback["res"] as CardData
+	_refresh_enemy_intent_preview()
+
+func _setup_enemy_intent_ui():
+	if enemy_intent_root or not battle_ui:
+		return
+	enemy_intent_root = Control.new()
+	enemy_intent_root.name = "EnemyIntentRoot"
+	enemy_intent_root.custom_minimum_size = ENEMY_INTENT_SIZE
+	enemy_intent_root.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	enemy_intent_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	enemy_intent_root.z_index = 20
+	if enemy_column_ui:
+		enemy_column_ui.add_child(enemy_intent_root)
+	else:
+		battle_ui.add_child(enemy_intent_root)
+
+	enemy_intent_outline = _create_card_slot_frame()
+	enemy_intent_root.add_child(enemy_intent_outline)
+
+	enemy_intent_card_holder = CenterContainer.new()
+	enemy_intent_card_holder.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	enemy_intent_card_holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	enemy_intent_root.add_child(enemy_intent_card_holder)
+
+	enemy_intent_preview_root = Control.new()
+	enemy_intent_preview_root.visible = false
+	enemy_intent_preview_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	enemy_intent_preview_root.mouse_filter = Control.MOUSE_FILTER_STOP
+	enemy_intent_preview_root.z_index = 300
+	battle_ui.add_child(enemy_intent_preview_root)
+
+	var dimmer = ColorRect.new()
+	dimmer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	dimmer.color = Color(0, 0, 0, 0.28)
+	dimmer.mouse_filter = Control.MOUSE_FILTER_STOP
+	enemy_intent_preview_root.add_child(dimmer)
+
+	enemy_intent_preview_holder = CenterContainer.new()
+	enemy_intent_preview_holder.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	enemy_intent_preview_holder.mouse_filter = Control.MOUSE_FILTER_STOP
+	enemy_intent_preview_root.add_child(enemy_intent_preview_holder)
+	_position_enemy_intent_ui()
+	_refresh_enemy_intent_preview()
+
+func _position_enemy_intent_ui():
+	if enemy_intent_root == null:
+		return
+	if enemy_column_ui and enemy_intent_root.get_parent() != enemy_column_ui:
+		var previous_parent = enemy_intent_root.get_parent()
+		if previous_parent:
+			previous_parent.remove_child(enemy_intent_root)
+		enemy_column_ui.add_child(enemy_intent_root)
+	if enemy_column_ui and enemy_stats_hud:
+		var target_index = enemy_stats_hud.get_index()
+		if enemy_intent_root.get_index() != target_index:
+			enemy_column_ui.move_child(enemy_intent_root, target_index)
+
+func _setup_player_discard_ui():
+	if player_discard_root or not battle_ui:
+		return
+	player_discard_root = Control.new()
+	player_discard_root.name = "PlayerDiscardRoot"
+	player_discard_root.custom_minimum_size = PLAYER_DISCARD_SIZE
+	player_discard_root.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	player_discard_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	player_discard_root.z_index = 20
+	if player_column_ui:
+		player_column_ui.add_child(player_discard_root)
+	else:
+		battle_ui.add_child(player_discard_root)
+
+	player_discard_frame = _create_card_slot_frame()
+	player_discard_root.add_child(player_discard_frame)
+
+	player_discard_card_holder = CenterContainer.new()
+	player_discard_card_holder.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	player_discard_card_holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	player_discard_root.add_child(player_discard_card_holder)
+	_position_player_discard_ui()
+
+func _position_player_discard_ui():
+	if player_discard_root == null:
+		return
+	if player_column_ui and player_discard_root.get_parent() != player_column_ui:
+		var previous_parent = player_discard_root.get_parent()
+		if previous_parent:
+			previous_parent.remove_child(player_discard_root)
+		player_column_ui.add_child(player_discard_root)
+	if player_column_ui and player_stats_hud:
+		var target_index = player_stats_hud.get_index()
+		if player_discard_root.get_index() != target_index:
+			player_column_ui.move_child(player_discard_root, target_index)
+
+func _refresh_player_discard_preview(card_data: CardData):
+	if player_discard_card_view and is_instance_valid(player_discard_card_view):
+		player_discard_card_view.queue_free()
+	player_discard_card_view = null
+	if card_data == null or player_discard_card_holder == null:
+		return
+	var card_view = full_card_scene.instantiate()
+	player_discard_card_view = card_view
+	player_discard_card_holder.add_child(card_view)
+	card_view.custom_minimum_size = PLAYER_DISCARD_SIZE
+	if card_view.has_method("setup"):
+		card_view.setup(card_data)
+	var back_face = card_view.get_node_or_null("%BackFace")
+	if back_face:
+		back_face.visible = false
+	var front_face = card_view.get_node_or_null("%FrontFace")
+	if front_face:
+		front_face.visible = true
+	card_view.is_face_up = true
+	card_view.disabled = true
+	card_view.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+func _create_card_slot_frame() -> Panel:
+	var panel = Panel.new()
+	panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var style = StyleBoxFlat.new()
+	style.bg_color = Color(1, 1, 1, 0.04)
+	style.border_width_left = 2
+	style.border_width_top = 2
+	style.border_width_right = 2
+	style.border_width_bottom = 2
+	style.border_color = Color(1, 1, 1, 0.18)
+	style.corner_radius_top_left = 12
+	style.corner_radius_top_right = 12
+	style.corner_radius_bottom_left = 12
+	style.corner_radius_bottom_right = 12
+	panel.add_theme_stylebox_override("panel", style)
+	return panel
+
+func _refresh_enemy_intent_preview():
+	if enemy_intent_card_view and is_instance_valid(enemy_intent_card_view):
+		enemy_intent_card_view.queue_free()
+	enemy_intent_card_view = null
+	if not enemy_intent_card_holder or current_enemy_intent_card_res == null:
+		return
+	var card_view = full_card_scene.instantiate()
+	enemy_intent_card_view = card_view
+	enemy_intent_card_holder.add_child(card_view)
+	card_view.custom_minimum_size = ENEMY_INTENT_SIZE
+	if card_view.has_method("setup"):
+		card_view.setup(current_enemy_intent_card_res)
+	var back_face = card_view.get_node_or_null("%BackFace")
+	if back_face:
+		back_face.visible = false
+	var front_face = card_view.get_node_or_null("%FrontFace")
+	if front_face:
+		front_face.visible = true
+	card_view.is_face_up = true
+	card_view.disabled = true
+	card_view.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+func _is_enemy_intent_preview_visible() -> bool:
+	return enemy_intent_preview_root != null and enemy_intent_preview_root.visible
+
+func _play_enemy_intent_preview(card_res: CardData):
+	if card_res == null or enemy_intent_preview_root == null or enemy_intent_preview_holder == null:
+		return
+	if active_enemy_intent_preview_card and is_instance_valid(active_enemy_intent_preview_card):
+		active_enemy_intent_preview_card.queue_free()
+		active_enemy_intent_preview_card = null
+
+	var card_view = full_card_scene.instantiate()
+	active_enemy_intent_preview_card = card_view
+	enemy_intent_preview_holder.add_child(card_view)
+	card_view.custom_minimum_size = Vector2(280, 420)
+	if card_view.has_method("setup"):
+		card_view.setup(card_res)
+	var back_face = card_view.get_node_or_null("%BackFace")
+	if back_face:
+		back_face.visible = false
+	var front_face = card_view.get_node_or_null("%FrontFace")
+	if front_face:
+		front_face.visible = true
+	card_view.is_face_up = true
+	card_view.disabled = false
+
+	enemy_intent_preview_root.visible = true
+	card_view.top_level = true
+	card_view.z_index = 310
+	var start_rect = enemy_intent_root.get_global_rect() if enemy_intent_root else Rect2(Vector2(960, 40), Vector2(120, 180))
+	var viewport_rect = get_viewport_rect()
+	var target_size = Vector2(280, 420)
+	var target_pos = viewport_rect.size * 0.5 - (target_size * 0.5)
+	card_view.global_position = start_rect.get_center() - (target_size * 0.2)
+	card_view.scale = Vector2(0.32, 0.32)
+	card_view.modulate = Color(1, 1, 1, 0.9)
+	var tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tween.tween_property(card_view, "global_position", target_pos, 0.25)
+	tween.parallel().tween_property(card_view, "scale", Vector2.ONE, 0.25)
+	await tween.finished
+
+	var acknowledged = false
+	var acknowledge_preview = func():
+		acknowledged = true
+	card_view.pressed.connect(acknowledge_preview, CONNECT_ONE_SHOT)
+	var elapsed = 0.0
+	while elapsed < ENEMY_INTENT_PREVIEW_SECONDS and not acknowledged and is_inside_tree():
+		await get_tree().create_timer(0.1).timeout
+		elapsed += 0.1
+
+	var end_tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+	end_tween.tween_property(card_view, "global_position", start_rect.get_center() - (target_size * 0.2), 0.22)
+	end_tween.parallel().tween_property(card_view, "scale", Vector2(0.32, 0.32), 0.22)
+	end_tween.parallel().tween_property(card_view, "modulate:a", 0.0, 0.22)
+	await end_tween.finished
+	_hide_enemy_intent_preview()
+
+func _hide_enemy_intent_preview():
+	if enemy_intent_preview_root:
+		enemy_intent_preview_root.visible = false
+	if active_enemy_intent_preview_card and is_instance_valid(active_enemy_intent_preview_card):
+		active_enemy_intent_preview_card.queue_free()
+	active_enemy_intent_preview_card = null
 
 # --- BOARD MANAGEMENT ---
 func _should_reshuffle() -> bool:
@@ -664,33 +1014,105 @@ func _trigger_reshuffle():
 func _init_encounter():
 	battle_ui.hide()
 	dialog_overlay.show()
+	_configure_dialog_box(true)
 	for child in %OptionContainer.get_children(): child.queue_free()
-	var btn = Button.new()
-	btn.text = "Enter Combat"; btn.custom_minimum_size.y = 50
-	btn.pressed.connect(func():
-		dialog_overlay.hide(); battle_ui.show()
-		can_flip = true; setup_board()
-	)
-	%OptionContainer.add_child(btn)
+	var room_lines = RoomDialogService.resolve_room_dialog(current_room_res, GameManager.current_node)
+	if not room_lines.is_empty():
+		_begin_room_dialog(room_lines, _show_enter_combat_button)
+		return
+	_show_enter_combat_button()
 
 func _setup_cleared_room_view():
 	battle_ui.hide()
 	dialog_overlay.show()
+	_configure_dialog_box(true)
 	if enemy_sprite:
 		enemy_sprite.visible = false
 	if has_node("%EnemyFlash"):
 		%EnemyFlash.visible = false
 	for child in %OptionContainer.get_children():
 		child.queue_free()
-	dialog_text.text = "This room has already been cleared."
+	var room_lines = RoomDialogService.resolve_room_dialog(current_room_res, GameManager.current_node)
+	if not room_lines.is_empty():
+		_begin_room_dialog(room_lines, _show_exit_cleared_room_button)
+		return
+	dialog_speaker.text = LocalizationManager.translate("dialog.speaker.narrator", "Narrator")
+	dialog_text.text = LocalizationManager.translate("dialog.room.cleared", "This room has already been cleared.")
+	_append_dialog_log(dialog_speaker.text, dialog_text.text)
+	continue_hint.visible = false
+	_show_exit_cleared_room_button()
+
+func _exit_cleared_room():
+	get_tree().change_scene_to_file(GameManager.get_active_biome_map_scene_path())
+
+func _begin_room_dialog(lines: Array[Dictionary], on_complete: Callable):
+	_active_room_dialog_lines = lines
+	_room_dialog_index = -1
+	_room_dialog_complete = false
+	_room_dialog_on_complete = on_complete
+	for child in %OptionContainer.get_children():
+		child.queue_free()
+	continue_hint.visible = true
+	dialog_overlay.show()
+	_configure_dialog_box(true)
+	_advance_room_dialog()
+
+func _is_room_dialog_active() -> bool:
+	return not _active_room_dialog_lines.is_empty() and not _room_dialog_complete
+
+func _advance_room_dialog():
+	if not _is_room_dialog_active():
+		return
+	_room_dialog_index += 1
+	if _room_dialog_index >= _active_room_dialog_lines.size():
+		_room_dialog_complete = true
+		continue_hint.visible = false
+		_active_room_dialog_lines.clear()
+		_configure_dialog_box(false)
+		if _room_dialog_on_complete.is_valid():
+			_room_dialog_on_complete.call()
+		return
+	var line = _active_room_dialog_lines[_room_dialog_index]
+	dialog_speaker.text = str(line.get("speaker_name", LocalizationManager.translate("dialog.speaker.narrator", "Narrator")))
+	dialog_text.text = str(line.get("text", ""))
+	_append_dialog_log(dialog_speaker.text, dialog_text.text)
+
+func _configure_dialog_box(expanded: bool):
+	if not dialog_box:
+		return
+	var target_height = _dialog_box_expanded_height if expanded else _dialog_box_collapsed_height
+	dialog_box.offset_top = -target_height * 0.5
+	dialog_box.offset_bottom = target_height * 0.5
+
+func _show_enter_combat_button():
+	_room_dialog_on_complete = Callable()
+	for child in %OptionContainer.get_children():
+		child.queue_free()
+	_configure_dialog_box(false)
+	var btn = Button.new()
+	btn.text = LocalizationManager.translate("dialog.enter_combat", "Enter Combat")
+	btn.custom_minimum_size.y = 50
+	btn.pressed.connect(func():
+		dialog_overlay.hide()
+		battle_ui.show()
+		can_flip = true
+		setup_board()
+	)
+	%OptionContainer.add_child(btn)
+
+func _show_exit_cleared_room_button():
+	_room_dialog_on_complete = Callable()
+	for child in %OptionContainer.get_children():
+		child.queue_free()
+	_configure_dialog_box(false)
 	var exit_btn = Button.new()
-	exit_btn.text = "Exit to Overworld"
+	exit_btn.text = LocalizationManager.translate("dialog.exit_overworld", "Exit to Overworld")
 	exit_btn.custom_minimum_size.y = 50
 	exit_btn.pressed.connect(_exit_cleared_room)
 	%OptionContainer.add_child(exit_btn)
 
-func _exit_cleared_room():
-	get_tree().change_scene_to_file(GameManager.get_active_biome_map_scene_path())
+func _append_dialog_log(speaker: String, text: String):
+	GameManager.add_run_log("%s: %s" % [speaker, text])
 
 func _check_win_loss():
 	if is_battle_over: return
@@ -699,21 +1121,20 @@ func _check_win_loss():
 		is_battle_over = true
 		GameManager.register_room_victory(GameManager.current_node, p_hp)
 		var xp_reward = current_enemy_res.xp_reward if current_enemy_res else 0
-		var xp_result = GameManager.add_player_xp(xp_reward)
+		GameManager.add_player_xp(xp_reward)
+		GameManager.add_run_log(
+			LocalizationManager.format(
+				"log.battle.victory",
+				{"room": current_room_res.room_name if current_room_res else LocalizationManager.translate("log.battle.enemy", "enemy")},
+				"Victory in {room}."
+			)
+		)
 		var default_victory_scene = "res://features/combat/VictoryScreenBattleMode.tscn" if GameManager.is_battle_mode else "res://features/combat/VictoryScreen.tscn"
-		var return_scene = GameManager.peek_pending_post_battle_scene(default_victory_scene)
-		if xp_result.get("leveled_up", false):
-			GameManager.level_up_return_scene = GameManager.consume_pending_post_battle_scene(default_victory_scene) if return_scene != default_victory_scene else default_victory_scene
-			await get_tree().create_timer(1.5).timeout
-			if not is_inside_tree():
-				return
-			get_tree().call_deferred("change_scene_to_file", "res://features/ui/CharacterLevelUp.tscn")
-			return
-		
+
 		await get_tree().create_timer(1.5).timeout
 		if not is_inside_tree():
 			return
-		get_tree().call_deferred("change_scene_to_file", GameManager.consume_pending_post_battle_scene(default_victory_scene))
+		get_tree().call_deferred("change_scene_to_file", default_victory_scene)
 			
 	elif p_hp <= 0:
 		is_battle_over = true
@@ -751,15 +1172,10 @@ func update_ui(instant: bool = false):
 	
 	
 func add_log(text):
-	var lbl = Label.new()
-	lbl.text = "> " + text
-	lbl.clip_text = true
-	lbl.autowrap_mode = TextServer.AUTOWRAP_OFF
-	lbl.add_theme_color_override("font_color", _get_log_entry_color(text))
-	log_box.add_child(lbl)
+	GameManager.add_run_log(text)
 
-	_refresh_log_view()
-	call_deferred("_scroll_log_to_latest")
+func _on_run_log_updated():
+	_rebuild_log_entries()
 
 func _get_log_entry_color(text: String) -> Color:
 	var t = text.to_lower()
@@ -797,7 +1213,23 @@ func _setup_battle_log_ui():
 	log_display.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	log_display.custom_minimum_size.y = LOG_COLLAPSED_HEIGHT
 	is_log_expanded = false
+	_rebuild_log_entries()
 	_refresh_log_view()
+
+func _rebuild_log_entries():
+	if not log_box:
+		return
+	for child in log_box.get_children():
+		child.queue_free()
+	for entry in GameManager.get_run_log():
+		var lbl = Label.new()
+		lbl.text = "> " + entry
+		lbl.clip_text = true
+		lbl.autowrap_mode = TextServer.AUTOWRAP_OFF
+		lbl.add_theme_color_override("font_color", _get_log_entry_color(entry))
+		log_box.add_child(lbl)
+	_refresh_log_view()
+	call_deferred("_scroll_log_to_latest")
 
 func _on_battle_log_row_gui_input(event: InputEvent):
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
@@ -902,6 +1334,7 @@ func _setup_enemy_portrait():
 				enemy_sprite.offset.y = sprite_feet_offset
 				enemy_sprite.flip_h = true
 				_apply_unit_visuals(enemy_sprite, current_enemy_res)
+			_roll_next_enemy_intent_card()
 
 
 func _animate_unit(sprite: Sprite2D, total: int, speed: float, anim_token: int):
@@ -933,20 +1366,26 @@ func _apply_unit_sheet(sprite: Sprite2D, res: Resource, sheet: Texture2D):
 	if not sprite or not res or not sheet:
 		return
 	sprite.texture = sheet
-	var h = res.get("hframes")
-	sprite.hframes = h if h != null else 8
-	var v = res.get("vframes")
-	sprite.vframes = v if v != null else 1
+	sprite.hframes = _get_unit_hframes(res)
+	sprite.vframes = _get_unit_vframes(res)
 	sprite.scale = Vector2(1.0, 1.0)
 	sprite.offset.y = sprite_feet_offset
 
+func _get_unit_hframes(res: Resource) -> int:
+	var h = int(res.get("hframes")) if res != null else 0
+	return h if h > 0 else DEFAULT_UNIT_HFRAMES
+
+func _get_unit_vframes(res: Resource) -> int:
+	var v = int(res.get("vframes")) if res != null else 0
+	return v if v > 0 else DEFAULT_UNIT_VFRAMES
+
 func _get_unit_total_frames(res: Resource) -> int:
-	var total = res.get("total_frames")
-	return total if total != null else 8
+	var total = int(res.get("total_frames")) if res != null else 0
+	return total if total > 0 else DEFAULT_UNIT_TOTAL_FRAMES
 
 func _get_unit_frame_speed(res: Resource) -> float:
-	var speed = res.get("frame_speed")
-	return speed if speed != null else 0.1
+	var speed = float(res.get("frame_speed")) if res != null else 0.0
+	return speed if speed > 0.0 else DEFAULT_UNIT_FRAME_SPEED
 
 func _play_unit_sheet_temporarily(sprite: Sprite2D, res: Resource, sheet_key: String, duration: float = ACTION_ANIM_DURATION):
 	if not sprite or not res:
@@ -1110,6 +1549,8 @@ func _on_viewport_resized():
 	_fit_floor_to_container_width()
 	_update_character_placement()
 	_refresh_log_view()
+	_position_player_discard_ui()
+	_position_enemy_intent_ui()
 
 func _fit_floor_to_container_width():
 	if not floor_rect or not floor_rect.texture:
@@ -1230,7 +1671,7 @@ func _setup_card_preview_overlay():
 func _is_card_preview_visible() -> bool:
 	return card_preview_root != null and card_preview_root.visible
 
-func _show_card_preview_for_id(card_id: String, animate_in: bool = false):
+func _show_card_preview_for_id(card_id: String, animate_in: bool = false, fly_to_discard: bool = false):
 	if card_id == "" or not full_card_scene:
 		return
 	var res_path = "res://data/cards/%s.tres" % card_id
@@ -1268,6 +1709,9 @@ func _show_card_preview_for_id(card_id: String, animate_in: bool = false):
 		tween.tween_property(card_view, "modulate:a", 1.0, 0.18)
 		tween.parallel().tween_property(card_view, "scale", Vector2(1.04, 1.04), 0.16)
 		tween.tween_property(card_view, "scale", Vector2(1.0, 1.0), 0.10)
+		await tween.finished
+	if fly_to_discard:
+		await _fly_preview_card_to_discard(card_view, card_data)
 
 func _hide_card_preview():
 	if not card_preview_root:
@@ -1276,3 +1720,25 @@ func _hide_card_preview():
 	if active_preview_card and is_instance_valid(active_preview_card):
 		active_preview_card.queue_free()
 	active_preview_card = null
+
+func _fly_preview_card_to_discard(card_view: Control, card_data: CardData):
+	if card_view == null or not is_instance_valid(card_view):
+		return
+	if player_discard_root == null:
+		_hide_card_preview()
+		return
+	await get_tree().create_timer(0.16).timeout
+	card_view.top_level = true
+	card_view.z_index = 320
+	var preview_size = Vector2(280.0, 420.0)
+	var start_pos = get_viewport_rect().size * 0.5 - (preview_size * 0.5)
+	card_view.global_position = start_pos
+	var target_rect = player_discard_root.get_global_rect()
+	var target_scale = min(target_rect.size.x / preview_size.x, target_rect.size.y / preview_size.y)
+	var target_pos = target_rect.get_center() - ((preview_size * target_scale) * 0.5)
+	var tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(card_view, "global_position", target_pos, 0.28)
+	tween.parallel().tween_property(card_view, "scale", Vector2(target_scale, target_scale), 0.28)
+	await tween.finished
+	_refresh_player_discard_preview(card_data)
+	_hide_card_preview()

@@ -75,6 +75,7 @@ func save_mid_run_state():
 		
 		"deck": GameManager.player_deck,
 		"active_deck": GameManager.active_deck,
+		"run_log": var_to_str(GameManager.run_log),
 
 		"items": GameManager.player_items,
 		"active_items": GameManager.active_items,
