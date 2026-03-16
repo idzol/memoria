@@ -3,13 +3,25 @@ extends Control
 const STORY_CHAPTER_SCENE = preload("res://features/map/StoryChapter.tscn")
 const MAP_SUMMARY_SCENE = preload("res://features/map/MapSummary.tscn")
 const STORY_ORDER = ["home", "town", "forest", "ice_caves", "desert", "swamp", "abyss", "void", "the_core"]
-const DEBUG_STORYMAP_INPUT := true
+const SCROLL_CONTENT_PADDING := 24.0
+const ENTRY_GAP := 18.0
+const CHAPTER_GAP := 28.0
+const ENTRY_TILE_PADDING := 14.0
+const SETTINGS_PATH := "user://settings.cfg"
+const SETTINGS_SECTION := "gameplay"
+const TUTORIAL_TIPS_KEY := "tutorial_tips"
+const TUTORIAL_FLAGS_SECTION := "tutorial_flags"
+const STORYMAP_FINAL_TUTORIAL_ID := "storymap_intro_complete"
+const TUTORIAL_TOAST_DURATION := 10.0
+const TUTORIAL_TOAST_COLOR := Color(0.4, 0.7, 1.0, 1.0)
 
 @onready var chapter_row = %ChapterRow
 @onready var scroll_container = %ScrollContainer
 @onready var avatar_button = %AvatarButton
 @onready var map_button = %MapButton
 @onready var header_label = %HeaderLabel
+@onready var info_toast_box = %InfoToastBox
+@onready var info_toast_label = %InfoToastLabel
 @onready var focus_overlay = %FocusOverlay
 @onready var focus_content = %FocusContent
 
@@ -17,6 +29,10 @@ var chapter_entries: Array[Dictionary] = []
 var selected_index: int = 0
 var _selected_style: StyleBoxFlat
 var _default_style: StyleBoxFlat
+var _info_toast_tween: Tween
+var _tutorial_step: int = -1
+var _tutorial_completed: bool = false
+var _tutorial_mode: String = ""
 
 func _ready():
 	_create_styles()
@@ -28,19 +44,15 @@ func _ready():
 		focus_overlay.gui_input.connect(_on_focus_overlay_input)
 	if scroll_container:
 		scroll_container.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_hide_info_toast()
 	_rebuild_chapters()
+	_begin_tutorial_if_needed.call_deferred()
+
+func _notification(what):
+	if what == NOTIFICATION_RESIZED and is_inside_tree() and scroll_container and chapter_row:
+		_rebuild_chapters()
 
 func _input(event):
-	if DEBUG_STORYMAP_INPUT and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		var viewport = get_viewport()
-		var hovered = viewport.gui_get_hovered_control() if viewport else null
-		_debug_input("global_click", {
-			"mouse": event.position,
-			"hovered": hovered.name if hovered else "<none>",
-			"hovered_type": hovered.get_class() if hovered else "<none>",
-			"overlay_visible": focus_overlay.visible if focus_overlay else false,
-			"selected_index": selected_index
-		})
 	if focus_overlay and focus_overlay.visible:
 		if event.is_action_pressed("ui_cancel"):
 			_close_focus_overlay()
@@ -75,24 +87,32 @@ func _rebuild_chapters():
 
 	var unlocked = GameManager.get_unlocked_story_biomes()
 	var show_story = not GameManager.is_battle_mode
-	var viewport_height = get_viewport_rect().size.y
-	var card_height = max(320.0, viewport_height * 0.9)
-	var chapter_height = card_height + 24.0
+	var available_height = _get_available_scroll_height()
+	var card_height = max(320.0, available_height - (SCROLL_CONTENT_PADDING * 2.0))
+	var card_width = card_height * (640.0 / 905.0)
+	var padded_card_width = card_width + (ENTRY_TILE_PADDING * 2.0)
+	var padded_card_height = card_height + (ENTRY_TILE_PADDING * 2.0)
+	var chapter_width = padded_card_width * (2.0 if show_story else 1.0) + (ENTRY_GAP if show_story else 0.0)
+	var chapter_height = padded_card_height + 24.0
 	header_label.text = LocalizationManager.translate("storymap.header.story", "Story Chapters") if show_story else LocalizationManager.translate("storymap.header.biome", "Biome Chapters")
+	chapter_row.custom_minimum_size = Vector2(
+		(chapter_width * unlocked.size()) + (CHAPTER_GAP * max(0, unlocked.size() - 1)),
+		chapter_height
+	)
 
 	for biome in STORY_ORDER:
 		if not unlocked.has(biome):
 			continue
 
 		var chapter = VBoxContainer.new()
-		chapter.custom_minimum_size = Vector2(660 if show_story else 320, chapter_height)
-		chapter.alignment = BoxContainer.ALIGNMENT_CENTER
+		chapter.custom_minimum_size = Vector2(chapter_width, chapter_height)
+		chapter.alignment = BoxContainer.ALIGNMENT_BEGIN
 		chapter.add_theme_constant_override("separation", 8)
 		chapter_row.add_child(chapter)
 
 		var content_row = HBoxContainer.new()
-		content_row.alignment = BoxContainer.ALIGNMENT_CENTER
-		content_row.add_theme_constant_override("separation", 18)
+		content_row.alignment = BoxContainer.ALIGNMENT_BEGIN
+		content_row.add_theme_constant_override("separation", ENTRY_GAP)
 		chapter.add_child(content_row)
 
 		if show_story:
@@ -115,6 +135,7 @@ func _rebuild_chapters():
 
 func _build_story_tile(biome: String) -> Control:
 	var wrapper = _build_entry_wrapper(biome, "story")
+	var content: MarginContainer = wrapper.get_meta("content")
 	var chapter_card = STORY_CHAPTER_SCENE.instantiate()
 	chapter_card.embedded_mode = true
 	chapter_card.show_background = false
@@ -123,11 +144,12 @@ func _build_story_tile(biome: String) -> Control:
 	chapter_card.title_override = _get_story_tile_title(biome)
 	chapter_card.set_biome(biome)
 	chapter_card.chapter_pressed.connect(_on_story_tile_pressed)
-	wrapper.add_child(chapter_card)
+	content.add_child(chapter_card)
 	return wrapper
 
 func _build_summary_tile(biome: String) -> Control:
 	var wrapper = _build_entry_wrapper(biome, "summary")
+	var content: MarginContainer = wrapper.get_meta("content")
 	var summary_card = MAP_SUMMARY_SCENE.instantiate()
 	summary_card.embedded_mode = true
 	summary_card.show_background = false
@@ -135,15 +157,18 @@ func _build_summary_tile(biome: String) -> Control:
 	summary_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	summary_card.set_biome(biome)
 	summary_card.summary_pressed.connect(_on_summary_tile_pressed)
-	wrapper.add_child(summary_card)
+	content.add_child(summary_card)
 	return wrapper
 
 func _build_entry_wrapper(biome: String, kind: String) -> Button:
 	var wrapper = Button.new()
 	wrapper.name = "%s_%s_button" % [biome, kind]
-	var card_height = max(320.0, get_viewport_rect().size.y * 0.9)
+	var card_height = max(320.0, _get_available_scroll_height() - (SCROLL_CONTENT_PADDING * 2.0))
 	var card_width = card_height * (640.0 / 905.0)
-	wrapper.custom_minimum_size = Vector2(card_width, card_height)
+	wrapper.custom_minimum_size = Vector2(
+		card_width + (ENTRY_TILE_PADDING * 2.0),
+		card_height + (ENTRY_TILE_PADDING * 2.0)
+	)
 	wrapper.flat = true
 	wrapper.text = ""
 	wrapper.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -153,7 +178,16 @@ func _build_entry_wrapper(biome: String, kind: String) -> Button:
 	wrapper.add_theme_stylebox_override("pressed", _default_style)
 	wrapper.add_theme_stylebox_override("focus", _default_style)
 	wrapper.pressed.connect(_on_entry_wrapper_pressed.bind(biome, kind))
-	wrapper.mouse_entered.connect(_select_entry.bind(biome, kind))
+	var content = MarginContainer.new()
+	content.name = "Content"
+	content.set_anchors_preset(Control.PRESET_FULL_RECT)
+	content.offset_left = ENTRY_TILE_PADDING
+	content.offset_top = ENTRY_TILE_PADDING
+	content.offset_right = -ENTRY_TILE_PADDING
+	content.offset_bottom = -ENTRY_TILE_PADDING
+	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	wrapper.add_child(content)
+	wrapper.set_meta("content", content)
 	chapter_entries.append({"button": wrapper, "biome": biome, "kind": kind})
 	return wrapper
 
@@ -223,12 +257,10 @@ func _handle_entry_action(biome: String, kind: String):
 	_open_selected_biome_map()
 
 func _on_story_tile_pressed(biome: String):
-	_debug_input("story_signal", {"biome": biome})
 	_select_entry(biome, "story")
 	_open_story_focus(biome)
 
 func _on_summary_tile_pressed(biome: String):
-	_debug_input("summary_signal", {"biome": biome})
 	_select_entry(biome, "summary")
 	_open_selected_biome_map()
 
@@ -238,12 +270,10 @@ func _select_entry(biome: String, kind: String):
 		if str(entry["biome"]) == biome and str(entry["kind"]) == kind:
 			selected_index = i
 			break
-	_debug_input("select_entry", {"biome": biome, "kind": kind, "index": selected_index})
 	_refresh_entry_styles()
 	_scroll_selected_into_view()
 
 func _on_entry_wrapper_pressed(biome: String, kind: String):
-	_debug_input("wrapper_pressed", {"biome": biome, "kind": kind})
 	_select_entry(biome, kind)
 	GameManager.set_selected_story_biome(biome)
 	if kind == "story":
@@ -254,9 +284,13 @@ func _on_entry_wrapper_pressed(biome: String, kind: String):
 func _open_story_focus(biome: String):
 	if not focus_overlay or not focus_content:
 		return
-	_debug_input("open_story_focus", {"biome": biome})
 	for child in focus_content.get_children():
 		child.queue_free()
+	var viewport_size = get_viewport_rect().size
+	focus_content.custom_minimum_size = Vector2(
+		focus_content.custom_minimum_size.x,
+		viewport_size.y * 0.95
+	)
 	GameManager.set_selected_story_biome(biome)
 	var chapter_scene = STORY_CHAPTER_SCENE.instantiate()
 	chapter_scene.embedded_mode = false
@@ -270,14 +304,12 @@ func _open_story_focus(biome: String):
 func _close_focus_overlay(_biome: String = ""):
 	if not focus_overlay:
 		return
-	_debug_input("close_story_focus", {})
 	focus_overlay.visible = false
 	for child in focus_content.get_children():
 		child.queue_free()
 
 func _on_focus_overlay_input(event: InputEvent):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		_debug_input("overlay_click", {"mouse": event.position})
 		_close_focus_overlay()
 
 func _open_selected_biome_map():
@@ -287,7 +319,6 @@ func _open_selected_biome_map():
 		if unlocked.is_empty():
 			return
 		biome = unlocked[0]
-	_debug_input("open_biome_map", {"biome": biome, "battle_mode": GameManager.is_battle_mode})
 	GameManager.set_selected_story_biome(biome)
 	if GameManager.is_battle_mode:
 		var biome_nodes = GameManager.get_nodes_for_biome(biome)
@@ -303,6 +334,8 @@ func _open_selected_biome_map():
 		GameManager.player_biome = biome
 		GameManager.player_grid_pos = Vector2i(int(entry_node.get("layer", 0)), int(entry_node.get("column", 0)))
 	else:
+		if GameManager.open_story_biome_intro_if_needed(biome):
+			return
 		GameManager.enter_story_biome(biome, true)
 	get_tree().change_scene_to_file(GameManager.get_active_biome_map_scene_path())
 
@@ -334,12 +367,152 @@ func _return_to_current_biome_map():
 		GameManager.enter_story_biome(biome, true)
 	get_tree().change_scene_to_file(GameManager.get_active_biome_map_scene_path())
 
-func _debug_input(label: String, details: Dictionary):
-	if not DEBUG_STORYMAP_INPUT:
-		return
-	print("[StoryMapUI] %s %s" % [label, details])
-
 func _mark_input_handled():
 	var viewport = get_viewport()
 	if viewport:
 		viewport.set_input_as_handled()
+
+func _hide_info_toast():
+	if info_toast_box:
+		info_toast_box.visible = false
+		info_toast_box.modulate = Color(1, 1, 1, 0)
+	if info_toast_label:
+		info_toast_label.text = ""
+
+func _show_tutorial_toast(message: String, on_finished: Callable = Callable()):
+	if _info_toast_tween:
+		_info_toast_tween.kill()
+		_hide_info_toast()
+	if not info_toast_box or not info_toast_label:
+		if on_finished.is_valid():
+			on_finished.call()
+		return
+	info_toast_label.text = message
+	info_toast_label.add_theme_color_override("font_color", TUTORIAL_TOAST_COLOR)
+	info_toast_box.visible = true
+	info_toast_box.modulate = Color(1, 1, 1, 0)
+	_info_toast_tween = create_tween()
+	_info_toast_tween.tween_property(info_toast_box, "modulate:a", 1.0, 0.12)
+	_info_toast_tween.tween_interval(TUTORIAL_TOAST_DURATION)
+	_info_toast_tween.tween_property(info_toast_box, "modulate:a", 0.0, 0.4)
+	_info_toast_tween.finished.connect(func():
+		_hide_info_toast()
+		if on_finished.is_valid():
+			on_finished.call()
+	)
+
+func _get_available_scroll_height() -> float:
+	if scroll_container and scroll_container.size.y > 0.0:
+		return scroll_container.size.y
+	return max(360.0, get_viewport_rect().size.y - 110.0)
+
+func _begin_tutorial_if_needed():
+	if _tutorial_completed or GameManager.is_battle_mode or not _are_tutorial_tips_enabled():
+		return
+	if _should_show_final_tutorial():
+		_tutorial_mode = "final"
+		_tutorial_step = 0
+		_focus_tutorial_target("town", "story")
+		_show_tutorial_toast(
+			LocalizationManager.translate(
+				"storymap.tutorial.complete",
+				"Continue to explore the world. Tutorial tips have now been turned off, you can turn them back on in settings. Good luck"
+			)
+		)
+		_complete_tutorial()
+		return
+	var first_biome = _get_first_unlocked_biome()
+	if first_biome == "":
+		return
+	_tutorial_mode = "intro"
+	_tutorial_step = 0
+	_focus_tutorial_target(first_biome, "story")
+	_show_tutorial_toast(
+		LocalizationManager.translate(
+			"storymap.tutorial.progress",
+			"The story map is where we track your progress"
+		),
+	func():
+		if not is_inside_tree():
+			return
+		var unlocked_biome = _get_first_unlocked_biome()
+		if unlocked_biome == "":
+			_complete_tutorial()
+			return
+		_tutorial_step = 1
+		_focus_tutorial_target(unlocked_biome, "summary")
+		var start_message = LocalizationManager.translate(
+			"storymap.tutorial.start",
+			"To start your journey, click on the first memory"
+		)
+		_show_tutorial_toast(start_message, Callable(self, "_complete_tutorial"))
+	)
+
+func _complete_tutorial():
+	if _tutorial_mode == "final":
+		_set_tutorial_seen(STORYMAP_FINAL_TUTORIAL_ID)
+		_set_tutorial_tips_enabled(false)
+	_tutorial_step = -1
+	_tutorial_completed = true
+	_tutorial_mode = ""
+
+func _focus_tutorial_target(biome: String, kind: String):
+	var entry_index = _find_entry_index(biome, kind)
+	if entry_index == -1:
+		return
+	selected_index = entry_index
+	_refresh_entry_styles()
+	_scroll_selected_into_view()
+
+func _find_entry_index(biome: String, kind: String) -> int:
+	for i in range(chapter_entries.size()):
+		var entry = chapter_entries[i]
+		if str(entry["biome"]) == biome and str(entry["kind"]) == kind:
+			return i
+	return -1
+
+func _get_selected_button() -> Button:
+	if chapter_entries.is_empty() or selected_index < 0 or selected_index >= chapter_entries.size():
+		return null
+	return chapter_entries[selected_index]["button"] as Button
+
+func _get_first_unlocked_biome() -> String:
+	var unlocked = GameManager.get_unlocked_story_biomes()
+	return unlocked[0] if not unlocked.is_empty() else ""
+
+func _is_tutorial_active() -> bool:
+	return _tutorial_step >= 0
+
+func _are_tutorial_tips_enabled() -> bool:
+	var config = ConfigFile.new()
+	if config.load(SETTINGS_PATH) != OK:
+		return true
+	return bool(config.get_value(SETTINGS_SECTION, TUTORIAL_TIPS_KEY, true))
+
+func _set_tutorial_tips_enabled(enabled: bool):
+	var config = ConfigFile.new()
+	config.load(SETTINGS_PATH)
+	config.set_value(SETTINGS_SECTION, TUTORIAL_TIPS_KEY, enabled)
+	config.save(SETTINGS_PATH)
+
+func _should_show_final_tutorial() -> bool:
+	var unlocked = GameManager.get_unlocked_story_biomes()
+	if unlocked.size() < 2:
+		return false
+	if not GameManager.is_biome_cleared("home"):
+		return false
+	return not _has_seen_tutorial(STORYMAP_FINAL_TUTORIAL_ID)
+
+func _has_seen_tutorial(tutorial_id: String) -> bool:
+	var config = ConfigFile.new()
+	if config.load(SETTINGS_PATH) != OK:
+		return false
+	return bool(config.get_value(TUTORIAL_FLAGS_SECTION, tutorial_id, false))
+
+func _set_tutorial_seen(tutorial_id: String):
+	if tutorial_id == "":
+		return
+	var config = ConfigFile.new()
+	config.load(SETTINGS_PATH)
+	config.set_value(TUTORIAL_FLAGS_SECTION, tutorial_id, true)
+	config.save(SETTINGS_PATH)

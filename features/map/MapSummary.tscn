@@ -1,6 +1,6 @@
 [gd_scene format=3]
 
-[ext_resource type="Theme" path="res://assets/themes/Greek.theme" id="1_theme"]
+[ext_resource type="Theme" path="res://assets/themes/Menu.theme" id="1_theme"]
 [ext_resource type="Script" path="res://features/map/MapSummary.gd" id="2_script"]
 
 [node name="MapSummary" type="Control"]

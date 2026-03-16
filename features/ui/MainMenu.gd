@@ -59,6 +59,10 @@ func _ready():
 	confirm_delete_popup.visible = false
 	if has_node("%SettingsOverlay"):
 		%SettingsOverlay.visible = false
+	if has_node("%ControlsOverlay"):
+		%ControlsOverlay.visible = false
+		if %ControlsOverlay.has_signal("closed") and not %ControlsOverlay.closed.is_connected(_on_controls_overlay_closed):
+			%ControlsOverlay.closed.connect(_on_controls_overlay_closed)
 	
 	_main_menu_buttons = [
 		%ContinueButton,
@@ -91,6 +95,8 @@ func _input(event):
 	if confirm_delete_popup.visible:
 		return
 	if has_node("%SettingsOverlay") and %SettingsOverlay.visible:
+		return
+	if has_node("%ControlsOverlay") and %ControlsOverlay.visible:
 		return
 	
 	if save_list_popup.visible:
@@ -292,7 +298,14 @@ func _on_settings_pressed():
 
 func _on_controls_pressed():
 	_play_click_sfx()
-	get_tree().change_scene_to_file("res://features/ui/ControlsMenu.tscn")
+	if has_node("%ControlsOverlay"):
+		if %ControlsOverlay.has_method("open"):
+			%ControlsOverlay.open()
+		else:
+			%ControlsOverlay.visible = true
+
+func _on_controls_overlay_closed():
+	_focus_main_option(_main_selected_index)
 
 func _on_credits_pressed():
 	_play_click_sfx()

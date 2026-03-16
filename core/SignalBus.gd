@@ -33,6 +33,7 @@ signal enemy_damaged(amount)
 # --- Progression & UI Signals ---
 signal gold_changed(new_total)
 signal hp_changed(current, max_hp)
+signal run_log_updated
 signal save_requested
 signal run_started
 signal run_ended(is_victory)    

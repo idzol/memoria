@@ -409,3 +409,28 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 14
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="TutorialToastBox" type="PanelContainer" parent="." unique_id=1083452201]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(560, 42)
+layout_mode = 1
+anchors_preset = 12
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -280.0
+offset_top = -88.0
+offset_right = 280.0
+offset_bottom = -46.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_info_toast")
+
+[node name="TutorialToastLabel" type="Label" parent="TutorialToastBox" unique_id=1083452202]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.7, 1, 1)
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+vertical_alignment = 1

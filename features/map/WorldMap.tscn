@@ -21,6 +21,19 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_day_panel"]
+bg_color = Color(0.05, 0.05, 0.07, 0.97)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.3, 0.36, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_size = 6
+
 [node name="WorldMap" type="Control" unique_id=1276611377]
 layout_mode = 3
 anchors_preset = 15
@@ -55,6 +68,7 @@ stretch_mode = 1
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
+offset_top = 100.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
@@ -62,8 +76,12 @@ grow_vertical = 2
 vertical_scroll_mode = 0
 
 [node name="MapContent" type="Control" parent="MapArea" unique_id=794470365]
-custom_minimum_size = Vector2(25000, 0)
-layout_mode = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 size_flags_vertical = 3
 mouse_filter = 2
 
@@ -81,6 +99,7 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="TopBar" type="PanelContainer" parent="." unique_id=1383085282]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 100)
 layout_mode = 1
 anchors_preset = 10
@@ -112,6 +131,17 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "PHASE 1"
+
+[node name="DayButton" type="Button" parent="TopBar/Margin/HBox/Left" unique_id=117713991]
+unique_name_in_owner = true
+layout_mode = 2
+flat = true
+alignment = 0
+theme_override_colors/font_color = Color(0.95, 0.82, 0.45, 1)
+theme_override_colors/font_hover_color = Color(1, 0.9, 0.55, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.9, 0.55, 1)
+theme_override_font_sizes/font_size = 18
+text = "Day 1. Protodia"
 
 [node name="Center" type="CenterContainer" parent="TopBar/Margin/HBox" unique_id=1371315180]
 layout_mode = 2
@@ -157,14 +187,17 @@ unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(420, 34)
 layout_mode = 1
-anchors_preset = 10
+anchors_preset = 12
 anchor_left = 0.5
+anchor_top = 1.0
 anchor_right = 0.5
+anchor_bottom = 1.0
 offset_left = -210.0
-offset_top = 112.0
+offset_top = -78.0
 offset_right = 210.0
-offset_bottom = 146.0
+offset_bottom = -44.0
 grow_horizontal = 2
+grow_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_info_toast")
 
 [node name="InfoToastLabel" type="Label" parent="InfoToastBox" unique_id=707777002]
@@ -174,3 +207,160 @@ theme_override_colors/font_color = Color(0.95, 0.35, 0.35, 1)
 theme_override_font_sizes/font_size = 14
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="DayInfoPanel" type="PanelContainer" parent="." unique_id=192177710]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(520, 0)
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -560.0
+offset_top = 112.0
+offset_right = -24.0
+offset_bottom = 412.0
+grow_horizontal = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_day_panel")
+
+[node name="MarginContainer" type="MarginContainer" parent="DayInfoPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 18
+
+[node name="VBoxContainer" type="VBoxContainer" parent="DayInfoPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="DayInfoTitle" type="Label" parent="DayInfoPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.83, 0.42, 1)
+theme_override_font_sizes/font_size = 28
+text = "Protodia"
+
+[node name="DayInfoDescription" type="Label" parent="DayInfoPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+text = "Day description"
+
+[node name="DayInfoDeitiesHeading" type="Label" parent="DayInfoPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.75, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "Deities"
+
+[node name="DayInfoDeities" type="Label" parent="DayInfoPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+text = "Zeus"
+
+[node name="DayInfoPurposeHeading" type="Label" parent="DayInfoPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.75, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "Purpose"
+
+[node name="DayInfoPurpose" type="Label" parent="DayInfoPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+text = "Purpose text"
+
+[node name="BacktrackDialog" type="Control" parent="." unique_id=19341011]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dimmer" type="ColorRect" parent="BacktrackDialog"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.02, 0.03, 0.72)
+
+[node name="CenterContainer" type="CenterContainer" parent="BacktrackDialog"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="BacktrackDialog/CenterContainer"]
+custom_minimum_size = Vector2(640, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_day_panel")
+
+[node name="MarginContainer" type="MarginContainer" parent="BacktrackDialog/CenterContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 22
+
+[node name="VBoxContainer" type="VBoxContainer" parent="BacktrackDialog/CenterContainer/PanelContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="BacktrackDialogText" type="Label" parent="BacktrackDialog/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.42, 0.42, 1)
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+autowrap_mode = 3
+text = "You have a feeling you have been here before."
+
+[node name="BacktrackDialogHint" type="Label" parent="BacktrackDialog/CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.82, 0.45, 1)
+horizontal_alignment = 1
+text = "Click to continue"
+
+[node name="BattleLogRow" type="HBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -44.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 40
+
+[node name="LeftSpacer" type="Control" parent="BattleLogRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(290, 0)
+layout_mode = 2
+
+[node name="LogDisplay" type="ScrollContainer" parent="BattleLogRow"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LogBox" type="VBoxContainer" parent="BattleLogRow/LogDisplay"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RightSpacer" type="Control" parent="BattleLogRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(290, 0)
+layout_mode = 2

@@ -17,7 +17,7 @@ Generated: 2026-02-26 05:17:17
 ### Cards
 - **climbing_pick.tres** (`res://data/cards/climbing_pick.tres`)
   - ⚠️ Missing: `res://assets/cards/icon/climbing_pick_icon.png`
-- **_card_asset_data.tres** (`res://data/cards/_card_asset_data.tres`)
+- **_card_asset_data.tres** (`res://data/card_asset_data.tres`)
   - ⚠️ Missing: `res://assets/cards/front/card_front_general.png`
   - ⚠️ Missing: `res://assets/cards/front/card_front_spell.png`
   - ⚠️ Missing: `res://assets/cards/front/card_front_trap.png`

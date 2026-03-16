@@ -1,0 +1,51 @@
+[gd_resource type="Resource" script_class="RoomDialogue" load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://data/resources/RoomDialogue.gd" id="1_dialogue"]
+[ext_resource type="Script" path="res://data/resources/RoomDialogSequence.gd" id="2_sequence"]
+[ext_resource type="Script" path="res://data/resources/RoomDialogLine.gd" id="3_line"]
+
+[sub_resource type="Resource" id="RoomDialogLine_first_player"]
+script = ExtResource("3_line")
+speaker_role = "player"
+text_key = "dialog.sample.tutorial_home.first.player"
+text = "test1"
+
+[sub_resource type="Resource" id="RoomDialogLine_first_npc"]
+script = ExtResource("3_line")
+speaker_role = "npc"
+text_key = "dialog.sample.tutorial_home.first.npc"
+text = "test2"
+
+[sub_resource type="Resource" id="RoomDialogSequence_first_visit"]
+script = ExtResource("2_sequence")
+id = "first_visit"
+condition = {
+"equals": 1,
+"type": "room_visit_count"
+}
+lines = [SubResource("RoomDialogLine_first_player"), SubResource("RoomDialogLine_first_npc")]
+
+[sub_resource type="Resource" id="RoomDialogLine_second_player"]
+script = ExtResource("3_line")
+speaker_role = "player"
+text_key = "dialog.sample.tutorial_home.second.player"
+text = "test3"
+
+[sub_resource type="Resource" id="RoomDialogLine_second_npc"]
+script = ExtResource("3_line")
+speaker_role = "npc"
+text_key = "dialog.sample.tutorial_home.second.npc"
+text = "test4"
+
+[sub_resource type="Resource" id="RoomDialogSequence_second_visit"]
+script = ExtResource("2_sequence")
+id = "second_visit"
+condition = {
+"equals": 2,
+"type": "room_visit_count"
+}
+lines = [SubResource("RoomDialogLine_second_player"), SubResource("RoomDialogLine_second_npc")]
+
+[resource]
+script = ExtResource("1_dialogue")
+sequences = [SubResource("RoomDialogSequence_first_visit"), SubResource("RoomDialogSequence_second_visit")]

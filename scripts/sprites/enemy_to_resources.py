@@ -13,6 +13,7 @@ NAME_SPANISH_KEYS = ["namespanish", "name_es", "namees", "spanishname"]
 NAME_FRENCH_KEYS = ["namefrench", "name_fr", "namefr", "frenchname"]
 NAME_GERMAN_KEYS = ["namegerman", "name_de", "namede", "germanname"]
 LOOT_POWER_KEYS = ["lootpower", "loot_power"]
+ENEMY_CARDS_KEYS = ["enemy_cards", "enemycards", "cards"]
 
 def normalize_row(row):
     return {str(key).strip().lower(): value for key, value in row.items()}
@@ -49,6 +50,14 @@ def get_loot_power(row):
         return 0
 
 
+def parse_enemy_cards(row):
+    raw_value = get_first_value(row, ENEMY_CARDS_KEYS, "")
+    if raw_value == "":
+        return []
+    parts = re.split(r"[;,|]", raw_value)
+    return [part.strip() for part in parts if part.strip()]
+
+
 def parse_loot(loot_str):
     gold_min, gold_max = 0, 0
     items = []
@@ -76,6 +85,7 @@ def generate_enemy_tres(row):
     g_min, g_max, items = parse_loot(row.get("loot", ""))
     names = get_localized_names(row)
     loot_power = get_loot_power(row)
+    enemy_cards = parse_enemy_cards(row)
 
     lines = [
         '[gd_resource type="Resource" script_class="EnemyData" load_steps=4 format=3]',
@@ -102,6 +112,7 @@ def generate_enemy_tres(row):
         'defend_sheet = ExtResource("4_def")',
         'armor = %s' % row.get("armor", "0"),
         'base_damage = %s' % row.get("attack", "10"),
+        'enemy_cards = %s' % str(enemy_cards).replace("'", '"'),
         'difficulty_tier = %s' % row.get("tier", "1"),
         'xp_reward = %s' % row.get("xp", "20"),
         'loot_power = %d' % loot_power,

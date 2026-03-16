@@ -4,6 +4,7 @@
 [ext_resource type="Theme" uid="uid://kw6gdo1dshed" path="res://assets/themes/Minotaur.theme" id="1_uhfsk"]
 [ext_resource type="Theme" path="res://assets/themes/Menu.theme" id="1_menu_modal_theme"]
 [ext_resource type="PackedScene" uid="uid://dm5v8f6r7p2m5" path="res://features/ui/SettingsOverlay.tscn" id="2_settings"]
+[ext_resource type="PackedScene" path="res://features/ui/ControlsOverlay.tscn" id="3_controls"]
 [ext_resource type="Texture2D" uid="uid://ki802i37gyb4" path="res://assets/ui/main_background.png" id="3_bg_texture"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_opaque_modal"]
@@ -297,6 +298,11 @@ layout_mode = 2
 text = "CANCEL"
 
 [node name="SettingsOverlay" parent="." unique_id=89381519 instance=ExtResource("2_settings")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="ControlsOverlay" parent="." instance=ExtResource("3_controls")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1

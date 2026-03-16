@@ -57,12 +57,14 @@ layout_mode = 2
 theme_override_constants/separation = 20
 
 [node name="Title" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=133885877]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "SETTINGS"
 horizontal_alignment = 1
 
 [node name="AudioHeader" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=799156702]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
 text = "Audio"
@@ -107,6 +109,7 @@ step = 0.05
 layout_mode = 2
 
 [node name="DisplayHeader" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=294091978]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
 text = "Display"
@@ -137,6 +140,44 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="HSeparator2" type="HSeparator" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=769696574]
+layout_mode = 2
+
+[node name="GameplayHeader" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+text = "Gameplay"
+horizontal_alignment = 1
+
+[node name="GameplayGrid" type="GridContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 10
+columns = 2
+
+[node name="TutorialTipsLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/GameplayGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Tutorial Tips"
+
+[node name="TutorialTipsButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/GameplayGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "On"
+
+[node name="RunLogLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/GameplayGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Global Log"
+
+[node name="RunLogButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/GameplayGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "On"
+
+[node name="HSeparator3" type="HSeparator" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
 [node name="BackButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=109998041]

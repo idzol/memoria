@@ -15,6 +15,7 @@ class_name EnemyData
 @export var hp: int = 50
 @export var armor: int = 0
 @export var base_damage: int = 10
+@export var enemy_cards: Array[String] = []
 @export var difficulty_tier: int = 1 ## Determines board size (e.g. 1=3x3, 3=4x4, 6=5x5)
 @export var xp_reward: int = 25
 @export var probabilities: Array[float] = [0.6, 0.2, 0.1, 0.1] ## [Atk, Strong Atk, Debuff, Pass]

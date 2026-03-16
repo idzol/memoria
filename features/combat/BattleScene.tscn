@@ -127,6 +127,7 @@ layout_mode = 2
 text = "☰"
 
 [node name="StageLayoutContainer" type="MarginContainer" parent="UI/MainLayout" unique_id=1788464385]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/margin_left = 40
@@ -345,6 +346,14 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "Room Name"
+horizontal_alignment = 1
+
+[node name="DialogSpeaker" type="Label" parent="DialogOverlay/VBox" unique_id=11030021]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.82, 0.45, 1)
+theme_override_font_sizes/font_size = 18
+text = "Narrator"
 horizontal_alignment = 1
 
 [node name="DialogText" type="Label" parent="DialogOverlay/VBox" unique_id=934671793]
