@@ -19,7 +19,7 @@ var asset_library: MapAssetData = preload("res://data/map/map_data.tres")
 
 var node_data = null
 
-func setup_biome_node(data: Dictionary, grid_tex: Texture2D, is_cleared: bool, is_player_here: bool, is_revealed: bool, is_reachable: bool):
+func setup_biome_node(data: Dictionary, grid_tex: Texture2D, _is_cleared: bool, is_player_here: bool, is_revealed: bool, _is_reachable: bool):
 	node_data = data
 	
 	# 1. Update Grid Background (Always visible if revealed)
@@ -122,10 +122,9 @@ func _get_type_icon_texture(type: String) -> Texture2D:
 	return asset_library.map_icon_mystery
 
 func _get_node_icon_texture(data: Dictionary) -> Texture2D:
-	if str(data.get("type", "")) == "home" or bool(data.get("is_home", false)):
-		return _get_type_icon_texture("home")
-
 	if GameManager.is_battle_mode:
+		if str(data.get("type", "")) == "home" or bool(data.get("is_home", false)):
+			return _get_type_icon_texture("home")
 		return _get_type_icon_texture(str(data.get("type", "mystery")))
 
 	var custom_icon_path = str(data.get("custom_icon_path", ""))
@@ -133,6 +132,9 @@ func _get_node_icon_texture(data: Dictionary) -> Texture2D:
 		var custom_icon = load(custom_icon_path) as Texture2D
 		if custom_icon:
 			return custom_icon
+
+	if str(data.get("type", "")) == "home" or bool(data.get("is_home", false)):
+		return _get_type_icon_texture("home")
 
 	return _get_type_icon_texture(str(data.get("type", "mystery")))
 

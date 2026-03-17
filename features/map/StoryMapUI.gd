@@ -14,12 +14,14 @@ const TUTORIAL_FLAGS_SECTION := "tutorial_flags"
 const STORYMAP_FINAL_TUTORIAL_ID := "storymap_intro_complete"
 const TUTORIAL_TOAST_DURATION := 10.0
 const TUTORIAL_TOAST_COLOR := Color(0.4, 0.7, 1.0, 1.0)
+const STORY_TILE_VIEWPORT_HEIGHT_RATIO := 0.78
 
 @onready var chapter_row = %ChapterRow
 @onready var scroll_container = %ScrollContainer
 @onready var avatar_button = %AvatarButton
 @onready var map_button = %MapButton
 @onready var header_label = %HeaderLabel
+@onready var background_rect = $BG
 @onready var info_toast_box = %InfoToastBox
 @onready var info_toast_label = %InfoToastLabel
 @onready var focus_overlay = %FocusOverlay
@@ -33,6 +35,8 @@ var _info_toast_tween: Tween
 var _tutorial_step: int = -1
 var _tutorial_completed: bool = false
 var _tutorial_mode: String = ""
+var _last_story_layout_height: int = -1
+var _last_focus_layout_height: int = -1
 
 func _ready():
 	_create_styles()
@@ -50,7 +54,11 @@ func _ready():
 
 func _notification(what):
 	if what == NOTIFICATION_RESIZED and is_inside_tree() and scroll_container and chapter_row:
-		_rebuild_chapters()
+		var scene_height = int(roundi(_get_scene_height()))
+		if scene_height != _last_story_layout_height:
+			_rebuild_chapters()
+		if focus_overlay and focus_overlay.visible and scene_height != _last_focus_layout_height:
+			_apply_focus_content_size()
 
 func _input(event):
 	if focus_overlay and focus_overlay.visible:
@@ -87,8 +95,7 @@ func _rebuild_chapters():
 
 	var unlocked = GameManager.get_unlocked_story_biomes()
 	var show_story = not GameManager.is_battle_mode
-	var available_height = _get_available_scroll_height()
-	var card_height = max(320.0, available_height - (SCROLL_CONTENT_PADDING * 2.0))
+	var card_height = _get_story_tile_height()
 	var card_width = card_height * (640.0 / 905.0)
 	var padded_card_width = card_width + (ENTRY_TILE_PADDING * 2.0)
 	var padded_card_height = card_height + (ENTRY_TILE_PADDING * 2.0)
@@ -112,7 +119,7 @@ func _rebuild_chapters():
 
 		var content_row = HBoxContainer.new()
 		content_row.alignment = BoxContainer.ALIGNMENT_BEGIN
-		content_row.add_theme_constant_override("separation", ENTRY_GAP)
+		content_row.add_theme_constant_override("separation", int(roundi(ENTRY_GAP)))
 		chapter.add_child(content_row)
 
 		if show_story:
@@ -132,16 +139,20 @@ func _rebuild_chapters():
 			break
 	_refresh_entry_styles()
 	_scroll_selected_into_view.call_deferred()
+	_last_story_layout_height = int(roundi(_get_scene_height()))
 
 func _build_story_tile(biome: String) -> Control:
 	var wrapper = _build_entry_wrapper(biome, "story")
 	var content: MarginContainer = wrapper.get_meta("content")
+	var target_size: Vector2 = wrapper.get_meta("embedded_target_size")
 	var chapter_card = STORY_CHAPTER_SCENE.instantiate()
 	chapter_card.embedded_mode = true
 	chapter_card.show_background = false
 	chapter_card.allow_navigation = false
 	chapter_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	chapter_card.title_override = _get_story_tile_title(biome)
+	if chapter_card.has_method("set_embedded_target_size"):
+		chapter_card.set_embedded_target_size(target_size)
 	chapter_card.set_biome(biome)
 	chapter_card.chapter_pressed.connect(_on_story_tile_pressed)
 	content.add_child(chapter_card)
@@ -150,11 +161,14 @@ func _build_story_tile(biome: String) -> Control:
 func _build_summary_tile(biome: String) -> Control:
 	var wrapper = _build_entry_wrapper(biome, "summary")
 	var content: MarginContainer = wrapper.get_meta("content")
+	var target_size: Vector2 = wrapper.get_meta("embedded_target_size")
 	var summary_card = MAP_SUMMARY_SCENE.instantiate()
 	summary_card.embedded_mode = true
 	summary_card.show_background = false
 	summary_card.allow_navigation = false
 	summary_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if summary_card.has_method("set_embedded_target_size"):
+		summary_card.set_embedded_target_size(target_size)
 	summary_card.set_biome(biome)
 	summary_card.summary_pressed.connect(_on_summary_tile_pressed)
 	content.add_child(summary_card)
@@ -163,11 +177,12 @@ func _build_summary_tile(biome: String) -> Control:
 func _build_entry_wrapper(biome: String, kind: String) -> Button:
 	var wrapper = Button.new()
 	wrapper.name = "%s_%s_button" % [biome, kind]
-	var card_height = max(320.0, _get_available_scroll_height() - (SCROLL_CONTENT_PADDING * 2.0))
+	var card_height = _get_story_tile_height()
 	var card_width = card_height * (640.0 / 905.0)
+	var embedded_target_size = Vector2(card_width, card_height)
 	wrapper.custom_minimum_size = Vector2(
-		card_width + (ENTRY_TILE_PADDING * 2.0),
-		card_height + (ENTRY_TILE_PADDING * 2.0)
+		embedded_target_size.x + (ENTRY_TILE_PADDING * 2.0),
+		embedded_target_size.y + (ENTRY_TILE_PADDING * 2.0)
 	)
 	wrapper.flat = true
 	wrapper.text = ""
@@ -188,6 +203,7 @@ func _build_entry_wrapper(biome: String, kind: String) -> Button:
 	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	wrapper.add_child(content)
 	wrapper.set_meta("content", content)
+	wrapper.set_meta("embedded_target_size", embedded_target_size)
 	chapter_entries.append({"button": wrapper, "biome": biome, "kind": kind})
 	return wrapper
 
@@ -249,16 +265,13 @@ func _activate_selected_entry():
 	var entry = chapter_entries[selected_index]
 	_handle_entry_action(str(entry["biome"]), str(entry["kind"]))
 
-func _handle_entry_action(biome: String, kind: String):
+func _handle_entry_action(biome: String, _kind: String):
 	GameManager.set_selected_story_biome(biome)
-	if kind == "story" and not GameManager.is_battle_mode:
-		_open_story_focus(biome)
-		return
 	_open_selected_biome_map()
 
 func _on_story_tile_pressed(biome: String):
 	_select_entry(biome, "story")
-	_open_story_focus(biome)
+	_open_selected_biome_map()
 
 func _on_summary_tile_pressed(biome: String):
 	_select_entry(biome, "summary")
@@ -276,9 +289,6 @@ func _select_entry(biome: String, kind: String):
 func _on_entry_wrapper_pressed(biome: String, kind: String):
 	_select_entry(biome, kind)
 	GameManager.set_selected_story_biome(biome)
-	if kind == "story":
-		_open_story_focus(biome)
-		return
 	_open_selected_biome_map()
 
 func _open_story_focus(biome: String):
@@ -286,11 +296,7 @@ func _open_story_focus(biome: String):
 		return
 	for child in focus_content.get_children():
 		child.queue_free()
-	var viewport_size = get_viewport_rect().size
-	focus_content.custom_minimum_size = Vector2(
-		focus_content.custom_minimum_size.x,
-		viewport_size.y * 0.95
-	)
+	_apply_focus_content_size()
 	GameManager.set_selected_story_biome(biome)
 	var chapter_scene = STORY_CHAPTER_SCENE.instantiate()
 	chapter_scene.embedded_mode = false
@@ -300,6 +306,18 @@ func _open_story_focus(biome: String):
 	chapter_scene.chapter_pressed.connect(_close_focus_overlay)
 	focus_content.add_child(chapter_scene)
 	focus_overlay.visible = true
+
+func _apply_focus_content_size():
+	if not focus_content:
+		return
+	var target_height = _get_focus_content_height()
+	var target_width = focus_content.custom_minimum_size.x
+	focus_content.custom_minimum_size = Vector2(target_width, target_height)
+	focus_content.offset_left = -target_width * 0.5
+	focus_content.offset_right = target_width * 0.5
+	focus_content.offset_top = 0.0
+	focus_content.offset_bottom = target_height
+	_last_focus_layout_height = int(roundi(target_height))
 
 func _close_focus_overlay(_biome: String = ""):
 	if not focus_overlay:
@@ -337,7 +355,7 @@ func _open_selected_biome_map():
 		if GameManager.open_story_biome_intro_if_needed(biome):
 			return
 		GameManager.enter_story_biome(biome, true)
-	get_tree().change_scene_to_file(GameManager.get_active_biome_map_scene_path())
+	SceneTransition.change_scene_to_file(GameManager.get_active_biome_map_scene_path())
 
 func _scroll_selected_into_view():
 	if chapter_entries.is_empty():
@@ -365,7 +383,7 @@ func _return_to_current_biome_map():
 	GameManager.set_selected_story_biome(biome)
 	if not GameManager.is_battle_mode:
 		GameManager.enter_story_biome(biome, true)
-	get_tree().change_scene_to_file(GameManager.get_active_biome_map_scene_path())
+	SceneTransition.change_scene_to_file(GameManager.get_active_biome_map_scene_path())
 
 func _mark_input_handled():
 	var viewport = get_viewport()
@@ -404,7 +422,23 @@ func _show_tutorial_toast(message: String, on_finished: Callable = Callable()):
 func _get_available_scroll_height() -> float:
 	if scroll_container and scroll_container.size.y > 0.0:
 		return scroll_container.size.y
-	return max(360.0, get_viewport_rect().size.y - 110.0)
+	return max(360.0, _get_scene_height() - 110.0)
+
+func _get_story_tile_height() -> float:
+	return max(320.0, _get_scene_height() * STORY_TILE_VIEWPORT_HEIGHT_RATIO)
+
+func _get_scene_height() -> float:
+	if background_rect and background_rect.size.y > 0.0:
+		return background_rect.size.y
+	if size.y > 0.0:
+		return size.y
+	return get_viewport_rect().size.y
+
+func _get_focus_content_height() -> float:
+	if scroll_container and scroll_container.size.y > 0.0:
+		return scroll_container.size.y
+	return _get_scene_height()
+
 
 func _begin_tutorial_if_needed():
 	if _tutorial_completed or GameManager.is_battle_mode or not _are_tutorial_tips_enabled():

@@ -73,22 +73,24 @@ func _on_exit_pressed():
 	if _is_exiting:
 		return
 	_is_exiting = true
-	await _fade_to_white()
-	await get_tree().create_timer(1.5).timeout
 
 	if GameManager.run_summary_exit_to_main_menu:
+		await _fade_to_white()
+		await get_tree().create_timer(1.5).timeout
 		GameManager.run_summary_exit_to_main_menu = false
 		get_tree().change_scene_to_file("res://features/ui/MainMenu.tscn")
 		return
 
 	if GameManager.is_battle_mode:
 		# Battle mode: return to Main Menu
+		await _fade_to_white()
+		await get_tree().create_timer(1.5).timeout
 		get_tree().change_scene_to_file("res://features/ui/MainMenu.tscn")
 	else:
 		# Story mode: return to the story map at the current biome home
 		GameManager.begin_new_story_run(GameManager.player_biome if GameManager.player_biome != "" else "town")
 		SaveManager.save_mid_run_state()
-		get_tree().change_scene_to_file(GameManager.get_story_map_scene_path())
+		await SceneTransition.change_scene_to_file(GameManager.get_story_map_scene_path())
 
 func _fade_to_white():
 	var fade_layer = CanvasLayer.new()

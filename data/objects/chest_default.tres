@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ObjectData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://data/resources/ObjectData.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/objects/chest_default.png" id="2_image"]
+
+[resource]
+script = ExtResource("1_script")
+object_id = "chest_default"
+name = "Weathered Chest"
+object_image = ExtResource("2_image")
+hframes = 8
+vframes = 1
+total_frames = 8
+frame_speed = 0.12
+object_size = 4
+object_items = ["item:burning_fan", "item:blood_vial", "item:ancient_heart"]
+object_probability = [0.18, 0.12, 0.10]

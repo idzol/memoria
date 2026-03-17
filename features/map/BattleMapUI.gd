@@ -396,7 +396,17 @@ func _is_home_node(node_data: Dictionary) -> bool:
 func _enter_room(data: Dictionary):
 	GameManager.current_node = data
 	SignalBus.node_selected.emit(data)
-	match str(data.get("type", "battle")):
+	var room_path = str(data.get("room_resource_path", ""))
+	var room_res: RoomData = null
+	if room_path != "" and ResourceLoader.exists(room_path):
+		room_res = load(room_path) as RoomData
+	var room_type = str(data.get("type", "battle"))
+	if room_res:
+		room_type = str(room_res.type)
+	var node_id = str(data.get("id", ""))
+	var is_object_room = room_res != null and room_res.enemy_id == "" and room_res.object_id != ""
+	var is_object_room_cleared = is_object_room and GameManager.is_room_cleared(node_id)
+	match room_type:
 		"battle", "boss":
 			get_tree().change_scene_to_file("res://features/combat/BattleScene.tscn")
 		"treasure":
@@ -404,7 +414,10 @@ func _enter_room(data: Dictionary):
 		"rest":
 			get_tree().change_scene_to_file("res://features/encounters/RestScene.tscn")
 		"event", "home":
-			get_tree().change_scene_to_file("res://features/encounters/EventScene.tscn")
+			if is_object_room and not is_object_room_cleared:
+				get_tree().change_scene_to_file("res://features/combat/BattleScene.tscn")
+			else:
+				get_tree().change_scene_to_file("res://features/encounters/EventScene.tscn")
 		"shop":
 			get_tree().change_scene_to_file("res://features/encounters/ShopScene.tscn")
 		_:

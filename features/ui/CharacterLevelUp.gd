@@ -163,4 +163,4 @@ func _on_continue_pressed():
 	GameManager.level_up_return_scene = ""
 	if next_scene == "":
 		next_scene = GameManager.get_active_biome_map_scene_path()
-	get_tree().change_scene_to_file(next_scene)
+	SceneTransition.change_scene_to_file(next_scene)

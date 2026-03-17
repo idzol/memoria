@@ -19,19 +19,28 @@ const TABLET_ASPECT_RATIO = 640.0 / 905.0
 @onready var continue_button = %ContinueButton
 
 var display_biome: String = ""
+var embedded_target_size: Vector2 = Vector2.ZERO
 
 func _ready():
 	continue_button.pressed.connect(_back_to_story_map)
+	if not resized.is_connected(_refresh_embedded_layout):
+		resized.connect(_refresh_embedded_layout)
 	if ResourceLoader.exists(GRANITE_TEXTURE_PATH):
 		granite_rect.texture = load(GRANITE_TEXTURE_PATH)
 		granite_rect.modulate = Color(0.78, 0.78, 0.82, 0.9)
 	_apply_mode()
 	_refresh_content.call_deferred()
+	_refresh_embedded_layout.call_deferred()
 
 func set_biome(biome: String):
 	display_biome = biome
 	if is_inside_tree():
 		_refresh_content()
+
+func set_embedded_target_size(target_size: Vector2):
+	embedded_target_size = target_size
+	if is_inside_tree():
+		_refresh_embedded_layout()
 
 func _input(event):
 	if embedded_mode:
@@ -54,18 +63,17 @@ func _apply_mode():
 	continue_button.visible = allow_navigation and not embedded_mode
 	if embedded_mode:
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
-		var embedded_height = _get_embedded_height()
-		var embedded_width = embedded_height * TABLET_ASPECT_RATIO
-		custom_minimum_size = Vector2(embedded_width, embedded_height)
+		custom_minimum_size = Vector2.ZERO
+		size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		size_flags_vertical = Control.SIZE_EXPAND_FILL
 		center.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		tablet.custom_minimum_size = Vector2(embedded_width, embedded_height)
-		body_label.custom_minimum_size = Vector2(0, embedded_height * 0.72)
 		body_label.scroll_active = false
 		body_label.fit_content = false
 		title_label.add_theme_font_size_override("font_size", 30)
 		body_label.add_theme_font_size_override("normal_font_size", 22)
 		continue_button.text = ""
 		_set_control_tree_mouse_filter(self, Control.MOUSE_FILTER_IGNORE)
+		_refresh_embedded_layout.call_deferred()
 	else:
 		mouse_filter = Control.MOUSE_FILTER_STOP
 		custom_minimum_size = Vector2.ZERO
@@ -98,6 +106,25 @@ func _get_title_for_biome(biome: String) -> String:
 
 func _get_embedded_height() -> float:
 	return max(320.0, get_viewport_rect().size.y * 0.9)
+
+func _refresh_embedded_layout():
+	if not embedded_mode or not tablet or not body_label:
+		return
+	var available_size = embedded_target_size
+	if available_size == Vector2.ZERO:
+		available_size = size
+	if available_size == Vector2.ZERO and get_parent() is Control:
+		available_size = (get_parent() as Control).size
+	if available_size == Vector2.ZERO:
+		var fallback_height = _get_embedded_height()
+		available_size = Vector2(fallback_height * TABLET_ASPECT_RATIO, fallback_height)
+	var target_height = max(320.0, available_size.y)
+	var target_width = target_height * TABLET_ASPECT_RATIO
+	if available_size.x > 0.0 and target_width > available_size.x:
+		target_width = available_size.x
+		target_height = target_width / TABLET_ASPECT_RATIO
+	tablet.custom_minimum_size = Vector2(target_width, target_height)
+	body_label.custom_minimum_size = Vector2(0, target_height * 0.72)
 
 func _back_to_story_map():
 	if embedded_mode or not allow_navigation:

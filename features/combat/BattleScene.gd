@@ -30,6 +30,7 @@ extends Node2D
 @onready var enemy_atk_val = %EnemyAtkVal
 @onready var enemy_def_val = %EnemyDefVal
 @onready var stage_layout_container = %StageLayoutContainer
+@onready var arena_center = %ArenaCenter
 @onready var player_column_ui = get_node_or_null("UI/MainLayout/StageLayoutContainer/StageLayout/PlayerColumnUI")
 @onready var player_stats_hud = get_node_or_null("UI/MainLayout/StageLayoutContainer/StageLayout/PlayerColumnUI/StatsHUD")
 @onready var enemy_column_ui = get_node_or_null("UI/MainLayout/StageLayoutContainer/StageLayout/EnemyColumnUI")
@@ -66,8 +67,10 @@ var difficulty: int = 0
 var current_room_res: RoomData = null
 var current_enemy_res: EnemyData = null
 var current_player_res: PlayerData = null
+var current_object_res: ObjectData = null
 var in_game_menu = null
 var is_cleared_room: bool = false
+var is_object_room: bool = false
 var death_transition_in_progress: bool = false
 
 # Current Stats for Calculation
@@ -101,6 +104,8 @@ var active_enemy_intent_preview_card: Control = null
 var current_enemy_intent_card_id: String = ""
 var current_enemy_intent_card_res: CardData = null
 var enemy_intent_preview_dismiss_requested: bool = false
+var object_reward_preview_dismiss_requested: bool = false
+var object_reward_preview_active: bool = false
 var is_log_expanded: bool = false
 var log_collapsed_global_rect: Rect2 = Rect2()
 var _active_room_dialog_lines: Array[Dictionary] = []
@@ -115,7 +120,7 @@ const ENERGY_PIP_FULL = Color(1.0, 0.86, 0.35, 1.0)
 const ENERGY_PIP_EMPTY = Color(0.46, 0.35, 0.08, 1.0)
 const CARD_SELECTION_OUTLINE = "KeyboardCardSelectionOutline"
 const ACTION_ANIM_DURATION = 0.35
-const ENEMY_INTENT_PREVIEW_SECONDS = 3.0
+const ENEMY_INTENT_PREVIEW_SECONDS = 2.0
 const ENEMY_DEFAULT_CARD_ID = "enemy_default"
 const PLAYER_DISCARD_SIZE = Vector2(150.0, 216.0)
 const ENEMY_INTENT_SIZE = Vector2(150.0, 216.0)
@@ -138,6 +143,16 @@ const DEFAULT_UNIT_TOTAL_FRAMES = 8
 const DEFAULT_UNIT_FRAME_SPEED = 0.1
 const ENERGY_PIP_CHAR = "▮"
 
+const OBJECT_CARD_BACK_ICON_PATH = "res://assets/cards/back_icon/card_back_object_icon.png"
+const OBJECT_FALLBACK_REWARD_KEYS = [
+	"card:healing_herb",
+	"card:bread",
+	"card:electric_gel",
+	"card:trap",
+	"card:bomb",
+	"card:gold_coins"
+]
+
 func _ready():
 	var node_data = GameManager.current_node
 	_ensure_player_deck_not_empty()
@@ -153,6 +168,9 @@ func _ready():
 	if node_data.has("room_resource_path"):
 		current_room_res = load(node_data.room_resource_path) as RoomData
 		_apply_room_data(current_room_res)
+		is_object_room = current_room_res != null and current_room_res.enemy_id == "" and current_room_res.object_id != ""
+		if is_object_room:
+			current_object_res = _load_object_resource(current_room_res.object_id)
 	
 	# Instance the In-Game Menu (Esc key)
 	if in_game_menu_scene:
@@ -170,7 +188,17 @@ func _ready():
 
 	_setup_player_spritesheet()
 	if is_cleared_room:
+		if is_object_room:
+			_setup_object_portrait()
+			_prepare_object_room_ui()
 		_setup_cleared_room_view()
+	elif is_object_room:
+		_setup_object_portrait()
+		_prepare_object_room_ui()
+		battle_ui.show()
+		dialog_overlay.hide()
+		can_flip = true
+		setup_board()
 	else:
 		_setup_enemy_portrait()
 		_init_encounter()
@@ -194,8 +222,11 @@ func _ready():
 
 func _input(event):
 	if _is_enemy_intent_preview_visible():
-		if event.is_action_pressed("ui_accept") or event.is_action_pressed("ui_cancel"):
+		var is_key_press = event is InputEventKey and event.pressed and not event.is_echo()
+		var is_mouse_press = event is InputEventMouseButton and event.pressed
+		if is_key_press or is_mouse_press:
 			_request_enemy_intent_preview_dismiss()
+			_hide_enemy_intent_preview()
 			get_viewport().set_input_as_handled()
 			return
 
@@ -207,6 +238,13 @@ func _input(event):
 			return
 
 	if _is_card_preview_visible():
+		if object_reward_preview_active:
+			var is_key_press = event is InputEventKey and event.pressed and not event.is_echo()
+			var is_mouse_press = event is InputEventMouseButton and event.pressed
+			if is_key_press or is_mouse_press:
+				object_reward_preview_dismiss_requested = true
+				get_viewport().set_input_as_handled()
+			return
 		if (event is InputEventMouseButton and event.pressed) or event.is_action_pressed("ui_accept"):
 			_hide_card_preview()
 			return
@@ -420,7 +458,12 @@ func _sync_stat_icons():
 	if player_def_val: player_def_val.text = str(p_def + temp_armor_bonus)
 	
 	# Sync Enemy Icons
-	if current_enemy_res:
+	if is_object_room:
+		if enemy_atk_val:
+			enemy_atk_val.text = "-"
+		if enemy_def_val:
+			enemy_def_val.text = "-"
+	elif current_enemy_res:
 		enemy_atk_val.text = str(current_enemy_res.base_damage)
 		enemy_def_val.text = str(current_enemy_res.armor + temp_enemy_armor_bonus)
 	
@@ -488,7 +531,10 @@ func _on_card_pressed(card):
 	if Time.get_ticks_msec() < guard_until:
 		return
 	if card.is_face_up:
-		_show_card_preview_for_id(card.card_type, false)
+		if is_object_room:
+			_show_reward_preview_for_key(card.card_type, false)
+		else:
+			_show_card_preview_for_id(card.card_type, false)
 
 func _check_match():
 	flipped_cards = flipped_cards.filter(func(c): return is_instance_valid(c))
@@ -517,6 +563,10 @@ func _check_match():
 		
 		c1.is_matched = true; c2.is_matched = true
 		c1.modulate = Color(0.6, 1.2, 0.6); c2.modulate = Color(0.6, 1.2, 0.6)
+		if is_object_room:
+			await _play_object_reward_focus_preview(c1.card_type)
+			await _resolve_object_match(c1.card_type)
+			return
 		await _show_card_preview_for_id(c1.card_type, true, true)
 		
 		_process_combat_action(c1.card_type)
@@ -532,11 +582,13 @@ func _check_match():
 		add_log("No cards matched.")
 		await get_tree().create_timer(1.0).timeout
 		if not is_inside_tree() or is_battle_over: return
-		
-		await _enemy_turn()
-		update_ui()
-		_check_win_loss()
-		_resolve_turn_end()
+		if is_object_room:
+			_resolve_turn_end()
+		else:
+			await _enemy_turn()
+			update_ui()
+			_check_win_loss()
+			_resolve_turn_end()
 
 func _resolve_turn_end():
 	if is_battle_over: return
@@ -641,6 +693,63 @@ func _process_combat_action(card_id: String):
 			_flash_unit(%PlayerFlash, Color.SEA_GREEN)
 			SignalBus.battle_intensity_changed.emit(0.5)
 			SignalBus.sfx_triggered.emit(AudioData.SFX["SHIELD"])
+
+func _resolve_object_match(reward_key: String):
+	var reward = _parse_reward_key(reward_key)
+	if reward.is_empty():
+		return
+	var reward_kind = str(reward.get("kind", "card"))
+	var reward_id = str(reward.get("id", ""))
+	if reward_kind == "item":
+		GameManager.add_item(reward_id)
+		var item_data = _load_item_data(reward_id)
+		var item_name = item_data.name if item_data else reward_id.replace("_", " ").capitalize()
+		add_log("You found %s." % item_name)
+	else:
+		await _apply_object_card_effect(reward_id)
+	if not is_inside_tree() or p_hp <= 0:
+		return
+	GameManager.current_hp = p_hp
+	GameManager.register_room_interaction_complete(GameManager.current_node, true)
+	is_cleared_room = true
+	await get_tree().create_timer(0.2).timeout
+	if is_inside_tree():
+		_setup_cleared_room_view()
+
+func _apply_object_card_effect(card_id: String):
+	var card_res = _load_card_data(card_id)
+	if card_res == null:
+		return
+	var localized_name = LocalizationManager.localized_resource_name(card_res, card_res.name)
+	match card_id:
+		"gold_coins":
+			var gold_gain = max(1, int(card_res.value))
+			GameManager.gold += gold_gain
+			GameManager.world_state.global.gold = GameManager.gold
+			add_log("%s grants %d gold." % [localized_name, gold_gain])
+			return
+		"electric_gel":
+			GameManager.current_energy = max(GameManager.current_energy, GameManager.base_energy + 1)
+			add_log("%s surges through you. Energy rises." % localized_name)
+			return
+
+	match String(card_res.type):
+		"heal", "heal_large":
+			p_hp = min(GameManager.player_hp_total, p_hp + int(card_res.value))
+			add_log("%s restores %d HP." % [localized_name, int(card_res.value)])
+			_flash_unit(%PlayerFlash, Color.SEA_GREEN)
+		"treasure":
+			var treasure_gain = max(1, int(card_res.value))
+			GameManager.gold += treasure_gain
+			GameManager.world_state.global.gold = GameManager.gold
+			add_log("%s grants %d gold." % [localized_name, treasure_gain])
+		_:
+			var incoming_damage = max(1, int(card_res.value))
+			p_hp = max(0, p_hp - incoming_damage)
+			add_log("%s hits you for %d damage." % [localized_name, incoming_damage])
+			_flash_unit(%PlayerFlash, Color.ORANGE_RED)
+			if p_hp <= 0:
+				await _handle_player_death_transition()
 
 func _calculate_final_damage(card_val: int, type: String, attacker: String, defender: String) -> int:
 	var total = card_val
@@ -804,6 +913,8 @@ func _setup_enemy_intent_ui():
 	enemy_intent_preview_root.add_child(enemy_intent_preview_holder)
 	_position_enemy_intent_ui()
 	_refresh_enemy_intent_preview()
+	if is_object_room:
+		enemy_intent_root.visible = false
 
 func _position_enemy_intent_ui():
 	if enemy_intent_root == null:
@@ -961,12 +1072,14 @@ func _play_enemy_intent_preview(card_res: CardData):
 		return
 
 	var elapsed = 0.0
-	while elapsed < ENEMY_INTENT_PREVIEW_SECONDS and not enemy_intent_preview_dismiss_requested and is_inside_tree():
+	while elapsed < ENEMY_INTENT_PREVIEW_SECONDS and not enemy_intent_preview_dismiss_requested and _is_enemy_intent_preview_visible() and is_inside_tree():
 		await get_tree().create_timer(0.05).timeout
 		elapsed += 0.05
 
 	if not is_inside_tree() or not is_instance_valid(card_view):
 		_hide_enemy_intent_preview()
+		return
+	if not _is_enemy_intent_preview_visible():
 		return
 
 	var end_tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
@@ -1068,15 +1181,24 @@ func _init_encounter():
 	_show_enter_combat_button()
 
 func _setup_cleared_room_view():
+	can_flip = false
+	if grid:
+		grid.visible = false
 	battle_ui.hide()
 	dialog_overlay.show()
 	_configure_dialog_box(true)
 	if enemy_sprite:
-		enemy_sprite.visible = false
+		enemy_sprite.visible = is_object_room and current_object_res != null
 	if has_node("%EnemyFlash"):
 		%EnemyFlash.visible = false
 	for child in %OptionContainer.get_children():
 		child.queue_free()
+	if is_object_room:
+		dialog_speaker.text = LocalizationManager.translate("dialog.speaker.narrator", "Narrator")
+		dialog_text.text = LocalizationManager.translate("dialog.room.cleared", "This room has already been cleared.")
+		_append_dialog_log(dialog_speaker.text, dialog_text.text)
+		_show_exit_cleared_room_button()
+		return
 	var room_lines = RoomDialogService.resolve_room_dialog(current_room_res, GameManager.current_node)
 	if not room_lines.is_empty():
 		_begin_room_dialog(room_lines, _show_exit_cleared_room_button)
@@ -1176,27 +1298,34 @@ func _check_win_loss():
 		await get_tree().create_timer(1.5).timeout
 		if not is_inside_tree():
 			return
-		get_tree().call_deferred("change_scene_to_file", default_victory_scene)
+		SceneTransition.change_scene_to_file(default_victory_scene)
 			
 	elif p_hp <= 0:
 		is_battle_over = true
 		if death_transition_in_progress:
 			return
-		death_transition_in_progress = true
-		GameManager.current_hp = max(0, p_hp)
-		if GameManager.is_battle_mode:
-			# Battle mode: show DeathScreen, then RunSummary
-			await _fade_to_black_and_change_scene("res://features/ui/DeathScreen.tscn")
-		else:
-			# Story mode: return to the current biome's permanent home, then show DeathScreen.
-			GameManager.begin_new_story_run(GameManager.player_biome if GameManager.player_biome != "" else "town")
-			await _fade_to_black_and_change_scene("res://features/ui/DeathScreen.tscn")
+		await _handle_player_death_transition()
+
+func _handle_player_death_transition():
+	if death_transition_in_progress:
+		return
+	death_transition_in_progress = true
+	p_hp = 0
+	GameManager.current_hp = 0
+	update_ui(true)
+	await get_tree().create_timer(0.45).timeout
+	if not is_inside_tree():
+		return
+	if not GameManager.is_battle_mode:
+		# Story mode: return to the current biome's permanent home, then show DeathScreen.
+		GameManager.begin_new_story_run(GameManager.player_biome if GameManager.player_biome != "" else "town")
+	await _fade_to_black_and_change_scene("res://features/ui/DeathScreen.tscn")
 
 
 func update_ui(instant: bool = false):
 	# Dynamic Text update
 	player_hp_text.text = "%d / %d" % [p_hp, GameManager.player_hp_total]
-	enemy_hp_text.text = "HP: %d" % e_hp
+	enemy_hp_text.text = current_object_res.name if is_object_room and current_object_res else "HP: %d" % e_hp
 	
 	# Dynamic Bar update with Tween
 	var duration = 0.0 if instant else 0.4
@@ -1205,7 +1334,7 @@ func update_ui(instant: bool = false):
 		player_hp_bar.max_value = GameManager.player_hp_total
 		create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT).tween_property(player_hp_bar, "value", p_hp, duration)
 	
-	if enemy_hp_bar:
+	if enemy_hp_bar and not is_object_room:
 		enemy_hp_bar.max_value = max_e_hp
 		create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT).tween_property(enemy_hp_bar, "value", e_hp, duration)
 
@@ -1395,6 +1524,64 @@ func _setup_enemy_portrait():
 				_apply_unit_visuals(enemy_sprite, current_enemy_res)
 			_roll_next_enemy_intent_card()
 
+func _load_object_resource(object_id: String) -> ObjectData:
+	var base_path = "res://data/objects/%s" % object_id
+	for ext in [".res", ".tres"]:
+		var full_path = base_path + ext
+		if ResourceLoader.exists(full_path):
+			return load(full_path) as ObjectData
+	return null
+
+func _setup_object_portrait():
+	if enemy_sprite == null:
+		return
+	if current_object_res == null:
+		enemy_sprite.visible = false
+		return
+	enemy_sprite.visible = true
+	enemy_sprite.texture = current_object_res.object_image
+	enemy_sprite.hframes = max(1, int(current_object_res.hframes))
+	enemy_sprite.vframes = max(1, int(current_object_res.vframes))
+	enemy_sprite.frame = 0
+	enemy_sprite.scale = Vector2.ONE
+	enemy_sprite.offset.y = sprite_feet_offset
+	enemy_sprite.flip_h = false
+	_sync_flash_overlay(enemy_sprite, %EnemyFlash)
+	_start_unit_animation(enemy_sprite, max(1, int(current_object_res.total_frames)), max(0.01, float(current_object_res.frame_speed)))
+
+func _prepare_object_room_ui():
+	if enemy_stats_hud:
+		enemy_stats_hud.visible = false
+	if enemy_hp_bar:
+		enemy_hp_bar.visible = false
+	if enemy_hp_text:
+		enemy_hp_text.visible = true
+	if enemy_intent_root:
+		enemy_intent_root.visible = false
+	if enemy_atk_val:
+		enemy_atk_val.text = ""
+	if enemy_def_val:
+		enemy_def_val.text = ""
+	if enemy_hp_text:
+		enemy_hp_text.text = ""
+	if enemy_sprite:
+		enemy_sprite.visible = current_object_res != null
+	if has_node("%EnemyFlash"):
+		%EnemyFlash.visible = false
+	if arena_center:
+		var style = StyleBoxFlat.new()
+		style.bg_color = Color(0.18, 0.42, 0.22, 0.42)
+		style.border_width_left = 2
+		style.border_width_top = 2
+		style.border_width_right = 2
+		style.border_width_bottom = 2
+		style.border_color = Color(0.55, 0.84, 0.55, 0.55)
+		style.corner_radius_top_left = 10
+		style.corner_radius_top_right = 10
+		style.corner_radius_bottom_left = 10
+		style.corner_radius_bottom_right = 10
+		arena_center.add_theme_stylebox_override("panel", style)
+
 
 func _animate_unit(sprite: Sprite2D, total: int, speed: float, anim_token: int):
 	var frame = 0; var dir = 1
@@ -1500,6 +1687,11 @@ func setup_board():
 
 	for child in grid.get_children(): child.queue_free()
 
+	if is_object_room:
+		_setup_object_board()
+		_sync_stat_icons()
+		return
+
 	# 1. Determine Grid Size
 	var size = 3
 	if difficulty >= 3: size = 4
@@ -1547,6 +1739,145 @@ func setup_board():
 
 	# Final UI updates 
 	_sync_stat_icons()
+
+func _setup_object_board():
+	var size = 4
+	if current_object_res:
+		size = max(2, int(current_object_res.object_size))
+	grid.columns = size
+	var total_slots = size * size
+	var pair_count = int(floor(float(total_slots) / 2.0))
+	var final_grid_keys: Array[String] = []
+	for _i in range(pair_count):
+		var reward_key = _pick_weighted_object_reward_key()
+		final_grid_keys.append(reward_key)
+		final_grid_keys.append(reward_key)
+	if final_grid_keys.size() < total_slots:
+		final_grid_keys.append(_pick_weighted_object_reward_key())
+	final_grid_keys.shuffle()
+
+	var card_dim = _get_card_dimension_for_grid(size)
+	for reward_key in final_grid_keys:
+		var card_node = card_scene.instantiate()
+		grid.add_child(card_node)
+		card_node.custom_minimum_size = Vector2(card_dim, card_dim)
+		_setup_object_card_node(card_node, reward_key)
+		card_node.card_flipped.connect(_on_card_flipped)
+		card_node.pressed.connect(_on_card_pressed.bind(card_node))
+
+func _setup_object_card_node(card_node: TextureButton, reward_key: String):
+	card_node.set_meta("forced_back_texture_path", OBJECT_CARD_BACK_ICON_PATH)
+	var reward = _parse_reward_key(reward_key)
+	if reward.is_empty():
+		card_node.card_type = reward_key
+		return
+	match str(reward.get("kind", "card")):
+		"item":
+			var item_data = _load_item_data(str(reward.get("id", "")))
+			if item_data and card_node.has_method("setup_item"):
+				card_node.setup_item(item_data)
+		_:
+			var card_data = _load_card_data(str(reward.get("id", "")))
+			if card_data and card_node.has_method("setup"):
+				card_node.setup(card_data)
+	card_node.card_type = reward_key
+
+func _pick_weighted_object_reward_key() -> String:
+	var weighted_rewards = _build_object_weighted_rewards()
+	if weighted_rewards.is_empty():
+		return OBJECT_FALLBACK_REWARD_KEYS[0]
+	var total_weight = 0.0
+	for entry in weighted_rewards:
+		total_weight += float(entry.get("weight", 0.0))
+	if total_weight <= 0.0:
+		return str(weighted_rewards[0].get("key", OBJECT_FALLBACK_REWARD_KEYS[0]))
+	var roll = randf() * total_weight
+	var running = 0.0
+	for entry in weighted_rewards:
+		running += float(entry.get("weight", 0.0))
+		if roll <= running:
+			return str(entry.get("key", OBJECT_FALLBACK_REWARD_KEYS[0]))
+	return str(weighted_rewards[0].get("key", OBJECT_FALLBACK_REWARD_KEYS[0]))
+
+func _build_object_weighted_rewards() -> Array[Dictionary]:
+	var weighted_rewards: Array[Dictionary] = []
+	if current_object_res == null:
+		for fallback_key in OBJECT_FALLBACK_REWARD_KEYS:
+			weighted_rewards.append({"key": fallback_key, "weight": 1.0})
+		return weighted_rewards
+
+	var object_items = current_object_res.object_items
+	var probabilities = current_object_res.object_probability
+	if object_items.is_empty():
+		for fallback_key in OBJECT_FALLBACK_REWARD_KEYS:
+			weighted_rewards.append({"key": fallback_key, "weight": 1.0})
+		return weighted_rewards
+
+	if probabilities.is_empty():
+		for raw_item in object_items:
+			var reward_key = _normalize_reward_key(str(raw_item))
+			if reward_key != "":
+				weighted_rewards.append({"key": reward_key, "weight": 1.0})
+		return weighted_rewards
+
+	var probability_sum = 0.0
+	for i in range(object_items.size()):
+		var reward_key = _normalize_reward_key(str(object_items[i]))
+		if reward_key == "":
+			continue
+		var weight = 0.0
+		if i < probabilities.size():
+			weight = max(0.0, float(probabilities[i]))
+		weighted_rewards.append({"key": reward_key, "weight": weight})
+		probability_sum += weight
+
+	var remaining_weight = max(0.0, 1.0 - probability_sum)
+	if remaining_weight > 0.0:
+		var fallback_weight = remaining_weight / float(max(1, OBJECT_FALLBACK_REWARD_KEYS.size()))
+		for fallback_key in OBJECT_FALLBACK_REWARD_KEYS:
+			weighted_rewards.append({"key": fallback_key, "weight": fallback_weight})
+
+	if weighted_rewards.is_empty():
+		for fallback_key in OBJECT_FALLBACK_REWARD_KEYS:
+			weighted_rewards.append({"key": fallback_key, "weight": 1.0})
+	return weighted_rewards
+
+func _normalize_reward_key(raw_value: String) -> String:
+	var value = raw_value.strip_edges()
+	if value == "":
+		return ""
+	if value.contains(":"):
+		var parts = value.split(":", false, 1)
+		if parts.size() == 2:
+			return "%s:%s" % [parts[0].to_lower(), parts[1].strip_edges()]
+	var item_id = value
+	if ResourceLoader.exists("res://data/items/%s.tres" % item_id):
+		return "item:%s" % item_id
+	if ResourceLoader.exists("res://data/cards/%s.tres" % item_id):
+		return "card:%s" % item_id
+	return ""
+
+func _parse_reward_key(reward_key: String) -> Dictionary:
+	var normalized = reward_key.strip_edges()
+	if normalized == "":
+		return {}
+	if normalized.contains(":"):
+		var parts = normalized.split(":", false, 1)
+		if parts.size() == 2:
+			return {"kind": parts[0].to_lower(), "id": parts[1].strip_edges()}
+	return {"kind": "card", "id": normalized}
+
+func _load_card_data(card_id: String) -> CardData:
+	var res_path = "res://data/cards/%s.tres" % card_id
+	if not ResourceLoader.exists(res_path):
+		return null
+	return load(res_path) as CardData
+
+func _load_item_data(item_id: String) -> ItemData:
+	var res_path = "res://data/items/%s.tres" % item_id
+	if not ResourceLoader.exists(res_path):
+		return null
+	return load(res_path) as ItemData
 
 func _get_card_dimension_for_grid(columns: int) -> float:
 	var usable_size = min(grid.size.x, grid.size.y)
@@ -1682,28 +2013,13 @@ func _get_floor_midline_y(view_size: Vector2) -> float:
 	return view_size.y * (1.0 - ground_height_ratio)
 
 func _debug_win():
-	get_tree().call_deferred("change_scene_to_file", "res://features/combat/VictoryScreen.tscn")
+	SceneTransition.change_scene_to_file("res://features/combat/VictoryScreen.tscn")
 
 func _debug_lose():
-	get_tree().call_deferred("change_scene_to_file", "res://features/ui/RunSummary.tscn")
+	SceneTransition.change_scene_to_file("res://features/ui/RunSummary.tscn")
 
 func _fade_to_black_and_change_scene(scene_path: String):
-	var fade_layer = CanvasLayer.new()
-	fade_layer.layer = 100
-	add_child(fade_layer)
-	
-	var fade_rect = ColorRect.new()
-	fade_rect.color = Color(0, 0, 0, 0)
-	fade_rect.anchors_preset = Control.PRESET_FULL_RECT
-	fade_rect.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	fade_rect.grow_vertical = Control.GROW_DIRECTION_BOTH
-	fade_layer.add_child(fade_rect)
-	
-	var tween = create_tween()
-	tween.tween_property(fade_rect, "color:a", 1.0, 0.6)
-	await tween.finished
-	if is_inside_tree():
-		get_tree().change_scene_to_file(scene_path)
+	await SceneTransition.change_scene_to_file(scene_path, 0.6)
 
 func _ensure_player_deck_not_empty():
 	var fallback_deck: Array = ["sword", "shield", "heart"]
@@ -1744,14 +2060,28 @@ func _is_card_preview_visible() -> bool:
 	return card_preview_root != null and card_preview_root.visible
 
 func _show_card_preview_for_id(card_id: String, animate_in: bool = false, fly_to_discard: bool = false):
-	if card_id == "" or not full_card_scene:
+	await _show_reward_preview_for_key("card:%s" % card_id, animate_in, fly_to_discard)
+
+func _show_reward_preview_for_key(reward_key: String, animate_in: bool = false, fly_to_discard: bool = false):
+	if reward_key == "" or not full_card_scene:
 		return
-	var res_path = "res://data/cards/%s.tres" % card_id
-	if not ResourceLoader.exists(res_path):
+	var reward = _parse_reward_key(reward_key)
+	if reward.is_empty():
 		return
-	var card_data = load(res_path) as CardData
-	if not card_data:
+	var kind = str(reward.get("kind", "card"))
+	var reward_id = str(reward.get("id", ""))
+	if reward_id == "":
 		return
+	var item_data: ItemData = null
+	var card_data: CardData = null
+	if kind == "item":
+		item_data = _load_item_data(reward_id)
+		if item_data == null:
+			return
+	else:
+		card_data = _load_card_data(reward_id)
+		if card_data == null:
+			return
 
 	if active_preview_card and is_instance_valid(active_preview_card):
 		active_preview_card.queue_free()
@@ -1760,10 +2090,16 @@ func _show_card_preview_for_id(card_id: String, animate_in: bool = false, fly_to
 	var card_view = full_card_scene.instantiate()
 	active_preview_card = card_view
 	card_preview_holder.add_child(card_view)
+	if is_object_room:
+		card_view.set_meta("forced_back_texture_path", OBJECT_CARD_BACK_ICON_PATH)
 	card_view.custom_minimum_size = Vector2(280, 420)
 	card_view.scale = Vector2(1.0, 1.0)
-	if card_view.has_method("setup"):
-		card_view.setup(card_data)
+	if kind == "item":
+		if card_view.has_method("setup_item"):
+			card_view.setup_item(item_data)
+	else:
+		if card_view.has_method("setup"):
+			card_view.setup(card_data)
 	var back_face = card_view.get_node_or_null("%BackFace")
 	if back_face:
 		back_face.visible = false
@@ -1782,13 +2118,27 @@ func _show_card_preview_for_id(card_id: String, animate_in: bool = false, fly_to
 		tween.parallel().tween_property(card_view, "scale", Vector2(1.04, 1.04), 0.16)
 		tween.tween_property(card_view, "scale", Vector2(1.0, 1.0), 0.10)
 		await tween.finished
-	if fly_to_discard:
+	if fly_to_discard and kind == "card":
 		await _fly_preview_card_to_discard(card_view, card_data)
+
+func _play_object_reward_focus_preview(reward_key: String):
+	object_reward_preview_active = true
+	object_reward_preview_dismiss_requested = false
+	await _show_reward_preview_for_key(reward_key, true, false)
+	var elapsed = 0.0
+	while elapsed < 3.0 and not object_reward_preview_dismiss_requested and is_inside_tree():
+		await get_tree().create_timer(0.05).timeout
+		elapsed += 0.05
+	object_reward_preview_active = false
+	object_reward_preview_dismiss_requested = false
+	_hide_card_preview()
 
 func _hide_card_preview():
 	if not card_preview_root:
 		return
 	card_preview_root.visible = false
+	object_reward_preview_active = false
+	object_reward_preview_dismiss_requested = false
 	if active_preview_card and is_instance_valid(active_preview_card):
 		active_preview_card.queue_free()
 	active_preview_card = null

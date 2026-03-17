@@ -6,11 +6,14 @@
 assets/
 
 # Python venv
-.venv*
+.venv*/
 
 # System ignores
 .DS_Store
 Thumbs.db
+
+# Godot addons
+addons/
 
 # General 
 *.tmp                  # Temporary files

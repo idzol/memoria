@@ -32,6 +32,7 @@ AudioData="*uid://cdny3c8lcfgwf"
 AudioManager="*uid://elew3qdjogf4"
 DataManager="*uid://dvhhaxmgsc0mu"
 LocalizationManager="*res://core/LocalizationManager.gd"
+SceneTransition="*res://core/SceneTransition.gd"
 
 [display]
 

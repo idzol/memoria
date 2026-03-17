@@ -17,7 +17,7 @@ const MAP_DATA_PATH = "res://data/map/map_data.tres"
 const GLOBAL_DEFAULT_ROOM_PATH = "res://data/rooms/default_battle.tres"
 const BIOME_ORDER = ["home", "town", "forest", "ice_caves", "desert", "swamp", "abyss", "void", "the_core"]
 const BIOME_ROOM_SOURCE = {
-	"home": "town",
+	"home": "tutorial",
 	"town": "town",
 	"forest": "forest",
 	"ice_caves": "ice_caves",
@@ -55,15 +55,18 @@ func _start_smooth_init():
 	_index_paths_only("items")
 	_index_room_paths_only()
 	_index_enemy_paths_only()
-	_refresh_load_plan()
+	_refresh_load_plan("", "", false)
 	_ensure_background_loader_running()
 
-func prioritize_story_assets(current_biome: String = "", next_biome: String = ""):
-	_refresh_load_plan(current_biome, next_biome)
+func prioritize_story_assets(current_biome: String = "", next_biome: String = "", include_completed_biomes: bool = false):
+	_refresh_load_plan(current_biome, next_biome, include_completed_biomes)
 	_ensure_background_loader_running()
 
-func _refresh_load_plan(current_biome: String = "", next_biome: String = ""):
-	var priority_biomes = _get_priority_biomes(current_biome, next_biome)
+func prioritize_story_assets_for_resume(current_biome: String = "", next_biome: String = ""):
+	prioritize_story_assets(current_biome, next_biome, true)
+
+func _refresh_load_plan(current_biome: String = "", next_biome: String = "", include_completed_biomes: bool = false):
+	var priority_biomes = _get_priority_biomes(current_biome, next_biome, include_completed_biomes)
 	_load_entries.clear()
 	_queued_paths.clear()
 
@@ -74,7 +77,6 @@ func _refresh_load_plan(current_biome: String = "", next_biome: String = ""):
 		_queue_biome_assets(biome, "Preparing %s..." % biome.replace("_", " ").capitalize())
 
 	_queue_global_rewards("Preparing cards and items...")
-	_queue_remaining_biome_assets(priority_biomes, "Streaming remaining chapters...")
 
 	_total_to_load = _load_entries.size()
 	_processed_count = 0
@@ -171,15 +173,6 @@ func _queue_global_rewards(label: String):
 			for path in _registry[type][rarity]:
 				_queue_path(path, label)
 
-func _queue_remaining_biome_assets(priority_biomes: Array[String], label: String):
-	for biome in BIOME_ORDER:
-		if priority_biomes.has(biome):
-			continue
-		for room_path in _room_paths_by_biome.get(biome, []):
-			_queue_path(room_path, label)
-		for enemy_path in _get_enemy_paths_for_biome(biome):
-			_queue_path(enemy_path, label)
-
 func _queue_path(path: String, label: String):
 	if path == "" or _queued_paths.has(path) or _resource_cache.has(path):
 		return
@@ -188,21 +181,34 @@ func _queue_path(path: String, label: String):
 	_queued_paths[path] = true
 	_load_entries.append({"path": path, "label": label})
 
-func _get_priority_biomes(current_biome: String = "", next_biome: String = "") -> Array[String]:
+func _get_priority_biomes(current_biome: String = "", next_biome: String = "", include_completed_biomes: bool = false) -> Array[String]:
 	var result: Array[String] = []
 	var resolved_current = current_biome
 	if resolved_current == "":
 		resolved_current = _get_current_priority_biome()
 	if resolved_current == "":
 		resolved_current = BIOME_ORDER[0]
-	if BIOME_ORDER.has(resolved_current):
+	if include_completed_biomes:
+		for biome in _get_completed_biomes():
+			if BIOME_ORDER.has(biome) and not result.has(biome):
+				result.append(biome)
+	if BIOME_ORDER.has(resolved_current) and not result.has(resolved_current):
 		result.append(resolved_current)
 
 	var resolved_next = next_biome
 	if resolved_next == "":
 		resolved_next = _get_next_biome(resolved_current)
-	if resolved_next != "" and resolved_next != resolved_current and BIOME_ORDER.has(resolved_next):
+	if resolved_next != "" and resolved_next != resolved_current and BIOME_ORDER.has(resolved_next) and not result.has(resolved_next):
 		result.append(resolved_next)
+	return result
+
+func _get_completed_biomes() -> Array[String]:
+	var result: Array[String] = []
+	if GameManager == null:
+		return result
+	for biome in BIOME_ORDER:
+		if GameManager.is_biome_cleared(biome):
+			result.append(biome)
 	return result
 
 func _get_current_priority_biome() -> String:

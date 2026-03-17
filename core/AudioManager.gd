@@ -23,6 +23,7 @@ const MUSIC_PATH = "res://assets/music/"
 const SFX_PATH = "res://assets/sfx/"
 const SETTINGS_PATH = "user://settings.cfg"
 const SETTINGS_SECTION_AUDIO = "audio"
+const AudioDataScript = preload("res://core/AudioData.gd")
 
 func _ready():
 	add_child(music_player_base)
@@ -127,7 +128,7 @@ func _to_db(linear_volume: float) -> float:
 	return linear_to_db(v)
 
 func _on_music_change_requested(track_id: String, fade_time: float = 2.0):
-	var actual_id = AudioData.get_track_id(track_id)
+	var actual_id = AudioDataScript.get_track_id(track_id)
 	
 	if actual_id == current_track_id: return
 	
@@ -190,7 +191,7 @@ func _on_battle_intensity_changed(new_intensity: float):
 	tween.tween_property(music_player_perc, "volume_db", target_db, 0.8).set_trans(Tween.TRANS_SINE)
 
 func _on_sfx_triggered(sfx_id: String):
-	var actual_sfx = AudioData.get_sfx_id(sfx_id)
+	var actual_sfx = AudioDataScript.get_sfx_id(sfx_id)
 	var path = SFX_PATH + actual_sfx + ".wav"
 	
 	if not FileAccess.file_exists(path):
