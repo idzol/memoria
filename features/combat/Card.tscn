@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://csn80tiagf37g" path="res://features/combat/Card.gd" id="1_k81y5"]
 [ext_resource type="Texture2D" uid="uid://cmyeha26b6ndv" path="res://assets/cards/back/card_back_common.png" id="2_back"]
 [ext_resource type="Theme" uid="uid://djn7txycnus44" path="res://assets/themes/Card.theme" id="3_74jmb"]
-[ext_resource type="Texture2D" uid="uid://d2mmbuxm4hln2" path="res://assets/cards/front/card_front.png" id="4_front"]
+[ext_resource type="Texture2D" path="res://assets/cards/front/card_front.png" id="4_front"]
 [ext_resource type="FontFile" uid="uid://c7g5lygp6h6k8" path="res://assets/fonts/Almendra-Bold.ttf" id="5_o35ix"]
 [ext_resource type="FontFile" uid="uid://d6vga6j4rrsy" path="res://assets/fonts/Metamorphous-Regular.ttf" id="5_w8c5q"]
 

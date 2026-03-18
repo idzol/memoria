@@ -1,20 +1,22 @@
 [gd_resource type="Resource" script_class="RoomData" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://data/resources/RoomData.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/rooms/map/town_dimly_lit_alley.png" id="2_icon"]
-[ext_resource type="Texture2D" path="res://assets/rooms/scene/town_dimly_lit_alley_room.png" id="3_bg"]
+[ext_resource type="Texture2D" path="res://assets/rooms/map/town_default.png" id="2_icon"]
+[ext_resource type="Texture2D" path="res://assets/rooms/scene/town_default_room.png" id="3_bg"]
 
 [resource]
 script = ExtResource("1_script")
-room_name = "Dimly Lit Alley"
-type = "battle"
+room_name = "Default Room"
+type = "event"
 biome = "town"
-initial_dialog = "It's quieter here. Someone is watching from the shadows."
+initial_dialog = ""
 dialog_tree_id = ""
-enemy_id = "pickpocket"
+enemy_id = ""
 npc_id = ""
-difficulty_override = -1
-loot_list = ["gold"]
+object_id = ""
+difficulty_tier = 1
+loot_list = []
+complete_condition = {}
 map_icon = ExtResource("2_icon")
 background_texture = ExtResource("3_bg")
 music_track = "battle_theme"

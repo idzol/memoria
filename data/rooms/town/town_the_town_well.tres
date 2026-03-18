@@ -7,14 +7,16 @@
 [resource]
 script = ExtResource("1_script")
 room_name = "The Town Well"
-type = "lore"
+type = "event"
 biome = "town"
 initial_dialog = "The water is cool and clear. Pennies glitter at the bottom."
 dialog_tree_id = ""
 enemy_id = ""
 npc_id = ""
-difficulty_override = -1
+object_id = ""
+difficulty_tier = -1
 loot_list = ["luck_charm"]
+complete_condition = {}
 map_icon = ExtResource("2_icon")
 background_texture = ExtResource("3_bg")
 music_track = "battle_theme"

@@ -14,7 +14,8 @@ extends Control
 @onready var run_log_button = %RunLogButton
 @onready var back_button = $CenterContainer/PanelContainer/MarginContainer/VBoxContainer/BackButton
 
-const SETTINGS_PATH := "user://settings.cfg"
+const AudioSettingsScript = preload("res://core/AudioSettings.gd")
+const SETTINGS_PATH := AudioSettingsScript.SETTINGS_PATH
 const SETTINGS_SECTION := "gameplay"
 const TUTORIAL_TIPS_KEY := "tutorial_tips"
 const RUN_LOG_KEY := "show_run_log"

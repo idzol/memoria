@@ -143,6 +143,18 @@ const ITEMS_ROOT = "res://data/items/"
 const CARDS_ROOT = "res://data/cards/"
 const STORY_BIOME_ORDER = ["home", "town", "forest", "ice_caves", "desert", "swamp", "abyss", "void", "the_core"]
 const BATTLE_BIOME_ORDER = ["home", "town", "forest", "ice_caves", "desert", "swamp", "abyss", "void", "the_core"]
+const STORY_BIOME_ROOM_SOURCE = {
+	"home": "tutorial",
+	"town": "town",
+	"forest": "forest",
+	"ice_caves": "ice_caves",
+	"desert": "desert",
+	"swamp": "swamp",
+	"abyss": "abyss",
+	"void": "void",
+	"the_core": "the_core"
+}
+const STORY_ROOM_ROOT = "res://data/rooms/"
 
 func _ready():
 	SignalBus.node_selected.connect(_on_node_selected)
@@ -432,7 +444,7 @@ func add_card_to_collection(card_id: String):
 		if not card_id in world_state.cards.owned:
 			world_state.cards.owned.append(card_id)
 			# Sync with player_deck for UI compatibility
-			if not card_id in player_items:
+			if not card_id in player_deck:
 				player_deck.append(card_id)
 			print("GameManager: Card verified and added to owned collection: ", card_id)
 			refresh_story_room_completions()
@@ -443,7 +455,22 @@ func add_card_to_collection(card_id: String):
 func add_item(item_id: String):
 	if !world_state.items.owned.has(item_id):
 		world_state.items.owned.append(item_id)
+	if not player_items.has(item_id):
+		player_items.append(item_id)
 	refresh_story_room_completions()
+
+func register_room_interaction_complete(node_data: Dictionary, mark_cleared: bool = true):
+	var node_id = str(node_data.get("id", ""))
+	if node_id == "":
+		return
+	_ensure_room_state(node_id)
+	world_state.rooms[node_id].visited = true
+	if mark_cleared:
+		world_state.rooms[node_id].cleared = true
+		if not completed_nodes.has(node_id):
+			completed_nodes.append(node_id)
+	refresh_story_room_completions()
+	SaveManager.save_mid_run_state()
 
 func has_item(item_id: String) -> bool:
 	return world_state.items.owned.has(item_id)
@@ -533,7 +560,6 @@ func start_actual_run():
 	clear_run_log()
 	var start_stats = _get_class_stats_for_level(player_level)
 	_apply_level_stats(start_stats)
-	current_hp = max_hp
 	gold = 50
 	player_xp = 0
 	last_xp_gained = 0
@@ -549,6 +575,7 @@ func start_actual_run():
 	randomize_world_map_skew_direction()
 	active_deck = ["sword", "shield", "heart"]
 	recalculate_player_totals()
+	current_hp = player_hp_total
 
 	# 1. Setup fixed locations - Certain squares become "fixed" over time or are guaranteed by the map design
 	fixed_nodes.clear()
@@ -572,6 +599,7 @@ func start_actual_run():
 	_initialize_story_progression()
 	_initialize_story_biome_homes()
 	if not generated_new_map:
+		_ensure_story_biomes_generated(_get_story_biome_generation_targets("home", false))
 		_reroll_incomplete_story_rooms_for_new_run()
 	enter_story_biome("home", true)
 	SaveManager.save_mid_run_state()
@@ -579,7 +607,7 @@ func start_actual_run():
 	# 3. Cleanup
 	hide_loading()
 
-	get_tree().change_scene_to_file(get_story_map_scene_path())
+	SceneTransition.change_scene_to_file(get_story_map_scene_path())
 
 func _on_gen_progress(percent: float, description: String):
 	update_loading(description, percent)
@@ -641,6 +669,13 @@ func load_run_from_data(data: Dictionary):
 	player_grid_pos = Vector2i(saved_pos[0], saved_pos[1])
 	if world_map_skew_direction == "":
 		randomize_world_map_skew_direction()
+	if not is_battle_mode:
+		_ensure_story_biomes_generated(_get_story_biome_generation_targets(selected_story_biome if selected_story_biome != "" else player_biome, true))
+		if DataManager and DataManager.has_method("prioritize_story_assets_for_resume"):
+			DataManager.prioritize_story_assets_for_resume(
+				selected_story_biome if selected_story_biome != "" else player_biome,
+				_get_next_biome_key(selected_story_biome if selected_story_biome != "" else player_biome)
+			)
 	
 	if is_battle_mode:
 		get_tree().change_scene_to_file(get_active_biome_map_scene_path())
@@ -673,6 +708,28 @@ func _initialize_story_biome_homes():
 		if home_node_id != "":
 			set_biome_home_node_id(biome, home_node_id)
 			_apply_home_type_to_node(home_node_id)
+
+func _get_story_biome_generation_targets(current_biome: String = "", include_completed_biomes: bool = false) -> Array[String]:
+	var resolved_current = current_biome if current_biome != "" else (player_biome if player_biome != "" else "home")
+	var targets: Array[String] = []
+	if include_completed_biomes:
+		for biome in STORY_BIOME_ORDER:
+			if is_biome_cleared(biome) and not targets.has(biome):
+				targets.append(biome)
+	if resolved_current != "" and not targets.has(resolved_current):
+		targets.append(resolved_current)
+	var next_biome = _get_next_biome_key(resolved_current)
+	if next_biome != "" and not targets.has(next_biome):
+		targets.append(next_biome)
+	return targets
+
+func _ensure_story_biomes_generated(target_biomes: Array[String]):
+	if is_battle_mode or target_biomes.is_empty():
+		return
+	var gen = preload("res://features/map/MapGenerator.gd").new()
+	add_child(gen)
+	run_map = gen.expand_story_map_immediate(run_map, target_biomes)
+	gen.queue_free()
 
 func get_nodes_for_biome(biome: String) -> Array[Dictionary]:
 	var results: Array[Dictionary] = []
@@ -783,8 +840,22 @@ func _pick_random_story_biome_home_node_id(biome: String) -> String:
 	var biome_nodes = get_nodes_for_biome(biome)
 	if biome_nodes.is_empty():
 		return ""
+	var expected_home_path = _get_story_biome_home_room_path(biome)
+	if expected_home_path != "":
+		for node in biome_nodes:
+			if str(node.get("room_resource_path", "")) == expected_home_path:
+				return str(node.get("id", ""))
+	var tagged_home_node = _find_home_node_for_biome(biome)
+	if not tagged_home_node.is_empty():
+		return str(tagged_home_node.get("id", ""))
 	var picked_node = biome_nodes.pick_random()
 	return str(picked_node.get("id", ""))
+
+func _get_story_biome_home_room_path(biome: String) -> String:
+	if biome == "":
+		return ""
+	var source_biome = str(STORY_BIOME_ROOM_SOURCE.get(biome, biome))
+	return "%s%s/%s_home.tres" % [STORY_ROOM_ROOT, source_biome, source_biome]
 
 func _find_home_node_for_biome(biome: String) -> Dictionary:
 	for raw_key in run_map.keys():
@@ -1093,6 +1164,9 @@ func register_room_victory(node_data: Dictionary, remaining_hp: int):
 		mark_biome_cleared(biome)
 		var next_biome = _get_next_biome_key(biome)
 		unlock_biome(next_biome)
+		_ensure_story_biomes_generated(_get_story_biome_generation_targets(next_biome, false))
+		if DataManager and DataManager.has_method("prioritize_story_assets"):
+			DataManager.prioritize_story_assets(next_biome)
 		_move_player_to_random_next_biome(node_data)
 		pending_post_battle_scene = get_active_biome_map_scene_path() if is_battle_mode else get_story_map_scene_path()
 	else:

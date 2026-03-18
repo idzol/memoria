@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://b8y7g6h5j4k3"]
 
-[ext_resource type="Script" uid="uid://tfhpf6d8mrtm" path="res://features/ui/InGameMenu.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://cip1mal8itqo4" path="res://features/ui/InGameMenu.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://dm5v8f6r7p2m5" path="res://features/ui/SettingsOverlay.tscn" id="2_settings"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_modal"]

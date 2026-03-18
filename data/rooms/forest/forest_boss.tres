@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="RoomData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://data/resources/RoomData.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/rooms/map/forest_boss.png" id="2_icon"]
+[ext_resource type="Texture2D" path="res://assets/rooms/scene/forest_boss_room.png" id="3_bg"]
+
+[resource]
+script = ExtResource("1_script")
+room_name = "Boss Room"
+type = "boss"
+biome = "forest"
+initial_dialog = ""
+dialog_tree_id = ""
+enemy_id = ""
+npc_id = ""
+object_id = ""
+difficulty_tier = 9
+loot_list = []
+complete_condition = {}
+map_icon = ExtResource("2_icon")
+background_texture = ExtResource("3_bg")
+music_track = "battle_theme"

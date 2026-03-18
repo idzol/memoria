@@ -7,14 +7,16 @@
 [resource]
 script = ExtResource("1_script")
 room_name = "Moonlit Glade"
-type = "lore"
+type = "event"
 biome = "forest"
 initial_dialog = "A peaceful clearing, though the silence is unsettling."
 dialog_tree_id = ""
 enemy_id = ""
 npc_id = ""
-difficulty_override = -1
+object_id = ""
+difficulty_tier = -1
 loot_list = ["elixir"]
+complete_condition = {}
 map_icon = ExtResource("2_icon")
 background_texture = ExtResource("3_bg")
 music_track = "battle_theme"

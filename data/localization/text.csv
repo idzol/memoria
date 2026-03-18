@@ -45,7 +45,7 @@ dialog.speaker.npc,NPC,NPC,PNJ,NSC
 dialog.speaker.narrator,Narrator,Narrador,Narrateur,Erzahler
 dialog.enter_combat,Enter Combat,Entrar en combate,Entrer en combat,Kampf beginnen
 dialog.exit_overworld,Exit to Overworld,Salir al mapa,Quitter vers la carte,Zur Karte zuruckkehren
-dialog.room.cleared,This room has already been cleared.,Esta sala ya fue completada.,Cette salle a deja ete terminee.,Dieser Raum wurde bereits abgeschlossen.
+dialog.room.cleared,You see nothing further of note here.,TODO,TODO,TODO
 log.room.enter,Entered {room}.,Entraste en {room}.,Entree dans {room}.,{room} betreten.
 log.battle.victory,Victory in {room}.,Victoria en {room}.,Victoire dans {room}.,Sieg in {room}.
 log.level_up,{name} leveled up to {level}.,{name} subio al nivel {level}.,{name} est passe au niveau {level}.,{name} hat Stufe {level} erreicht.

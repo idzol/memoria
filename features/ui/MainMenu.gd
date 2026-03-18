@@ -80,7 +80,6 @@ func _ready():
 		btn.mouse_entered.connect(_on_main_button_hovered.bind(btn))
 	_refresh_localized_text()
 	_focus_main_option(0)
-	_fade_in_from_white()
 
 func _input(event):
 	if name_entry_popup.visible:
@@ -498,18 +497,3 @@ func _can_repeat_save_scroll() -> bool:
 		return false
 	return true
 
-func _fade_in_from_white():
-	var fade_layer = CanvasLayer.new()
-	fade_layer.layer = 100
-	add_child(fade_layer)
-	
-	var fade_rect = ColorRect.new()
-	fade_rect.color = Color(1, 1, 1, 1)
-	fade_rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	fade_layer.add_child(fade_rect)
-	
-	var tween = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	tween.tween_property(fade_rect, "color:a", 0.0, 0.9)
-	await tween.finished
-	if is_instance_valid(fade_layer):
-		fade_layer.queue_free()

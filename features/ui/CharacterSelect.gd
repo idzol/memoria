@@ -43,6 +43,7 @@ var tile_selected_style: StyleBoxFlat
 func _ready():
 	if AssetRegistry.CHARACTER_ASSETS.has("background"):
 		background_tex.texture = load(AssetRegistry.CHARACTER_ASSETS.background)
+		_fit_background_to_scene()
 
 	_setup_confirm_button_style()
 	_setup_tile_styles()
@@ -51,6 +52,10 @@ func _ready():
 
 	confirm_btn.disabled = false
 	_select_index(0)
+
+func _notification(what):
+	if what == NOTIFICATION_RESIZED:
+		_fit_background_to_scene()
 
 func _input(event):
 	if event.is_action_pressed("ui_cancel"):
@@ -78,6 +83,18 @@ func _setup_confirm_button_style():
 	confirm_btn.add_theme_stylebox_override("pressed", sb)
 	confirm_btn.add_theme_stylebox_override("disabled", sb)
 	confirm_btn.add_theme_stylebox_override("focus", sb)
+
+func _fit_background_to_scene():
+	if not background_tex or not background_tex.texture:
+		return
+
+	var scene_size := size
+	if scene_size.x <= 0.0 or scene_size.y <= 0.0:
+		return
+
+	background_tex.stretch_mode = TextureRect.STRETCH_SCALE
+	background_tex.position = Vector2.ZERO
+	background_tex.size = scene_size
 
 func _setup_tile_styles():
 	tile_default_style = StyleBoxFlat.new()

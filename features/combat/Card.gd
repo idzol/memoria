@@ -27,6 +27,7 @@ var card_type: String = ""
 var is_matched: bool = false
 var is_face_up: bool = false
 const FRONT_ASSETS_ROOT := "res://assets/cards/front/"
+const OBJECT_BACK_ICON_PATH := "res://assets/cards/back_icon/card_back_object_icon.png"
 const CARD_BASE_SIZE := Vector2(160.0, 240.0)
 const TYPE_FILE_ALIASES := {
 	"armor": "defend",
@@ -81,6 +82,7 @@ func setup(data: CardData):
 	_apply_center_type_icon(data.type)
 	
 	_apply_visual_templates(data)
+	_apply_forced_back_texture()
 
 
 func setup_item(data: ItemData):
@@ -101,6 +103,8 @@ func setup_item(data: ItemData):
 	
 	if card_image_rect: 
 		card_image_rect.texture = data.item_image
+	if card_icon_rect:
+		card_icon_rect.texture = data.item_icon
 	
 	# Items use 'Unique' template style by default for high visibility in inventory
 	if asset_templates:
@@ -110,6 +114,7 @@ func setup_item(data: ItemData):
 			back_template_rect.texture = asset_templates.card_back_unique
 	
 	_apply_center_type_icon(data.type)
+	_apply_forced_back_texture()
 
 
 func _apply_visual_templates(data: CardData):
@@ -209,6 +214,21 @@ func _load_first_texture(paths: Array[String]) -> Texture2D:
 			return load(path) as Texture2D
 	return null
 
+func _apply_forced_back_texture():
+	var forced_path = str(get_meta("forced_back_texture_path", ""))
+	if forced_path == "":
+		return
+	if not ResourceLoader.exists(forced_path):
+		return
+	var forced_tex = load(forced_path) as Texture2D
+	if forced_tex == null:
+		return
+	if back_template_rect:
+		back_template_rect.texture = forced_tex
+	if back_icon_rect:
+		back_icon_rect.texture = forced_tex
+		back_icon_rect.visible = false
+
 func _apply_scaled_front_layout():
 	var ratio = _get_card_layout_ratio()
 	_lock_label_rect(title_label, _scaled_rect(TITLE_ORIGINAL_RECT, ratio))
@@ -241,7 +261,7 @@ func _scaled_rect(rect: Rect2, ratio: float) -> Rect2:
 func _lock_label_rect(label: Label, rect: Rect2):
 	if not label:
 		return
-	label.layout_mode = 0
+	label.set("layout_mode", 1)
 	label.anchor_left = 0.0
 	label.anchor_top = 0.0
 	label.anchor_right = 0.0

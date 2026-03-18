@@ -17,7 +17,18 @@ class_name RoomData
 @export_group("Encounters")
 @export var enemy_id: String = ""
 @export var npc_id: String = ""
-@export var difficulty_override: int = -1
+@export var object_id: String = ""
+var _difficulty_tier_value: int = -1
+@export var difficulty_tier: int = -1:
+	set(value):
+		_difficulty_tier_value = value
+	get:
+		return _difficulty_tier_value
+@export_storage var difficulty_override: int = -1:
+	set(value):
+		_difficulty_tier_value = value
+	get:
+		return _difficulty_tier_value
 
 @export_group("Rewards")
 @export var loot_list: Array[String] = []
@@ -28,4 +39,7 @@ class_name RoomData
 @export var map_icon: Texture2D 
 ## Background for the scene (res://assets/room/{biome}/{id}_scene.png)
 @export var background_texture: Texture2D
+@export_enum("fixed", "proportional") var background_scaling: String = "fixed"
+@export var character_scaling: Vector2 = Vector2.ONE
+@export var floor: Texture2D
 @export var music_track: String = "battle_theme"

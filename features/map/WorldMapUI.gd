@@ -98,7 +98,7 @@ const LOG_COLOR_GOOD = Color(0.62, 1.0, 0.62, 1.0)
 const LOG_COLOR_BAD = Color(1.0, 0.58, 0.58, 1.0)
 const LOG_COLOR_NEUTRAL = Color(0.86, 0.86, 0.86, 1.0)
 const PARALLELOGRAM_ROW_OFFSET_RATIO = 0.5
-const CURVE_SAMPLES = 8
+const CURVE_SAMPLES = 14
 
 func _ready():
 	_setup_ui()
@@ -128,7 +128,9 @@ func _ready():
 		add_child(in_game_menu)
 		in_game_menu.hide()
 
-	SignalBus.music_change_requested.emit(AudioData.TRACKS["TOWN"], 1.0)
+	var biome_track = AudioData.get_biome_track_id(_get_active_biome())
+	if biome_track != "":
+		SignalBus.music_change_requested.emit(biome_track, 1.5)
 	_scroll_to_player()
 	_begin_worldmap_tutorial_if_needed.call_deferred()
 
@@ -656,6 +658,9 @@ func _enter_room(data: Dictionary):
 	if room_res:
 		room_type = str(room_res.type)
 	var room_name = room_res.room_name if room_res and room_res.room_name != "" else _get_room_display_name(data)
+	var node_id = str(data.get("id", ""))
+	var is_object_room = room_res != null and room_res.enemy_id == "" and room_res.object_id != ""
+	var is_object_room_cleared = is_object_room and GameManager.is_room_cleared(node_id)
 	GameManager.add_run_log(
 		LocalizationManager.format(
 			"log.room.enter",
@@ -672,7 +677,10 @@ func _enter_room(data: Dictionary):
 		"shop":
 			get_tree().change_scene_to_file("res://features/encounters/ShopScene.tscn")
 		"event", "home", "lore", "npc":
-			get_tree().change_scene_to_file("res://features/encounters/EventScene.tscn")
+			if is_object_room and not is_object_room_cleared:
+				get_tree().change_scene_to_file("res://features/combat/BattleScene.tscn")
+			else:
+				get_tree().change_scene_to_file("res://features/encounters/EventScene.tscn")
 		_:
 			get_tree().change_scene_to_file("res://features/combat/BattleScene.tscn")
 
@@ -759,10 +767,8 @@ func _update_map_content_bounds():
 	if not map_content or not scroll_area:
 		return
 	map_content.custom_minimum_size = scroll_area.size
-	map_content.size = scroll_area.size
 	if node_container:
 		node_container.custom_minimum_size = scroll_area.size
-		node_container.size = scroll_area.size
 
 func _get_node_position(layer: int, column: int) -> Vector2:
 	var relative_layer = layer - visible_min_layer
@@ -799,7 +805,7 @@ func _draw_hand_drawn_dotted_line(p1: Vector2, p2: Vector2):
 		if i % 2 != 0:
 			continue
 		var segment = Line2D.new()
-		segment.width = max(2.0, 4.0 * current_node_scale)
+		segment.width = max(1.5, 2.5 * current_node_scale)
 		segment.default_color = DOTTED_COLOR
 		segment.begin_cap_mode = Line2D.LINE_CAP_ROUND
 		segment.end_cap_mode = Line2D.LINE_CAP_ROUND
@@ -877,7 +883,7 @@ func _open_story_map():
 		if not current_data.is_empty():
 			var biome = str(current_data.get("biome", GameManager.selected_story_biome))
 			GameManager.set_selected_story_biome(biome)
-	get_tree().change_scene_to_file(GameManager.get_story_map_scene_path())
+	SceneTransition.change_scene_to_file(GameManager.get_story_map_scene_path())
 
 func _get_active_biome() -> String:
 	if GameManager.is_battle_mode:

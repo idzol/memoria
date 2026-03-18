@@ -89,7 +89,7 @@ func _ready():
 		right_panel.tab_changed.connect(_on_tab_changed)
 	_begin_character_tutorial_if_needed.call_deferred()
 
-func _notification(what):
+func _notification(_what):
 	pass
 
 func _setup_hold_timer():
@@ -243,7 +243,7 @@ func _connect_card_interactions(card_ui: Control, id: String, mode: String, sour
 	card_ui.gui_input.connect(_on_card_gui_input.bind(card_ui, id, mode, source, res))
 	card_ui.pressed.connect(_on_collection_card_pressed.bind(card_ui, id, mode, source, res))
 
-func _on_collection_card_pressed(card_ui: Control, id: String, mode: String, source: String, res: Resource):
+func _on_collection_card_pressed(card_ui: Control, id: String, mode: String, source: String, _res: Resource):
 	if _consume_press_instance_id == card_ui.get_instance_id():
 		_consume_press_instance_id = -1
 		return

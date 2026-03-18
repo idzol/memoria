@@ -1,7 +1,7 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bkyy1muum61ac"]
 
-[ext_resource type="Theme" path="res://assets/themes/Greek.theme" id="1_theme"]
-[ext_resource type="Script" path="res://features/map/StoryMapUI.gd" id="2_logic"]
+[ext_resource type="Theme" uid="uid://cy1tv88ir10yq" path="res://assets/themes/Greek.theme" id="1_theme"]
+[ext_resource type="Script" uid="uid://dpaj8gsetnwk" path="res://features/map/StoryMapUI.gd" id="2_logic"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_info_toast"]
 bg_color = Color(0, 0, 0, 0.35)
@@ -15,7 +15,7 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[node name="StoryMap" type="Control"]
+[node name="StoryMap" type="Control" unique_id=151049399]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -25,7 +25,7 @@ grow_vertical = 2
 theme = ExtResource("1_theme")
 script = ExtResource("2_logic")
 
-[node name="BG" type="ColorRect" parent="."]
+[node name="BG" type="ColorRect" parent="." unique_id=1437079065]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -34,24 +34,24 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.05, 0.05, 0.06, 1)
 
-[node name="TopBar" type="PanelContainer" parent="."]
+[node name="TopBar" type="PanelContainer" parent="." unique_id=1190618257]
 custom_minimum_size = Vector2(0, 96)
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
 grow_horizontal = 2
 
-[node name="TopMargin" type="MarginContainer" parent="TopBar"]
+[node name="TopMargin" type="MarginContainer" parent="TopBar" unique_id=1803134951]
 layout_mode = 2
 theme_override_constants/margin_left = 24
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 24
 theme_override_constants/margin_bottom = 16
 
-[node name="TopHBox" type="HBoxContainer" parent="TopBar/TopMargin"]
+[node name="TopHBox" type="HBoxContainer" parent="TopBar/TopMargin" unique_id=1148784540]
 layout_mode = 2
 
-[node name="HeaderLabel" type="Label" parent="TopBar/TopMargin/TopHBox"]
+[node name="HeaderLabel" type="Label" parent="TopBar/TopMargin/TopHBox" unique_id=1318331723]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -59,23 +59,22 @@ theme_override_font_sizes/font_size = 28
 text = "Story Chapters"
 vertical_alignment = 1
 
-[node name="MapButton" type="Button" parent="TopBar/TopMargin/TopHBox"]
+[node name="MapButton" type="Button" parent="TopBar/TopMargin/TopHBox" unique_id=1890984836]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(70, 56)
 layout_mode = 2
 text = "🗺️"
 
-[node name="AvatarButton" type="Button" parent="TopBar/TopMargin/TopHBox"]
+[node name="AvatarButton" type="Button" parent="TopBar/TopMargin/TopHBox" unique_id=1324545294]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(70, 56)
 layout_mode = 2
 text = "👤"
 
-[node name="ScrollContainer" type="ScrollContainer" parent="."]
+[node name="ScrollContainer" type="ScrollContainer" parent="." unique_id=148011740]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
-anchor_top = 0.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_top = 110.0
@@ -84,24 +83,24 @@ grow_vertical = 2
 horizontal_scroll_mode = 2
 vertical_scroll_mode = 0
 
-[node name="ContentMargin" type="MarginContainer" parent="ScrollContainer"]
+[node name="ContentMargin" type="MarginContainer" parent="ScrollContainer" unique_id=2050111316]
 layout_mode = 2
 theme_override_constants/margin_left = 24
 theme_override_constants/margin_top = 24
 theme_override_constants/margin_right = 24
 theme_override_constants/margin_bottom = 24
 
-[node name="ChapterRow" type="HBoxContainer" parent="ScrollContainer/ContentMargin"]
+[node name="ChapterRow" type="HBoxContainer" parent="ScrollContainer/ContentMargin" unique_id=9786360]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 28
 
-[node name="InfoToastBox" type="PanelContainer" parent="."]
+[node name="InfoToastBox" type="PanelContainer" parent="." unique_id=1781062332]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(520, 42)
 layout_mode = 1
-anchors_preset = 12
+anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
@@ -114,7 +113,7 @@ grow_horizontal = 2
 grow_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_info_toast")
 
-[node name="InfoToastLabel" type="Label" parent="InfoToastBox"]
+[node name="InfoToastLabel" type="Label" parent="InfoToastBox" unique_id=712959293]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.7, 1, 1)
@@ -122,7 +121,7 @@ theme_override_font_sizes/font_size = 16
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="FocusOverlay" type="Control" parent="."]
+[node name="FocusOverlay" type="Control" parent="." unique_id=1242064267]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -133,7 +132,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 
-[node name="Shade" type="ColorRect" parent="FocusOverlay"]
+[node name="Shade" type="ColorRect" parent="FocusOverlay" unique_id=2099195286]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -142,7 +141,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.18, 0.18, 0.2, 0.72)
 
-[node name="FocusCenter" type="CenterContainer" parent="FocusOverlay"]
+[node name="FocusCenter" type="Control" parent="FocusOverlay" unique_id=1456133244]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -151,10 +150,14 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="FocusContent" type="MarginContainer" parent="FocusOverlay/FocusCenter"]
+[node name="FocusContent" type="MarginContainer" parent="FocusOverlay/FocusCenter" unique_id=712582346]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(720, 940)
-layout_mode = 2
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+grow_horizontal = 2
 theme_override_constants/margin_left = 28
 theme_override_constants/margin_top = 28
 theme_override_constants/margin_right = 28

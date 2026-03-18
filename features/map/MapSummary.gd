@@ -30,20 +30,29 @@ const NODE_OUTLINE_COLOR = Color(0.58, 0.58, 0.62, 0.92)
 @onready var open_button = %OpenButton
 
 var display_biome: String = ""
+var embedded_target_size: Vector2 = Vector2.ZERO
 
 func _ready():
 	open_button.pressed.connect(_open_biome_map)
 	preview_frame.resized.connect(_queue_preview_refresh)
+	if not resized.is_connected(_refresh_embedded_layout):
+		resized.connect(_refresh_embedded_layout)
 	if ResourceLoader.exists(GRANITE_TEXTURE_PATH):
 		granite_rect.texture = load(GRANITE_TEXTURE_PATH)
 		granite_rect.modulate = Color(0.8, 0.8, 0.84, 0.82)
 	_apply_mode()
 	_refresh_content.call_deferred()
+	_refresh_embedded_layout.call_deferred()
 
 func set_biome(biome: String):
 	display_biome = biome
 	if is_inside_tree():
 		_refresh_content.call_deferred()
+
+func set_embedded_target_size(target_size: Vector2):
+	embedded_target_size = target_size
+	if is_inside_tree():
+		_refresh_embedded_layout()
 
 func _input(event):
 	if embedded_mode:
@@ -65,16 +74,15 @@ func _apply_mode():
 	open_button.visible = allow_navigation and not embedded_mode
 	if embedded_mode:
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
-		var embedded_height = _get_embedded_height()
-		var embedded_width = embedded_height * TABLET_ASPECT_RATIO
-		custom_minimum_size = Vector2(embedded_width, embedded_height)
+		custom_minimum_size = Vector2.ZERO
+		size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		size_flags_vertical = Control.SIZE_EXPAND_FILL
 		center.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		tablet.custom_minimum_size = Vector2(embedded_width, embedded_height)
-		preview_frame.custom_minimum_size = Vector2(0, embedded_height * 0.74)
 		title_label.add_theme_font_size_override("font_size", 22)
 		subtitle_label.add_theme_font_size_override("font_size", 14)
 		open_button.text = ""
 		_set_control_tree_mouse_filter(self, Control.MOUSE_FILTER_IGNORE)
+		_refresh_embedded_layout.call_deferred()
 	else:
 		mouse_filter = Control.MOUSE_FILTER_STOP
 		custom_minimum_size = Vector2.ZERO
@@ -182,7 +190,7 @@ func _get_node_color(node: Dictionary, biome: String) -> Color:
 		return ROOM_COLOR
 	return ROOM_COLOR
 
-func _get_connection_color(source_id: String, target_id: String, biome: String) -> Color:
+func _get_connection_color(_source_id: String, _target_id: String, biome: String) -> Color:
 	if GameManager.is_battle_mode and GameManager.is_biome_cleared(biome):
 		return Color(0.28, 0.28, 0.32, 0.8)
 	return Color(0.24, 0.24, 0.28, 0.5)
@@ -250,7 +258,27 @@ func _get_preview_layout(bounds: Dictionary) -> Dictionary:
 func _get_embedded_height() -> float:
 	return max(320.0, get_viewport_rect().size.y * 0.9)
 
-func _apply_preview_background(biome: String, layout: Dictionary):
+func _refresh_embedded_layout():
+	if not embedded_mode or not tablet or not preview_frame:
+		return
+	var available_size = embedded_target_size
+	if available_size == Vector2.ZERO:
+		available_size = size
+	if available_size == Vector2.ZERO and get_parent() is Control:
+		available_size = (get_parent() as Control).size
+	if available_size == Vector2.ZERO:
+		var fallback_height = _get_embedded_height()
+		available_size = Vector2(fallback_height * TABLET_ASPECT_RATIO, fallback_height)
+	var target_height = max(320.0, available_size.y)
+	var target_width = target_height * TABLET_ASPECT_RATIO
+	if available_size.x > 0.0 and target_width > available_size.x:
+		target_width = available_size.x
+		target_height = target_width / TABLET_ASPECT_RATIO
+	tablet.custom_minimum_size = Vector2(target_width, target_height)
+	preview_frame.custom_minimum_size = Vector2(0, target_height * 0.74)
+	_queue_preview_refresh()
+
+func _apply_preview_background(_biome: String, _layout: Dictionary):
 	if not preview_bg:
 		return
 	var frame_size = preview_frame.size if preview_frame.size != Vector2.ZERO else preview_frame.custom_minimum_size

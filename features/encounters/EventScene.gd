@@ -49,6 +49,8 @@ const LOG_COLOR_NEUTRAL = Color(0.86, 0.86, 0.86, 1.0)
 const SETTINGS_PATH := "user://settings.cfg"
 const SETTINGS_SECTION := "gameplay"
 const RUN_LOG_KEY := "show_run_log"
+const BG_SCALING_FIXED := "fixed"
+const BG_SCALING_PROPORTIONAL := "proportional"
 
 func _ready():
 	if in_game_menu_scene:
@@ -103,6 +105,7 @@ func _load_encounter_data():
 	dialog_speaker.text = LocalizationManager.translate("dialog.speaker.narrator", "Narrator")
 	exit_button.text = LocalizationManager.translate("dialog.exit_overworld", "Exit to Overworld")
 	_apply_room_environment(current_room_res)
+	_request_scene_music()
 	_configure_dialog_panel(true)
 		
 	# 2. Player Spritesheet (same setup as BattleScene)
@@ -119,6 +122,17 @@ func _load_encounter_data():
 			_setup_empty_npc()
 	else:
 		_setup_empty_npc()
+
+func _request_scene_music():
+	if not current_room_res:
+		return
+	var room_type = str(current_room_res.type)
+	if room_type != "home":
+		return
+	var biome = str(current_room_res.biome if current_room_res.biome != "" else GameManager.player_biome)
+	var biome_track = AudioData.get_biome_track_id(biome)
+	if biome_track != "":
+		SignalBus.music_change_requested.emit(biome_track, 1.5)
 
 func _setup_npc(data: NPCData):
 	npc_name_label.text = data.name
@@ -222,7 +236,7 @@ func _setup_unit_visuals(sprite: Sprite2D, res: Resource):
 		sprite.texture = sheet
 		sprite.hframes = res.get("hframes")
 		sprite.vframes = res.get("vframes")
-		sprite.scale = Vector2(1.0, 1.0)
+		sprite.scale = _get_room_character_scale()
 		sprite.offset.y = sprite_feet_offset
 		_update_character_placement()
 		_animate_unit(sprite, res.get("total_frames"), res.get("frame_speed"))
@@ -235,7 +249,7 @@ func _setup_player_spritesheet():
 		player_sprite.texture = idle_tex
 		player_sprite.hframes = 6
 		player_sprite.vframes = 6
-		player_sprite.scale = Vector2(1.0, 1.0)
+		player_sprite.scale = _get_room_character_scale()
 		player_sprite.offset.y = sprite_feet_offset
 		_update_character_placement()
 		_animate_unit(player_sprite, 8, 0.12)
@@ -252,18 +266,40 @@ func _animate_unit(sprite: Sprite2D, total: int, speed: float):
 		await get_tree().create_timer(speed).timeout
 
 func _apply_room_environment(res: RoomData):
-	if background and res.background_texture:
-		background.texture = res.background_texture
+	if background:
+		background.stretch_mode = _get_background_stretch_mode(res)
+		if res.background_texture:
+			background.texture = res.background_texture
 	if floor_rect:
-		var biome = res.biome if res.biome != "" else "town"
-		var floor_path = "res://assets/rooms/floor/%s_floor.png" % biome.to_lower()
-		if ResourceLoader.exists(floor_path):
-			floor_rect.texture = load(floor_path)
+		var floor_texture = _get_room_floor_texture(res)
+		if floor_texture:
+			floor_rect.texture = floor_texture
 			floor_rect.stretch_mode = TextureRect.STRETCH_SCALE
 			floor_rect.visible = true
 			_fit_floor_to_container_width()
 		else:
 			floor_rect.visible = false
+
+func _get_background_stretch_mode(res: RoomData) -> int:
+	if not res:
+		return TextureRect.STRETCH_SCALE
+	return TextureRect.STRETCH_KEEP_ASPECT_COVERED if res.background_scaling == BG_SCALING_PROPORTIONAL else TextureRect.STRETCH_SCALE
+
+func _get_room_character_scale() -> Vector2:
+	if current_room_res and current_room_res.character_scaling != Vector2.ZERO:
+		return current_room_res.character_scaling
+	return Vector2.ONE
+
+func _get_room_floor_texture(res: RoomData) -> Texture2D:
+	if not res:
+		return null
+	if res.floor:
+		return res.floor
+	var biome = res.biome if res.biome != "" else "town"
+	var floor_path = "res://assets/rooms/floor/%s_floor.png" % biome.to_lower()
+	if ResourceLoader.exists(floor_path):
+		return load(floor_path) as Texture2D
+	return null
 
 func _on_viewport_resized():
 	_fit_floor_to_container_width()
