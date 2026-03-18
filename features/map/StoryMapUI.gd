@@ -40,6 +40,7 @@ var _last_focus_layout_height: int = -1
 
 func _ready():
 	_create_styles()
+	SignalBus.music_change_requested.emit(AudioData.TRACKS["STORY_MENU"], 1.5)
 	if avatar_button:
 		avatar_button.pressed.connect(_open_character_screen)
 	if map_button:

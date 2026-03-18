@@ -22,11 +22,13 @@ const GLOBAL_DEFAULT_ROOM_PATH = "res://data/rooms/default_battle.tres"
 
 var _room_pool_by_biome: Dictionary = {}
 var _used_room_paths_by_biome: Dictionary = {}
+var _node_visual_scale_rng := RandomNumberGenerator.new()
 
 func generate_battle_map() -> Dictionary:
 	var map: Dictionary = {}
 	_room_pool_by_biome.clear()
 	_used_room_paths_by_biome.clear()
+	_node_visual_scale_rng.randomize()
 
 	var layer_offset := 0
 	var previous_exit_id := ""
@@ -63,7 +65,8 @@ func generate_battle_map() -> Dictionary:
 					"room_resource_path": room_res.resource_path if room_res else _get_default_room_path_for_biome(biome_key),
 					"initial_dialog": room_res.initial_dialog if room_res else "",
 					"connections": [],
-					"is_home": is_home
+					"is_home": is_home,
+					"node_visual_scale": _get_random_node_visual_scale()
 				}
 				if room_res and room_res.map_icon:
 					data["custom_icon_path"] = room_res.map_icon.resource_path
@@ -98,6 +101,9 @@ func generate_battle_map() -> Dictionary:
 
 func _build_node_id(biome: String, row: int, col: int) -> String:
 	return "node_%s_%d_%d" % [biome, row, col]
+
+func _get_random_node_visual_scale() -> float:
+	return _node_visual_scale_rng.randf_range(0.8, 1.2)
 
 func _get_grid_size_for_biome_index(biome_index: int) -> int:
 	return clampi(biome_index + 2, 2, 10)

@@ -16,6 +16,7 @@ var asset_library: MapAssetData = preload("res://data/map/map_data.tres")
 @onready var player_indicator = %PlayerIcon
 @onready var fill = %Fill
 @onready var border = %Border
+@onready var room_name_label: Label = %RoomNameLabel
 
 var node_data = null
 
@@ -29,6 +30,11 @@ func setup_biome_node(data: Dictionary, grid_tex: Texture2D, _is_cleared: bool, 
 	# 2. Update Player Avatar
 	if player_indicator:
 		player_indicator.visible = is_player_here
+
+	if room_name_label:
+		room_name_label.text = str(data.get("name", ""))
+		room_name_label.visible = is_revealed and room_name_label.text != ""
+		room_name_label.modulate = Color(0.92, 0.92, 0.96, 0.92)
 	
 	# 3. Icon Logic
 	if is_revealed:
@@ -41,6 +47,7 @@ func setup_biome_node(data: Dictionary, grid_tex: Texture2D, _is_cleared: bool, 
 		icon_rect.modulate = Color(1, 1, 1, 0)
 
 	_apply_base_styles()
+	_apply_visual_scale(float(data.get("node_visual_scale", 1.0)))
 	set_highlight_state(is_player_here, false)
 
 func set_highlight_state(is_player_here: bool, is_selected: bool):
@@ -85,6 +92,22 @@ func _apply_base_styles():
 			fill_style.border_width_top = 0
 			fill_style.border_width_right = 0
 			fill_style.border_width_bottom = 0
+
+func _apply_visual_scale(scale_factor: float):
+	var clamped_scale = clamp(scale_factor, 0.8, 1.2)
+	var visual_scale = Vector2.ONE * clamped_scale
+	if icon_rect:
+		icon_rect.pivot_offset = icon_rect.size * 0.5
+		icon_rect.scale = visual_scale
+	if border:
+		border.pivot_offset = border.size * 0.5
+		border.scale = visual_scale
+	if fill:
+		fill.pivot_offset = fill.size * 0.5
+		fill.scale = visual_scale
+	if grid_texture_rect:
+		grid_texture_rect.pivot_offset = grid_texture_rect.size * 0.5
+		grid_texture_rect.scale = visual_scale
 
 func _ensure_style(panel: Panel, draw_center: bool):
 	if not panel:

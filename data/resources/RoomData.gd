@@ -39,4 +39,7 @@ var _difficulty_tier_value: int = -1
 @export var map_icon: Texture2D 
 ## Background for the scene (res://assets/room/{biome}/{id}_scene.png)
 @export var background_texture: Texture2D
+@export_enum("fixed", "proportional") var background_scaling: String = "fixed"
+@export var character_scaling: Vector2 = Vector2.ONE
+@export var floor: Texture2D
 @export var music_track: String = "battle_theme"

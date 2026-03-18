@@ -39,6 +39,9 @@ var credits_data = {
 func _ready():
 	# Ensure the node can process input
 	set_process_input(true)
+	var credits_track = AudioData.TRACKS.get("CREDITS", "")
+	if credits_track != "":
+		SignalBus.music_change_requested.emit(credits_track, 1.5)
 	# Hide scrollbar visually but keep mechanics
 	scroll_container.get_v_scroll_bar().modulate.a = 0
 	setup_credits()

@@ -128,7 +128,9 @@ func _ready():
 		add_child(in_game_menu)
 		in_game_menu.hide()
 
-	SignalBus.music_change_requested.emit(AudioData.TRACKS["TOWN"], 1.0)
+	var biome_track = AudioData.get_biome_track_id(_get_active_biome())
+	if biome_track != "":
+		SignalBus.music_change_requested.emit(biome_track, 1.5)
 	_scroll_to_player()
 	_begin_worldmap_tutorial_if_needed.call_deferred()
 

@@ -1283,6 +1283,8 @@ func _check_win_loss():
 	
 	if e_hp <= 0:
 		is_battle_over = true
+		if not is_object_room:
+			SignalBus.music_change_requested.emit("", 1.0)
 		GameManager.register_room_victory(GameManager.current_node, p_hp)
 		var xp_reward = current_enemy_res.xp_reward if current_enemy_res else 0
 		GameManager.add_player_xp(xp_reward)
@@ -1614,7 +1616,7 @@ func _apply_unit_sheet(sprite: Sprite2D, res: Resource, sheet: Texture2D):
 	sprite.texture = sheet
 	sprite.hframes = _get_unit_hframes(res)
 	sprite.vframes = _get_unit_vframes(res)
-	sprite.scale = Vector2(1.0, 1.0)
+	sprite.scale = _get_room_character_scale()
 	sprite.offset.y = sprite_feet_offset
 	_sync_flash_overlay(sprite, %PlayerFlash if sprite == player_sprite else %EnemyFlash)
 
@@ -1930,23 +1932,42 @@ func _apply_room_data(res: RoomData):
 	if has_node("%DialogText"): %DialogText.text = res.initial_dialog
 	
 	# 1. Load Background
-	if background and res.background_texture: 
-		background.texture = res.background_texture
+	if background:
+		background.stretch_mode = _get_background_stretch_mode(res)
+		if res.background_texture:
+			background.texture = res.background_texture
 	
 	# 2. Dynamic Floor Loading (Bottom 200px)
 	if floor_rect:
-		var biome = res.biome if res.biome != "" else "town"
-		# Adjusted path to match standard project structure
-		var floor_path = "res://assets/rooms/floor/%s_floor.png" % biome.to_lower()
-		if ResourceLoader.exists(floor_path):
-			floor_rect.texture = load(floor_path)
+		var floor_texture = _get_room_floor_texture(res)
+		if floor_texture:
+			floor_rect.texture = floor_texture
 			floor_rect.stretch_mode = TextureRect.STRETCH_SCALE
 			floor_rect.visible = true
 			_fit_floor_to_container_width()
 		else:
-			# Fallback if specific file is missing
-			print("[BattleScene] Floor texture missing: ", floor_path)
 			floor_rect.visible = false
+
+func _get_background_stretch_mode(res: RoomData) -> int:
+	if not res:
+		return TextureRect.STRETCH_SCALE
+	return TextureRect.STRETCH_KEEP_ASPECT_COVERED if res.background_scaling == "proportional" else TextureRect.STRETCH_SCALE
+
+func _get_room_character_scale() -> Vector2:
+	if current_room_res and current_room_res.character_scaling != Vector2.ZERO:
+		return current_room_res.character_scaling
+	return Vector2.ONE
+
+func _get_room_floor_texture(res: RoomData) -> Texture2D:
+	if not res:
+		return null
+	if res.floor:
+		return res.floor
+	var biome = res.biome if res.biome != "" else "town"
+	var floor_path = "res://assets/rooms/floor/%s_floor.png" % biome.to_lower()
+	if ResourceLoader.exists(floor_path):
+		return load(floor_path) as Texture2D
+	return null
 
 func _on_viewport_resized():
 	_fit_floor_to_container_width()

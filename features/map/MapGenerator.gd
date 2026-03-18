@@ -23,10 +23,12 @@ const INITIAL_STORY_BIOMES = ["home", "town"]
 
 var _room_pool_by_biome: Dictionary = {}
 var _used_room_paths_by_biome: Dictionary = {}
+var _node_visual_scale_rng := RandomNumberGenerator.new()
 
 func generate_new_map() -> Dictionary:
 	_room_pool_by_biome.clear()
 	_used_room_paths_by_biome.clear()
+	_node_visual_scale_rng.randomize()
 	return await expand_story_map({}, INITIAL_STORY_BIOMES)
 
 func expand_story_map(existing_map: Dictionary, target_biomes: Array) -> Dictionary:
@@ -41,6 +43,7 @@ func expand_story_map(existing_map: Dictionary, target_biomes: Array) -> Diction
 	return map
 
 func expand_story_map_immediate(existing_map: Dictionary, target_biomes: Array) -> Dictionary:
+	_node_visual_scale_rng.randomize()
 	var map: Dictionary = existing_map.duplicate(true)
 	var normalized_targets = _normalize_target_biomes(target_biomes)
 	for biome_key in normalized_targets:
@@ -56,6 +59,7 @@ func reroll_incomplete_story_rooms(existing_map: Dictionary, room_states: Dictio
 	var updated_map := existing_map.duplicate(true)
 	_room_pool_by_biome.clear()
 	_used_room_paths_by_biome.clear()
+	_node_visual_scale_rng.randomize()
 	var biomes_to_reroll = _normalize_target_biomes(target_biomes if not target_biomes.is_empty() else _get_biomes_present_in_map(updated_map))
 
 	for biome in biomes_to_reroll:
@@ -90,6 +94,7 @@ func reroll_incomplete_story_rooms(existing_map: Dictionary, room_states: Dictio
 			node["initial_dialog"] = room_res.initial_dialog if room_res else str(node.get("initial_dialog", ""))
 			node["base_type"] = "home" if is_home else (room_res.type if room_res else fallback_type)
 			node["type"] = "home" if is_home else str(node.get("base_type", fallback_type))
+			node["node_visual_scale"] = _get_random_node_visual_scale()
 			if room_res and room_res.map_icon:
 				node["custom_icon_path"] = room_res.map_icon.resource_path
 			else:
@@ -126,7 +131,8 @@ func _generate_biome_into_map(map: Dictionary, biome_key: String, biome_index: i
 				"room_resource_path": room_res.resource_path if room_res else _get_default_room_path_for_biome(biome_key),
 				"initial_dialog": room_res.initial_dialog if room_res else "",
 				"connections": [],
-				"is_home": is_home
+				"is_home": is_home,
+				"node_visual_scale": _get_random_node_visual_scale()
 			}
 			if room_res and room_res.map_icon:
 				data["custom_icon_path"] = room_res.map_icon.resource_path
@@ -235,6 +241,9 @@ func _build_node_id(biome: String, row: int, col: int) -> String:
 
 func _pick_random_coord(size: int) -> Vector2i:
 	return Vector2i(randi_range(0, size - 1), randi_range(0, size - 1))
+
+func _get_random_node_visual_scale() -> float:
+	return _node_visual_scale_rng.randf_range(0.8, 1.2)
 
 func _get_grid_size_for_biome_index(biome_index: int) -> int:
 	return clampi(biome_index + 2, 2, 10)

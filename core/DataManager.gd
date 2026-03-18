@@ -6,6 +6,7 @@ extends Node
 
 signal initialization_progress(percent: float, current_task: String)
 signal initialization_complete
+signal transition_loading_resumed
 
 const PATHS = {
 	"cards": "res://data/cards/",
@@ -46,6 +47,7 @@ var _queued_paths: Dictionary = {}
 var _total_to_load: int = 0
 var _processed_count: int = 0
 var _is_processing_queue: bool = false
+var _is_transition_paused: bool = false
 
 func _ready():
 	_start_smooth_init()
@@ -64,6 +66,16 @@ func prioritize_story_assets(current_biome: String = "", next_biome: String = ""
 
 func prioritize_story_assets_for_resume(current_biome: String = "", next_biome: String = ""):
 	prioritize_story_assets(current_biome, next_biome, true)
+
+func pause_for_scene_transition():
+	_is_transition_paused = true
+
+func resume_after_scene_transition():
+	var was_paused = _is_transition_paused
+	_is_transition_paused = false
+	if was_paused:
+		transition_loading_resumed.emit()
+	_ensure_background_loader_running()
 
 func _refresh_load_plan(current_biome: String = "", next_biome: String = "", include_completed_biomes: bool = false):
 	var priority_biomes = _get_priority_biomes(current_biome, next_biome, include_completed_biomes)
@@ -94,6 +106,11 @@ func _process_background_loading():
 	var start_time = Time.get_ticks_usec()
 
 	while _processed_count < _total_to_load:
+		if _is_transition_paused:
+			await transition_loading_resumed
+			start_time = Time.get_ticks_usec()
+			continue
+
 		var entry = _load_entries[_processed_count]
 		_maybe_cache_resource(str(entry.get("path", "")))
 		_processed_count += 1
@@ -103,6 +120,8 @@ func _process_background_loading():
 			var progress = float(_processed_count) / max(1.0, float(_total_to_load))
 			initialization_progress.emit(progress, str(entry.get("label", "Streaming Memoria...")))
 			await get_tree().process_frame
+			if _is_transition_paused:
+				await transition_loading_resumed
 			start_time = Time.get_ticks_usec()
 
 	_is_processing_queue = false

@@ -13,7 +13,9 @@ func change_scene_to_file(scene_path: String, fade_duration: float = DEFAULT_FAD
 	if _transition_in_progress:
 		return
 	_transition_in_progress = true
-	_ensure_overlay()
+	if DataManager and DataManager.has_method("pause_for_scene_transition"):
+		DataManager.pause_for_scene_transition()
+	await _ensure_overlay()
 	_fade_rect.color = Color(0, 0, 0, 0)
 	_overlay_layer.visible = true
 
@@ -37,15 +39,18 @@ func change_scene_to_file(scene_path: String, fade_duration: float = DEFAULT_FAD
 	_finish_transition()
 
 func _ensure_overlay():
+	var root := get_tree().root
 	if _overlay_layer and is_instance_valid(_overlay_layer) and _fade_rect and is_instance_valid(_fade_rect):
-		if _overlay_layer.get_parent() != get_tree().root:
-			get_tree().root.add_child(_overlay_layer)
+		if _overlay_layer.get_parent() != root:
+			root.call_deferred("add_child", _overlay_layer)
+			await _overlay_layer.tree_entered
 		return
 
 	_overlay_layer = CanvasLayer.new()
 	_overlay_layer.layer = TRANSITION_LAYER
 	_overlay_layer.visible = false
-	get_tree().root.add_child(_overlay_layer)
+	root.call_deferred("add_child", _overlay_layer)
+	await _overlay_layer.tree_entered
 
 	_fade_rect = ColorRect.new()
 	_fade_rect.color = Color(0, 0, 0, 0)
@@ -58,4 +63,6 @@ func _finish_transition():
 		_fade_rect.color = Color(0, 0, 0, 0)
 	if _overlay_layer and is_instance_valid(_overlay_layer):
 		_overlay_layer.visible = false
+	if DataManager and DataManager.has_method("resume_after_scene_transition"):
+		DataManager.resume_after_scene_transition()
 	_transition_in_progress = false

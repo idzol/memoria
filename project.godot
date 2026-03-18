@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Memory Dungeon"
-run/main_scene="uid://c5n80tiagf37h"
+run/main_scene="res://features/ui/IntroCreditsRoll.tscn"
 config/use_custom_user_dir=true
 config/custom_user_dir_name="MemoryDungeon"
 config/features=PackedStringArray("4.6", "Forward Plus")

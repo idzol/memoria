@@ -9,12 +9,12 @@ class_name ObjectData
 @export var object_image: Texture2D
 @export var hframes: int = 8
 @export var vframes: int = 1
-@export var total_frames: int = 8
-@export_storage var total_frames: int = 8:
+var _total_frames: int = 8
+@export var total_frames: int = 8:
 	set(value):
-		total_frames = value
+		_total_frames = value
 	get:
-		return total_frames
+		return _total_frames
 @export var frame_speed: float = 0.12
 
 @export_group("Interaction")
