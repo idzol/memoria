@@ -57,6 +57,7 @@ extends Node2D
 
 var card_scene = preload("res://features/combat/CardIcon.tscn")
 var full_card_scene = preload("res://features/combat/Card.tscn")
+var victory_overlay_scene = preload("res://features/combat/VictoryScreen.tscn")
 var in_game_menu_scene = preload("res://features/ui/InGameMenu.tscn")
 
 # --- Combat State ---
@@ -69,6 +70,7 @@ var current_enemy_res: EnemyData = null
 var current_player_res: PlayerData = null
 var current_object_res: ObjectData = null
 var in_game_menu = null
+var victory_overlay = null
 var is_cleared_room: bool = false
 var is_object_room: bool = false
 var death_transition_in_progress: bool = false
@@ -87,6 +89,7 @@ var keyboard_selected_card_index: int = -1
 var keyboard_selection_active: bool = false
 var card_selection_style: StyleBoxFlat
 var card_preview_layer: CanvasLayer = null
+var victory_overlay_layer: CanvasLayer = null
 var card_preview_root: Control = null
 var card_preview_holder: CenterContainer = null
 var active_preview_card: Control = null
@@ -168,7 +171,12 @@ func _ready():
 	if node_data.has("room_resource_path"):
 		current_room_res = load(node_data.room_resource_path) as RoomData
 		_apply_room_data(current_room_res)
-		is_object_room = current_room_res != null and current_room_res.enemy_id == "" and current_room_res.object_id != ""
+		is_object_room = (
+			current_room_res != null
+			and current_room_res.enemy_id == ""
+			and current_room_res.object_id != ""
+			and not bool(node_data.get("object_consumed", false))
+		)
 		if is_object_room:
 			current_object_res = _load_object_resource(current_room_res.object_id)
 	
@@ -204,7 +212,8 @@ func _ready():
 		_init_encounter()
 	
 	# Music 
-	SignalBus.music_change_requested.emit(AudioData.TRACKS["BATTLE_STANDARD"], 1.0)
+	var battle_track = AudioData.TRACKS["OBJECT_STANDARD"] if is_object_room else AudioData.TRACKS["BATTLE_STANDARD"]
+	SignalBus.music_change_requested.emit(battle_track, 1.0)
 
 	# Initial UI Sync
 	_sync_status_bar()
@@ -1188,7 +1197,7 @@ func _setup_cleared_room_view():
 	dialog_overlay.show()
 	_configure_dialog_box(true)
 	if enemy_sprite:
-		enemy_sprite.visible = is_object_room and current_object_res != null
+		enemy_sprite.visible = false
 	if has_node("%EnemyFlash"):
 		%EnemyFlash.visible = false
 	for child in %OptionContainer.get_children():
@@ -1209,7 +1218,9 @@ func _setup_cleared_room_view():
 	_show_exit_cleared_room_button()
 
 func _exit_cleared_room():
-	get_tree().change_scene_to_file(GameManager.get_active_biome_map_scene_path())
+	SceneTransition.change_scene_to_file(
+		GameManager.consume_pending_post_battle_scene(GameManager.get_active_biome_map_scene_path())
+	)
 
 func _begin_room_dialog(lines: Array[Dictionary], on_complete: Callable):
 	_active_room_dialog_lines = lines
@@ -1295,12 +1306,10 @@ func _check_win_loss():
 				"Victory in {room}."
 			)
 		)
-		var default_victory_scene = "res://features/combat/VictoryScreenBattleMode.tscn" if GameManager.is_battle_mode else "res://features/combat/VictoryScreen.tscn"
-
-		await get_tree().create_timer(1.5).timeout
+		await _fade_out_enemy_after_defeat()
 		if not is_inside_tree():
 			return
-		SceneTransition.change_scene_to_file(default_victory_scene)
+		_show_victory_overlay()
 			
 	elif p_hp <= 0:
 		is_battle_over = true
@@ -1950,8 +1959,8 @@ func _apply_room_data(res: RoomData):
 
 func _get_background_stretch_mode(res: RoomData) -> int:
 	if not res:
-		return TextureRect.STRETCH_SCALE
-	return TextureRect.STRETCH_KEEP_ASPECT_COVERED if res.background_scaling == "proportional" else TextureRect.STRETCH_SCALE
+		return TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	return TextureRect.STRETCH_KEEP_ASPECT_COVERED
 
 func _get_room_character_scale() -> Vector2:
 	if current_room_res and current_room_res.character_scaling != Vector2.ZERO:
@@ -1961,13 +1970,7 @@ func _get_room_character_scale() -> Vector2:
 func _get_room_floor_texture(res: RoomData) -> Texture2D:
 	if not res:
 		return null
-	if res.floor:
-		return res.floor
-	var biome = res.biome if res.biome != "" else "town"
-	var floor_path = "res://assets/rooms/floor/%s_floor.png" % biome.to_lower()
-	if ResourceLoader.exists(floor_path):
-		return load(floor_path) as Texture2D
-	return null
+	return res.floor
 
 func _on_viewport_resized():
 	_fit_floor_to_container_width()
@@ -2034,7 +2037,7 @@ func _get_floor_midline_y(view_size: Vector2) -> float:
 	return view_size.y * (1.0 - ground_height_ratio)
 
 func _debug_win():
-	SceneTransition.change_scene_to_file("res://features/combat/VictoryScreen.tscn")
+	_show_victory_overlay()
 
 func _debug_lose():
 	SceneTransition.change_scene_to_file("res://features/ui/RunSummary.tscn")
@@ -2076,6 +2079,75 @@ func _setup_card_preview_overlay():
 	card_preview_holder.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	card_preview_holder.mouse_filter = Control.MOUSE_FILTER_STOP
 	card_preview_root.add_child(card_preview_holder)
+
+func _fade_out_enemy_after_defeat():
+	if is_object_room:
+		return
+	var tween = create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	if enemy_sprite:
+		tween.parallel().tween_property(enemy_sprite, "modulate:a", 0.0, 0.6)
+	if enemy_hp_bar:
+		tween.parallel().tween_property(enemy_hp_bar, "modulate:a", 0.0, 0.4)
+	if enemy_hp_text:
+		tween.parallel().tween_property(enemy_hp_text, "modulate:a", 0.0, 0.4)
+	if enemy_column_ui:
+		tween.parallel().tween_property(enemy_column_ui, "modulate:a", 0.0, 0.4)
+	if enemy_stats_hud:
+		tween.parallel().tween_property(enemy_stats_hud, "modulate:a", 0.0, 0.4)
+	await tween.finished
+
+func _show_victory_overlay():
+	if victory_overlay != null and is_instance_valid(victory_overlay):
+		victory_overlay.queue_free()
+	if victory_overlay_layer == null or not is_instance_valid(victory_overlay_layer):
+		victory_overlay_layer = CanvasLayer.new()
+		victory_overlay_layer.layer = 120
+		add_child(victory_overlay_layer)
+	victory_overlay = victory_overlay_scene.instantiate()
+	victory_overlay.overlay_mode = true
+	victory_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	victory_overlay_layer.add_child(victory_overlay)
+	victory_overlay.populate_rewards(
+		GameManager.pending_loot,
+		GameManager.last_xp_gained,
+		_get_victory_gold_amount(),
+		current_enemy_res.name if current_enemy_res else ""
+	)
+	victory_overlay.continue_requested.connect(_on_victory_overlay_continue)
+
+func _get_victory_gold_amount() -> int:
+	var total = 0
+	for entry in GameManager.pending_loot:
+		if entry is Dictionary and str(entry.get("id", "")) == "gold":
+			total += int(entry.get("amount", 0))
+	return total
+
+func _on_victory_overlay_continue():
+	if victory_overlay != null and is_instance_valid(victory_overlay):
+		victory_overlay.queue_free()
+		victory_overlay = null
+	if victory_overlay_layer != null and is_instance_valid(victory_overlay_layer):
+		victory_overlay_layer.queue_free()
+		victory_overlay_layer = null
+	if not GameManager.is_battle_mode and GameManager._is_boss_room(GameManager.current_node):
+		var cleared_biome = str(GameManager.current_node.get("biome", ""))
+		GameManager.mark_biome_cleared(cleared_biome)
+		SaveManager.save_mid_run_state()
+		SceneTransition.change_scene_to_file(
+			GameManager.consume_pending_post_battle_scene(GameManager.get_story_map_scene_path())
+		)
+		return
+	if enemy_sprite:
+		enemy_sprite.visible = false
+	if enemy_hp_bar:
+		enemy_hp_bar.visible = false
+	if enemy_hp_text:
+		enemy_hp_text.visible = false
+	if enemy_column_ui:
+		enemy_column_ui.visible = false
+	if enemy_stats_hud:
+		enemy_stats_hud.visible = false
+	_setup_cleared_room_view()
 
 func _is_card_preview_visible() -> bool:
 	return card_preview_root != null and card_preview_root.visible
@@ -2167,10 +2239,17 @@ func _hide_card_preview():
 func _fly_preview_card_to_discard(card_view: Control, card_data: CardData):
 	if card_view == null or not is_instance_valid(card_view):
 		return
-	if player_discard_root == null:
+	if player_discard_root == null or not is_instance_valid(player_discard_root):
 		_hide_card_preview()
 		return
 	await get_tree().create_timer(0.16).timeout
+	if card_view == null or not is_instance_valid(card_view):
+		return
+	if active_preview_card != card_view:
+		return
+	if player_discard_root == null or not is_instance_valid(player_discard_root):
+		_hide_card_preview()
+		return
 	card_view.top_level = true
 	card_view.z_index = 320
 	var preview_size = Vector2(280.0, 420.0)
@@ -2183,5 +2262,7 @@ func _fly_preview_card_to_discard(card_view: Control, card_data: CardData):
 	tween.tween_property(card_view, "global_position", target_pos, 0.28)
 	tween.parallel().tween_property(card_view, "scale", Vector2(target_scale, target_scale), 0.28)
 	await tween.finished
+	if card_view == null or not is_instance_valid(card_view):
+		return
 	_refresh_player_discard_preview(card_data)
 	_hide_card_preview()

@@ -266,13 +266,16 @@ func _activate_selected_entry():
 	var entry = chapter_entries[selected_index]
 	_handle_entry_action(str(entry["biome"]), str(entry["kind"]))
 
-func _handle_entry_action(biome: String, _kind: String):
+func _handle_entry_action(biome: String, kind: String):
 	GameManager.set_selected_story_biome(biome)
+	if kind == "story":
+		GameManager.begin_story_sequence(biome, GameManager.get_story_map_scene_path(), false, false)
+		return
 	_open_selected_biome_map()
 
 func _on_story_tile_pressed(biome: String):
 	_select_entry(biome, "story")
-	_open_selected_biome_map()
+	GameManager.begin_story_sequence(biome, GameManager.get_story_map_scene_path(), false, false)
 
 func _on_summary_tile_pressed(biome: String):
 	_select_entry(biome, "summary")
@@ -290,6 +293,9 @@ func _select_entry(biome: String, kind: String):
 func _on_entry_wrapper_pressed(biome: String, kind: String):
 	_select_entry(biome, kind)
 	GameManager.set_selected_story_biome(biome)
+	if kind == "story":
+		GameManager.begin_story_sequence(biome, GameManager.get_story_map_scene_path(), false, false)
+		return
 	_open_selected_biome_map()
 
 func _open_story_focus(biome: String):

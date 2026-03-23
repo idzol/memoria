@@ -17,6 +17,14 @@ const PATHS = {
 const MAP_DATA_PATH = "res://data/map/map_data.tres"
 const GLOBAL_DEFAULT_ROOM_PATH = "res://data/rooms/default_battle.tres"
 const BIOME_ORDER = ["home", "town", "forest", "ice_caves", "desert", "swamp", "abyss", "void", "the_core"]
+const PERFORMANCE_SENSITIVE_SCENE_NAMES = {
+	"StoryCutscene": true,
+	"StoryChapterSequence": true
+}
+const PERFORMANCE_SENSITIVE_SCENE_PATHS = {
+	"res://features/ui/StoryCutscene.tscn": true,
+	"res://features/map/StoryChapterSequence.tscn": true
+}
 const BIOME_ROOM_SOURCE = {
 	"home": "tutorial",
 	"town": "town",
@@ -106,8 +114,8 @@ func _process_background_loading():
 	var start_time = Time.get_ticks_usec()
 
 	while _processed_count < _total_to_load:
-		if _is_transition_paused:
-			await transition_loading_resumed
+		if _should_pause_background_loading():
+			await _wait_for_background_loading_resume()
 			start_time = Time.get_ticks_usec()
 			continue
 
@@ -120,14 +128,35 @@ func _process_background_loading():
 			var progress = float(_processed_count) / max(1.0, float(_total_to_load))
 			initialization_progress.emit(progress, str(entry.get("label", "Streaming Memoria...")))
 			await get_tree().process_frame
-			if _is_transition_paused:
-				await transition_loading_resumed
+			if _should_pause_background_loading():
+				await _wait_for_background_loading_resume()
 			start_time = Time.get_ticks_usec()
 
 	_is_processing_queue = false
 	is_initialized = true
 	initialization_complete.emit()
 	print("[DataManager] Priority background loading complete.")
+
+func _should_pause_background_loading() -> bool:
+	return _is_transition_paused or _is_performance_sensitive_scene_active()
+
+func _wait_for_background_loading_resume():
+	while _should_pause_background_loading():
+		if _is_transition_paused:
+			await transition_loading_resumed
+		else:
+			await get_tree().process_frame
+
+func _is_performance_sensitive_scene_active() -> bool:
+	var tree = get_tree()
+	if tree == null:
+		return false
+	var current_scene = tree.current_scene
+	if current_scene == null:
+		return false
+	if PERFORMANCE_SENSITIVE_SCENE_NAMES.has(str(current_scene.name)):
+		return true
+	return PERFORMANCE_SENSITIVE_SCENE_PATHS.has(str(current_scene.scene_file_path))
 
 func _index_paths_only(type: String):
 	var root_path = PATHS[type]

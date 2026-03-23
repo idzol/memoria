@@ -182,7 +182,7 @@ func _on_battle_mode_clicked():
 	_open_name_entry_popup()
 
 func _open_name_entry_popup():
-	GameManager.is_battle_mode = _pending_mode_is_battle
+	GameManager.set_game_mode(GameManager.GAME_MODE_BATTLE if _pending_mode_is_battle else GameManager.GAME_MODE_STORY)
 	name_entry_popup.visible = true
 	name_input.text = ""
 	name_input.placeholder_text = LocalizationManager.translate("menu.hero_name", "Hero Name...")
@@ -239,7 +239,8 @@ func _populate_save_list():
 		save_container.add_child(hbox)
 
 		var mode_label = Label.new()
-		var is_battle = data.get("is_battle_mode", false)
+		var game_mode = str(data.get("game_mode", ""))
+		var is_battle = game_mode == GameManager.GAME_MODE_BATTLE if game_mode != "" else bool(data.get("is_battle_mode", false))
 		mode_label.text = LocalizationManager.translate("menu.battle_mode", "BATTLE MODE") if is_battle else LocalizationManager.translate("menu.story_mode", "STORY MODE")
 		mode_label.custom_minimum_size = Vector2(130, 50)
 		mode_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER

@@ -282,8 +282,8 @@ func _apply_room_environment(res: RoomData):
 
 func _get_background_stretch_mode(res: RoomData) -> int:
 	if not res:
-		return TextureRect.STRETCH_SCALE
-	return TextureRect.STRETCH_KEEP_ASPECT_COVERED if res.background_scaling == BG_SCALING_PROPORTIONAL else TextureRect.STRETCH_SCALE
+		return TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	return TextureRect.STRETCH_KEEP_ASPECT_COVERED
 
 func _get_room_character_scale() -> Vector2:
 	if current_room_res and current_room_res.character_scaling != Vector2.ZERO:
@@ -293,13 +293,7 @@ func _get_room_character_scale() -> Vector2:
 func _get_room_floor_texture(res: RoomData) -> Texture2D:
 	if not res:
 		return null
-	if res.floor:
-		return res.floor
-	var biome = res.biome if res.biome != "" else "town"
-	var floor_path = "res://assets/rooms/floor/%s_floor.png" % biome.to_lower()
-	if ResourceLoader.exists(floor_path):
-		return load(floor_path) as Texture2D
-	return null
+	return res.floor
 
 func _on_viewport_resized():
 	_fit_floor_to_container_width()

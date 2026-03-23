@@ -4,7 +4,6 @@ extends Control
 # Shared overworld UI for both battle mode and story mode, using the battle-map layout.
 
 @onready var node_container = %NodeContainer
-@onready var lines_container = %LinesContainer
 @onready var biome_label = %BiomeLabel
 @onready var phase_label = %PhaseLabel
 @onready var day_button = %DayButton
@@ -51,10 +50,9 @@ var visible_min_column: int = 0
 var visible_max_column: int = 0
 
 const BASE_NODE_SIZE = Vector2(180, 180)
-const BASE_LAYER_SPACING = 240.0
-const BASE_ROW_SPACING = 220.0
+const BASE_LAYER_SPACING = 135.0
+const BASE_ROW_SPACING = 180.0
 const BASE_TOP_PADDING = 120.0
-const DOTTED_COLOR = Color(0.68, 0.68, 0.72, 0.85)
 const BACKTRACK_PROMPT = "You have a feeling you have been here before. An intense pain fills your mind as memory floods back"
 const SETTINGS_PATH := "user://settings.cfg"
 const SETTINGS_SECTION := "gameplay"
@@ -97,9 +95,6 @@ const LOG_SIDE_SPACER_WIDTH = 0.0
 const LOG_COLOR_GOOD = Color(0.62, 1.0, 0.62, 1.0)
 const LOG_COLOR_BAD = Color(1.0, 0.58, 0.58, 1.0)
 const LOG_COLOR_NEUTRAL = Color(0.86, 0.86, 0.86, 1.0)
-const PARALLELOGRAM_ROW_OFFSET_RATIO = 0.5
-const CURVE_SAMPLES = 14
-
 func _ready():
 	_setup_ui()
 	_setup_battle_log_ui()
@@ -135,7 +130,7 @@ func _ready():
 	_begin_worldmap_tutorial_if_needed.call_deferred()
 
 func _notification(what):
-	if what == NOTIFICATION_RESIZED and is_inside_tree() and node_container and lines_container and map_content and scroll_area and not GameManager.run_map.is_empty():
+	if what == NOTIFICATION_RESIZED and is_inside_tree() and node_container and map_content and scroll_area and not GameManager.run_map.is_empty():
 		_sync_map_area_to_top_bar()
 		_draw_map()
 		_refresh_log_view()
@@ -226,12 +221,10 @@ func _toggle_in_game_menu():
 		in_game_menu.open()
 
 func _draw_map():
-	if not node_container or not lines_container or not map_content or not scroll_area:
+	if not node_container or not map_content or not scroll_area:
 		return
 	for n in node_container.get_children():
 		n.queue_free()
-	for l in lines_container.get_children():
-		l.queue_free()
 	node_widgets_by_id.clear()
 	node_positions_by_id.clear()
 
@@ -274,6 +267,7 @@ func _draw_map():
 		var node_pos = _get_node_position(int(data.get("layer", 0)), int(data.get("column", 0)))
 		node_ui.position = node_pos
 		node_ui.scale = Vector2.ONE * current_node_scale
+		node_ui.z_index = int(data.get("layer", 0)) * 10 + int(data.get("column", 0))
 		node_positions_by_id[node_id] = node_pos
 
 		var is_player_here = node_id == current_id
@@ -289,27 +283,6 @@ func _draw_map():
 		node_ui.node_clicked.connect(_on_node_clicked)
 		if node_ui.has_signal("node_double_clicked"):
 			node_ui.node_double_clicked.connect(_on_node_double_clicked)
-
-	var drawn_pairs: Dictionary = {}
-	for source_id in revealed_set.keys():
-		var source_id_str = str(source_id)
-		var source_data = _get_map_entry_by_id(source_id_str)
-		if source_data.is_empty() or not node_positions_by_id.has(source_id_str):
-			continue
-		for raw_target_id in source_data.get("connections", []):
-			var target_id = _resolve_map_key(raw_target_id)
-			if target_id == "" or not revealed_set.has(target_id):
-				continue
-			if not node_positions_by_id.has(target_id):
-				continue
-			var pair_key = _make_pair_key(source_id_str, target_id)
-			if drawn_pairs.has(pair_key):
-				continue
-			drawn_pairs[pair_key] = true
-			_draw_hand_drawn_dotted_line(
-				node_positions_by_id[source_id_str] + current_node_half_size,
-				node_positions_by_id[target_id] + current_node_half_size
-			)
 
 	_refresh_selection_highlight(current_id)
 	if not GameManager.is_battle_mode:
@@ -402,6 +375,8 @@ func _populate_day_info(day_number: int, day_index: int):
 		)
 
 func _get_room_display_name(node_data: Dictionary) -> String:
+	if str(node_data.get("type", "")) == "background":
+		return ""
 	var room_path = str(node_data.get("room_resource_path", ""))
 	if room_path != "" and ResourceLoader.exists(room_path):
 		var room_res = load(room_path) as RoomData
@@ -461,11 +436,13 @@ func _recalculate_map_bounds(biome: String):
 
 func _rebuild_adjacent_targets(current_id: String, biome: String):
 	adjacent_node_ids = _get_accessible_adjacent_node_ids(current_id, biome)
-	if adjacent_node_ids.is_empty():
-		selected_node_id = ""
+	var selectable_node_ids = _get_selectable_node_ids(current_id)
+	if selectable_node_ids.is_empty():
+		selected_node_id = current_id
 		return
-	if selected_node_id == "" or not adjacent_node_ids.has(selected_node_id):
-		selected_node_id = adjacent_node_ids[0]
+	if selected_node_id == "" or not selectable_node_ids.has(selected_node_id):
+		selected_node_id = current_id if selectable_node_ids.has(current_id) else selectable_node_ids[0]
+	_update_selected_room_title()
 
 func _refresh_selection_highlight(current_id: String):
 	for id_key in node_widgets_by_id.keys():
@@ -474,40 +451,35 @@ func _refresh_selection_highlight(current_id: String):
 			continue
 		if node_ui.has_method("set_highlight_state"):
 			node_ui.set_highlight_state(id_key == current_id, id_key == selected_node_id)
+	_update_selected_room_title()
 
 func _move_selection_by_direction(dir: Vector2i):
-	if adjacent_node_ids.is_empty():
-		return
 	var current_id = _find_current_node_id()
 	if current_id == "":
 		return
-
-	var current_data = _get_map_entry_by_id(current_id)
-	if current_data.is_empty():
+	var selectable_node_ids = _get_selectable_node_ids(current_id)
+	if selectable_node_ids.is_empty():
 		return
 
 	var origin_id = selected_node_id if selected_node_id != "" else current_id
-	var origin_data = _get_map_entry_by_id(origin_id)
-	if origin_data.is_empty():
-		origin_data = current_data
+	if not node_positions_by_id.has(origin_id):
+		return
+	var origin_center = node_positions_by_id[origin_id] + current_node_half_size
+	var input_direction = Vector2(dir.x, dir.y).normalized()
 
 	var best_id = ""
 	var best_score = INF
-	for candidate_id in adjacent_node_ids:
-		var candidate_data = _get_map_entry_by_id(candidate_id)
-		if candidate_data.is_empty():
+	for candidate_id in selectable_node_ids:
+		if not node_positions_by_id.has(candidate_id):
 			continue
-		var dx = int(candidate_data.get("layer", 0)) - int(origin_data.get("layer", 0))
-		var dy = int(candidate_data.get("column", 0)) - int(origin_data.get("column", 0))
-		if dir.x < 0 and dx >= 0:
+		var candidate_center = node_positions_by_id[candidate_id] + current_node_half_size
+		var delta = candidate_center - origin_center
+		if delta.length_squared() <= 0.001:
 			continue
-		if dir.x > 0 and dx <= 0:
+		var alignment = input_direction.dot(delta.normalized())
+		if alignment <= 0.1:
 			continue
-		if dir.y < 0 and dy >= 0:
-			continue
-		if dir.y > 0 and dy <= 0:
-			continue
-		var score = abs(dx) + abs(dy) + (abs(dy) if dir.x != 0 else abs(dx)) * 0.25
+		var score = delta.length() + (1.0 - alignment) * 240.0
 		if score < best_score:
 			best_score = score
 			best_id = candidate_id
@@ -519,6 +491,12 @@ func _move_selection_by_direction(dir: Vector2i):
 
 func _activate_selected_node():
 	if selected_node_id == "":
+		return
+	var current_id = _find_current_node_id()
+	if selected_node_id == current_id:
+		var current_data = _get_map_entry_by_id(current_id)
+		if not current_data.is_empty():
+			_enter_room(current_data)
 		return
 	_attempt_travel(selected_node_id)
 
@@ -534,6 +512,13 @@ func _on_node_clicked(data: Dictionary):
 		if adjacent_node_ids.has(node_id):
 			_attempt_travel(node_id)
 			return
+		selected_node_id = node_id
+		_refresh_selection_highlight(current_id)
+		return
+	if node_id == current_id:
+		selected_node_id = node_id
+		_refresh_selection_highlight(current_id)
+		return
 	if adjacent_node_ids.has(node_id):
 		selected_node_id = node_id
 		_refresh_selection_highlight(current_id)
@@ -647,8 +632,14 @@ func _is_home_node(node_data: Dictionary) -> bool:
 	return bool(node_data.get("is_home", false)) or str(node_data.get("type", "")) == "home"
 
 func _enter_room(data: Dictionary):
+	if not bool(data.get("passable", true)) or str(data.get("type", "")) == "background":
+		return
+	var previous_node_id = str(GameManager.current_node.get("id", ""))
 	GameManager.current_node = data
-	SignalBus.node_selected.emit(data)
+	var signal_data = data.duplicate(true)
+	if str(data.get("id", "")) == previous_node_id:
+		signal_data["skip_visit_record"] = true
+	SignalBus.node_selected.emit(signal_data)
 
 	var room_path = str(data.get("room_resource_path", ""))
 	var room_res: RoomData = null
@@ -685,8 +676,11 @@ func _enter_room(data: Dictionary):
 			get_tree().change_scene_to_file("res://features/combat/BattleScene.tscn")
 
 func _find_current_node_id() -> String:
+	var active_biome = _get_active_biome()
 	for raw_key in GameManager.run_map.keys():
 		var data = GameManager.run_map[raw_key]
+		if not GameManager.is_battle_mode and str(data.get("biome", "")) != active_biome:
+			continue
 		if int(data.get("layer", -999)) == _get_player_layer() and int(data.get("column", -999)) == _get_player_column():
 			return str(raw_key)
 	return ""
@@ -732,6 +726,7 @@ func _get_adjacent_node_ids(node_id: String, biome: String) -> Array[String]:
 	var data = _get_map_entry_by_id(node_id)
 	if data.is_empty():
 		return results
+	var source_coord = Vector2i(int(data.get("layer", 0)), int(data.get("column", 0)))
 
 	for raw_target_id in data.get("connections", []):
 		var target_id = _resolve_map_key(raw_target_id)
@@ -741,6 +736,9 @@ func _get_adjacent_node_ids(node_id: String, biome: String) -> Array[String]:
 		if target_data.is_empty():
 			continue
 		if str(target_data.get("biome", "")) != biome:
+			continue
+		var target_coord = Vector2i(int(target_data.get("layer", 0)), int(target_data.get("column", 0)))
+		if not _is_hex_adjacent(source_coord, target_coord):
 			continue
 		if not results.has(target_id):
 			results.append(target_id)
@@ -754,101 +752,63 @@ func _get_accessible_adjacent_node_ids(node_id: String, biome: String) -> Array[
 		var target_data = _get_map_entry_by_id(target_id)
 		if target_data.is_empty():
 			continue
+		if not bool(target_data.get("passable", true)):
+			continue
 		var target_type = str(target_data.get("type", "room"))
-		if target_type == "":
+		if target_type == "" or target_type == "background":
 			continue
 		results.append(target_id)
 	return results
 
-func _make_pair_key(a: String, b: String) -> String:
-	return "%s|%s" % [a, b] if a < b else "%s|%s" % [b, a]
-
 func _update_map_content_bounds():
 	if not map_content or not scroll_area:
 		return
-	map_content.custom_minimum_size = scroll_area.size
+	var layer_count = max(1, visible_max_layer - visible_min_layer + 1)
+	var column_count = max(1, visible_max_column - visible_min_column + 1)
+	var content_width = float(max(0, column_count - 1)) * current_row_spacing + current_node_size.x + current_row_spacing * 0.5 + 48.0
+	var content_height = float(max(0, layer_count - 1)) * current_layer_spacing + current_node_size.y + 48.0
+	map_content.custom_minimum_size = Vector2(
+		max(scroll_area.size.x, content_width),
+		max(scroll_area.size.y, content_height)
+	)
 	if node_container:
-		node_container.custom_minimum_size = scroll_area.size
+		node_container.custom_minimum_size = map_content.custom_minimum_size
 
 func _get_node_position(layer: int, column: int) -> Vector2:
 	var relative_layer = layer - visible_min_layer
 	var relative_column = column - visible_min_column
 	var content_width = max(scroll_area.size.x, map_content.custom_minimum_size.x)
 	var content_height = max(scroll_area.size.y, map_content.custom_minimum_size.y)
-	var nodes_span_x = float(max(0, visible_max_layer - visible_min_layer)) * current_layer_spacing
-	var nodes_span_y = float(max(0, visible_max_column - visible_min_column)) * current_row_spacing
+	var nodes_span_x = float(max(0, visible_max_column - visible_min_column)) * current_row_spacing + current_row_spacing * 0.5
+	var nodes_span_y = float(max(0, visible_max_layer - visible_min_layer)) * current_layer_spacing
 	var start_x = (content_width - nodes_span_x - current_node_size.x) * 0.5
 	var start_y = (content_height - nodes_span_y - current_node_size.y) * 0.5
-	var base_position = Vector2(
-		relative_layer * current_layer_spacing + start_x,
-		relative_column * current_row_spacing + start_y
-	)
-	return base_position + _get_parallelogram_offset(relative_layer, relative_column)
-
-func _get_parallelogram_offset(relative_layer: int, relative_column: int) -> Vector2:
-	var half_node = current_node_half_size * PARALLELOGRAM_ROW_OFFSET_RATIO
-	match GameManager.world_map_skew_direction:
-		"left":
-			return Vector2(-float(relative_column) * half_node.x, 0.0)
-		"right":
-			return Vector2(float(relative_column) * half_node.x, 0.0)
-		"up":
-			return Vector2(0.0, -float(relative_layer) * half_node.y)
-		"down":
-			return Vector2(0.0, float(relative_layer) * half_node.y)
-		_:
-			return Vector2.ZERO
-
-func _draw_hand_drawn_dotted_line(p1: Vector2, p2: Vector2):
-	var points = _build_curved_line_points(p1, p2)
-	for i in range(points.size() - 1):
-		if i % 2 != 0:
-			continue
-		var segment = Line2D.new()
-		segment.width = max(1.5, 2.5 * current_node_scale)
-		segment.default_color = DOTTED_COLOR
-		segment.begin_cap_mode = Line2D.LINE_CAP_ROUND
-		segment.end_cap_mode = Line2D.LINE_CAP_ROUND
-		segment.add_point(points[i])
-		segment.add_point(points[i + 1])
-		lines_container.add_child(segment)
-
-func _build_curved_line_points(p1: Vector2, p2: Vector2) -> Array[Vector2]:
-	var points: Array[Vector2] = []
-	var delta = p2 - p1
-	var distance = max(delta.length(), 1.0)
-	var dir = delta / distance
-	var perpendicular = Vector2(-dir.y, dir.x)
-	var rng = RandomNumberGenerator.new()
-	rng.seed = _make_line_seed(p1, p2)
-	var curve_amount = max(18.0, distance * 0.18)
-	var control_a = p1 + (delta * 0.33) + perpendicular * rng.randf_range(-curve_amount, curve_amount)
-	var control_b = p1 + (delta * 0.66) + perpendicular * rng.randf_range(-curve_amount, curve_amount)
-	for i in range(CURVE_SAMPLES + 1):
-		var t = float(i) / float(CURVE_SAMPLES)
-		var point = _sample_cubic_bezier(p1, control_a, control_b, p2, t)
-		if i > 0 and i < CURVE_SAMPLES:
-			point += perpendicular * sin(t * PI * 2.0) * rng.randf_range(-curve_amount * 0.12, curve_amount * 0.12)
-		points.append(point)
-	return points
-
-func _sample_cubic_bezier(p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2, t: float) -> Vector2:
-	var inv = 1.0 - t
-	return (
-		inv * inv * inv * p0
-		+ 3.0 * inv * inv * t * p1
-		+ 3.0 * inv * t * t * p2
-		+ t * t * t * p3
+	var offset_x = current_row_spacing * 0.5 if posmod(relative_layer, 2) == 0 else 0.0
+	return Vector2(
+		relative_column * current_row_spacing + offset_x + start_x,
+		relative_layer * current_layer_spacing + start_y
 	)
 
-func _make_line_seed(p1: Vector2, p2: Vector2) -> int:
-	return hash([
-		int(round(p1.x)),
-		int(round(p1.y)),
-		int(round(p2.x)),
-		int(round(p2.y)),
-		GameManager.world_map_skew_direction
-	])
+func _get_selectable_node_ids(current_id: String) -> Array[String]:
+	var results: Array[String] = []
+	if current_id != "":
+		results.append(current_id)
+	for node_id in adjacent_node_ids:
+		if not results.has(node_id):
+			results.append(node_id)
+	return results
+
+func _update_selected_room_title():
+	if not tracker_text:
+		return
+	var display_id = selected_node_id
+	if display_id == "":
+		display_id = _find_current_node_id()
+	var display_data = _get_map_entry_by_id(display_id)
+	if display_data.is_empty():
+		tracker_text.text = ""
+		return
+	tracker_text.text = _get_room_display_name(display_data)
 
 func _scroll_to_player():
 	await get_tree().process_frame
@@ -860,8 +820,8 @@ func _update_map_layout_scale():
 	var row_count = max(1, visible_max_column - visible_min_column + 1)
 	var available_width = max(scroll_area.size.x, get_viewport_rect().size.x) - 96.0
 	var available_height = max(scroll_area.size.y, get_viewport_rect().size.y) - 96.0
-	var base_width = float(max(0, layer_count - 1)) * BASE_LAYER_SPACING + BASE_NODE_SIZE.x
-	var base_height = float(max(0, row_count - 1)) * BASE_ROW_SPACING + BASE_NODE_SIZE.y
+	var base_width = float(max(0, row_count - 1)) * BASE_ROW_SPACING + BASE_NODE_SIZE.x + BASE_ROW_SPACING * 0.5
+	var base_height = float(max(0, layer_count - 1)) * BASE_LAYER_SPACING + BASE_NODE_SIZE.y
 	var width_scale = available_width / max(base_width, 1.0)
 	var height_scale = available_height / max(base_height, 1.0)
 	current_node_scale = clamp(min(width_scale, height_scale, 1.0), 0.42, 1.0)
@@ -871,6 +831,32 @@ func _update_map_layout_scale():
 	current_row_spacing = BASE_ROW_SPACING * current_node_scale
 	current_left_padding = 0.0
 	current_top_padding = 0.0
+
+func _is_hex_adjacent(a: Vector2i, b: Vector2i) -> bool:
+	if a == b:
+		return false
+	var deltas_even = [
+		Vector2i(-1, -1),
+		Vector2i(-1, 0),
+		Vector2i(0, -1),
+		Vector2i(0, 1),
+		Vector2i(1, -1),
+		Vector2i(1, 0)
+	]
+	var deltas_odd = [
+		Vector2i(-1, 0),
+		Vector2i(-1, 1),
+		Vector2i(0, -1),
+		Vector2i(0, 1),
+		Vector2i(1, 0),
+		Vector2i(1, 1)
+	]
+	var deltas = deltas_even if posmod(a.x, 2) == 0 else deltas_odd
+	var delta = b - a
+	for allowed in deltas:
+		if delta == allowed:
+			return true
+	return false
 
 func _on_avatar_pressed():
 	GameManager.profile_return_scene = "res://features/map/WorldMap.tscn"
