@@ -19,7 +19,6 @@ extends Control
 @onready var energy_value_label = %EnergyValue
 @onready var attack_value_label = %AttackValue
 @onready var defense_value_label = %DefenseValue
-@onready var title_label: Label = %TitleLabel
 @onready var warrior_label: Label = %WarriorLabel
 @onready var scholar_label: Label = %ScholarLabel
 @onready var alchemist_label: Label = %AlchemistLabel
@@ -216,7 +215,6 @@ func _return_to_main_menu():
 	get_tree().change_scene_to_file("res://features/ui/MainMenu.tscn")
 
 func _refresh_localized_text():
-	title_label.text = LocalizationManager.translate("character_select.title", "CHOOSE YOUR IDENTITY")
 	warrior_label.text = LocalizationManager.translate("character_select.class.warrior", "WARRIOR")
 	scholar_label.text = LocalizationManager.translate("character_select.class.scholar", "SCHOLAR")
 	alchemist_label.text = LocalizationManager.translate("character_select.class.alchemist", "ALCHEMIST")

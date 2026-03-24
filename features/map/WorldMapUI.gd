@@ -82,6 +82,9 @@ var current_top_padding: float = BASE_TOP_PADDING
 var _tutorial_active: bool = false
 var _tutorial_id: String = ""
 var _tutorial_target_mode: String = "node"
+var _tutorial_overlay: Control = null
+var _tutorial_message_label: Label = null
+var _tutorial_hint_label: Label = null
 var is_log_expanded: bool = false
 var log_collapsed_global_rect: Rect2 = Rect2()
 var _backtrack_prompt_visible: bool = false
@@ -96,6 +99,7 @@ const LOG_COLOR_GOOD = Color(0.62, 1.0, 0.62, 1.0)
 const LOG_COLOR_BAD = Color(1.0, 0.58, 0.58, 1.0)
 const LOG_COLOR_NEUTRAL = Color(0.86, 0.86, 0.86, 1.0)
 func _ready():
+	_ensure_tutorial_overlay()
 	_setup_ui()
 	_setup_battle_log_ui()
 	if not SignalBus.run_log_updated.is_connected(_on_run_log_updated):
@@ -137,6 +141,12 @@ func _notification(what):
 
 func _input(event):
 	if get_viewport().is_input_handled():
+		return
+
+	if _tutorial_active:
+		if _is_tutorial_dismiss_input(event):
+			_dismiss_tutorial_popup()
+			get_viewport().set_input_as_handled()
 		return
 
 	if is_log_expanded and event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
@@ -206,6 +216,85 @@ func _setup_ui():
 	_hide_info_toast()
 	_hide_day_info_panel()
 	_hide_backtrack_dialog()
+	_configure_overlay_layers()
+
+func _configure_overlay_layers():
+	if info_toast_box:
+		info_toast_box.z_index = 400
+	if day_info_panel:
+		day_info_panel.z_index = 410
+	if battle_log_row:
+		battle_log_row.z_index = 420
+	if backtrack_dialog:
+		backtrack_dialog.z_index = 500
+		backtrack_dialog.mouse_filter = Control.MOUSE_FILTER_STOP
+	if _tutorial_overlay:
+		_tutorial_overlay.z_index = 600
+		_tutorial_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+
+func _ensure_tutorial_overlay():
+	if _tutorial_overlay and is_instance_valid(_tutorial_overlay):
+		return
+	_tutorial_overlay = Control.new()
+	_tutorial_overlay.name = "TutorialOverlay"
+	_tutorial_overlay.visible = false
+	_tutorial_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_tutorial_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	add_child(_tutorial_overlay)
+
+	var shade = ColorRect.new()
+	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	shade.color = Color(0.02, 0.02, 0.03, 0.78)
+	shade.mouse_filter = Control.MOUSE_FILTER_STOP
+	_tutorial_overlay.add_child(shade)
+
+	var center = CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tutorial_overlay.add_child(center)
+
+	var panel = PanelContainer.new()
+	panel.custom_minimum_size = Vector2(720, 0)
+	center.add_child(panel)
+
+	var panel_style = StyleBoxFlat.new()
+	panel_style.bg_color = Color(0.07, 0.08, 0.1, 0.96)
+	panel_style.border_width_left = 2
+	panel_style.border_width_top = 2
+	panel_style.border_width_right = 2
+	panel_style.border_width_bottom = 2
+	panel_style.border_color = Color(0.4, 0.7, 1.0, 0.8)
+	panel_style.corner_radius_top_left = 14
+	panel_style.corner_radius_top_right = 14
+	panel_style.corner_radius_bottom_left = 14
+	panel_style.corner_radius_bottom_right = 14
+	panel.add_theme_stylebox_override("panel", panel_style)
+
+	var margin = MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 30)
+	margin.add_theme_constant_override("margin_top", 24)
+	margin.add_theme_constant_override("margin_right", 30)
+	margin.add_theme_constant_override("margin_bottom", 22)
+	panel.add_child(margin)
+
+	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 16)
+	margin.add_child(vbox)
+
+	_tutorial_message_label = Label.new()
+	_tutorial_message_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_tutorial_message_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_tutorial_message_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_tutorial_message_label.add_theme_font_size_override("font_size", 28)
+	_tutorial_message_label.add_theme_color_override("font_color", Color(0.95, 0.97, 1.0, 1.0))
+	vbox.add_child(_tutorial_message_label)
+
+	_tutorial_hint_label = Label.new()
+	_tutorial_hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_tutorial_hint_label.add_theme_font_size_override("font_size", 18)
+	_tutorial_hint_label.add_theme_color_override("font_color", TUTORIAL_TOAST_COLOR)
+	_tutorial_hint_label.text = LocalizationManager.translate("tutorial.continue_any_input", "Click or press any key to continue")
+	vbox.add_child(_tutorial_hint_label)
 
 func _sync_map_area_to_top_bar():
 	if not scroll_area or not top_bar:
@@ -262,6 +351,14 @@ func _draw_map():
 		if str(data.get("biome", "")) != current_biome:
 			continue
 
+		var is_player_here = node_id == current_id
+		var is_selected = node_id == selected_node_id
+		var is_revealed = revealed_set.has(node_id)
+		if not is_revealed:
+			continue
+		var state = GameManager.world_state.rooms.get(node_id, {})
+		var is_cleared = state.get("cleared", false)
+
 		var node_ui = node_scene.instantiate()
 		node_container.add_child(node_ui)
 		var node_pos = _get_node_position(int(data.get("layer", 0)), int(data.get("column", 0)))
@@ -269,12 +366,6 @@ func _draw_map():
 		node_ui.scale = Vector2.ONE * current_node_scale
 		node_ui.z_index = int(data.get("layer", 0)) * 10 + int(data.get("column", 0))
 		node_positions_by_id[node_id] = node_pos
-
-		var is_player_here = node_id == current_id
-		var is_selected = node_id == selected_node_id
-		var is_revealed = revealed_set.has(node_id)
-		var state = GameManager.world_state.rooms.get(node_id, {})
-		var is_cleared = state.get("cleared", false)
 
 		node_ui.setup_biome_node(data, grid_tex, is_cleared, is_player_here, is_revealed, adjacent_node_ids.has(node_id))
 		if node_ui.has_method("set_highlight_state"):
@@ -543,7 +634,7 @@ func _attempt_travel(target_id: String):
 	if target_data.is_empty():
 		return
 
-	if _is_backtrack(target_id) and not _is_home_node(target_data):
+	if _is_backtrack(target_id):
 		await _travel_to_boss_node(target_data)
 		return
 
@@ -561,6 +652,7 @@ func _show_backtrack_dialog():
 	if not backtrack_dialog:
 		return
 	_backtrack_prompt_visible = true
+	backtrack_dialog.move_to_front()
 	backtrack_dialog.visible = true
 	if backtrack_dialog_text:
 		backtrack_dialog_text.text = LocalizationManager.translate("worldmap.backtrack_prompt", BACKTRACK_PROMPT)
@@ -626,7 +718,17 @@ func _build_boss_node(base_data: Dictionary) -> Dictionary:
 	return out
 
 func _is_backtrack(target_id: String) -> bool:
-	return GameManager.has_visited_node_this_run(target_id)
+	if target_id == "":
+		return false
+	var target_data = _get_map_entry_by_id(target_id)
+	if target_data.is_empty():
+		return false
+	if _is_home_node(target_data):
+		return false
+	var room_state = GameManager.world_state.rooms.get(target_id, {})
+	if bool(room_state.get("completed", false)):
+		return false
+	return GameManager.get_room_visit_count_this_run(target_id) >= 2
 
 func _is_home_node(node_data: Dictionary) -> bool:
 	return bool(node_data.get("is_home", false)) or str(node_data.get("type", "")) == "home"
@@ -765,7 +867,13 @@ func _update_map_content_bounds():
 		return
 	var layer_count = max(1, visible_max_layer - visible_min_layer + 1)
 	var column_count = max(1, visible_max_column - visible_min_column + 1)
-	var content_width = float(max(0, column_count - 1)) * current_row_spacing + current_node_size.x + current_row_spacing * 0.5 + 48.0
+	var min_row_offset = _get_row_offset_for_layer(visible_min_layer)
+	var max_row_offset = min_row_offset
+	for layer in range(visible_min_layer, visible_max_layer + 1):
+		var row_offset = _get_row_offset_for_layer(layer)
+		min_row_offset = min(min_row_offset, row_offset)
+		max_row_offset = max(max_row_offset, row_offset)
+	var content_width = float(max(0, column_count - 1)) * current_row_spacing + current_node_size.x + (max_row_offset - min_row_offset) + 48.0
 	var content_height = float(max(0, layer_count - 1)) * current_layer_spacing + current_node_size.y + 48.0
 	map_content.custom_minimum_size = Vector2(
 		max(scroll_area.size.x, content_width),
@@ -779,15 +887,24 @@ func _get_node_position(layer: int, column: int) -> Vector2:
 	var relative_column = column - visible_min_column
 	var content_width = max(scroll_area.size.x, map_content.custom_minimum_size.x)
 	var content_height = max(scroll_area.size.y, map_content.custom_minimum_size.y)
-	var nodes_span_x = float(max(0, visible_max_column - visible_min_column)) * current_row_spacing + current_row_spacing * 0.5
+	var min_row_offset = _get_row_offset_for_layer(visible_min_layer)
+	var max_row_offset = min_row_offset
+	for row_layer in range(visible_min_layer, visible_max_layer + 1):
+		var row_offset = _get_row_offset_for_layer(row_layer)
+		min_row_offset = min(min_row_offset, row_offset)
+		max_row_offset = max(max_row_offset, row_offset)
+	var nodes_span_x = float(max(0, visible_max_column - visible_min_column)) * current_row_spacing + (max_row_offset - min_row_offset)
 	var nodes_span_y = float(max(0, visible_max_layer - visible_min_layer)) * current_layer_spacing
 	var start_x = (content_width - nodes_span_x - current_node_size.x) * 0.5
 	var start_y = (content_height - nodes_span_y - current_node_size.y) * 0.5
-	var offset_x = current_row_spacing * 0.5 if posmod(relative_layer, 2) == 0 else 0.0
+	var offset_x = _get_row_offset_for_layer(layer) - min_row_offset
 	return Vector2(
 		relative_column * current_row_spacing + offset_x + start_x,
 		relative_layer * current_layer_spacing + start_y
 	)
+
+func _get_row_offset_for_layer(layer: int) -> float:
+	return current_row_spacing * 0.5 if posmod(layer, 2) == 1 else 0.0
 
 func _get_selectable_node_ids(current_id: String) -> Array[String]:
 	var results: Array[String] = []
@@ -811,7 +928,14 @@ func _update_selected_room_title():
 	tracker_text.text = _get_room_display_name(display_data)
 
 func _scroll_to_player():
-	await get_tree().process_frame
+	if not is_inside_tree():
+		return
+	var tree := get_tree()
+	if tree == null:
+		return
+	await tree.process_frame
+	if not is_inside_tree() or scroll_area == null:
+		return
 	scroll_area.scroll_horizontal = 0
 	scroll_area.scroll_vertical = 0
 
@@ -869,7 +993,7 @@ func _open_story_map():
 		if not current_data.is_empty():
 			var biome = str(current_data.get("biome", GameManager.selected_story_biome))
 			GameManager.set_selected_story_biome(biome)
-	SceneTransition.change_scene_to_file(GameManager.get_story_map_scene_path())
+	SceneTransition.change_scene_to_file(GameManager.get_story_line_scene_path())
 
 func _get_active_biome() -> String:
 	if GameManager.is_battle_mode:
@@ -960,14 +1084,13 @@ func _begin_worldmap_tutorial_if_needed():
 		)
 
 func _dismiss_tutorial_popup():
+	_tutorial_active = false
+	if _tutorial_overlay:
+		_tutorial_overlay.visible = false
 	if _tutorial_id != "":
 		_set_tutorial_seen(_tutorial_id)
-	_tutorial_active = false
 	_tutorial_id = ""
 	_tutorial_target_mode = "node"
-	if _info_toast_tween:
-		_info_toast_tween.kill()
-	_hide_info_toast()
 	if avatar_button:
 		avatar_button.remove_theme_stylebox_override("normal")
 		avatar_button.remove_theme_stylebox_override("hover")
@@ -995,10 +1118,18 @@ func _set_tutorial_seen(tutorial_id: String):
 	config.save(SETTINGS_PATH)
 
 func _show_tutorial_popup(tutorial_id: String, message: String, target_mode: String):
-	_dismiss_tutorial_popup()
+	if _tutorial_active:
+		_dismiss_tutorial_popup()
 	_tutorial_id = tutorial_id
 	_tutorial_target_mode = target_mode
 	_tutorial_active = true
+	if _tutorial_message_label:
+		_tutorial_message_label.text = message
+	if _tutorial_hint_label:
+		_tutorial_hint_label.text = LocalizationManager.translate("tutorial.continue_any_input", "Click or press any key to continue")
+	if _tutorial_overlay:
+		_tutorial_overlay.visible = true
+		_tutorial_overlay.move_to_front()
 	if target_mode == "avatar" and avatar_button:
 		var highlight_style = StyleBoxFlat.new()
 		highlight_style.bg_color = Color(0.18, 0.42, 0.2, 0.78)
@@ -1015,21 +1146,17 @@ func _show_tutorial_popup(tutorial_id: String, message: String, target_mode: Str
 		avatar_button.add_theme_stylebox_override("hover", highlight_style)
 		avatar_button.add_theme_stylebox_override("pressed", highlight_style)
 		avatar_button.add_theme_stylebox_override("focus", highlight_style)
-		_show_info_toast(message, TUTORIAL_TOAST_DURATION, TUTORIAL_TOAST_COLOR)
-	_set_tutorial_seen(tutorial_id)
-	_tutorial_active = false
-	_tutorial_id = ""
-	_tutorial_target_mode = "node"
-	if target_mode == "avatar" and avatar_button:
-		var clear_tween = create_tween()
-		clear_tween.tween_interval(TUTORIAL_TOAST_DURATION)
-		clear_tween.finished.connect(func():
-			if avatar_button:
-				avatar_button.remove_theme_stylebox_override("normal")
-				avatar_button.remove_theme_stylebox_override("hover")
-				avatar_button.remove_theme_stylebox_override("pressed")
-				avatar_button.remove_theme_stylebox_override("focus")
-		)
+
+func _is_tutorial_dismiss_input(event: InputEvent) -> bool:
+	if event is InputEventMouseButton:
+		return event.pressed
+	if event is InputEventKey:
+		return event.pressed and not event.is_echo()
+	if event is InputEventJoypadButton:
+		return event.pressed
+	if event is InputEventJoypadMotion:
+		return abs(event.axis_value) >= 0.2
+	return false
 
 func _on_run_log_updated():
 	_apply_log_visibility()

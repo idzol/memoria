@@ -171,6 +171,8 @@ func _generate_biome_into_map(map: Dictionary, biome_key: String, biome_index: i
 			"custom_icon_path": background_icon_path
 		}
 
+	_ensure_impassable_neighbors(map, biome_key, biome_index, active_room_count, background_icon_path)
+
 	for pair_key in layout.get("connections", []):
 		var pair_parts = str(pair_key).split("|")
 		if pair_parts.size() != 2:
@@ -193,6 +195,45 @@ func _generate_biome_into_map(map: Dictionary, biome_key: String, biome_index: i
 			if bool(map[neighbor_id].get("passable", true)):
 				continue
 			_connect_nodes(map, source_id, neighbor_id)
+
+func _ensure_impassable_neighbors(map: Dictionary, biome_key: String, biome_index: int, active_room_count: int, background_icon_path: String):
+	var biome_nodes: Array[Dictionary] = []
+	for raw_id in map.keys():
+		var node = map[raw_id]
+		if str(node.get("biome", "")) != biome_key:
+			continue
+		if not bool(node.get("passable", true)):
+			continue
+		biome_nodes.append(node)
+
+	for node in biome_nodes:
+		var source_coord = Vector2i(int(node.get("layer", 0)), int(node.get("column", 0)))
+		for neighbor in _get_hex_neighbors(source_coord):
+			if not _is_coord_on_board(neighbor):
+				continue
+			var neighbor_id = _build_node_id(biome_key, neighbor.x, neighbor.y)
+			if not map.has(neighbor_id):
+				map[neighbor_id] = {
+					"id": neighbor_id,
+					"name": "",
+					"type": "background",
+					"base_type": "background",
+					"biome": biome_key,
+					"biome_index": biome_index,
+					"layer": neighbor.x,
+					"column": neighbor.y,
+					"difficulty": int(ceil(sqrt(active_room_count))),
+					"room_resource_path": "",
+					"initial_dialog": "",
+					"connections": [],
+					"is_home": false,
+					"node_visual_scale": 1.0,
+					"node_shape": "hex",
+					"passable": false,
+					"custom_icon_path": background_icon_path
+				}
+			if not bool(map[neighbor_id].get("passable", true)):
+				_connect_nodes(map, str(node.get("id", "")), neighbor_id)
 
 func _connect_nodes(map: Dictionary, a_id: String, b_id: String):
 	if a_id == "" or b_id == "" or not map.has(a_id) or not map.has(b_id):

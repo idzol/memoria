@@ -117,6 +117,13 @@ var _room_dialog_complete: bool = false
 var _room_dialog_on_complete: Callable
 var _dialog_box_expanded_height := 400.0
 var _dialog_box_collapsed_height := 220.0
+var tutorial_overlay_layer: CanvasLayer = null
+var tutorial_overlay_root: Control = null
+var tutorial_message_label: Label = null
+var tutorial_hint_label: Label = null
+var tutorial_resume_can_flip: bool = false
+var tutorial_active: bool = false
+var tutorial_id: String = ""
 
 var active_status_effects = {"player": [], "enemy": []} # e.g. ["vulnerable", "charged"]
 const ENERGY_PIP_FULL = Color(1.0, 0.86, 0.35, 1.0)
@@ -130,6 +137,8 @@ const ENEMY_INTENT_SIZE = Vector2(150.0, 216.0)
 const SETTINGS_PATH := "user://settings.cfg"
 const SETTINGS_SECTION := "gameplay"
 const RUN_LOG_KEY := "show_run_log"
+const TUTORIAL_TIPS_KEY := "tutorial_tips"
+const TUTORIAL_FLAGS_SECTION := "tutorial_flags"
 const LOG_COLLAPSED_HEIGHT = 32.0
 const LOG_EXPANDED_LINE_COUNT = 10
 const LOG_LINE_HEIGHT = 22.0
@@ -147,6 +156,8 @@ const DEFAULT_UNIT_FRAME_SPEED = 0.1
 const ENERGY_PIP_CHAR = "▮"
 
 const OBJECT_CARD_BACK_ICON_PATH = "res://assets/cards/back_icon/card_back_object_icon.png"
+const TUTORIAL_HUT_ROOM_PATH = "res://data/rooms/tutorial/tutorial_hut.tres"
+const TUTORIAL_WHARF_ROOM_PATH = "res://data/rooms/tutorial/tutorial_wharf.tres"
 const OBJECT_FALLBACK_REWARD_KEYS = [
 	"card:healing_herb",
 	"card:bread",
@@ -157,6 +168,7 @@ const OBJECT_FALLBACK_REWARD_KEYS = [
 ]
 
 func _ready():
+	_setup_tutorial_overlay()
 	var node_data = GameManager.current_node
 	_ensure_player_deck_not_empty()
 	_ensure_safe_energy_defaults()
@@ -228,8 +240,14 @@ func _ready():
 	add_log("Battle begins.")
 	_update_character_placement()
 	get_viewport().size_changed.connect(_on_viewport_resized)
+	_maybe_show_room_tutorial()
 
 func _input(event):
+	if tutorial_active:
+		if _is_tutorial_dismiss_input(event):
+			_dismiss_tutorial_overlay()
+			get_viewport().set_input_as_handled()
+		return
 	if _is_enemy_intent_preview_visible():
 		var is_key_press = event is InputEventKey and event.pressed and not event.is_echo()
 		var is_mouse_press = event is InputEventMouseButton and event.pressed
@@ -2115,6 +2133,140 @@ func _show_victory_overlay():
 	)
 	victory_overlay.continue_requested.connect(_on_victory_overlay_continue)
 
+func _setup_tutorial_overlay():
+	if tutorial_overlay_layer and is_instance_valid(tutorial_overlay_layer):
+		return
+	tutorial_overlay_layer = CanvasLayer.new()
+	tutorial_overlay_layer.layer = 140
+	add_child(tutorial_overlay_layer)
+
+	tutorial_overlay_root = Control.new()
+	tutorial_overlay_root.visible = false
+	tutorial_overlay_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	tutorial_overlay_root.mouse_filter = Control.MOUSE_FILTER_STOP
+	tutorial_overlay_layer.add_child(tutorial_overlay_root)
+
+	var shade = ColorRect.new()
+	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	shade.color = Color(0.02, 0.02, 0.03, 0.82)
+	shade.mouse_filter = Control.MOUSE_FILTER_STOP
+	tutorial_overlay_root.add_child(shade)
+
+	var center = CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tutorial_overlay_root.add_child(center)
+
+	var panel = PanelContainer.new()
+	panel.custom_minimum_size = Vector2(760, 0)
+	center.add_child(panel)
+
+	var panel_style = StyleBoxFlat.new()
+	panel_style.bg_color = Color(0.07, 0.08, 0.1, 0.97)
+	panel_style.border_width_left = 2
+	panel_style.border_width_top = 2
+	panel_style.border_width_right = 2
+	panel_style.border_width_bottom = 2
+	panel_style.border_color = Color(0.4, 0.7, 1.0, 0.8)
+	panel_style.corner_radius_top_left = 14
+	panel_style.corner_radius_top_right = 14
+	panel_style.corner_radius_bottom_left = 14
+	panel_style.corner_radius_bottom_right = 14
+	panel.add_theme_stylebox_override("panel", panel_style)
+
+	var margin = MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 30)
+	margin.add_theme_constant_override("margin_top", 24)
+	margin.add_theme_constant_override("margin_right", 30)
+	margin.add_theme_constant_override("margin_bottom", 22)
+	panel.add_child(margin)
+
+	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 16)
+	margin.add_child(vbox)
+
+	tutorial_message_label = Label.new()
+	tutorial_message_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	tutorial_message_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	tutorial_message_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	tutorial_message_label.add_theme_font_size_override("font_size", 30)
+	tutorial_message_label.add_theme_color_override("font_color", Color(0.95, 0.97, 1.0, 1.0))
+	vbox.add_child(tutorial_message_label)
+
+	tutorial_hint_label = Label.new()
+	tutorial_hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	tutorial_hint_label.add_theme_font_size_override("font_size", 18)
+	tutorial_hint_label.add_theme_color_override("font_color", Color(0.4, 0.7, 1.0, 1.0))
+	tutorial_hint_label.text = LocalizationManager.translate("tutorial.continue_any_input", "Click or press any key to continue")
+	vbox.add_child(tutorial_hint_label)
+
+func _maybe_show_room_tutorial():
+	if not _are_tutorial_tips_enabled() or current_room_res == null:
+		return
+	var room_path = str(current_room_res.resource_path)
+	var message_key = ""
+	var tutorial_flag = ""
+	if room_path == TUTORIAL_HUT_ROOM_PATH:
+		message_key = "tutorial.room.hut_intro"
+		tutorial_flag = "tutorial_room_hut_intro"
+	elif room_path == TUTORIAL_WHARF_ROOM_PATH:
+		message_key = "tutorial.room.wharf_intro"
+		tutorial_flag = "tutorial_room_wharf_intro"
+	if tutorial_flag == "" or _has_seen_tutorial(tutorial_flag):
+		return
+	_show_tutorial_overlay(tutorial_flag, LocalizationManager.translate(message_key, ""))
+
+func _show_tutorial_overlay(next_tutorial_id: String, message: String):
+	if tutorial_overlay_root == null or message.strip_edges() == "":
+		return
+	tutorial_id = next_tutorial_id
+	tutorial_active = true
+	tutorial_resume_can_flip = can_flip
+	can_flip = false
+	tutorial_message_label.text = message
+	tutorial_hint_label.text = LocalizationManager.translate("tutorial.continue_any_input", "Click or press any key to continue")
+	tutorial_overlay_root.visible = true
+
+func _dismiss_tutorial_overlay():
+	tutorial_active = false
+	if tutorial_overlay_root:
+		tutorial_overlay_root.visible = false
+	if tutorial_id != "":
+		_set_tutorial_seen(tutorial_id)
+	tutorial_id = ""
+	can_flip = tutorial_resume_can_flip
+
+func _is_tutorial_dismiss_input(event: InputEvent) -> bool:
+	if event is InputEventMouseButton:
+		return event.pressed
+	if event is InputEventKey:
+		return event.pressed and not event.is_echo()
+	if event is InputEventJoypadButton:
+		return event.pressed
+	if event is InputEventJoypadMotion:
+		return abs(event.axis_value) >= 0.2
+	return false
+
+func _are_tutorial_tips_enabled() -> bool:
+	var config = ConfigFile.new()
+	if config.load(SETTINGS_PATH) != OK:
+		return true
+	return bool(config.get_value(SETTINGS_SECTION, TUTORIAL_TIPS_KEY, true))
+
+func _has_seen_tutorial(seen_tutorial_id: String) -> bool:
+	var config = ConfigFile.new()
+	if config.load(SETTINGS_PATH) != OK:
+		return false
+	return bool(config.get_value(TUTORIAL_FLAGS_SECTION, seen_tutorial_id, false))
+
+func _set_tutorial_seen(seen_tutorial_id: String):
+	if seen_tutorial_id == "":
+		return
+	var config = ConfigFile.new()
+	config.load(SETTINGS_PATH)
+	config.set_value(TUTORIAL_FLAGS_SECTION, seen_tutorial_id, true)
+	config.save(SETTINGS_PATH)
+
 func _get_victory_gold_amount() -> int:
 	var total = 0
 	for entry in GameManager.pending_loot:
@@ -2134,7 +2286,7 @@ func _on_victory_overlay_continue():
 		GameManager.mark_biome_cleared(cleared_biome)
 		SaveManager.save_mid_run_state()
 		SceneTransition.change_scene_to_file(
-			GameManager.consume_pending_post_battle_scene(GameManager.get_story_map_scene_path())
+			GameManager.consume_pending_post_battle_scene(GameManager.get_story_line_scene_path())
 		)
 		return
 	if enemy_sprite:
@@ -2212,6 +2364,10 @@ func _show_reward_preview_for_key(reward_key: String, animate_in: bool = false, 
 		tween.tween_property(card_view, "scale", Vector2(1.0, 1.0), 0.10)
 		await tween.finished
 	if fly_to_discard and kind == "card":
+		if card_view == null or not is_instance_valid(card_view):
+			return
+		if active_preview_card != card_view:
+			return
 		await _fly_preview_card_to_discard(card_view, card_data)
 
 func _play_object_reward_focus_preview(reward_key: String):
@@ -2236,7 +2392,7 @@ func _hide_card_preview():
 		active_preview_card.queue_free()
 	active_preview_card = null
 
-func _fly_preview_card_to_discard(card_view: Control, card_data: CardData):
+func _fly_preview_card_to_discard(card_view, card_data: CardData):
 	if card_view == null or not is_instance_valid(card_view):
 		return
 	if player_discard_root == null or not is_instance_valid(player_discard_root):

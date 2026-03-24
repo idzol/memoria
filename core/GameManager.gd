@@ -348,8 +348,8 @@ func set_selected_story_biome(biome: String):
 	if DataManager and DataManager.has_method("prioritize_story_assets"):
 		DataManager.prioritize_story_assets(selected_story_biome)
 
-func get_story_map_scene_path() -> String:
-	return "res://features/map/StoryMap.tscn"
+func get_story_line_scene_path() -> String:
+	return "res://features/map/StoryLine.tscn"
 
 func get_story_cutscene_scene_path() -> String:
 	return "res://features/ui/StoryCutscene.tscn"
@@ -661,7 +661,7 @@ func start_actual_run():
 	# 3. Cleanup
 	hide_loading()
 
-	begin_story_sequence("home", get_story_map_scene_path(), false, true)
+	begin_story_sequence("home", get_story_line_scene_path(), false, true)
 
 func _on_gen_progress(percent: float, description: String):
 	update_loading(description, percent)
@@ -744,7 +744,7 @@ func load_run_from_data(data: Dictionary):
 		if pending_story_sequence_biome != "":
 			get_tree().change_scene_to_file(get_story_cutscene_scene_path())
 		else:
-			get_tree().change_scene_to_file(get_story_map_scene_path())
+			get_tree().change_scene_to_file(get_story_line_scene_path())
 
 func _decode_variant_field(data: Dictionary, key: String, default_value):
 	var raw = data.get(key, default_value)
@@ -834,7 +834,7 @@ func queue_story_sequence(biome: String, return_scene: String = ""):
 	if biome == "":
 		return
 	pending_story_sequence_biome = biome
-	pending_story_sequence_return_scene = return_scene if return_scene != "" else get_story_map_scene_path()
+	pending_story_sequence_return_scene = return_scene if return_scene != "" else get_story_line_scene_path()
 
 func clear_story_sequence():
 	pending_story_sequence_biome = ""
@@ -865,13 +865,13 @@ func begin_story_sequence(
 
 func advance_story_sequence_from_cutscene():
 	if not has_pending_story_sequence():
-		SceneTransition.change_scene_to_file(get_story_map_scene_path())
+		SceneTransition.change_scene_to_file(get_story_line_scene_path())
 		return
 	set_selected_story_biome(get_pending_story_sequence_biome())
 	SceneTransition.change_scene_to_file(get_story_chapter_sequence_scene_path())
 
 func finish_story_sequence():
-	var return_scene = pending_story_sequence_return_scene if pending_story_sequence_return_scene != "" else get_story_map_scene_path()
+	var return_scene = pending_story_sequence_return_scene if pending_story_sequence_return_scene != "" else get_story_line_scene_path()
 	clear_story_sequence()
 	SaveManager.save_mid_run_state()
 	SceneTransition.change_scene_to_file(return_scene)
@@ -937,7 +937,7 @@ func get_scene_path_for_room(node_data: Dictionary) -> String:
 func open_story_biome_intro_if_needed(biome: String) -> bool:
 	if biome == "" or is_battle_mode or has_entered_story_biome(biome):
 		return false
-	begin_story_sequence(biome, get_story_map_scene_path(), true, true)
+	begin_story_sequence(biome, get_story_line_scene_path(), true, true)
 	return true
 
 func _pick_random_story_biome_home_node_id(biome: String) -> String:
@@ -1064,6 +1064,15 @@ func has_visited_node_this_run(node_id: String) -> bool:
 		return false
 	return current_run_visited_nodes.has(node_id)
 
+func get_room_visit_count_this_run(node_id: String) -> int:
+	if node_id == "":
+		return 0
+	var count := 0
+	for visited_id in current_run_visited_nodes:
+		if str(visited_id) == node_id:
+			count += 1
+	return count
+
 func record_biome_path_step(node_data: Dictionary):
 	var biome = str(node_data.get("biome", ""))
 	if biome == "":
@@ -1082,7 +1091,7 @@ func _on_node_selected(node_data: Dictionary):
 		return
 	record_biome_path_step(node_data)
 	var node_id = str(node_data.get("id", ""))
-	if node_id != "" and not current_run_visited_nodes.has(node_id):
+	if node_id != "":
 		current_run_visited_nodes.append(node_id)
 	_ensure_room_state(str(node_data.get("id", "")))
 	mark_room_visited(str(node_data.get("id", "")))
@@ -1320,10 +1329,10 @@ func register_room_victory(node_data: Dictionary, remaining_hp: int):
 			pending_post_battle_scene = get_active_biome_map_scene_path()
 		elif next_biome != "" and not has_entered_story_biome(next_biome):
 			mark_story_biome_entered(next_biome)
-			queue_story_sequence(next_biome, get_story_map_scene_path())
+			queue_story_sequence(next_biome, get_story_line_scene_path())
 			pending_post_battle_scene = get_story_cutscene_scene_path()
 		else:
-			pending_post_battle_scene = get_story_map_scene_path()
+			pending_post_battle_scene = get_story_line_scene_path()
 	else:
 		_set_player_position_from_node(node_data)
 		if not is_battle_mode:

@@ -40,6 +40,7 @@ menu.start,START,EMPEZAR,COMMENCER,STARTEN
 menu.cancel,CANCEL,CANCELAR,ANNULER,ABBRECHEN
 common.back,Back,Atras,Retour,Zuruck
 dialog.click_continue,Click to continue,Haz clic para continuar,Cliquez pour continuer,Klicken zum Fortfahren
+tutorial.continue_any_input,Click or press any key to continue,Haz clic o pulsa cualquier tecla para continuar,Cliquez ou appuyez sur une touche pour continuer,Klicken Sie oder drucken Sie eine beliebige Taste um fortzufahren
 dialog.speaker.player,You,Tu,Vous,Du
 dialog.speaker.npc,NPC,NPC,PNJ,NSC
 dialog.speaker.narrator,Narrator,Narrador,Narrateur,Erzahler
@@ -104,7 +105,7 @@ storymap.header.story,Story Chapters,Capitulos de historia,Chapitres d'histoire,
 storymap.header.biome,Biome Chapters,Capitulos de bioma,Chapitres de biome,Biomkapitel
 storymap.chapter_number,Chapter {number},Capitulo {number},Chapitre {number},Kapitel {number}
 storymap.tutorial.progress,The story map is where we track your progress,El mapa de historia es donde seguimos tu progreso,La carte d'histoire est l'endroit ou nous suivons votre progression,Auf der Story-Karte verfolgen wir deinen Fortschritt
-storymap.tutorial.start,"To start your journey, click on the first memory","Para comenzar tu viaje, haz clic en el primer recuerdo","Pour commencer votre voyage, cliquez sur le premier souvenir","Um deine Reise zu beginnen, klicke auf die erste Erinnerung"
+storymap.tutorial.start,"To start your journey, click on your first memory","Para comenzar tu viaje, haz clic en el primer recuerdo","Pour commencer votre voyage, cliquez sur le premier souvenir","Um deine Reise zu beginnen, klicke auf die erste Erinnerung"
 storymap.tutorial.complete,"Continue to explore the world. Tutorial tips have now been turned off, you can turn them back on in settings. Good luck","Sigue explorando el mundo. Los consejos del tutorial se han desactivado, puedes volver a activarlos en ajustes. Buena suerte","Continuez a explorer le monde. Les astuces du didacticiel ont maintenant ete desactivees, vous pouvez les reactiver dans les parametres. Bonne chance","Erkunde die Welt weiter. Die Tutorialhinweise wurden jetzt ausgeschaltet, du kannst sie in den Einstellungen wieder aktivieren. Viel Gluck"
 storymap.click_continue,Click to continue,Haz clic para continuar,Cliquez pour continuer,Klicken zum Fortfahren
 storymap.status.cleared,Cleared,Completado,Termine,Abgeschlossen
@@ -167,6 +168,8 @@ worldmap.tutorial.first_card,"As you regain memory, you can strengthen your reso
 worldmap.tutorial.first_item,"As you gain items, you can better equip yourself for the adventure",A medida que consigues objetos puedes equiparte mejor para la aventura,A mesure que vous gagnez des objets vous pouvez mieux vous equiper pour l'aventure,Wenn du Gegenstande findest kannst du dich fur das Abenteuer besser ausrusten
 worldmap.tutorial.explore,Continue to discover the world. Be careful returning to a place you have already been,Sigue descubriendo el mundo. Ten cuidado al volver a un lugar en el que ya has estado,Continuez a decouvrir le monde. Faites attention en revenant dans un lieu ou vous etes deja passe,Setze deine Entdeckung der Welt fort. Sei vorsichtig wenn du an einen Ort zuruckkehrst den du bereits besucht hast
 worldmap.backtrack_prompt,"You have a feeling you have been here before. An intense pain fills your mind as memory floods back","Sientes que ya has estado aqui antes. Un dolor intenso invade tu mente mientras los recuerdos regresan","Vous avez l'impression d'etre deja venu ici. Une douleur intense envahit votre esprit tandis que les souvenirs reviennent","Du hast das Gefuhl, schon einmal hier gewesen zu sein. Ein intensiver Schmerz durchzuckt deinen Geist, als die Erinnerungen zuruckkehren"
+tutorial.room.hut_intro,"You may find items along the way. Match the same card to keep it.","Puede que encuentres objetos en el camino. Empareja la misma carta para conservarlo.","Vous pourriez trouver des objets en chemin. Associez la meme carte pour le conserver.","Du kannst unterwegs Gegenstande finden. Ordne dieselbe Karte zu, um ihn zu behalten."
+tutorial.room.wharf_intro,"You will need to fight to regain your memory. Match card to card to keep it.","Tendras que luchar para recuperar tu memoria. Empareja carta con carta para conservarla.","Vous devrez combattre pour retrouver votre memoire. Associez carte a carte pour la conserver.","Du musst kampfen, um deine Erinnerung zuruckzugewinnen. Ordne Karte zu Karte zu, um sie zu behalten."
 story.title.home,Introduction,Introduccion,Introduction,Einfuhrung
 story.title.default,{biome} Chronicle,Cronica de {biome},Chronique de {biome},{biome}-Chronik
 story.body.fallback,The stone remembers more than the traveler does.,La piedra recuerda mas que el viajero.,La pierre se souvient plus que le voyageur.,Der Stein erinnert sich besser als der Reisende.

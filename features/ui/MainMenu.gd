@@ -187,7 +187,7 @@ func _open_name_entry_popup():
 	name_input.text = ""
 	name_input.placeholder_text = LocalizationManager.translate("menu.hero_name", "Hero Name...")
 	_hide_name_toast()
-	name_input.grab_focus()
+	_focus_name_input()
 
 func _on_name_confirmed():
 	var p_name = name_input.text.strip_edges()
@@ -203,7 +203,7 @@ func _on_name_confirmed():
 				{"name": p_name},
 				"{name} is already being used."
 			))
-			name_input.grab_focus()
+			_focus_name_input()
 			return
 		
 	GameManager.player_name = p_name
@@ -366,6 +366,18 @@ func _show_name_toast(message: String):
 	_name_toast_tween.tween_interval(1.6)
 	_name_toast_tween.tween_property(name_toast, "modulate:a", 0.0, 0.3)
 	_name_toast_tween.finished.connect(_hide_name_toast)
+
+func _focus_name_input():
+	if not name_entry_popup or not name_input:
+		return
+	name_entry_popup.grab_click_focus()
+	if has_node("%ConfirmNameBtn"):
+		%ConfirmNameBtn.release_focus()
+	if has_node("%CancelNameBtn"):
+		%CancelNameBtn.release_focus()
+	name_input.editable = true
+	name_input.grab_focus()
+	name_input.call_deferred("grab_focus")
 
 func _play_click_sfx():
 	# Trigger common UI click sound from music.csv (e.g., sfx_207)

@@ -90,7 +90,7 @@ func _on_exit_pressed():
 		# Story mode: return to the story map at the current biome home
 		GameManager.begin_new_story_run(GameManager.player_biome if GameManager.player_biome != "" else "town")
 		SaveManager.save_mid_run_state()
-		await SceneTransition.change_scene_to_file(GameManager.get_story_map_scene_path())
+		await SceneTransition.change_scene_to_file(GameManager.get_story_line_scene_path())
 
 func _fade_to_white():
 	var fade_layer = CanvasLayer.new()
