@@ -13,6 +13,8 @@ var pending_level_up: Dictionary = {}
 var level_up_return_scene: String = ""
 var run_summary_exit_to_main_menu: bool = false
 var pending_post_battle_scene: String = ""
+var pending_story_sequence_biome: String = ""
+var pending_story_sequence_return_scene: String = ""
 var player_biome: String = "home"
 var selected_story_biome: String = "home"
 var profile_return_scene: String = ""
@@ -33,7 +35,22 @@ var player_items: Array = [] # "wood_splinter", "mug_of_ale", "iron_scrap"
 var active_items: Array = [] # "wood_splinter"
 
 # --- Game Mode ---
-var is_battle_mode: bool = false
+const GAME_MODE_BATTLE := "battle_mode"
+const GAME_MODE_STORY := "story_mode"
+
+var game_mode: String = GAME_MODE_STORY:
+	set(value):
+		game_mode = GAME_MODE_BATTLE if value == GAME_MODE_BATTLE else GAME_MODE_STORY
+
+var is_battle_mode: bool:
+	get:
+		return game_mode == GAME_MODE_BATTLE
+	set(value):
+		game_mode = GAME_MODE_BATTLE if value else GAME_MODE_STORY
+
+var is_story_mode: bool:
+	get:
+		return game_mode == GAME_MODE_STORY
 
 # --- Run Progression ---
 var completed_nodes: Array = []
@@ -107,6 +124,12 @@ func clear_run_log():
 func randomize_world_map_skew_direction():
 	var directions = ["up", "down", "left", "right"]
 	world_map_skew_direction = directions[randi() % directions.size()]
+
+func set_game_mode(mode: String):
+	game_mode = mode
+
+func is_game_mode(mode: String) -> bool:
+	return game_mode == mode
 
 # --- PERSISTENT WORLD STATE ---
 # This structure tracks EVERY interaction across the game world.
@@ -239,7 +262,11 @@ func evaluate_condition(condition: Dictionary, context: Dictionary = {}) -> bool
 			return _matches_numeric_condition(visit_count, condition)
 		"run_mode":
 			var mode = str(condition.get("value", condition.get("mode", "story"))).to_lower()
-			return (mode == "battle" and is_battle_mode) or (mode == "story" and not is_battle_mode)
+			return (
+				(mode == "battle" or mode == "battle_mode") and is_battle_mode
+			) or (
+				(mode == "story" or mode == "story_mode") and is_story_mode
+			)
 		"stat_check":
 			return world_state.global.get(condition.stat, 0) >= condition.value
 	return true
@@ -321,8 +348,14 @@ func set_selected_story_biome(biome: String):
 	if DataManager and DataManager.has_method("prioritize_story_assets"):
 		DataManager.prioritize_story_assets(selected_story_biome)
 
-func get_story_map_scene_path() -> String:
-	return "res://features/map/StoryMap.tscn"
+func get_story_line_scene_path() -> String:
+	return "res://features/map/StoryLine.tscn"
+
+func get_story_cutscene_scene_path() -> String:
+	return "res://features/ui/StoryCutscene.tscn"
+
+func get_story_chapter_sequence_scene_path() -> String:
+	return "res://features/map/StoryChapterSequence.tscn"
 
 func get_active_biome_map_scene_path() -> String:
 	return "res://features/map/WorldMap.tscn"
@@ -366,6 +399,11 @@ func is_room_cleared(room_id: String) -> bool:
 	if room_id == "":
 		return false
 	return world_state.rooms.has(room_id) and world_state.rooms[room_id].get("cleared", false)
+
+func get_enemy_defeat_count(enemy_id: String) -> int:
+	if enemy_id == "":
+		return 0
+	return int(world_state.enemies.get(enemy_id, {}).get("defeated", 0))
 
 func _ensure_room_state(room_id: String):
 	if room_id == "":
@@ -467,10 +505,24 @@ func register_room_interaction_complete(node_data: Dictionary, mark_cleared: boo
 	world_state.rooms[node_id].visited = true
 	if mark_cleared:
 		world_state.rooms[node_id].cleared = true
+		world_state.rooms[node_id].completed = true
 		if not completed_nodes.has(node_id):
 			completed_nodes.append(node_id)
+		_consume_room_object(node_id)
+		SignalBus.map_node_completed.emit(node_id)
 	refresh_story_room_completions()
 	SaveManager.save_mid_run_state()
+
+func _consume_room_object(node_id: String):
+	if node_id == "":
+		return
+	if run_map.has(node_id):
+		var run_node = run_map[node_id]
+		if run_node is Dictionary:
+			run_node["object_consumed"] = true
+			run_map[node_id] = run_node
+	if str(current_node.get("id", "")) == node_id:
+		current_node["object_consumed"] = true
 
 func has_item(item_id: String) -> bool:
 	return world_state.items.owned.has(item_id)
@@ -503,6 +555,7 @@ func load_save_data(data: Dictionary):
 	world_state = data
 
 func start_battle_mode():
+	set_game_mode(GAME_MODE_BATTLE)
 	player_level = 1
 	player_xp = 0
 	last_xp_gained = 0
@@ -556,6 +609,7 @@ func start_battle_mode():
 	get_tree().change_scene_to_file(get_active_biome_map_scene_path())
 
 func start_actual_run():
+	set_game_mode(GAME_MODE_STORY)
 	player_level = 1
 	clear_run_log()
 	var start_stats = _get_class_stats_for_level(player_level)
@@ -607,7 +661,7 @@ func start_actual_run():
 	# 3. Cleanup
 	hide_loading()
 
-	SceneTransition.change_scene_to_file(get_story_map_scene_path())
+	begin_story_sequence("home", get_story_line_scene_path(), false, true)
 
 func _on_gen_progress(percent: float, description: String):
 	update_loading(description, percent)
@@ -621,7 +675,10 @@ func reset_to_home():
 	player_grid_pos = Vector2i(-99, -99)
 
 func load_run_from_data(data: Dictionary):
-	is_battle_mode = data.get("is_battle_mode", false)
+	var saved_mode = str(data.get("game_mode", ""))
+	if saved_mode == "":
+		saved_mode = GAME_MODE_BATTLE if bool(data.get("is_battle_mode", false)) else GAME_MODE_STORY
+	set_game_mode(saved_mode)
 	player_name = data.get("player_name", "Unknown")
 	player_class = data.get("player_class", "Archivist")
 	player_level = data.get("player_level", data.get("current_level", 1))
@@ -630,6 +687,8 @@ func load_run_from_data(data: Dictionary):
 	pending_level_up = _decode_variant_field(data, "pending_level_up", {})
 	level_up_return_scene = data.get("level_up_return_scene", "")
 	pending_post_battle_scene = data.get("pending_post_battle_scene", "")
+	pending_story_sequence_biome = data.get("pending_story_sequence_biome", "")
+	pending_story_sequence_return_scene = data.get("pending_story_sequence_return_scene", "")
 	player_biome = data.get("player_biome", player_biome)
 	selected_story_biome = data.get("selected_story_biome", player_biome)
 	profile_return_scene = data.get("profile_return_scene", "")
@@ -682,7 +741,10 @@ func load_run_from_data(data: Dictionary):
 	else:
 		if selected_story_biome == "":
 			selected_story_biome = player_biome
-		get_tree().change_scene_to_file(get_story_map_scene_path())
+		if pending_story_sequence_biome != "":
+			get_tree().change_scene_to_file(get_story_cutscene_scene_path())
+		else:
+			get_tree().change_scene_to_file(get_story_line_scene_path())
 
 func _decode_variant_field(data: Dictionary, key: String, default_value):
 	var raw = data.get(key, default_value)
@@ -765,6 +827,55 @@ func mark_story_biome_entered(biome: String):
 	_ensure_biome_state(biome)
 	world_state.biomes[biome].entered = true
 
+func has_pending_story_sequence() -> bool:
+	return pending_story_sequence_biome != ""
+
+func queue_story_sequence(biome: String, return_scene: String = ""):
+	if biome == "":
+		return
+	pending_story_sequence_biome = biome
+	pending_story_sequence_return_scene = return_scene if return_scene != "" else get_story_line_scene_path()
+
+func clear_story_sequence():
+	pending_story_sequence_biome = ""
+	pending_story_sequence_return_scene = ""
+
+func get_pending_story_sequence_biome() -> String:
+	if pending_story_sequence_biome != "":
+		return pending_story_sequence_biome
+	return selected_story_biome if selected_story_biome != "" else player_biome
+
+func begin_story_sequence(
+	biome: String,
+	return_scene: String = "",
+	prepare_biome_entry: bool = false,
+	mark_entered: bool = false
+):
+	if biome == "":
+		return
+	if prepare_biome_entry and not is_battle_mode:
+		enter_story_biome(biome, true)
+	else:
+		set_selected_story_biome(biome)
+	if mark_entered:
+		mark_story_biome_entered(biome)
+	queue_story_sequence(biome, return_scene)
+	SaveManager.save_mid_run_state()
+	SceneTransition.change_scene_to_file(get_story_cutscene_scene_path())
+
+func advance_story_sequence_from_cutscene():
+	if not has_pending_story_sequence():
+		SceneTransition.change_scene_to_file(get_story_line_scene_path())
+		return
+	set_selected_story_biome(get_pending_story_sequence_biome())
+	SceneTransition.change_scene_to_file(get_story_chapter_sequence_scene_path())
+
+func finish_story_sequence():
+	var return_scene = pending_story_sequence_return_scene if pending_story_sequence_return_scene != "" else get_story_line_scene_path()
+	clear_story_sequence()
+	SaveManager.save_mid_run_state()
+	SceneTransition.change_scene_to_file(return_scene)
+
 func enter_story_biome(biome: String, mark_as_home_if_new: bool = true):
 	if biome == "":
 		return
@@ -826,14 +937,7 @@ func get_scene_path_for_room(node_data: Dictionary) -> String:
 func open_story_biome_intro_if_needed(biome: String) -> bool:
 	if biome == "" or is_battle_mode or has_entered_story_biome(biome):
 		return false
-	enter_story_biome(biome, true)
-	var home_node = get_story_biome_home_node(biome)
-	if home_node.is_empty():
-		return false
-	mark_story_biome_entered(biome)
-	current_node = home_node
-	SignalBus.node_selected.emit(home_node)
-	get_tree().change_scene_to_file(get_scene_path_for_room(home_node))
+	begin_story_sequence(biome, get_story_line_scene_path(), true, true)
 	return true
 
 func _pick_random_story_biome_home_node_id(biome: String) -> String:
@@ -960,6 +1064,15 @@ func has_visited_node_this_run(node_id: String) -> bool:
 		return false
 	return current_run_visited_nodes.has(node_id)
 
+func get_room_visit_count_this_run(node_id: String) -> int:
+	if node_id == "":
+		return 0
+	var count := 0
+	for visited_id in current_run_visited_nodes:
+		if str(visited_id) == node_id:
+			count += 1
+	return count
+
 func record_biome_path_step(node_data: Dictionary):
 	var biome = str(node_data.get("biome", ""))
 	if biome == "":
@@ -971,10 +1084,14 @@ func record_biome_path_step(node_data: Dictionary):
 
 
 func _on_node_selected(node_data: Dictionary):
-	current_node = node_data
+	current_node = node_data.duplicate(true)
+	current_node.erase("skip_visit_record")
+	if bool(node_data.get("skip_visit_record", false)):
+		SaveManager.save_mid_run_state()
+		return
 	record_biome_path_step(node_data)
 	var node_id = str(node_data.get("id", ""))
-	if node_id != "" and not current_run_visited_nodes.has(node_id):
+	if node_id != "":
 		current_run_visited_nodes.append(node_id)
 	_ensure_room_state(str(node_data.get("id", "")))
 	mark_room_visited(str(node_data.get("id", "")))
@@ -983,7 +1100,7 @@ func _on_node_selected(node_data: Dictionary):
 
 
 # --- LOOT LOGIC ---
-func prepare_victory_loot(node_data: Dictionary):
+func prepare_victory_loot(node_data: Dictionary, enemy_defeat_count_before: int = 0):
 	pending_loot.clear()
 	
 	var room_loot_pool = []
@@ -1004,9 +1121,25 @@ func prepare_victory_loot(node_data: Dictionary):
 					
 					# FIXED: Handle Nil enemy_res to prevent property access crash
 					if enemy_res:
-						var power_reward = _roll_power_matched_loot(enemy_res.loot_power)
-						if not power_reward.is_empty():
-							enemy_loot_pool.append(power_reward)
+						if is_story_mode:
+							if enemy_defeat_count_before <= 0:
+								for raw_drop in enemy_res.item_drops:
+									var drop_id = str(raw_drop).strip_edges()
+									if drop_id == "":
+										continue
+									var reward_kind = _resolve_reward_kind(drop_id)
+									enemy_loot_pool.append({
+										"id": drop_id,
+										"min": 1,
+										"max": 1,
+										"is_card": reward_kind == "card",
+										"is_item": reward_kind == "item"
+									})
+							room_loot_pool = []
+						else:
+							var power_reward = _roll_power_matched_loot(enemy_res.loot_power)
+							if not power_reward.is_empty():
+								enemy_loot_pool.append(power_reward)
 						enemy_loot_pool.append({
 							"id": "gold", 
 							"min": enemy_res.gold_min, 
@@ -1020,7 +1153,14 @@ func prepare_victory_loot(node_data: Dictionary):
 	for item_def in master_pool:
 		var reward = {}
 		if item_def is String:
-			reward = {"id": item_def, "amount": 1, "name": item_def.replace("_", " ").capitalize()}
+			var reward_kind = _resolve_reward_kind(item_def)
+			reward = {
+				"id": item_def,
+				"amount": 1,
+				"name": _get_reward_display_name(item_def, 1),
+				"is_card": reward_kind == "card",
+				"is_item": reward_kind == "item"
+			}
 			
 			# Integrated Check: If the item exists in cards/ path, handle as a card discovery
 			var card_path = "res://data/cards/%s.tres" % item_def
@@ -1042,6 +1182,9 @@ func prepare_victory_loot(node_data: Dictionary):
 				gold += amount
 				world_state.global.gold = gold
 			else:
+				var reward_kind = "card" if bool(item_def.get("is_card", false)) else ("item" if bool(item_def.get("is_item", false)) else _resolve_reward_kind(item_id))
+				reward["is_card"] = reward_kind == "card"
+				reward["is_item"] = reward_kind == "item"
 				if bool(item_def.get("is_card", false)):
 					add_card_to_collection(item_id)
 				else:
@@ -1129,6 +1272,17 @@ func _get_reward_display_name(item_id: String, amount: int) -> String:
 			return LocalizationManager.localized_resource_name(item_res, item_res.name)
 	return item_id.replace("_", " ").capitalize()
 
+func _resolve_reward_kind(item_id: String) -> String:
+	if item_id == "" or item_id == "gold":
+		return "gold"
+	var card_path = "%s/%s.tres" % [CARDS_ROOT, item_id]
+	if ResourceLoader.exists(card_path):
+		return "card"
+	var item_path = "%s/%s.tres" % [ITEMS_ROOT, item_id]
+	if ResourceLoader.exists(item_path):
+		return "item"
+	return "item"
+
 
 func _on_combat_won():
 	register_room_victory(current_node, current_hp)
@@ -1142,7 +1296,7 @@ func _on_combat_won():
 func register_room_victory(node_data: Dictionary, remaining_hp: int):
 	current_hp = remaining_hp
 	pending_post_battle_scene = ""
-	prepare_victory_loot(node_data)
+	var enemy_defeat_count_before := 0
 
 	var node_id = str(node_data.get("id", ""))
 	if node_id != "":
@@ -1156,8 +1310,11 @@ func register_room_victory(node_data: Dictionary, remaining_hp: int):
 			var room_res = load(room_path) as RoomData
 			if room_res and room_res.enemy_id != "":
 				_ensure_enemy_state(room_res.enemy_id)
+				enemy_defeat_count_before = int(world_state.enemies[room_res.enemy_id].get("defeated", 0))
 				world_state.enemies[room_res.enemy_id].defeated += 1
 		refresh_story_room_completions()
+
+	prepare_victory_loot(node_data, enemy_defeat_count_before)
 
 	if _is_boss_room(node_data):
 		var biome = str(node_data.get("biome", ""))
@@ -1168,7 +1325,14 @@ func register_room_victory(node_data: Dictionary, remaining_hp: int):
 		if DataManager and DataManager.has_method("prioritize_story_assets"):
 			DataManager.prioritize_story_assets(next_biome)
 		_move_player_to_random_next_biome(node_data)
-		pending_post_battle_scene = get_active_biome_map_scene_path() if is_battle_mode else get_story_map_scene_path()
+		if is_battle_mode:
+			pending_post_battle_scene = get_active_biome_map_scene_path()
+		elif next_biome != "" and not has_entered_story_biome(next_biome):
+			mark_story_biome_entered(next_biome)
+			queue_story_sequence(next_biome, get_story_line_scene_path())
+			pending_post_battle_scene = get_story_cutscene_scene_path()
+		else:
+			pending_post_battle_scene = get_story_line_scene_path()
 	else:
 		_set_player_position_from_node(node_data)
 		if not is_battle_mode:

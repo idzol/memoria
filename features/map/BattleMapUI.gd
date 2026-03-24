@@ -542,4 +542,4 @@ func _open_story_map():
 		if not current_data.is_empty():
 			var biome = str(current_data.get("biome", GameManager.selected_story_biome))
 			GameManager.set_selected_story_biome("town" if biome == "home" else biome)
-	get_tree().change_scene_to_file(GameManager.get_story_map_scene_path())
+	get_tree().change_scene_to_file(GameManager.get_story_line_scene_path())

@@ -182,12 +182,12 @@ func _on_battle_mode_clicked():
 	_open_name_entry_popup()
 
 func _open_name_entry_popup():
-	GameManager.is_battle_mode = _pending_mode_is_battle
+	GameManager.set_game_mode(GameManager.GAME_MODE_BATTLE if _pending_mode_is_battle else GameManager.GAME_MODE_STORY)
 	name_entry_popup.visible = true
 	name_input.text = ""
 	name_input.placeholder_text = LocalizationManager.translate("menu.hero_name", "Hero Name...")
 	_hide_name_toast()
-	name_input.grab_focus()
+	_focus_name_input()
 
 func _on_name_confirmed():
 	var p_name = name_input.text.strip_edges()
@@ -203,7 +203,7 @@ func _on_name_confirmed():
 				{"name": p_name},
 				"{name} is already being used."
 			))
-			name_input.grab_focus()
+			_focus_name_input()
 			return
 		
 	GameManager.player_name = p_name
@@ -239,7 +239,8 @@ func _populate_save_list():
 		save_container.add_child(hbox)
 
 		var mode_label = Label.new()
-		var is_battle = data.get("is_battle_mode", false)
+		var game_mode = str(data.get("game_mode", ""))
+		var is_battle = game_mode == GameManager.GAME_MODE_BATTLE if game_mode != "" else bool(data.get("is_battle_mode", false))
 		mode_label.text = LocalizationManager.translate("menu.battle_mode", "BATTLE MODE") if is_battle else LocalizationManager.translate("menu.story_mode", "STORY MODE")
 		mode_label.custom_minimum_size = Vector2(130, 50)
 		mode_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -365,6 +366,18 @@ func _show_name_toast(message: String):
 	_name_toast_tween.tween_interval(1.6)
 	_name_toast_tween.tween_property(name_toast, "modulate:a", 0.0, 0.3)
 	_name_toast_tween.finished.connect(_hide_name_toast)
+
+func _focus_name_input():
+	if not name_entry_popup or not name_input:
+		return
+	name_entry_popup.grab_click_focus()
+	if has_node("%ConfirmNameBtn"):
+		%ConfirmNameBtn.release_focus()
+	if has_node("%CancelNameBtn"):
+		%CancelNameBtn.release_focus()
+	name_input.editable = true
+	name_input.grab_focus()
+	name_input.call_deferred("grab_focus")
 
 func _play_click_sfx():
 	# Trigger common UI click sound from music.csv (e.g., sfx_207)

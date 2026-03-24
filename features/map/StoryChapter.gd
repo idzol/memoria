@@ -22,7 +22,7 @@ var display_biome: String = ""
 var embedded_target_size: Vector2 = Vector2.ZERO
 
 func _ready():
-	continue_button.pressed.connect(_back_to_story_map)
+	continue_button.pressed.connect(_back_to_story_line)
 	if not resized.is_connected(_refresh_embedded_layout):
 		resized.connect(_refresh_embedded_layout)
 	if ResourceLoader.exists(GRANITE_TEXTURE_PATH):
@@ -46,7 +46,7 @@ func _input(event):
 	if embedded_mode:
 		return
 	if event.is_action_pressed("ui_cancel"):
-		_back_to_story_map()
+		_back_to_story_line()
 
 func _gui_input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
@@ -126,11 +126,11 @@ func _refresh_embedded_layout():
 	tablet.custom_minimum_size = Vector2(target_width, target_height)
 	body_label.custom_minimum_size = Vector2(0, target_height * 0.72)
 
-func _back_to_story_map():
+func _back_to_story_line():
 	if embedded_mode or not allow_navigation:
 		chapter_pressed.emit(_get_biome())
 		return
-	get_tree().change_scene_to_file(GameManager.get_story_map_scene_path())
+	get_tree().change_scene_to_file(GameManager.get_story_line_scene_path())
 
 func _set_control_tree_mouse_filter(node: Node, filter_mode: Control.MouseFilter):
 	if node is Control:

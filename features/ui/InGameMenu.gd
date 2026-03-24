@@ -158,7 +158,7 @@ func _end_day_story_mode():
 	GameManager.begin_new_story_run(GameManager.player_biome if GameManager.player_biome != "" else "town")
 	SaveManager.save_mid_run_state()
 	get_tree().paused = false
-	get_tree().change_scene_to_file(GameManager.get_story_map_scene_path())
+	get_tree().change_scene_to_file(GameManager.get_story_line_scene_path())
 
 func _update_save_button_state():
 	var disable_save = _is_save_disabled_in_current_scene()

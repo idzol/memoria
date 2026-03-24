@@ -17,6 +17,14 @@ const PATHS = {
 const MAP_DATA_PATH = "res://data/map/map_data.tres"
 const GLOBAL_DEFAULT_ROOM_PATH = "res://data/rooms/default_battle.tres"
 const BIOME_ORDER = ["home", "town", "forest", "ice_caves", "desert", "swamp", "abyss", "void", "the_core"]
+const PERFORMANCE_SENSITIVE_SCENE_NAMES = {
+	"StoryCutscene": true,
+	"StoryChapterSequence": true
+}
+const PERFORMANCE_SENSITIVE_SCENE_PATHS = {
+	"res://features/ui/StoryCutscene.tscn": true,
+	"res://features/map/StoryChapterSequence.tscn": true
+}
 const BIOME_ROOM_SOURCE = {
 	"home": "tutorial",
 	"town": "town",
@@ -31,6 +39,7 @@ const BIOME_ROOM_SOURCE = {
 
 # CONFIG: Time Budget (in microseconds)
 const FRAME_BUDGET_USEC = 1000
+const INPUT_ACTIVITY_PAUSE_MSEC = 400
 
 var _registry: Dictionary = {
 	"cards": {},
@@ -48,9 +57,16 @@ var _total_to_load: int = 0
 var _processed_count: int = 0
 var _is_processing_queue: bool = false
 var _is_transition_paused: bool = false
+var _input_pause_until_usec: int = 0
 
 func _ready():
+	set_process_input(true)
 	_start_smooth_init()
+
+func _input(event: InputEvent):
+	if not _is_user_activity_event(event):
+		return
+	_register_input_activity_pause()
 
 func _start_smooth_init():
 	_index_paths_only("cards")
@@ -106,8 +122,8 @@ func _process_background_loading():
 	var start_time = Time.get_ticks_usec()
 
 	while _processed_count < _total_to_load:
-		if _is_transition_paused:
-			await transition_loading_resumed
+		if _should_pause_background_loading():
+			await _wait_for_background_loading_resume()
 			start_time = Time.get_ticks_usec()
 			continue
 
@@ -120,14 +136,60 @@ func _process_background_loading():
 			var progress = float(_processed_count) / max(1.0, float(_total_to_load))
 			initialization_progress.emit(progress, str(entry.get("label", "Streaming Memoria...")))
 			await get_tree().process_frame
-			if _is_transition_paused:
-				await transition_loading_resumed
+			if _should_pause_background_loading():
+				await _wait_for_background_loading_resume()
 			start_time = Time.get_ticks_usec()
 
 	_is_processing_queue = false
 	is_initialized = true
 	initialization_complete.emit()
 	print("[DataManager] Priority background loading complete.")
+
+func _should_pause_background_loading() -> bool:
+	return _is_transition_paused or _is_performance_sensitive_scene_active() or _is_input_activity_pause_active()
+
+func _wait_for_background_loading_resume():
+	while _should_pause_background_loading():
+		if _is_transition_paused:
+			await transition_loading_resumed
+		else:
+			await get_tree().process_frame
+
+func _is_performance_sensitive_scene_active() -> bool:
+	var tree = get_tree()
+	if tree == null:
+		return false
+	var current_scene = tree.current_scene
+	if current_scene == null:
+		return false
+	if PERFORMANCE_SENSITIVE_SCENE_NAMES.has(str(current_scene.name)):
+		return true
+	return PERFORMANCE_SENSITIVE_SCENE_PATHS.has(str(current_scene.scene_file_path))
+
+func _is_input_activity_pause_active() -> bool:
+	return Time.get_ticks_usec() < _input_pause_until_usec
+
+func _register_input_activity_pause():
+	_input_pause_until_usec = Time.get_ticks_usec() + (INPUT_ACTIVITY_PAUSE_MSEC * 1000)
+
+func _is_user_activity_event(event: InputEvent) -> bool:
+	if event == null:
+		return false
+	if event is InputEventMouseMotion:
+		return event.relative.length_squared() > 0.0
+	if event is InputEventMouseButton:
+		return event.pressed
+	if event is InputEventKey:
+		return event.pressed and not event.echo
+	if event is InputEventJoypadButton:
+		return event.pressed
+	if event is InputEventJoypadMotion:
+		return abs(event.axis_value) >= 0.2
+	if event is InputEventScreenTouch:
+		return event.pressed
+	if event is InputEventScreenDrag:
+		return true
+	return false
 
 func _index_paths_only(type: String):
 	var root_path = PATHS[type]

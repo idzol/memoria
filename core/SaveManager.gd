@@ -50,6 +50,7 @@ func save_mid_run_state():
 	
 	# AUTHENTICATED PROFILE DATA
 	var run_data = {
+		"game_mode": GameManager.game_mode,
 		"is_battle_mode": GameManager.is_battle_mode,
 		"player_name": GameManager.player_name,
 		"player_class": GameManager.player_class,
@@ -59,6 +60,8 @@ func save_mid_run_state():
 		"pending_level_up": var_to_str(GameManager.pending_level_up),
 		"level_up_return_scene": GameManager.level_up_return_scene,
 		"pending_post_battle_scene": GameManager.pending_post_battle_scene,
+		"pending_story_sequence_biome": GameManager.pending_story_sequence_biome,
+		"pending_story_sequence_return_scene": GameManager.pending_story_sequence_return_scene,
 		"player_biome": GameManager.player_biome,
 		"selected_story_biome": GameManager.selected_story_biome,
 		"profile_return_scene": GameManager.profile_return_scene,

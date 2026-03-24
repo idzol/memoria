@@ -64,8 +64,12 @@ var _hold_payload: Dictionary = {}
 var _consume_press_instance_id: int = -1
 var _tutorial_active: bool = false
 var _tutorial_id: String = ""
+var _tutorial_overlay: Control = null
+var _tutorial_message_label: Label = null
+var _tutorial_hint_label: Label = null
 
 func _ready():
+	_ensure_tutorial_overlay()
 	# Testing purposes if loaded directly
 	_ensure_default_player_deck()
 	_ensure_default_inventory_deck()
@@ -377,7 +381,7 @@ func _on_back_pressed():
 		GameManager.profile_return_scene = ""
 		get_tree().change_scene_to_file(next_scene)
 	else:
-		var next_scene = GameManager.profile_return_scene if GameManager.profile_return_scene != "" else GameManager.get_story_map_scene_path()
+		var next_scene = GameManager.profile_return_scene if GameManager.profile_return_scene != "" else GameManager.get_story_line_scene_path()
 		GameManager.profile_return_scene = ""
 		get_tree().change_scene_to_file(next_scene)
 
@@ -521,6 +525,11 @@ func _hide_card_preview():
 	_expanded_preview_card = null
 
 func _input(event: InputEvent):
+	if _tutorial_active:
+		if _is_tutorial_dismiss_input(event):
+			_dismiss_character_tutorial()
+			accept_event()
+		return
 	if event.is_action_pressed("ui_cancel"):
 		_on_back_pressed()
 		return
@@ -614,6 +623,81 @@ func _hide_info_toasts():
 	if tutorial_toast_label:
 		tutorial_toast_label.text = ""
 
+func _ensure_tutorial_overlay():
+	if _tutorial_overlay and is_instance_valid(_tutorial_overlay):
+		return
+	_tutorial_overlay = Control.new()
+	_tutorial_overlay.name = "TutorialOverlay"
+	_tutorial_overlay.visible = false
+	_tutorial_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_tutorial_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	add_child(_tutorial_overlay)
+
+	var shade = ColorRect.new()
+	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	shade.color = Color(0.02, 0.02, 0.03, 0.82)
+	shade.mouse_filter = Control.MOUSE_FILTER_STOP
+	_tutorial_overlay.add_child(shade)
+
+	var center = CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tutorial_overlay.add_child(center)
+
+	var panel = PanelContainer.new()
+	panel.custom_minimum_size = Vector2(760, 0)
+	center.add_child(panel)
+
+	var panel_style = StyleBoxFlat.new()
+	panel_style.bg_color = Color(0.07, 0.08, 0.1, 0.97)
+	panel_style.border_width_left = 2
+	panel_style.border_width_top = 2
+	panel_style.border_width_right = 2
+	panel_style.border_width_bottom = 2
+	panel_style.border_color = Color(0.4, 0.7, 1.0, 0.8)
+	panel_style.corner_radius_top_left = 14
+	panel_style.corner_radius_top_right = 14
+	panel_style.corner_radius_bottom_left = 14
+	panel_style.corner_radius_bottom_right = 14
+	panel.add_theme_stylebox_override("panel", panel_style)
+
+	var margin = MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 30)
+	margin.add_theme_constant_override("margin_top", 24)
+	margin.add_theme_constant_override("margin_right", 30)
+	margin.add_theme_constant_override("margin_bottom", 22)
+	panel.add_child(margin)
+
+	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 16)
+	margin.add_child(vbox)
+
+	_tutorial_message_label = Label.new()
+	_tutorial_message_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_tutorial_message_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_tutorial_message_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_tutorial_message_label.add_theme_font_size_override("font_size", 30)
+	_tutorial_message_label.add_theme_color_override("font_color", Color(0.95, 0.97, 1.0, 1.0))
+	vbox.add_child(_tutorial_message_label)
+
+	_tutorial_hint_label = Label.new()
+	_tutorial_hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_tutorial_hint_label.add_theme_font_size_override("font_size", 18)
+	_tutorial_hint_label.add_theme_color_override("font_color", TUTORIAL_TOAST_COLOR)
+	_tutorial_hint_label.text = LocalizationManager.translate("tutorial.continue_any_input", "Click or press any key to continue")
+	vbox.add_child(_tutorial_hint_label)
+
+func _is_tutorial_dismiss_input(event: InputEvent) -> bool:
+	if event is InputEventMouseButton:
+		return event.pressed
+	if event is InputEventKey:
+		return event.pressed and not event.is_echo()
+	if event is InputEventJoypadButton:
+		return event.pressed
+	if event is InputEventJoypadMotion:
+		return abs(event.axis_value) >= 0.2
+	return false
+
 func _show_info_toast(message: String):
 	_show_info_toast_with_style(message, 1.0, Color(1, 1, 1, 1.0))
 
@@ -695,9 +779,8 @@ func _begin_character_tutorial_if_needed():
 
 func _dismiss_character_tutorial():
 	_tutorial_active = false
-	if _info_toast_tween:
-		_info_toast_tween.kill()
-	_hide_info_toasts()
+	if _tutorial_overlay:
+		_tutorial_overlay.visible = false
 	if _tutorial_id != "":
 		_set_tutorial_seen(_tutorial_id)
 	_tutorial_id = ""
@@ -726,10 +809,13 @@ func _set_tutorial_seen(tutorial_id: String):
 func _show_character_tutorial(tutorial_id: String, message: String):
 	_tutorial_id = tutorial_id
 	_tutorial_active = true
-	_show_info_toast_with_style(message, TUTORIAL_TOAST_DURATION, TUTORIAL_TOAST_COLOR)
-	_set_tutorial_seen(tutorial_id)
-	_tutorial_active = false
-	_tutorial_id = ""
+	if _tutorial_message_label:
+		_tutorial_message_label.text = message
+	if _tutorial_hint_label:
+		_tutorial_hint_label.text = LocalizationManager.translate("tutorial.continue_any_input", "Click or press any key to continue")
+	if _tutorial_overlay:
+		_tutorial_overlay.visible = true
+		_tutorial_overlay.move_to_front()
 
 func _on_tab_changed(_tab: int):
 	_begin_character_tutorial_if_needed()
