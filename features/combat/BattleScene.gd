@@ -19,11 +19,14 @@ extends Node2D
 @onready var log_box = %LogBox
 @onready var log_display = %LogDisplay
 @onready var log_right_spacer = %RightSpacer
+@onready var biome_label = get_node_or_null("%BiomeLabel")
+@onready var phase_label = get_node_or_null("%PhaseLabel")
+@onready var tracker_text = get_node_or_null("%TrackerText")
+@onready var avatar_button = get_node_or_null("%AvatarButton")
+@onready var story_button = get_node_or_null("%StoryButton")
+@onready var exit_button = get_node_or_null("%ExitButton")
 
 # Status Bar References
-@onready var biome_room_label = %BiomeRoomLabel
-# @onready var conditions_container = %ConditionsContainer
-@onready var round_label = %RoundLabel
 @onready var energy_pips = %EnergyPips
 @onready var player_atk_val = %PlayerAtkVal
 @onready var player_def_val = %PlayerDefVal
@@ -199,6 +202,9 @@ func _ready():
 		in_game_menu.hide()
 	if has_node("%MenuIconBtn"):
 		%MenuIconBtn.pressed.connect(_toggle_in_game_menu)
+	if exit_button:
+		exit_button.pressed.connect(_exit_cleared_room)
+	_configure_top_bar()
 	if dialog_speaker:
 		dialog_speaker.text = LocalizationManager.translate("dialog.speaker.narrator", "Narrator")
 
@@ -516,13 +522,27 @@ func _render_energy_pips():
 
 
 func _sync_status_bar():
-	# Biome | Room
 	var biome_name = current_room_res.biome.capitalize() if current_room_res else "Unknown"
 	var room_name = current_room_res.room_name if current_room_res else "Battle"
-	biome_room_label.text = "%s  |  %s" % [biome_name, room_name]
-	
-	# Round
-	round_label.text = "ROUND: %d" % round_number
+	if biome_label:
+		biome_label.text = biome_name
+	if tracker_text:
+		tracker_text.text = room_name
+	if phase_label:
+		phase_label.text = "ROUND: %d" % round_number
+
+func _configure_top_bar():
+	if avatar_button:
+		avatar_button.disabled = true
+		avatar_button.modulate = Color(0.6, 0.6, 0.6, 1.0)
+	if story_button:
+		story_button.disabled = true
+		story_button.modulate = Color(0.6, 0.6, 0.6, 1.0)
+	if energy_pips:
+		energy_pips.visible = true
+	if exit_button:
+		exit_button.visible = false
+		exit_button.text = LocalizationManager.translate("dialog.exit_overworld", "Exit to Overworld")
 
 # --- INPUT & FLOW ---
 func _on_card_flipped(card):
@@ -1279,6 +1299,7 @@ func _configure_dialog_box(expanded: bool):
 
 func _show_enter_combat_button():
 	_room_dialog_on_complete = Callable()
+	_hide_exit_button()
 	for child in %OptionContainer.get_children():
 		child.queue_free()
 	_configure_dialog_box(false)
@@ -1298,11 +1319,12 @@ func _show_exit_cleared_room_button():
 	for child in %OptionContainer.get_children():
 		child.queue_free()
 	_configure_dialog_box(false)
-	var exit_btn = Button.new()
-	exit_btn.text = LocalizationManager.translate("dialog.exit_overworld", "Exit to Overworld")
-	exit_btn.custom_minimum_size.y = 50
-	exit_btn.pressed.connect(_exit_cleared_room)
-	%OptionContainer.add_child(exit_btn)
+	if exit_button:
+		exit_button.visible = true
+
+func _hide_exit_button():
+	if exit_button:
+		exit_button.visible = false
 
 func _append_dialog_log(speaker: String, text: String):
 	GameManager.add_run_log("%s: %s" % [speaker, text])
@@ -1368,7 +1390,8 @@ func update_ui(instant: bool = false):
 		create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT).tween_property(enemy_hp_bar, "value", e_hp, duration)
 
 	_sync_stat_icons()
-	round_label.text = "ROUND: %d" % round_number
+	if phase_label:
+		phase_label.text = "ROUND: %d" % round_number
 	
 	
 func add_log(text):

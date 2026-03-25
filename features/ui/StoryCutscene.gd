@@ -4,6 +4,8 @@ extends Control
 @onready var body_label = %BodyLabel
 @onready var continue_button = %ContinueButton
 
+var _is_continuing := false
+
 const CUTSCENE_PLACEHOLDERS := {
 	"home": {
 		"title": "Chapter 1: The First Memory",
@@ -44,6 +46,9 @@ const CUTSCENE_PLACEHOLDERS := {
 }
 
 func _ready():
+	if DataManager and DataManager.has_method("pause_for_cutscene"):
+		DataManager.pause_for_cutscene()
+
 	var biome = GameManager.get_pending_story_sequence_biome()
 	var content = CUTSCENE_PLACEHOLDERS.get(biome, {
 		"title": biome.replace("_", " ").capitalize(),
@@ -54,12 +59,17 @@ func _ready():
 	continue_button.text = "Continue"
 	continue_button.pressed.connect(_continue_sequence)
 
+func _exit_tree():
+	if DataManager and DataManager.has_method("resume_after_cutscene"):
+		DataManager.resume_after_cutscene()
+
 func _input(event):
 	var is_space = event is InputEventKey and event.pressed and not event.is_echo() and event.keycode == KEY_SPACE
 	if event.is_action_pressed("ui_accept") or event.is_action_pressed("ui_cancel") or is_space:
 		_continue_sequence()
 
 func _continue_sequence():
-	if not is_inside_tree():
+	if _is_continuing or not is_inside_tree():
 		return
+	_is_continuing = true
 	GameManager.advance_story_sequence_from_cutscene()

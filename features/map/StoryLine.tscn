@@ -35,7 +35,7 @@ grow_vertical = 2
 color = Color(0.05, 0.05, 0.06, 1)
 
 [node name="TopBar" type="PanelContainer" parent="." unique_id=1190618257]
-custom_minimum_size = Vector2(0, 96)
+custom_minimum_size = Vector2(0, 100)
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -43,33 +43,67 @@ grow_horizontal = 2
 
 [node name="TopMargin" type="MarginContainer" parent="TopBar" unique_id=1803134951]
 layout_mode = 2
-theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 16
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 16
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_right = 30
 
 [node name="TopHBox" type="HBoxContainer" parent="TopBar/TopMargin" unique_id=1148784540]
 layout_mode = 2
 
-[node name="HeaderLabel" type="Label" parent="TopBar/TopMargin/TopHBox" unique_id=1318331723]
+[node name="Left" type="VBoxContainer" parent="TopBar/TopMargin/TopHBox"]
+layout_mode = 2
+alignment = 1
+
+[node name="PhaseLabel" type="Label" parent="TopBar/TopMargin/TopHBox/Left"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 28
 text = "Story Chapters"
-vertical_alignment = 1
 
-[node name="MapButton" type="Button" parent="TopBar/TopMargin/TopHBox" unique_id=1890984836]
+[node name="DayButton" type="Button" parent="TopBar/TopMargin/TopHBox/Left"]
+unique_name_in_owner = true
+layout_mode = 2
+flat = true
+alignment = 0
+theme_override_colors/font_color = Color(0.95, 0.82, 0.45, 1)
+theme_override_colors/font_hover_color = Color(1, 0.9, 0.55, 1)
+theme_override_colors/font_pressed_color = Color(1, 0.9, 0.55, 1)
+theme_override_font_sizes/font_size = 18
+text = "Day 1. Protodia"
+
+[node name="Center" type="CenterContainer" parent="TopBar/TopMargin/TopHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TrackerText" type="Label" parent="TopBar/TopMargin/TopHBox/Center"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.2, 1)
+theme_override_font_sizes/font_size = 32
+text = "Room Name"
+horizontal_alignment = 1
+
+[node name="Right" type="HBoxContainer" parent="TopBar/TopMargin/TopHBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 2
+
+[node name="MapButton" type="Button" parent="TopBar/TopMargin/TopHBox/Right" unique_id=1890984836]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(70, 56)
 layout_mode = 2
 text = "🗺️"
 
-[node name="AvatarButton" type="Button" parent="TopBar/TopMargin/TopHBox" unique_id=1324545294]
+[node name="AvatarButton" type="Button" parent="TopBar/TopMargin/TopHBox/Right" unique_id=1324545294]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(70, 56)
 layout_mode = 2
 text = "👤"
+
+[node name="MenuIconBtn" type="Button" parent="TopBar/TopMargin/TopHBox/Right"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(42, 34)
+layout_mode = 2
+text = "☰"
 
 [node name="ScrollContainer" type="ScrollContainer" parent="." unique_id=148011740]
 unique_name_in_owner = true

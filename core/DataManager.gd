@@ -18,10 +18,12 @@ const MAP_DATA_PATH = "res://data/map/map_data.tres"
 const GLOBAL_DEFAULT_ROOM_PATH = "res://data/rooms/default_battle.tres"
 const BIOME_ORDER = ["home", "town", "forest", "ice_caves", "desert", "swamp", "abyss", "void", "the_core"]
 const PERFORMANCE_SENSITIVE_SCENE_NAMES = {
+	"IntroCinematic": true,
 	"StoryCutscene": true,
 	"StoryChapterSequence": true
 }
 const PERFORMANCE_SENSITIVE_SCENE_PATHS = {
+	"res://features/ui/IntroCinematic.tscn": true,
 	"res://features/ui/StoryCutscene.tscn": true,
 	"res://features/map/StoryChapterSequence.tscn": true
 }
@@ -57,6 +59,7 @@ var _total_to_load: int = 0
 var _processed_count: int = 0
 var _is_processing_queue: bool = false
 var _is_transition_paused: bool = false
+var _cutscene_pause_count: int = 0
 var _input_pause_until_usec: int = 0
 
 func _ready():
@@ -90,6 +93,17 @@ func resume_after_scene_transition():
 	var was_paused = _is_transition_paused
 	_is_transition_paused = false
 	if was_paused:
+		transition_loading_resumed.emit()
+	_ensure_background_loader_running()
+
+func pause_for_cutscene():
+	_cutscene_pause_count += 1
+
+func resume_after_cutscene():
+	if _cutscene_pause_count <= 0:
+		return
+	_cutscene_pause_count -= 1
+	if not _should_pause_background_loading():
 		transition_loading_resumed.emit()
 	_ensure_background_loader_running()
 
@@ -146,7 +160,7 @@ func _process_background_loading():
 	print("[DataManager] Priority background loading complete.")
 
 func _should_pause_background_loading() -> bool:
-	return _is_transition_paused or _is_performance_sensitive_scene_active() or _is_input_activity_pause_active()
+	return _is_transition_paused or _cutscene_pause_count > 0 or _is_performance_sensitive_scene_active() or _is_input_activity_pause_active()
 
 func _wait_for_background_loading_resume():
 	while _should_pause_background_loading():

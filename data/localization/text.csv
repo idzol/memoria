@@ -63,7 +63,7 @@ character_select.title,CHOOSE YOUR IDENTITY,ELIGE TU IDENTIDAD,CHOISISSEZ VOTRE 
 character_select.class.warrior,WARRIOR,GUERRERO,GUERRIER,KRIEGER
 character_select.class.scholar,SCHOLAR,ERUDITO,ERUDIT,GELEHRTER
 character_select.class.alchemist,ALCHEMIST,ALQUIMISTA,ALCHIMISTE,ALCHEMIST
-character_select.stats_title,LEVEL 1 STATS,ESTADISTICAS DE NIVEL 1,STATISTIQUES NIVEAU 1,WERTE AUF STUFE 1
+character_select.stats_title,IDENTITY,TODO,TODO,TODO
 character_select.health,HEALTH,SALUD,SANTE,GESUNDHEIT
 character_select.energy,ENERGY,ENERGIA,ENERGIE,ENERGIE
 character_select.attack,ATTACK,ATAQUE,ATTAQUE,ANGRIFF
