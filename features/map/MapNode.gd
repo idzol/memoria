@@ -36,6 +36,10 @@ const HEX_ICON_SIZE_MULTIPLIER = 1.0
 const HEX_ICON_BASE_HORIZONTAL_INSET = 0
 const HEX_ICON_BASE_TOP_INSET = 0
 const HEX_ICON_BASE_BOTTOM_INSET = 0
+const DEFAULT_ICON_SCALE_X = 1.0
+const DEFAULT_ICON_SCALE_Y = 1.0
+const DEFAULT_BACKGROUND_ICON_ALPHA = 0.6
+const DEFAULT_FOREGROUND_ICON_ALPHA = 1.0
 
 func setup_biome_node(data: Dictionary, grid_tex: Texture2D, _is_cleared: bool, is_player_here: bool, is_revealed: bool, _is_reachable: bool):
 	_resolve_ui_refs()
@@ -65,7 +69,7 @@ func setup_biome_node(data: Dictionary, grid_tex: Texture2D, _is_cleared: bool, 
 		visible = true
 		if icon_rect:
 			icon_rect.texture = _get_node_icon_texture(data)
-			icon_rect.modulate = Color(1, 1, 1, 0.6) if _is_background_node else Color.WHITE
+			icon_rect.modulate = Color(1, 1, 1, _get_icon_alpha())
 	else:
 		if icon_rect:
 			icon_rect.texture = null
@@ -170,7 +174,12 @@ func _apply_visual_scale(scale_factor: float):
 	var visual_scale = Vector2.ONE * clamped_scale
 	if icon_rect:
 		icon_rect.pivot_offset = icon_rect.size * 0.5
-		icon_rect.scale = visual_scale
+		var icon_scale_x = float(node_data.get("icon_scale_x", DEFAULT_ICON_SCALE_X)) if node_data is Dictionary else DEFAULT_ICON_SCALE_X
+		var icon_scale_y = float(node_data.get("icon_scale_y", DEFAULT_ICON_SCALE_Y)) if node_data is Dictionary else DEFAULT_ICON_SCALE_Y
+		icon_rect.scale = Vector2(
+			visual_scale.x * icon_scale_x,
+			visual_scale.y * icon_scale_y
+		)
 	if border:
 		border.pivot_offset = border.size * 0.5
 		border.scale = visual_scale
@@ -217,12 +226,17 @@ func _get_type_icon_texture(type: String) -> Texture2D:
 	return asset_library.map_icon_mystery
 
 func _get_node_icon_texture(data: Dictionary) -> Texture2D:
+	var custom_icon_path = str(data.get("custom_icon_path", ""))
+	if bool(data.get("force_custom_icon", false)) and custom_icon_path != "" and ResourceLoader.exists(custom_icon_path):
+		var forced_icon = load(custom_icon_path) as Texture2D
+		if forced_icon:
+			return forced_icon
+
 	if GameManager.is_battle_mode:
 		if str(data.get("type", "")) == "home" or bool(data.get("is_home", false)):
 			return _get_type_icon_texture("home")
 		return _get_type_icon_texture(str(data.get("type", "mystery")))
 
-	var custom_icon_path = str(data.get("custom_icon_path", ""))
 	if custom_icon_path != "" and ResourceLoader.exists(custom_icon_path):
 		var custom_icon = load(custom_icon_path) as Texture2D
 		if custom_icon:
@@ -232,6 +246,12 @@ func _get_node_icon_texture(data: Dictionary) -> Texture2D:
 		return _get_type_icon_texture("home")
 
 	return _get_type_icon_texture(str(data.get("type", "mystery")))
+
+func _get_icon_alpha() -> float:
+	if not (node_data is Dictionary):
+		return DEFAULT_FOREGROUND_ICON_ALPHA
+	var fallback_alpha = DEFAULT_BACKGROUND_ICON_ALPHA if _is_background_node else DEFAULT_FOREGROUND_ICON_ALPHA
+	return float(node_data.get("icon_alpha", fallback_alpha))
 
 func _draw():
 	if not _is_hex_node:
