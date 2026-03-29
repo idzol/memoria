@@ -6,22 +6,32 @@ extends Control
 @onready var story_block = %StoryBlock
 @onready var continue_hint = %ContinueHint
 
-const SCROLL_SPEED := 46.0
+const SCROLL_SPEED := 30.0
 const STORY_PLACEHOLDERS := {
 	"home": {
 		"title": "Introduction",
-		"body": "Upon the desolate heights of the crags, the youth did cast aside the treasures of the immortals, 
-for the polished bronze had become to him as heavy stones without meaning. 
-He looked upon the shield and saw only the passing of clouds, finding no reflection of his former purpose within its metallic depths. 
- Like a traveler who sheds a heavy cloak in the heat of noon, he abandoned the instruments of his fate against the jagged rocks, 
-choosing instead the path that led downward to the salt-spray and the common soil of men.
+		"body": "
+Upon the desolate heights of the crags,
+The youth did cast aside the treasures of the immortals, 
+For the polished bronze had become to him as heavy stones without meaning. 
+He looked upon the shield and saw only the passing of clouds,
+Finding no reflection of his former purpose within its metallic depths. 
+Like a traveler who sheds a heavy cloak in the heat of noon,
+He abandoned the instruments of his fate against the jagged rocks, 
+Choosing instead the path that led downward to the salt-spray and the common soil of men.
 
-He descended into the village, where the air was thick with the scent of drying kelp and the labor of the forge. 
-There, his tools were put to the base service of the hearth and the pier, its keen edge used to pry the stubborn barnacle from rotted wood. 
+He descended into the village, 
+Where the air was thick with the scent of drying kelp and the labor of the forge. 
+There, his tools were put to the base service of the hearth and the pier, 
+Its keen edge used to pry the stubborn barnacle from rotted wood. 
 
-Dictys the fisherman looked upon the lad, and saw a silent drifter with eyes clouded by the mist of forgetting. 
-As the golden thread of destiny snapped, the boy stood upon the stone quay, casting his line into the grey expanse, 
-knowing at last the peace of a man who has traded myth for the simple hunger of the sea."
+Dictys the fisherman looked upon the lad, 
+And saw a silent drifter with eyes clouded by the mist of forgetting.
+As the golden thread of destiny snapped, 
+The boy stood upon the stone quay, 
+Casting his line into the grey expanse, 
+Knowing at last the peace of a man,
+Who has traded myth for the simple hunger of the sea."
 	},
 	"town": {
 		"title": "Town",
@@ -81,8 +91,9 @@ func _process(delta: float):
 		continue_hint.modulate.a = 1.0
 
 func _input(event):
-	var is_space = event is InputEventKey and event.pressed and not event.is_echo() and event.keycode == KEY_SPACE
-	if event.is_action_pressed("ui_accept") or event.is_action_pressed("ui_cancel") or is_space:
+	var is_key_press = event is InputEventKey and event.pressed and not event.is_echo()
+	var is_mouse_press = event is InputEventMouseButton and event.pressed
+	if is_key_press or is_mouse_press:
 		_finish_sequence()
 
 func _layout_story_block():

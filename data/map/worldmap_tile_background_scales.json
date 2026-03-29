@@ -2,913 +2,1277 @@
   "version": 1,
   "defaults": {
     "scale_x": 1.0,
-    "scale_y": 1.0
+    "scale_y": 1.0,
+    "offset_x": 0.0,
+    "offset_y": 0.0
   },
   "rooms": {
     "res://data/rooms/abyss/abyss_bioluminescent_reef.tres": {
       "texture_path": "res://assets/rooms/map/abyss_bioluminescent_reef.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/abyss/abyss_boss.tres": {
       "texture_path": "res://assets/rooms/map/abyss_boss.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.094017,
+      "scale_y": 1.04065,
+      "offset_x": -0.480769,
+      "offset_y": -0.914634
     },
     "res://data/rooms/abyss/abyss_coral_throne.tres": {
       "texture_path": "res://assets/rooms/map/abyss_coral_throne.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/abyss/abyss_crushing_trench.tres": {
       "texture_path": "res://assets/rooms/map/abyss_crushing_trench.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/abyss/abyss_dark_current.tres": {
       "texture_path": "res://assets/rooms/map/abyss_dark_current.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.084746,
+      "scale_y": 1.066667,
+      "offset_x": -0.858051,
+      "offset_y": 1.78125
     },
     "res://data/rooms/abyss/abyss_deep_forge.tres": {
       "texture_path": "res://assets/rooms/map/abyss_deep_forge.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.082452,
+      "scale_y": 1.04065,
+      "offset_x": -0.665962,
+      "offset_y": -0.914634
     },
     "res://data/rooms/abyss/abyss_default.tres": {
       "texture_path": "res://assets/rooms/map/abyss_thermal_vent.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/abyss/abyss_jellyfish_forest.tres": {
       "texture_path": "res://assets/rooms/map/abyss_jellyfish_forest.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 3.867188,
+      "offset_y": 0.087891
     },
     "res://data/rooms/abyss/abyss_kelp_tangle.tres": {
       "texture_path": "res://assets/rooms/map/abyss_kelp_tangle.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/abyss/abyss_leviathans_bed.tres": {
       "texture_path": "res://assets/rooms/map/abyss_leviathans_bed.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.082452,
+      "scale_y": 1.03854,
+      "offset_x": -0.665962,
+      "offset_y": -1.004057
     },
     "res://data/rooms/abyss/abyss_lost_city_gates.tres": {
       "texture_path": "res://assets/rooms/map/abyss_lost_city_gates.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/abyss/abyss_obsidian_ridge.tres": {
       "texture_path": "res://assets/rooms/map/abyss_obsidian_ridge.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/abyss/abyss_octopus_den.tres": {
       "texture_path": "res://assets/rooms/map/abyss_octopus_den.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.073375,
+      "scale_y": 1.062241,
+      "offset_x": -1.037736,
+      "offset_y": 1.960581
     },
     "res://data/rooms/abyss/abyss_pearl_grotto.tres": {
       "texture_path": "res://assets/rooms/map/abyss_pearl_grotto.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/abyss/abyss_pressure_chamber.tres": {
       "texture_path": "res://assets/rooms/map/abyss_pressure_chamber.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/abyss/abyss_silent_cathedral.tres": {
       "texture_path": "res://assets/rooms/map/abyss_silent_cathedral.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.07113,
+      "scale_y": 1.066667,
+      "offset_x": -0.941423,
+      "offset_y": 2.4375
     },
     "res://data/rooms/abyss/abyss_sunken_galleon.tres": {
       "texture_path": "res://assets/rooms/map/abyss_sunken_galleon.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/abyss/abyss_sunken_library.tres": {
       "texture_path": "res://assets/rooms/map/abyss_sunken_library.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.07563,
+      "scale_y": 1.064449,
+      "offset_x": -0.945378,
+      "offset_y": 1.871102
     },
     "res://data/rooms/abyss/abyss_the_abyss_wall.tres": {
       "texture_path": "res://assets/rooms/map/abyss_the_abyss_wall.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/abyss/abyss_the_maw.tres": {
       "texture_path": "res://assets/rooms/map/abyss_the_maw.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.077895,
+      "scale_y": 1.066667,
+      "offset_x": -0.757895,
+      "offset_y": 1.96875
     },
     "res://data/rooms/abyss/abyss_thermal_vent.tres": {
       "texture_path": "res://assets/rooms/map/abyss_thermal_vent.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/abyss/abyss_whale_fall.tres": {
       "texture_path": "res://assets/rooms/map/abyss_whale_fall.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/desert/desert_abandoned_bazaar.tres": {
       "texture_path": "res://assets/rooms/map/desert_abandoned_bazaar.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/desert/desert_beetle_burrow.tres": {
       "texture_path": "res://assets/rooms/map/desert_beetle_burrow.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/desert/desert_boss.tres": {
       "texture_path": "res://assets/rooms/map/desert_boss.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.122807,
+      "scale_y": 1.084746,
+      "offset_x": -0.888158,
+      "offset_y": -0.95339
     },
     "res://data/rooms/desert/desert_cactus_forest.tres": {
       "texture_path": "res://assets/rooms/map/desert_cactus_forest.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.230769,
+      "scale_y": 1.087049,
+      "offset_x": 0.0,
+      "offset_y": 0.0
     },
     "res://data/rooms/desert/desert_default.tres": {
       "texture_path": "res://assets/rooms/map/desert_default.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.132743,
+      "scale_y": 1.084746,
+      "offset_x": 0.199115,
+      "offset_y": 0.0
     },
     "res://data/rooms/desert/desert_dried_well.tres": {
       "texture_path": "res://assets/rooms/map/desert_dried_well.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/desert/desert_dusty_vault.tres": {
       "texture_path": "res://assets/rooms/map/desert_dusty_vault.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.101075,
+      "scale_y": 1.110629,
+      "offset_x": -0.096774,
+      "offset_y": -9.078091
     },
     "res://data/rooms/desert/desert_glass_canyon.tres": {
       "texture_path": "res://assets/rooms/map/desert_glass_canyon.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.22488,
+      "scale_y": 1.07563,
+      "offset_x": 0.430622,
+      "offset_y": -0.378151
     },
     "res://data/rooms/desert/desert_mirage_oasis.tres": {
       "texture_path": "res://assets/rooms/map/desert_mirage_oasis.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.04065,
+      "scale_y": 1.24878,
+      "offset_x": -1.371951,
+      "offset_y": 0.658537
     },
     "res://data/rooms/desert/desert_nomad_camp.tres": {
       "texture_path": "res://assets/rooms/map/desert_nomad_camp.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/desert/desert_obsidian_pillar.tres": {
       "texture_path": "res://assets/rooms/map/desert_obsidian_pillar.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/desert/desert_pharaohs_sanctum.tres": {
       "texture_path": "res://assets/rooms/map/desert_pharaohs_sanctum.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.160998,
+      "scale_y": 1.084746,
+      "offset_x": -0.306122,
+      "offset_y": -0.476695
     },
     "res://data/rooms/desert/desert_quick_sand.tres": {
       "texture_path": "res://assets/rooms/map/desert_quick_sand.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.190698,
+      "scale_y": 1.080169,
+      "offset_x": -0.627907,
+      "offset_y": 1.424051
     },
     "res://data/rooms/desert/desert_ruined_outpost.tres": {
       "texture_path": "res://assets/rooms/map/desert_ruined_outpost.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/desert/desert_salt_flats.tres": {
       "texture_path": "res://assets/rooms/map/desert_salt_flats.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/desert/desert_sandstorm_eye.tres": {
       "texture_path": "res://assets/rooms/map/desert_sandstorm_eye.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/desert/desert_searing_overlook.tres": {
       "texture_path": "res://assets/rooms/map/desert_searing_overlook.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/desert/desert_sphinx_gate.tres": {
       "texture_path": "res://assets/rooms/map/desert_sphinx_gate.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.080169,
+      "scale_y": 1.110629,
+      "offset_x": -1.044304,
+      "offset_y": -0.683297
     },
     "res://data/rooms/desert/desert_sun-bleached_dunes.tres": {
       "texture_path": "res://assets/rooms/map/desert_sun-bleached_dunes.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/desert/desert_sun_temple.tres": {
       "texture_path": "res://assets/rooms/map/desert_sun_temple.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.190698,
+      "scale_y": 1.080169,
+      "offset_x": -0.627907,
+      "offset_y": 1.424051
     },
     "res://data/rooms/desert/desert_the_red_mesa.tres": {
       "texture_path": "res://assets/rooms/map/desert_the_red_mesa.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.105832,
+      "scale_y": 1.110629,
+      "offset_x": 0.291577,
+      "offset_y": -6.832972
     },
     "res://data/rooms/desert/desert_valley_of_kings.tres": {
       "texture_path": "res://assets/rooms/map/desert_valley_of_kings.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/forest/forest_boss.tres": {
       "texture_path": "res://assets/rooms/map/forest_boss.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.383784,
+      "scale_y": 1.204706,
+      "offset_x": 0.243243,
+      "offset_y": 2.964706
     },
     "res://data/rooms/forest/forest_buzzing_hollow.tres": {
       "texture_path": "res://assets/rooms/map/forest_buzzing_hollow.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.080169,
+      "scale_y": 1.132743,
+      "offset_x": -2.088608,
+      "offset_y": 0.39823
     },
     "res://data/rooms/forest/forest_creek_bed.tres": {
       "texture_path": "res://assets/rooms/map/forest_creek_bed.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/forest/forest_default.tres": {
       "texture_path": "res://assets/rooms/map/forest_default.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.372654,
+      "scale_y": 1.221957,
+      "offset_x": 0.241287,
+      "offset_y": 4.618138
     },
     "res://data/rooms/forest/forest_elder_oak.tres": {
       "texture_path": "res://assets/rooms/map/forest_elder_oak.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/forest/forest_forest_heart.tres": {
       "texture_path": "res://assets/rooms/map/forest_forest_heart.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.422222,
+      "scale_y": 1.273632,
+      "offset_x": 0.25,
+      "offset_y": 5.708955
     },
     "res://data/rooms/forest/forest_hidden_burrow.tres": {
       "texture_path": "res://assets/rooms/map/forest_hidden_burrow.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/forest/forest_hunters_blind.tres": {
       "texture_path": "res://assets/rooms/map/forest_hunters_blind.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/forest/forest_logging_camp.tres": {
       "texture_path": "res://assets/rooms/map/forest_logging_camp.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.032258,
+      "scale_y": 1.062241,
+      "offset_x": 0.816532,
+      "offset_y": 3.174274
     },
     "res://data/rooms/forest/forest_moonlit_glade.tres": {
       "texture_path": "res://assets/rooms/map/forest_moonlit_glade.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.03854,
+      "scale_y": 1.084746,
+      "offset_x": 0.365112,
+      "offset_y": 8.771186
     },
     "res://data/rooms/forest/forest_mushroom_circle.tres": {
       "texture_path": "res://assets/rooms/map/forest_mushroom_circle.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.04065,
+      "scale_y": 1.105832,
+      "offset_x": -0.182927,
+      "offset_y": 7.580994
     },
     "res://data/rooms/forest/forest_old_shrine.tres": {
       "texture_path": "res://assets/rooms/map/forest_old_shrine.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.032258,
+      "scale_y": 1.145414,
+      "offset_x": 0.181452,
+      "offset_y": 0.402685
     },
     "res://data/rooms/forest/forest_overgrown_path.tres": {
       "texture_path": "res://assets/rooms/map/forest_overgrown_path.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.110629,
+      "scale_y": 1.101075,
+      "offset_x": -1.952278,
+      "offset_y": 2.806452
     },
     "res://data/rooms/forest/forest_ruined_aviary.tres": {
       "texture_path": "res://assets/rooms/map/forest_ruined_aviary.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/forest/forest_shadow_grove.tres": {
       "texture_path": "res://assets/rooms/map/forest_shadow_grove.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.064449,
+      "scale_y": 1.150562,
+      "offset_x": -1.309771,
+      "offset_y": -0.101124
     },
     "res://data/rooms/forest/forest_spiders_web.tres": {
       "texture_path": "res://assets/rooms/map/forest_spiders_web.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/forest/forest_stags_rest.tres": {
       "texture_path": "res://assets/rooms/map/forest_stags_rest.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/forest/forest_the_great_root.tres": {
       "texture_path": "res://assets/rooms/map/forest_the_great_root.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.032258,
+      "scale_y": 1.060041,
+      "offset_x": 0.181452,
+      "offset_y": 1.118012
     },
     "res://data/rooms/forest/forest_the_wanderer.tres": {
       "texture_path": "res://assets/rooms/map/forest_the_wanderer.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.032258,
+      "scale_y": 1.145414,
+      "offset_x": 0.181452,
+      "offset_y": 0.402685
     },
     "res://data/rooms/forest/forest_thistle_thicket.tres": {
       "texture_path": "res://assets/rooms/map/forest_thistle_thicket.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.068894,
+      "scale_y": 1.239709,
+      "offset_x": -2.066806,
+      "offset_y": 0.653753
     },
     "res://data/rooms/forest/forest_watchtower.tres": {
       "texture_path": "res://assets/rooms/map/forest_watchtower.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/forest/forest_willow_weep.tres": {
       "texture_path": "res://assets/rooms/map/forest_willow_weep.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.227818,
+      "scale_y": 1.087049,
+      "offset_x": 0.107914,
+      "offset_y": 0.0
     },
     "res://data/rooms/ice_caves/ice_caves_aurora_hall.tres": {
       "texture_path": "res://assets/rooms/map/ice_caves_aurora_hall.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/ice_caves/ice_caves_blizzard_peak.tres": {
       "texture_path": "res://assets/rooms/map/ice_caves_blizzard_peak.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.080169,
+      "scale_y": 1.292929,
+      "offset_x": -2.563291,
+      "offset_y": -2.045455
     },
     "res://data/rooms/ice_caves/ice_caves_boss.tres": {
       "texture_path": "res://assets/rooms/map/ice_caves_boss.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.036437,
+      "scale_y": 1.101075,
+      "offset_x": -1.093117,
+      "offset_y": 0.387097
     },
     "res://data/rooms/ice_caves/ice_caves_crystal_chasm.tres": {
       "texture_path": "res://assets/rooms/map/ice_caves_crystal_chasm.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.383784,
+      "scale_y": 1.204706,
+      "offset_x": 0.121622,
+      "offset_y": 2.647059
     },
     "res://data/rooms/ice_caves/ice_caves_crystal_garden.tres": {
       "texture_path": "res://assets/rooms/map/ice_caves_crystal_garden.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.068894,
+      "scale_y": 1.296203,
+      "offset_x": 0.939457,
+      "offset_y": -2.506329
     },
     "res://data/rooms/ice_caves/ice_caves_default.tres": {
       "texture_path": "res://assets/rooms/map/ice_caves_default.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.053498,
+      "scale_y": 1.087049,
+      "offset_x": -1.666667,
+      "offset_y": -1.146497
     },
     "res://data/rooms/ice_caves/ice_caves_echo_chamber.tres": {
       "texture_path": "res://assets/rooms/map/ice_caves_echo_chamber.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.251834,
+      "scale_y": 1.199063,
+      "offset_x": -1.650367,
+      "offset_y": 0.421546
     },
     "res://data/rooms/ice_caves/ice_caves_frost_bridge.tres": {
       "texture_path": "res://assets/rooms/map/ice_caves_frost_bridge.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.383784,
+      "scale_y": 1.204706,
+      "offset_x": 0.121622,
+      "offset_y": 2.964706
     },
     "res://data/rooms/ice_caves/ice_caves_frozen_library.tres": {
       "texture_path": "res://assets/rooms/map/ice_caves_frozen_library.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/ice_caves/ice_caves_frozen_tomb.tres": {
       "texture_path": "res://assets/rooms/map/ice_caves_frozen_tomb.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.251834,
+      "scale_y": 1.199063,
+      "offset_x": -1.650367,
+      "offset_y": 0.421546
     },
     "res://data/rooms/ice_caves/ice_caves_glacial_rift.tres": {
       "texture_path": "res://assets/rooms/map/ice_caves_glacial_rift.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.117904,
+      "scale_y": 1.125275,
+      "offset_x": -1.768559,
+      "offset_y": 0.989011
     },
     "res://data/rooms/ice_caves/ice_caves_hidden_grotto.tres": {
       "texture_path": "res://assets/rooms/map/ice_caves_hidden_grotto.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/ice_caves/ice_caves_ice_throne.tres": {
       "texture_path": "res://assets/rooms/map/ice_caves_ice_throne.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.091684,
+      "scale_y": 1.080169,
+      "offset_x": 1.439232,
+      "offset_y": -8.259494
     },
     "res://data/rooms/ice_caves/ice_caves_icicle_gallery.tres": {
       "texture_path": "res://assets/rooms/map/ice_caves_icicle_gallery.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.145414,
+      "scale_y": 1.117904,
+      "offset_x": -2.516779,
+      "offset_y": 2.161572
     },
     "res://data/rooms/ice_caves/ice_caves_mammoth_graveyard.tres": {
       "texture_path": "res://assets/rooms/map/ice_caves_mammoth_graveyard.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/ice_caves/ice_caves_permafrost_mine.tres": {
       "texture_path": "res://assets/rooms/map/ice_caves_permafrost_mine.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.098712,
+      "scale_y": 1.087049,
+      "offset_x": -1.641631,
+      "offset_y": -0.477707
     },
     "res://data/rooms/ice_caves/ice_caves_sleeping_giant.tres": {
       "texture_path": "res://assets/rooms/map/ice_caves_sleeping_giant.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.091684,
+      "scale_y": 1.091684,
+      "offset_x": -1.727079,
+      "offset_y": -0.287846
     },
     "res://data/rooms/ice_caves/ice_caves_snowdrift.tres": {
       "texture_path": "res://assets/rooms/map/ice_caves_snowdrift.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/ice_caves/ice_caves_sub-zero_spring.tres": {
       "texture_path": "res://assets/rooms/map/ice_caves_sub-zero_spring.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.108225,
+      "scale_y": 1.09636,
+      "offset_x": -1.168831,
+      "offset_y": 1.638116
     },
     "res://data/rooms/ice_caves/ice_caves_the_cold_forge.tres": {
       "texture_path": "res://assets/rooms/map/ice_caves_the_cold_forge.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.103448,
+      "scale_y": 1.098712,
+      "offset_x": -0.969828,
+      "offset_y": -3.766094
     },
     "res://data/rooms/ice_caves/ice_caves_the_glacier_heart.tres": {
       "texture_path": "res://assets/rooms/map/ice_caves_the_glacier_heart.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.108225,
+      "scale_y": 1.110629,
+      "offset_x": -4.285714,
+      "offset_y": -12.592191
     },
     "res://data/rooms/ice_caves/ice_caves_whiteout_tunnel.tres": {
       "texture_path": "res://assets/rooms/map/ice_caves_whiteout_tunnel.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/swamp/swamp_blackwater_dock.tres": {
       "texture_path": "res://assets/rooms/map/swamp_blackwater_dock.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/swamp/swamp_blighted_orchard.tres": {
       "texture_path": "res://assets/rooms/map/swamp_blighted_orchard.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/swamp/swamp_bubbling_mire.tres": {
       "texture_path": "res://assets/rooms/map/swamp_bubbling_mire.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.062241,
+      "scale_y": 1.12035,
+      "offset_x": -0.280083,
+      "offset_y": 1.378556
     },
     "res://data/rooms/swamp/swamp_crocodile_creek.tres": {
       "texture_path": "res://assets/rooms/map/swamp_crocodile_creek.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.051335,
+      "scale_y": 1.084746,
+      "offset_x": -0.73922,
+      "offset_y": 0.667373
     },
     "res://data/rooms/swamp/swamp_deadwood_bridge.tres": {
       "texture_path": "res://assets/rooms/map/swamp_deadwood_bridge.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/swamp/swamp_default.tres": {
       "texture_path": "res://assets/rooms/map/swamp_firefly_marsh.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/swamp/swamp_firefly_marsh.tres": {
       "texture_path": "res://assets/rooms/map/swamp_firefly_marsh.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/swamp/swamp_foggy_meadow.tres": {
       "texture_path": "res://assets/rooms/map/swamp_foggy_meadow.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/swamp/swamp_grave_of_giants.tres": {
       "texture_path": "res://assets/rooms/map/swamp_grave_of_giants.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/swamp/swamp_hermits_stump.tres": {
       "texture_path": "res://assets/rooms/map/swamp_hermits_stump.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/swamp/swamp_leech_pool.tres": {
       "texture_path": "res://assets/rooms/map/swamp_leech_pool.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.091684,
+      "scale_y": 1.12035,
+      "offset_x": -1.727079,
+      "offset_y": 1.181619
     },
     "res://data/rooms/swamp/swamp_mist_veil.tres": {
       "texture_path": "res://assets/rooms/map/swamp_mist_veil.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/swamp/swamp_mosquito_hive.tres": {
       "texture_path": "res://assets/rooms/map/swamp_mosquito_hive.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.04918,
+      "scale_y": 1.084746,
+      "offset_x": -0.829918,
+      "offset_y": 2.764831
     },
     "res://data/rooms/swamp/swamp_peat_bog.tres": {
       "texture_path": "res://assets/rooms/map/swamp_peat_bog.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/swamp/swamp_rusting_ferry.tres": {
       "texture_path": "res://assets/rooms/map/swamp_rusting_ferry.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/swamp/swamp_shrunken_head_totem.tres": {
       "texture_path": "res://assets/rooms/map/swamp_shrunken_head_totem.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.053498,
+      "scale_y": 1.089362,
+      "offset_x": -0.648148,
+      "offset_y": 2.585106
     },
     "res://data/rooms/swamp/swamp_sunken_altar.tres": {
       "texture_path": "res://assets/rooms/map/swamp_sunken_altar.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/swamp/swamp_sunken_hut.tres": {
       "texture_path": "res://assets/rooms/map/swamp_sunken_hut.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.179724,
+      "scale_y": 1.150562,
+      "offset_x": -1.762673,
+      "offset_y": -1.820225
     },
     "res://data/rooms/swamp/swamp_tangled_mangroves.tres": {
       "texture_path": "res://assets/rooms/map/swamp_tangled_mangroves.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/swamp/swamp_the_heart_of_decay.tres": {
       "texture_path": "res://assets/rooms/map/swamp_the_heart_of_decay.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/swamp/swamp_willow_weep.tres": {
       "texture_path": "res://assets/rooms/map/swamp_willow_weep.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.080169,
+      "scale_y": 1.089362,
+      "offset_x": 0.189873,
+      "offset_y": 3.06383
     },
     "res://data/rooms/the_core/the_core_ash_plain.tres": {
       "texture_path": "res://assets/rooms/map/the_core_ash_plain.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/the_core/the_core_basalt_bridge.tres": {
       "texture_path": "res://assets/rooms/map/the_core_basalt_bridge.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/the_core/the_core_boss.tres": {
       "texture_path": "res://assets/rooms/map/the_core_boss.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.032258,
+      "scale_y": 1.013861,
+      "offset_x": 0.090726,
+      "offset_y": -0.267327
     },
     "res://data/rooms/the_core/the_core_cinder_grove.tres": {
       "texture_path": "res://assets/rooms/map/the_core_cinder_grove.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/the_core/the_core_crystal_furnace.tres": {
       "texture_path": "res://assets/rooms/map/the_core_crystal_furnace.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/the_core/the_core_default.tres": {
       "texture_path": "res://assets/rooms/map/the_core_the_great_engine.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/the_core/the_core_diamond_crag.tres": {
       "texture_path": "res://assets/rooms/map/the_core_diamond_crag.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/the_core/the_core_geothermal_well.tres": {
       "texture_path": "res://assets/rooms/map/the_core_geothermal_well.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/the_core/the_core_iron_foundry.tres": {
       "texture_path": "res://assets/rooms/map/the_core_iron_foundry.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.015873,
+      "scale_y": 1.001957,
+      "offset_x": 0.892857,
+      "offset_y": -0.35225
     },
     "res://data/rooms/the_core/the_core_machinery_hall.tres": {
       "texture_path": "res://assets/rooms/map/the_core_machinery_hall.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/the_core/the_core_magma_river.tres": {
       "texture_path": "res://assets/rooms/map/the_core_magma_river.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.03854,
+      "scale_y": 1.001957,
+      "offset_x": -1.004057,
+      "offset_y": -0.264188
     },
     "res://data/rooms/the_core/the_core_molten_waterfall.tres": {
       "texture_path": "res://assets/rooms/map/the_core_molten_waterfall.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/the_core/the_core_obsidian_lab.tres": {
       "texture_path": "res://assets/rooms/map/the_core_obsidian_lab.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/the_core/the_core_red_rock_vault.tres": {
       "texture_path": "res://assets/rooms/map/the_core_red_rock_vault.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/the_core/the_core_scorched_path.tres": {
       "texture_path": "res://assets/rooms/map/the_core_scorched_path.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/the_core/the_core_steam_vent.tres": {
       "texture_path": "res://assets/rooms/map/the_core_steam_vent.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/the_core/the_core_sulfur_pit.tres": {
       "texture_path": "res://assets/rooms/map/the_core_sulfur_pit.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/the_core/the_core_the_boiler.tres": {
       "texture_path": "res://assets/rooms/map/the_core_the_boiler.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/the_core/the_core_the_great_engine.tres": {
       "texture_path": "res://assets/rooms/map/the_core_the_great_engine.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/the_core/the_core_the_great_smelter.tres": {
       "texture_path": "res://assets/rooms/map/the_core_the_great_smelter.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/the_core/the_core_the_heart_of_the_world.tres": {
       "texture_path": "res://assets/rooms/map/the_core_the_heart_of_the_world.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/the_core/the_core_ventilation_shaft.tres": {
       "texture_path": "res://assets/rooms/map/the_core_ventilation_shaft.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/town/town_apothecary_shop.tres": {
       "texture_path": "res://assets/rooms/map/town_apothecary_shop.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.080169,
+      "scale_y": 1.160998,
+      "offset_x": -0.664557,
+      "offset_y": 2.040816
     },
     "res://data/rooms/town/town_bakers_hearth.tres": {
       "texture_path": "res://assets/rooms/map/town_bakers_hearth.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.036437,
+      "scale_y": 1.16895,
+      "offset_x": -1.366397,
+      "offset_y": 1.335616
     },
     "res://data/rooms/town/town_beggars_corner.tres": {
       "texture_path": "res://assets/rooms/map/town_beggars_corner.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.032258,
+      "scale_y": 1.135255,
+      "offset_x": 0.816532,
+      "offset_y": 1.496674
     },
     "res://data/rooms/town/town_blacksmiths_forge.tres": {
       "texture_path": "res://assets/rooms/map/town_blacksmiths_forge.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.07113,
+      "scale_y": 1.233735,
+      "offset_x": -0.564854,
+      "offset_y": 1.084337
     },
     "res://data/rooms/town/town_boss.tres": {
       "texture_path": "res://assets/rooms/map/town_boss.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.021956,
+      "scale_y": 1.137778,
+      "offset_x": -0.359281,
+      "offset_y": 0.2
     },
     "res://data/rooms/town/town_clock_tower.tres": {
       "texture_path": "res://assets/rooms/map/town_clock_tower.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.028112,
+      "scale_y": 1.142857,
+      "offset_x": -0.722892,
+      "offset_y": 0.502232
     },
     "res://data/rooms/town/town_default.tres": {
       "texture_path": "res://assets/rooms/map/town_default.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.032258,
+      "scale_y": 1.145414,
+      "offset_x": 0.090726,
+      "offset_y": 0.201342
     },
     "res://data/rooms/town/town_dimly_lit_alley.tres": {
       "texture_path": "res://assets/rooms/map/town_dimly_lit_alley.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.047035,
+      "scale_y": 1.150562,
+      "offset_x": -0.828221,
+      "offset_y": 0.910112
     },
     "res://data/rooms/town/town_general_store.tres": {
       "texture_path": "res://assets/rooms/map/town_general_store.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.03854,
+      "scale_y": 1.227818,
+      "offset_x": 1.004057,
+      "offset_y": -2.266187
     },
     "res://data/rooms/town/town_graveyard_path.tres": {
       "texture_path": "res://assets/rooms/map/town_graveyard_path.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.024,
+      "scale_y": 1.145414,
+      "offset_x": -1.08,
+      "offset_y": 1.711409
     },
     "res://data/rooms/town/town_guard_barracks.tres": {
       "texture_path": "res://assets/rooms/map/town_guard_barracks.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.047035,
+      "scale_y": 1.221957,
+      "offset_x": -0.920245,
+      "offset_y": 0.214797
     },
     "res://data/rooms/town/town_hidden_cellar.tres": {
       "texture_path": "res://assets/rooms/map/town_hidden_cellar.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.028112,
+      "scale_y": 1.137778,
+      "offset_x": 0.0,
+      "offset_y": 3.0
     },
     "res://data/rooms/town/town_home.tres": {
       "texture_path": "res://assets/rooms/map/town_home.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.174312,
+      "scale_y": 1.296203,
+      "offset_x": -1.135321,
+      "offset_y": 1.139241
     },
     "res://data/rooms/town/town_mayors_manor.tres": {
       "texture_path": "res://assets/rooms/map/town_mayors_manor.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.015873,
+      "scale_y": 1.233735,
+      "offset_x": -0.089286,
+      "offset_y": 1.192771
     },
     "res://data/rooms/town/town_old_library.tres": {
       "texture_path": "res://assets/rooms/map/town_old_library.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.044898,
+      "scale_y": 1.210402,
+      "offset_x": -0.826531,
+      "offset_y": -0.531915
     },
     "res://data/rooms/town/town_small_chapel.tres": {
       "texture_path": "res://assets/rooms/map/town_small_chapel.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.03854,
+      "scale_y": 1.177011,
+      "offset_x": -1.27789,
+      "offset_y": 3.0
     },
     "res://data/rooms/town/town_square.tres": {
       "texture_path": "res://assets/rooms/map/town_town_square.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.028112,
+      "scale_y": 1.22488,
+      "offset_x": 0.361446,
+      "offset_y": -2.15311
     },
     "res://data/rooms/town/town_the_elders_hall.tres": {
       "texture_path": "res://assets/rooms/map/town_the_elders_hall.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.028112,
+      "scale_y": 1.145414,
+      "offset_x": -0.180723,
+      "offset_y": 1.006711
     },
     "res://data/rooms/town/town_the_rusty_tankard.tres": {
       "texture_path": "res://assets/rooms/map/town_the_rusty_tankard.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.098712,
+      "scale_y": 1.216152,
+      "offset_x": -0.193133,
+      "offset_y": 1.710214
     },
     "res://data/rooms/town/town_the_town_well.tres": {
       "texture_path": "res://assets/rooms/map/town_the_town_well.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.051335,
+      "scale_y": 1.227818,
+      "offset_x": -0.73922,
+      "offset_y": -0.107914
     },
     "res://data/rooms/town/town_town_square.tres": {
       "texture_path": "res://assets/rooms/map/town_town_square.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.028112,
+      "scale_y": 1.22488,
+      "offset_x": 0.361446,
+      "offset_y": -2.15311
     },
     "res://data/rooms/town/town_training_grounds.tres": {
       "texture_path": "res://assets/rooms/map/town_training_grounds.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/town/town_village_gate.tres": {
       "texture_path": "res://assets/rooms/map/town_village_gate.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.044898,
+      "scale_y": 1.254902,
+      "offset_x": -2.387755,
+      "offset_y": -17.867647
     },
     "res://data/rooms/town/town_village_stables.tres": {
       "texture_path": "res://assets/rooms/map/town_village_stables.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.017893,
+      "scale_y": 1.147982,
+      "offset_x": 0.447316,
+      "offset_y": 2.320628
     },
     "res://data/rooms/tutorial/tutorial_boss.tres": {
       "texture_path": "res://assets/rooms/map/tutorial_boss.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.003922,
+      "scale_y": 1.087049,
+      "offset_x": 1.852941,
+      "offset_y": -0.191083
     },
     "res://data/rooms/tutorial/tutorial_echo.tres": {
       "texture_path": "res://assets/rooms/map/tutorial_echo.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.361702,
+      "scale_y": 1.110629,
+      "offset_x": 0.119681,
+      "offset_y": 1.073753
     },
     "res://data/rooms/tutorial/tutorial_home.tres": {
       "texture_path": "res://assets/rooms/map/tutorial_home.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.361702,
+      "scale_y": 1.160998,
+      "offset_x": 0.119681,
+      "offset_y": 2.44898
     },
     "res://data/rooms/tutorial/tutorial_hut.tres": {
       "texture_path": "res://assets/rooms/map/tutorial_hut.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.361702,
+      "scale_y": 1.12035,
+      "offset_x": 0.119681,
+      "offset_y": 3.446389
     },
     "res://data/rooms/tutorial/tutorial_wharf.tres": {
       "texture_path": "res://assets/rooms/map/tutorial_wharf.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.361702,
+      "scale_y": 1.160998,
+      "offset_x": 0.119681,
+      "offset_y": 2.040816
     },
     "res://data/rooms/void/void_blood_fountain.tres": {
       "texture_path": "res://assets/rooms/map/void_blood_fountain.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/void/void_clockwork_void.tres": {
       "texture_path": "res://assets/rooms/map/void_clockwork_void.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/void/void_default.tres": {
       "texture_path": "res://assets/rooms/map/void_the_rift.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.098712,
+      "scale_y": 1.017893,
+      "offset_x": -0.096567,
+      "offset_y": -1.163022
     },
     "res://data/rooms/void/void_echoing_silence.tres": {
       "texture_path": "res://assets/rooms/map/void_echoing_silence.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.09636,
+      "scale_y": 1.051335,
+      "offset_x": -0.09636,
+      "offset_y": 3.603696
     },
     "res://data/rooms/void/void_event_horizon.tres": {
       "texture_path": "res://assets/rooms/map/void_event_horizon.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.094017,
+      "scale_y": 1.015873,
+      "offset_x": -0.384615,
+      "offset_y": -1.428571
     },
     "res://data/rooms/void/void_final_descent.tres": {
       "texture_path": "res://assets/rooms/map/void_final_descent.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/void/void_fractal_edge.tres": {
       "texture_path": "res://assets/rooms/map/void_fractal_edge.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.098712,
+      "scale_y": 1.015873,
+      "offset_x": -0.193133,
+      "offset_y": -1.339286
     },
     "res://data/rooms/void/void_glass_ceiling.tres": {
       "texture_path": "res://assets/rooms/map/void_glass_ceiling.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/void/void_gravity_flip.tres": {
       "texture_path": "res://assets/rooms/map/void_gravity_flip.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/void/void_last_outpost.tres": {
       "texture_path": "res://assets/rooms/map/void_last_outpost.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.053498,
+      "scale_y": 1.032258,
+      "offset_x": -2.037037,
+      "offset_y": 0.453629
     },
     "res://data/rooms/void/void_memory_fragment.tres": {
       "texture_path": "res://assets/rooms/map/void_memory_fragment.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/void/void_mind_maze.tres": {
       "texture_path": "res://assets/rooms/map/void_mind_maze.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/void/void_null_space.tres": {
       "texture_path": "res://assets/rooms/map/void_null_space.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/void/void_obsidian_forge.tres": {
       "texture_path": "res://assets/rooms/map/void_obsidian_forge.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.091684,
+      "scale_y": 1.017893,
+      "offset_x": -0.479744,
+      "offset_y": -1.341948
     },
     "res://data/rooms/void/void_shadow_theatre.tres": {
       "texture_path": "res://assets/rooms/map/void_shadow_theatre.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/void/void_star_nursery.tres": {
       "texture_path": "res://assets/rooms/map/void_star_nursery.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.098712,
+      "scale_y": 1.051335,
+      "offset_x": 0.096567,
+      "offset_y": 2.402464
     },
     "res://data/rooms/void/void_the_rift.tres": {
       "texture_path": "res://assets/rooms/map/void_the_rift.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.098712,
+      "scale_y": 1.017893,
+      "offset_x": -0.096567,
+      "offset_y": -1.163022
     },
     "res://data/rooms/void/void_the_singularity.tres": {
       "texture_path": "res://assets/rooms/map/void_the_singularity.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/void/void_the_unmaking.tres": {
       "texture_path": "res://assets/rooms/map/void_the_unmaking.png",
       "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_y": 1.0,
+      "offset_x": 0.087891,
+      "offset_y": 0.087891
     },
     "res://data/rooms/void/void_void_gate.tres": {
       "texture_path": "res://assets/rooms/map/void_void_gate.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.089362,
+      "scale_y": 1.051335,
+      "offset_x": -0.957447,
+      "offset_y": 0.0
     },
     "res://data/rooms/void/void_void_market.tres": {
       "texture_path": "res://assets/rooms/map/void_void_market.png",
-      "scale_x": 1.0,
-      "scale_y": 1.0
+      "scale_x": 1.101075,
+      "scale_y": 1.032258,
+      "offset_x": -0.774194,
+      "offset_y": 2.086694
     }
   }
 }

@@ -362,8 +362,10 @@ func _draw_map():
 		var node_ui = node_scene.instantiate()
 		node_container.add_child(node_ui)
 		var node_pos = _get_node_position(int(data.get("layer", 0)), int(data.get("column", 0)))
+		node_ui.size = current_node_size
+		node_ui.custom_minimum_size = current_node_size
 		node_ui.position = node_pos
-		node_ui.scale = Vector2.ONE * current_node_scale
+		node_ui.scale = Vector2.ONE
 		node_ui.z_index = int(data.get("layer", 0)) * 10 + int(data.get("column", 0))
 		node_positions_by_id[node_id] = node_pos
 

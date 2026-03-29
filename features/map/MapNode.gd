@@ -38,6 +38,8 @@ const HEX_ICON_BASE_TOP_INSET = 0
 const HEX_ICON_BASE_BOTTOM_INSET = 0
 const DEFAULT_ICON_SCALE_X = 1.0
 const DEFAULT_ICON_SCALE_Y = 1.0
+const DEFAULT_ICON_OFFSET_X = 0.0
+const DEFAULT_ICON_OFFSET_Y = 0.0
 const DEFAULT_BACKGROUND_ICON_ALPHA = 0.6
 const DEFAULT_FOREGROUND_ICON_ALPHA = 1.0
 
@@ -78,6 +80,7 @@ func setup_biome_node(data: Dictionary, grid_tex: Texture2D, _is_cleared: bool, 
 	_apply_base_styles()
 	_apply_icon_layout()
 	_apply_visual_scale(float(data.get("node_visual_scale", 1.0)))
+	call_deferred("_refresh_visual_transforms")
 	set_highlight_state(is_player_here, false)
 	queue_redraw()
 
@@ -94,6 +97,8 @@ func _resolve_ui_refs():
 		border = get_node_or_null("%Border")
 	if room_name_label == null:
 		room_name_label = get_node_or_null("%RoomNameLabel") as Label
+	if not resized.is_connected(_refresh_visual_transforms):
+		resized.connect(_refresh_visual_transforms)
 
 func set_highlight_state(is_player_here: bool, is_selected: bool):
 	_is_player_here = is_player_here
@@ -157,16 +162,18 @@ func _apply_icon_layout():
 		var horizontal_inset = HEX_ICON_BASE_HORIZONTAL_INSET * inset_scale
 		var top_inset = HEX_ICON_BASE_TOP_INSET * inset_scale
 		var bottom_inset = HEX_ICON_BASE_BOTTOM_INSET * inset_scale
-		icon_rect.offset_left = horizontal_inset
-		icon_rect.offset_top = top_inset
-		icon_rect.offset_right = -horizontal_inset
-		icon_rect.offset_bottom = -bottom_inset
+		var offset = _get_icon_offset()
+		icon_rect.offset_left = horizontal_inset + offset.x
+		icon_rect.offset_top = top_inset + offset.y
+		icon_rect.offset_right = -horizontal_inset + offset.x
+		icon_rect.offset_bottom = -bottom_inset + offset.y
 		icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		return
-	icon_rect.offset_left = 16.0
-	icon_rect.offset_top = 16.0
-	icon_rect.offset_right = -16.0
-	icon_rect.offset_bottom = -16.0
+	var offset = _get_icon_offset()
+	icon_rect.offset_left = 16.0 + offset.x
+	icon_rect.offset_top = 16.0 + offset.y
+	icon_rect.offset_right = -16.0 + offset.x
+	icon_rect.offset_bottom = -16.0 + offset.y
 	icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 
 func _apply_visual_scale(scale_factor: float):
@@ -252,6 +259,20 @@ func _get_icon_alpha() -> float:
 		return DEFAULT_FOREGROUND_ICON_ALPHA
 	var fallback_alpha = DEFAULT_BACKGROUND_ICON_ALPHA if _is_background_node else DEFAULT_FOREGROUND_ICON_ALPHA
 	return float(node_data.get("icon_alpha", fallback_alpha))
+
+func _get_icon_offset() -> Vector2:
+	if not (node_data is Dictionary):
+		return Vector2.ZERO
+	return Vector2(
+		float(node_data.get("icon_offset_x", DEFAULT_ICON_OFFSET_X)),
+		float(node_data.get("icon_offset_y", DEFAULT_ICON_OFFSET_Y))
+	)
+
+func _refresh_visual_transforms():
+	if not is_inside_tree():
+		return
+	_apply_icon_layout()
+	_apply_visual_scale(float(node_data.get("node_visual_scale", 1.0)) if node_data is Dictionary else 1.0)
 
 func _draw():
 	if not _is_hex_node:

@@ -64,8 +64,9 @@ func _exit_tree():
 		DataManager.resume_after_cutscene()
 
 func _input(event):
-	var is_space = event is InputEventKey and event.pressed and not event.is_echo() and event.keycode == KEY_SPACE
-	if event.is_action_pressed("ui_accept") or event.is_action_pressed("ui_cancel") or is_space:
+	var is_key_press = event is InputEventKey and event.pressed and not event.is_echo()
+	var is_mouse_press = event is InputEventMouseButton and event.pressed
+	if is_key_press or is_mouse_press:
 		_continue_sequence()
 
 func _continue_sequence():

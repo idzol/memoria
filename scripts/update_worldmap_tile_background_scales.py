@@ -1,8 +1,8 @@
 import json
 import os
 import re
-import struct
-import zlib
+
+from PIL import Image
 
 
 ROOMS_ROOT = os.path.join("data", "rooms")
@@ -18,6 +18,7 @@ HEX_POINTS = [
     (0.0, HEX_HEIGHT * 0.25),
 ]
 MAP_ICON_PATH_PATTERN = re.compile(r'path="(res://assets/rooms/map/[^"]+)"')
+OPAQUE_ALPHA_THRESHOLD = 8
 
 
 def find_project_root():
@@ -37,7 +38,7 @@ SETTINGS_FILE = os.path.join(PROJECT_ROOT, SETTINGS_PATH)
 def load_settings():
     defaults = {
         "version": 1,
-        "defaults": {"scale_x": 1.0, "scale_y": 1.0},
+        "defaults": {"scale_x": 1.0, "scale_y": 1.0, "offset_x": 0.0, "offset_y": 0.0},
         "rooms": {},
     }
     if not os.path.exists(SETTINGS_FILE):
@@ -55,6 +56,8 @@ def load_settings():
         defaults["defaults"] = {
             "scale_x": float(parsed_defaults.get("scale_x", 1.0)),
             "scale_y": float(parsed_defaults.get("scale_y", 1.0)),
+            "offset_x": float(parsed_defaults.get("offset_x", 0.0)),
+            "offset_y": float(parsed_defaults.get("offset_y", 0.0)),
         }
     parsed_rooms = parsed.get("rooms", {})
     if isinstance(parsed_rooms, dict):
@@ -65,6 +68,8 @@ def load_settings():
                 "texture_path": str(entry.get("texture_path", "")),
                 "scale_x": float(entry.get("scale_x", defaults["defaults"]["scale_x"])),
                 "scale_y": float(entry.get("scale_y", defaults["defaults"]["scale_y"])),
+                "offset_x": float(entry.get("offset_x", defaults["defaults"]["offset_x"])),
+                "offset_y": float(entry.get("offset_y", defaults["defaults"]["offset_y"])),
             }
     return defaults
 
@@ -80,6 +85,8 @@ def save_settings(document):
         "defaults": {
             "scale_x": float(document["defaults"].get("scale_x", 1.0)),
             "scale_y": float(document["defaults"].get("scale_y", 1.0)),
+            "offset_x": float(document["defaults"].get("offset_x", 0.0)),
+            "offset_y": float(document["defaults"].get("offset_y", 0.0)),
         },
         "rooms": ordered_rooms,
     }
@@ -107,40 +114,19 @@ def read_map_icon_path(room_file_path):
     return match.group(1)
 
 
-def read_image_size(res_path):
-    file_path = os.path.join(PROJECT_ROOT, res_path.replace("res://", "").replace("/", os.sep))
+def get_image_file_path(res_path):
+    return os.path.join(PROJECT_ROOT, res_path.replace("res://", "").replace("/", os.sep))
+
+
+def load_image_rgba(res_path):
+    file_path = get_image_file_path(res_path)
     if not os.path.exists(file_path):
         return None
-    with open(file_path, "rb") as handle:
-        header = handle.read(32)
-    if header.startswith(b"\x89PNG\r\n\x1a\n"):
-        return struct.unpack(">II", header[16:24])
-    if header.startswith(b"\xff\xd8"):
-        return read_jpeg_size(file_path)
-    return None
-
-
-def read_jpeg_size(file_path):
-    with open(file_path, "rb") as handle:
-        handle.read(2)
-        while True:
-            marker_start = handle.read(1)
-            if not marker_start:
-                return None
-            if marker_start != b"\xff":
-                continue
-            marker = handle.read(1)
-            while marker == b"\xff":
-                marker = handle.read(1)
-            if marker in {b"\xc0", b"\xc1", b"\xc2", b"\xc3", b"\xc5", b"\xc6", b"\xc7", b"\xc9", b"\xca", b"\xcb", b"\xcd", b"\xce", b"\xcf"}:
-                block_length = struct.unpack(">H", handle.read(2))[0]
-                data = handle.read(block_length - 2)
-                height, width = struct.unpack(">HH", data[1:5])
-                return width, height
-            if marker in {b"\xd8", b"\xd9"}:
-                continue
-            block_length = struct.unpack(">H", handle.read(2))[0]
-            handle.seek(block_length - 2, os.SEEK_CUR)
+    try:
+        image = Image.open(file_path).convert("RGBA")
+    except OSError:
+        return None
+    return image
 
 
 def get_fitted_size(texture_width, texture_height):
@@ -153,6 +139,83 @@ def get_minimum_cover_scales(texture_width, texture_height):
     if fitted_width <= 0.0 or fitted_height <= 0.0:
         return 1.0, 1.0
     return HEX_WIDTH / fitted_width, HEX_HEIGHT / fitted_height
+
+
+def find_first_opaque_y_from_top(image, center_x):
+    for y in range(image.height):
+        if image.getpixel((center_x, y))[3] >= OPAQUE_ALPHA_THRESHOLD:
+            return y
+    return None
+
+
+def find_first_opaque_y_from_bottom(image, center_x):
+    for y in range(image.height - 1, -1, -1):
+        if image.getpixel((center_x, y))[3] >= OPAQUE_ALPHA_THRESHOLD:
+            return y
+    return None
+
+
+def find_first_opaque_x_from_left(image, center_y):
+    for x in range(image.width):
+        if image.getpixel((x, center_y))[3] >= OPAQUE_ALPHA_THRESHOLD:
+            return x
+    return None
+
+
+def find_first_opaque_x_from_right(image, center_y):
+    for x in range(image.width - 1, -1, -1):
+        if image.getpixel((x, center_y))[3] >= OPAQUE_ALPHA_THRESHOLD:
+            return x
+    return None
+
+
+def get_center_line_opaque_bounds(image):
+    center_x = image.width // 2
+    center_y = image.height // 2
+    top_y = find_first_opaque_y_from_top(image, center_x)
+    bottom_y = find_first_opaque_y_from_bottom(image, center_x)
+    left_x = find_first_opaque_x_from_left(image, center_y)
+    right_x = find_first_opaque_x_from_right(image, center_y)
+    if None in (top_y, bottom_y, left_x, right_x):
+        return None
+    return {
+        "center_x": center_x,
+        "center_y": center_y,
+        "top_y": top_y,
+        "bottom_y": bottom_y,
+        "left_x": left_x,
+        "right_x": right_x,
+    }
+
+
+def get_minimum_cover_scales_from_center_lines(image):
+    opaque_bounds = get_center_line_opaque_bounds(image)
+    if opaque_bounds is None:
+        return get_minimum_cover_scales(image.width, image.height), (0.0, 0.0), "image_bounds"
+
+    fitted_width, fitted_height = get_fitted_size(image.width, image.height)
+    fit_scale_x = fitted_width / float(image.width)
+    fit_scale_y = fitted_height / float(image.height)
+
+    top_distance = max(0.0, opaque_bounds["center_y"] - opaque_bounds["top_y"])
+    bottom_distance = max(0.0, opaque_bounds["bottom_y"] - opaque_bounds["center_y"])
+    left_distance = max(0.0, opaque_bounds["center_x"] - opaque_bounds["left_x"])
+    right_distance = max(0.0, opaque_bounds["right_x"] - opaque_bounds["center_x"])
+
+    vertical_half_extent = max(top_distance, bottom_distance) * fit_scale_y
+    horizontal_half_extent = max(left_distance, right_distance) * fit_scale_x
+
+    scale_x = 1.0 if horizontal_half_extent <= 0.0 else HEX_WIDTH * 0.5 / horizontal_half_extent
+    scale_y = 1.0 if vertical_half_extent <= 0.0 else HEX_HEIGHT * 0.5 / vertical_half_extent
+    scale_x = max(1.0, scale_x)
+    scale_y = max(1.0, scale_y)
+    content_center_x = (opaque_bounds["left_x"] + opaque_bounds["right_x"]) * 0.5
+    content_center_y = (opaque_bounds["top_y"] + opaque_bounds["bottom_y"]) * 0.5
+    delta_x = content_center_x - opaque_bounds["center_x"]
+    delta_y = content_center_y - opaque_bounds["center_y"]
+    offset_x = -delta_x * fit_scale_x * scale_x
+    offset_y = -delta_y * fit_scale_y * scale_y
+    return (scale_x, scale_y), (offset_x, offset_y), "center_lines"
 
 
 def hex_is_covered(texture_width, texture_height, scale_x, scale_y):
@@ -177,29 +240,38 @@ def update_scales():
     settings = load_settings()
     updated_count = 0
     skipped = []
+    center_line_count = 0
+    fallback_count = 0
     for room_res_path, room_file_path in iter_room_resources():
         icon_res_path = read_map_icon_path(room_file_path)
         if not icon_res_path:
             skipped.append((room_res_path, "missing map icon reference"))
             continue
-        image_size = read_image_size(icon_res_path)
-        if image_size is None:
+        image = load_image_rgba(icon_res_path)
+        if image is None:
             skipped.append((room_res_path, "missing or unsupported image"))
             continue
-        tex_width, tex_height = image_size
-        scale_x, scale_y = get_minimum_cover_scales(tex_width, tex_height)
-        covered = hex_is_covered(tex_width, tex_height, scale_x, scale_y)
+        (scale_x, scale_y), (offset_x, offset_y), method = get_minimum_cover_scales_from_center_lines(image)
+        covered = hex_is_covered(image.width, image.height, scale_x, scale_y)
         if not covered:
             skipped.append((room_res_path, "coverage check failed"))
             continue
+        if method == "center_lines":
+            center_line_count += 1
+        else:
+            fallback_count += 1
         settings["rooms"][room_res_path] = {
             "texture_path": icon_res_path,
             "scale_x": round_scale(scale_x),
             "scale_y": round_scale(scale_y),
+            "offset_x": round_scale(offset_x),
+            "offset_y": round_scale(offset_y),
         }
         updated_count += 1
     save_settings(settings)
     print(f"Updated {updated_count} world map tile scale entries in {SETTINGS_PATH}")
+    print(f"  - Used center-line alpha bounds: {center_line_count}")
+    print(f"  - Used full-image fallback: {fallback_count}")
     if skipped:
         print("Skipped entries:")
         for room_res_path, reason in skipped:

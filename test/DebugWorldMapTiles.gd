@@ -98,6 +98,7 @@ func _build_tile_card(entry: Dictionary) -> Control:
 	var room_path = str(entry.get("room_path", ""))
 	var icon_path = str(entry.get("icon_path", ""))
 	var scale = WorldMapTileBackgroundSettings.get_scale_for_room(room_path, icon_path)
+	var offset = WorldMapTileBackgroundSettings.get_offset_for_room(room_path, icon_path)
 
 	var panel = PanelContainer.new()
 	panel.custom_minimum_size = Vector2(290, 360)
@@ -157,6 +158,8 @@ func _build_tile_card(entry: Dictionary) -> Control:
 		"force_custom_icon": true,
 		"icon_scale_x": scale.x,
 		"icon_scale_y": scale.y,
+		"icon_offset_x": offset.x,
+		"icon_offset_y": offset.y,
 		"icon_alpha": 1.0,
 		"node_visual_scale": 1.0
 	}, null, false, false, true, false)
@@ -169,7 +172,7 @@ func _build_tile_card(entry: Dictionary) -> Control:
 	vbox.add_child(subtitle)
 
 	var scale_label = Label.new()
-	scale_label.text = "scale_x: %.3f | scale_y: %.3f" % [scale.x, scale.y]
+	scale_label.text = "scale_x: %.3f | scale_y: %.3f | offset_x: %.2f | offset_y: %.2f" % [scale.x, scale.y, offset.x, offset.y]
 	scale_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	scale_label.modulate = Color(0.42, 0.74, 1.0, 1.0)
 	vbox.add_child(scale_label)
