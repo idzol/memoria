@@ -10,7 +10,18 @@ const SCROLL_SPEED := 46.0
 const STORY_PLACEHOLDERS := {
 	"home": {
 		"title": "Introduction",
-		"body": "Placeholder chapter text.\n\nYou wake inside a memory that is already fading.\nThe path ahead is narrow, but it is yours to walk.\nEvery step into the tutorial is a step back toward yourself."
+		"body": "Upon the desolate heights of the crags, the youth did cast aside the treasures of the immortals, 
+for the polished bronze had become to him as heavy stones without meaning. 
+He looked upon the shield and saw only the passing of clouds, finding no reflection of his former purpose within its metallic depths. 
+ Like a traveler who sheds a heavy cloak in the heat of noon, he abandoned the instruments of his fate against the jagged rocks, 
+choosing instead the path that led downward to the salt-spray and the common soil of men.
+
+He descended into the village, where the air was thick with the scent of drying kelp and the labor of the forge. 
+There, his tools were put to the base service of the hearth and the pier, its keen edge used to pry the stubborn barnacle from rotted wood. 
+
+Dictys the fisherman looked upon the lad, and saw a silent drifter with eyes clouded by the mist of forgetting. 
+As the golden thread of destiny snapped, the boy stood upon the stone quay, casting his line into the grey expanse, 
+knowing at last the peace of a man who has traded myth for the simple hunger of the sea."
 	},
 	"town": {
 		"title": "Town",

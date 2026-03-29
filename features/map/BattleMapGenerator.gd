@@ -137,9 +137,16 @@ func _pick_room_for_biome(biome: String) -> RoomData:
 			unused_rooms.append(room_res)
 
 	if unused_rooms.is_empty():
-		var biome_default_path = _get_default_room_path_for_biome(biome)
-		var biome_default_res = DataManager.get_resource(biome_default_path)
-		return biome_default_res as RoomData
+		# Battle grids can be larger than the number of handcrafted rooms for a biome.
+		# Reuse the existing biome pool before falling back to a default placeholder room.
+		if not pool.is_empty():
+			used_set.clear()
+			_used_room_paths_by_biome[biome] = used_set
+			unused_rooms.assign(pool)
+		else:
+			var biome_default_path = _get_default_room_path_for_biome(biome)
+			var biome_default_res = DataManager.get_resource(biome_default_path)
+			return biome_default_res as RoomData
 
 	var picked: RoomData = unused_rooms.pick_random()
 	if picked and picked.resource_path != "":
