@@ -318,6 +318,7 @@ func _get_current_priority_biome() -> String:
 
 func _get_next_biome(current_biome: String) -> String:
 	var current_index = BIOME_ORDER.find(current_biome)
+
 	if current_index == -1:
 		return ""
 	if current_index + 1 >= BIOME_ORDER.size():
