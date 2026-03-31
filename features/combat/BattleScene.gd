@@ -202,6 +202,8 @@ func _ready():
 		in_game_menu = in_game_menu_scene.instantiate()
 		add_child(in_game_menu)
 		in_game_menu.hide()
+	if avatar_button and not avatar_button.pressed.is_connected(_on_avatar_pressed):
+		avatar_button.pressed.connect(_on_avatar_pressed)
 	if has_node("%MenuIconBtn"):
 		%MenuIconBtn.pressed.connect(_toggle_in_game_menu)
 	if exit_button:
@@ -351,6 +353,10 @@ func _handle_menu_cancel() -> bool:
 
 func _exit_to_overworld_from_battle():
 	get_tree().change_scene_to_file(GameManager.get_active_biome_map_scene_path())
+
+func _on_avatar_pressed():
+	GameManager.profile_return_scene = GameManager.get_active_biome_map_scene_path()
+	get_tree().change_scene_to_file("res://features/ui/CharacterScreen.tscn")
 
 func _is_current_room_cleared() -> bool:
 	if is_cleared_room:
@@ -504,6 +510,8 @@ func _handle_dialog_overlay_progress_input():
 		_activate_dialog_primary_option()
 	elif _is_dialog_box_expanded():
 		_configure_dialog_box(false)
+	elif dialog_overlay:
+		dialog_overlay.hide()
 	get_viewport().set_input_as_handled()
 
 func _on_dialog_overlay_gui_input(event: InputEvent):
@@ -580,8 +588,13 @@ func _configure_top_bar():
 	if status_bar:
 		status_bar.visible = true
 	if avatar_button:
-		avatar_button.disabled = true
-		avatar_button.modulate = Color(0.6, 0.6, 0.6, 1.0)
+		avatar_button.disabled = false
+		avatar_button.modulate = Color(1.0, 1.0, 1.0, 1.0)
+	if has_node("%MenuIconBtn"):
+		var menu_icon_btn = %MenuIconBtn
+		if menu_icon_btn is BaseButton:
+			menu_icon_btn.disabled = false
+		menu_icon_btn.modulate = Color(1.0, 1.0, 1.0, 1.0)
 	if story_button:
 		story_button.disabled = true
 		story_button.modulate = Color(0.6, 0.6, 0.6, 1.0)

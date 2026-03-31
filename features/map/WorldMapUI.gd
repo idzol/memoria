@@ -71,6 +71,9 @@ const MAP_DRAG_DEADZONE := 4.0
 const MIN_HEX_HORIZONTAL_PADDING := 32.0
 const MIN_HEX_VERTICAL_PADDING := 20.0
 const MAP_BOTTOM_SAFE_PADDING := 140.0
+const FOG_OF_WAR_ICON_PATH := "res://assets/rooms/map/all_fog_of_war.png"
+const CURRENT_CONNECTION_COLOR := Color(0.84, 0.9, 1.0, 0.95)
+const CURRENT_CONNECTION_WIDTH := 10.0
 const CULT_DAY_NAMES := [
 	"Protodia",
 	"Hoplidia",
@@ -360,6 +363,8 @@ func _draw_map():
 		return
 	for n in node_container.get_children():
 		n.queue_free()
+	for l in lines_container.get_children():
+		l.queue_free()
 	node_widgets_by_id.clear()
 	node_positions_by_id.clear()
 
@@ -400,9 +405,12 @@ func _draw_map():
 		var is_player_here = node_id == current_id
 		var is_selected = node_id == selected_node_id
 		var is_revealed = revealed_set.has(node_id)
+		if not is_revealed:
+			continue
 		var state = GameManager.world_state.rooms.get(node_id, {})
 		var is_cleared = state.get("cleared", false)
 		var visual_data = _apply_worldmap_tile_background_settings(data)
+		visual_data = _apply_story_room_visibility_art(visual_data, state, is_player_here)
 
 		var node_ui = node_scene.instantiate()
 		node_container.add_child(node_ui)
@@ -422,6 +430,7 @@ func _draw_map():
 		if node_ui.has_signal("node_double_clicked"):
 			node_ui.node_double_clicked.connect(_on_node_double_clicked)
 
+	_draw_current_adjacency_lines(current_id, revealed_set)
 	_refresh_selection_highlight(current_id)
 	if not GameManager.is_battle_mode:
 		_begin_worldmap_tutorial_if_needed.call_deferred()
@@ -654,14 +663,17 @@ func _get_room_display_name(node_data: Dictionary) -> String:
 
 func _build_visible_node_set(current_id: String, biome: String) -> Dictionary:
 	var visible_set: Dictionary = {}
-	visible_set[current_id] = true
+	if GameManager.is_battle_mode:
+		visible_set[current_id] = true
+		for neighbor_id in _get_adjacent_node_ids(current_id, biome):
+			visible_set[neighbor_id] = true
+		return visible_set
 
+	visible_set[current_id] = true
 	for neighbor_id in _get_adjacent_node_ids(current_id, biome):
 		visible_set[neighbor_id] = true
 
-	if GameManager.is_battle_mode:
-		return visible_set
-
+	var completed_ids: Array[String] = []
 	for raw_id in GameManager.run_map.keys():
 		var node_id = str(raw_id)
 		var data = _get_map_entry_by_id(node_id)
@@ -670,10 +682,60 @@ func _build_visible_node_set(current_id: String, biome: String) -> Dictionary:
 		if str(data.get("biome", "")) != biome:
 			continue
 		var state = GameManager.world_state.rooms.get(node_id, {})
-		if state.get("completed", false):
+		if _is_story_room_visible_as_completed(data, state):
 			visible_set[node_id] = true
+			completed_ids.append(node_id)
+
+	for completed_id in completed_ids:
+		for neighbor_id in _get_adjacent_node_ids(completed_id, biome):
+			visible_set[neighbor_id] = true
 
 	return visible_set
+
+func _apply_story_room_visibility_art(data: Dictionary, state: Dictionary, is_player_here: bool) -> Dictionary:
+	if GameManager.is_battle_mode:
+		return data
+	var visual_data = data.duplicate(true)
+	var node_type = str(visual_data.get("type", ""))
+	var is_passable = bool(visual_data.get("passable", true))
+	if not is_passable or node_type == "background":
+		return visual_data
+	var is_completed = _is_story_room_visible_as_completed(visual_data, state)
+	if is_player_here or is_completed:
+		return visual_data
+	if ResourceLoader.exists(FOG_OF_WAR_ICON_PATH):
+		visual_data["custom_icon_path"] = FOG_OF_WAR_ICON_PATH
+		visual_data["force_custom_icon"] = true
+		visual_data["icon_scale_x"] = 1.0
+		visual_data["icon_scale_y"] = 1.0
+		visual_data["icon_offset_x"] = 0.0
+		visual_data["icon_offset_y"] = 0.0
+		visual_data["icon_alpha"] = 1.0
+	return visual_data
+
+func _is_story_room_visible_as_completed(node_data: Dictionary, state: Dictionary) -> bool:
+	if bool(node_data.get("is_home", false)) or str(node_data.get("type", "")) == "home":
+		return true
+	return bool(state.get("completed", false))
+
+func _draw_current_adjacency_lines(current_id: String, revealed_set: Dictionary):
+	if not lines_container or current_id == "" or not node_positions_by_id.has(current_id):
+		return
+	var current_center = node_positions_by_id[current_id] + current_node_half_size
+	for target_id in adjacent_node_ids:
+		if not revealed_set.has(target_id):
+			continue
+		if not node_positions_by_id.has(target_id):
+			continue
+		var target_center = node_positions_by_id[target_id] + current_node_half_size
+		var segment = Line2D.new()
+		segment.width = CURRENT_CONNECTION_WIDTH
+		segment.default_color = CURRENT_CONNECTION_COLOR
+		segment.begin_cap_mode = Line2D.LINE_CAP_ROUND
+		segment.end_cap_mode = Line2D.LINE_CAP_ROUND
+		segment.add_point(current_center)
+		segment.add_point(target_center)
+		lines_container.add_child(segment)
 
 func _recalculate_map_bounds(biome: String):
 	var first = true
@@ -907,7 +969,7 @@ func _is_backtrack(target_id: String) -> bool:
 	var room_state = GameManager.world_state.rooms.get(target_id, {})
 	if bool(room_state.get("completed", false)):
 		return false
-	return GameManager.get_room_visit_count_this_run(target_id) >= 2
+	return GameManager.get_room_visit_count_this_run(target_id) >= 1
 
 func _is_home_node(node_data: Dictionary) -> bool:
 	return bool(node_data.get("is_home", false)) or str(node_data.get("type", "")) == "home"

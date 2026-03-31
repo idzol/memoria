@@ -266,6 +266,13 @@ func _on_collection_card_pressed(card_ui: Control, id: String, mode: String, sou
 	)
 
 func _can_transfer(mode: String, source: String, id: String, show_feedback: bool) -> bool:
+	if not _can_modify_loadout_here():
+		if show_feedback:
+			_show_info_toast(LocalizationManager.translate(
+				"character.toast.home_only_changes",
+				"You must be safe at home to make these changes."
+			))
+		return false
 	if mode == "deck":
 		var min_required = GameManager.player_level
 		if source == "active":
@@ -316,6 +323,12 @@ func _can_transfer(mode: String, source: String, id: String, show_feedback: bool
 					))
 				return false
 	return true
+
+func _can_modify_loadout_here() -> bool:
+	var current_node = GameManager.current_node
+	if current_node.is_empty():
+		return false
+	return bool(current_node.get("is_home", false)) or str(current_node.get("type", "")) == "home"
 
 func _apply_transfer(mode: String, source: String, id: String):
 	if mode == "deck":
