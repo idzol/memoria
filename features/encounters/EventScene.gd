@@ -92,11 +92,13 @@ func _input(event):
 			_refresh_log_view()
 			get_viewport().set_input_as_handled()
 			return
-	if _is_dialog_sequence_active() and (
-		event.is_action_pressed("ui_accept")
-		or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT)
-	):
+	if _is_dialog_sequence_active() and _is_narration_progress_input(event):
 		_advance_dialog_sequence()
+		get_viewport().set_input_as_handled()
+		return
+	if _is_narration_progress_input(event) and _can_collapse_dialog_panel():
+		_configure_dialog_panel(false)
+		get_viewport().set_input_as_handled()
 		return
 	if event.is_action_pressed("ui_cancel"):
 		if _handle_menu_cancel():
@@ -104,15 +106,13 @@ func _input(event):
 		_on_exit_pressed()
 
 func _on_dialog_panel_gui_input(event: InputEvent):
-	if not (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
+	if not _is_narration_progress_input(event):
 		return
 	if _is_dialog_sequence_active():
 		_advance_dialog_sequence()
 		get_viewport().set_input_as_handled()
 		return
-	if choice_container and choice_container.visible and choice_container.get_child_count() > 0:
-		return
-	if dialog_panel and dialog_panel.custom_minimum_size.y > _dialog_panel_collapsed_height:
+	if _can_collapse_dialog_panel():
 		_configure_dialog_panel(false)
 		get_viewport().set_input_as_handled()
 
@@ -338,7 +338,15 @@ func _get_room_character_scale() -> Vector2:
 func _get_room_floor_texture(res: RoomData) -> Texture2D:
 	if not res:
 		return null
-	return res.floor
+	if res.floor:
+		return res.floor
+	var biome = str(res.biome).strip_edges()
+	if biome == "":
+		return null
+	var fallback_path = "res://assets/rooms/floor/%s_floor.png" % biome
+	if ResourceLoader.exists(fallback_path):
+		return load(fallback_path) as Texture2D
+	return null
 
 func _on_viewport_resized():
 	_fit_floor_to_container_width()
@@ -419,6 +427,18 @@ func _configure_top_bar():
 
 func _get_narrator_name() -> String:
 	return LocalizationManager.translate("dialog.speaker.narrator", "Narrator")
+
+func _can_collapse_dialog_panel() -> bool:
+	if choice_container and choice_container.visible and choice_container.get_child_count() > 0:
+		return false
+	return dialog_panel != null and dialog_panel.custom_minimum_size.y > _dialog_panel_collapsed_height
+
+func _is_narration_progress_input(event: InputEvent) -> bool:
+	if event is InputEventKey:
+		return event.pressed and not event.is_echo()
+	if event is InputEventMouseButton:
+		return event.pressed
+	return false
 
 func _append_dialog_log(speaker: String, text: String):
 	GameManager.add_run_log("%s: %s" % [speaker, text])

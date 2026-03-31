@@ -38,7 +38,9 @@ func generate_battle_map() -> Dictionary:
 		var size = _get_grid_size_for_biome_index(biome_index)
 		var progress = float(biome_index) / max(1.0, float(BIOME_ORDER.size() - 1))
 		progress_updated.emit(progress, "Charting the %s..." % biome_key.capitalize())
-		await get_tree().process_frame
+		var scene_tree = _get_scene_tree()
+		if scene_tree != null:
+			await scene_tree.process_frame
 
 		if not _used_room_paths_by_biome.has(biome_key):
 			_used_room_paths_by_biome[biome_key] = {}
@@ -98,6 +100,13 @@ func generate_battle_map() -> Dictionary:
 
 	progress_updated.emit(1.0, "Synchronization complete.")
 	return map
+
+func _get_scene_tree() -> SceneTree:
+	var tree = get_tree()
+	if tree != null:
+		return tree
+	var main_loop = Engine.get_main_loop()
+	return main_loop as SceneTree
 
 func _build_node_id(biome: String, row: int, col: int) -> String:
 	return "node_%s_%d_%d" % [biome, row, col]

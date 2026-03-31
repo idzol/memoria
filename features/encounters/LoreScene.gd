@@ -31,6 +31,16 @@ func _ready():
 	# 3. Start Narrative
 	_init_narrative()
 
+func _input(event):
+	if not _is_narration_progress_input(event):
+		return
+	if _has_multiple_visible_options():
+		return
+	var primary_button = _get_primary_option_button()
+	if primary_button:
+		primary_button.pressed.emit()
+		get_viewport().set_input_as_handled()
+
 func _setup_portraits():
 	# Load Player Portrait
 	var player_path = "res://assets/player/base.png"
@@ -127,3 +137,25 @@ func _on_finish_encounter():
 
 	# Branching return path
 	get_tree().change_scene_to_file(GameManager.get_active_biome_map_scene_path())
+
+func _get_primary_option_button() -> Button:
+	for child in option_container.get_children():
+		if child is Button and child.visible and not child.disabled:
+			return child as Button
+	return null
+
+func _has_multiple_visible_options() -> bool:
+	var visible_count = 0
+	for child in option_container.get_children():
+		if child is Button and child.visible and not child.disabled:
+			visible_count += 1
+			if visible_count > 1:
+				return true
+	return false
+
+func _is_narration_progress_input(event: InputEvent) -> bool:
+	if event is InputEventKey:
+		return event.pressed and not event.is_echo()
+	if event is InputEventMouseButton:
+		return event.pressed
+	return false

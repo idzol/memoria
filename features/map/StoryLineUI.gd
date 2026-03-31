@@ -307,13 +307,14 @@ func _activate_selected_entry():
 func _handle_entry_action(biome: String, kind: String):
 	GameManager.set_selected_story_biome(biome)
 	if kind == "story":
-		GameManager.begin_story_sequence(biome, GameManager.get_story_line_scene_path(), false, false)
+		_open_selected_biome_map()
 		return
 	_open_selected_biome_map()
 
 func _on_story_tile_pressed(biome: String):
 	_select_entry(biome, "story")
-	GameManager.begin_story_sequence(biome, GameManager.get_story_line_scene_path(), false, false)
+	GameManager.set_selected_story_biome(biome)
+	_open_selected_biome_map()
 
 func _on_summary_tile_pressed(biome: String):
 	_select_entry(biome, "summary")
@@ -332,7 +333,7 @@ func _on_entry_wrapper_pressed(biome: String, kind: String):
 	_select_entry(biome, kind)
 	GameManager.set_selected_story_biome(biome)
 	if kind == "story":
-		GameManager.begin_story_sequence(biome, GameManager.get_story_line_scene_path(), false, false)
+		_open_selected_biome_map()
 		return
 	_open_selected_biome_map()
 

@@ -25,6 +25,7 @@ extends Node2D
 @onready var avatar_button = get_node_or_null("%AvatarButton")
 @onready var story_button = get_node_or_null("%StoryButton")
 @onready var exit_button = get_node_or_null("%ExitButton")
+@onready var status_bar = get_node_or_null("UI/MainLayout/StatusBar")
 
 # Status Bar References
 @onready var energy_pips = %EnergyPips
@@ -47,6 +48,7 @@ extends Node2D
 
 # UI Layers
 @onready var dialog_overlay = %DialogOverlay
+@onready var dialog_overlay_bg = get_node_or_null("DialogOverlay/BG")
 @onready var dialog_box = $DialogOverlay/VBox
 @onready var dialog_speaker = %DialogSpeaker
 @onready var dialog_text = %DialogText
@@ -204,6 +206,10 @@ func _ready():
 		%MenuIconBtn.pressed.connect(_toggle_in_game_menu)
 	if exit_button:
 		exit_button.pressed.connect(_exit_cleared_room)
+	if dialog_overlay_bg and not dialog_overlay_bg.gui_input.is_connected(_on_dialog_overlay_gui_input):
+		dialog_overlay_bg.gui_input.connect(_on_dialog_overlay_gui_input)
+	if dialog_box and not dialog_box.gui_input.is_connected(_on_dialog_overlay_gui_input):
+		dialog_box.gui_input.connect(_on_dialog_overlay_gui_input)
 	_configure_top_bar()
 	if dialog_speaker:
 		dialog_speaker.text = LocalizationManager.translate("dialog.speaker.narrator", "Narrator")
@@ -288,14 +294,11 @@ func _input(event):
 		return
 
 	# Dialog overlay: Enter accepts the primary option (e.g. "Enter Combat").
-	if _is_room_dialog_active() and (
-		event.is_action_pressed("ui_accept")
-		or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT)
-	):
-		_advance_room_dialog()
+	if _is_room_dialog_active() and _is_narration_progress_input(event):
+		_handle_dialog_overlay_progress_input()
 		return
-	if dialog_overlay and dialog_overlay.visible and event.is_action_pressed("ui_accept"):
-		_activate_dialog_primary_option()
+	if dialog_overlay and dialog_overlay.visible and _is_narration_progress_input(event):
+		_handle_dialog_overlay_progress_input()
 		return
 
 	if _can_handle_keyboard_card_input():
@@ -468,6 +471,48 @@ func _activate_dialog_primary_option():
 			(child as Button).pressed.emit()
 			return
 
+func _dialog_has_primary_option() -> bool:
+	if not has_node("%OptionContainer"):
+		return false
+	for child in %OptionContainer.get_children():
+		if child is Button and child.visible and not child.disabled:
+			return true
+	return false
+
+func _is_dialog_box_expanded() -> bool:
+	return dialog_box != null and (dialog_box.offset_bottom - dialog_box.offset_top) > (_dialog_box_collapsed_height + 1.0)
+
+func _is_narration_progress_input(event: InputEvent) -> bool:
+	if event is InputEventKey:
+		return event.pressed and not event.is_echo()
+	if event is InputEventMouseButton:
+		return event.pressed
+	return false
+
+func _should_close_cleared_room_overlay() -> bool:
+	if not is_cleared_room or dialog_overlay == null or not dialog_overlay.visible or dialog_text == null:
+		return false
+	var cleared_text = LocalizationManager.translate("dialog.room.cleared", "You see nothing further of note here.")
+	return dialog_text.text == cleared_text
+
+func _handle_dialog_overlay_progress_input():
+	if _is_room_dialog_active():
+		_advance_room_dialog()
+	elif _should_close_cleared_room_overlay():
+		dialog_overlay.hide()
+	elif _dialog_has_primary_option():
+		_activate_dialog_primary_option()
+	elif _is_dialog_box_expanded():
+		_configure_dialog_box(false)
+	get_viewport().set_input_as_handled()
+
+func _on_dialog_overlay_gui_input(event: InputEvent):
+	if dialog_overlay == null or not dialog_overlay.visible:
+		return
+	if not _is_narration_progress_input(event):
+		return
+	_handle_dialog_overlay_progress_input()
+
 func _get_grid_cards() -> Array:
 	var result: Array = []
 	for child in grid.get_children():
@@ -532,6 +577,8 @@ func _sync_status_bar():
 		phase_label.text = "ROUND: %d" % round_number
 
 func _configure_top_bar():
+	if status_bar:
+		status_bar.visible = true
 	if avatar_button:
 		avatar_button.disabled = true
 		avatar_button.modulate = Color(0.6, 0.6, 0.6, 1.0)
@@ -543,6 +590,16 @@ func _configure_top_bar():
 	if exit_button:
 		exit_button.visible = false
 		exit_button.text = LocalizationManager.translate("dialog.exit_overworld", "Exit to Overworld")
+
+func _set_combat_ui_visibility(show_stage: bool, show_log: bool = true):
+	if battle_ui:
+		battle_ui.show()
+	if status_bar:
+		status_bar.visible = true
+	if stage_layout_container:
+		stage_layout_container.visible = show_stage
+	if battle_log_row:
+		battle_log_row.visible = show_log
 
 # --- INPUT & FLOW ---
 func _on_card_flipped(card):
@@ -614,10 +671,16 @@ func _check_match():
 			await _play_object_reward_focus_preview(c1.card_type)
 			await _resolve_object_match(c1.card_type)
 			return
-		await _show_card_preview_for_id(c1.card_type, true, true)
-		
 		_process_combat_action(c1.card_type)
 		update_ui()
+		if e_hp <= 0:
+			var lethal_card_res = _load_card_data(c1.card_type)
+			if lethal_card_res:
+				_refresh_player_discard_preview(lethal_card_res)
+			_hide_card_preview()
+			_check_win_loss()
+			return
+		await _show_card_preview_for_id(c1.card_type, true, true)
 		_check_win_loss()
 		
 		# Resolve the turn attempt since a match was found
@@ -1231,7 +1294,10 @@ func _setup_cleared_room_view():
 	can_flip = false
 	if grid:
 		grid.visible = false
-	battle_ui.hide()
+	is_log_expanded = false
+	_restore_log_to_collapsed_row()
+	_set_combat_ui_visibility(false, true)
+	_refresh_log_view()
 	dialog_overlay.show()
 	_configure_dialog_box(true)
 	if enemy_sprite:
@@ -1308,7 +1374,7 @@ func _show_enter_combat_button():
 	btn.custom_minimum_size.y = 50
 	btn.pressed.connect(func():
 		dialog_overlay.hide()
-		battle_ui.show()
+		_set_combat_ui_visibility(true, true)
 		can_flip = true
 		setup_board()
 	)
@@ -1319,6 +1385,7 @@ func _show_exit_cleared_room_button():
 	for child in %OptionContainer.get_children():
 		child.queue_free()
 	_configure_dialog_box(false)
+	_set_combat_ui_visibility(false, false)
 	if exit_button:
 		exit_button.visible = true
 
@@ -2011,7 +2078,15 @@ func _get_room_character_scale() -> Vector2:
 func _get_room_floor_texture(res: RoomData) -> Texture2D:
 	if not res:
 		return null
-	return res.floor
+	if res.floor:
+		return res.floor
+	var biome = str(res.biome).strip_edges()
+	if biome == "":
+		return null
+	var fallback_path = "res://assets/rooms/floor/%s_floor.png" % biome
+	if ResourceLoader.exists(fallback_path):
+		return load(fallback_path) as Texture2D
+	return null
 
 func _on_viewport_resized():
 	_fit_floor_to_container_width()

@@ -16,6 +16,8 @@ var asset_library: MapAssetData = preload("res://data/map/map_data.tres")
 @onready var player_indicator = %PlayerIcon
 @onready var fill = %Fill
 @onready var border = %Border
+@onready var hex_fill = %HexFill
+@onready var hex_border = %HexBorder
 @onready var room_name_label: Label = %RoomNameLabel
 
 var node_data = null
@@ -95,6 +97,10 @@ func _resolve_ui_refs():
 		fill = get_node_or_null("%Fill")
 	if border == null:
 		border = get_node_or_null("%Border")
+	if hex_fill == null:
+		hex_fill = get_node_or_null("%HexFill")
+	if hex_border == null:
+		hex_border = get_node_or_null("%HexBorder")
 	if room_name_label == null:
 		room_name_label = get_node_or_null("%RoomNameLabel") as Label
 	if not resized.is_connected(_refresh_visual_transforms):
@@ -104,7 +110,7 @@ func set_highlight_state(is_player_here: bool, is_selected: bool):
 	_is_player_here = is_player_here
 	_is_selected = is_selected
 	if _is_hex_node:
-		queue_redraw()
+		_update_hex_visuals()
 		return
 	if not border or not fill:
 		return
@@ -134,6 +140,11 @@ func _apply_base_styles():
 			border.visible = false
 		if fill:
 			fill.visible = false
+		if hex_fill:
+			hex_fill.visible = true
+		if hex_border:
+			hex_border.visible = true
+		_update_hex_visuals()
 		return
 	if border:
 		border.visible = true
@@ -153,6 +164,10 @@ func _apply_base_styles():
 			fill_style.border_width_top = 0
 			fill_style.border_width_right = 0
 			fill_style.border_width_bottom = 0
+	if hex_fill:
+		hex_fill.visible = false
+	if hex_border:
+		hex_border.visible = false
 
 func _apply_icon_layout():
 	if not icon_rect:
@@ -273,17 +288,7 @@ func _refresh_visual_transforms():
 		return
 	_apply_icon_layout()
 	_apply_visual_scale(float(node_data.get("node_visual_scale", 1.0)) if node_data is Dictionary else 1.0)
-
-func _draw():
-	if not _is_hex_node:
-		return
-	var points = _get_hex_points()
-	var fill_color = _get_hex_fill_color()
-	var border_color = _get_hex_border_color()
-	draw_colored_polygon(points, fill_color)
-	var border_points = points.duplicate()
-	border_points.append(points[0])
-	draw_polyline(border_points, border_color, 3.0, true)
+	_update_hex_visuals()
 
 func _get_hex_points() -> PackedVector2Array:
 	var pad = 1.0
@@ -318,6 +323,19 @@ func _get_hex_border_color() -> Color:
 	if _is_selected:
 		return SELECTED_COLOR
 	return DEFAULT_BORDER_COLOR
+
+func _update_hex_visuals():
+	if not _is_hex_node:
+		return
+	var points = _get_hex_points()
+	if hex_fill:
+		hex_fill.polygon = points
+		hex_fill.color = _get_hex_fill_color()
+	if hex_border:
+		var border_points = points.duplicate()
+		border_points.append(points[0])
+		hex_border.points = border_points
+		hex_border.default_color = _get_hex_border_color()
 
 func _on_button_pressed():
 	if node_data:

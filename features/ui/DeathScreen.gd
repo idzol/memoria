@@ -73,4 +73,4 @@ func _fade_and_exit():
 	if GameManager.is_battle_mode:
 		get_tree().change_scene_to_file("res://features/ui/RunSummary.tscn")
 	else:
-		get_tree().change_scene_to_file(GameManager.get_active_biome_map_scene_path())
+		get_tree().change_scene_to_file(GameManager.get_story_line_scene_path())

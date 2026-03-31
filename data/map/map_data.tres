@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://dg3dn6ia3w8ok" path="res://assets/maps/icon/boss.png" id="7_boss"]
 [ext_resource type="Texture2D" uid="uid://qyksnobseyun" path="res://assets/maps/icon/mystery.png" id="8_mystery"]
 [ext_resource type="Texture2D" uid="uid://dbat5ko8nxhfs" path="res://assets/maps/backgrounds/map_town_background.png" id="9_town_bg"]
+[ext_resource type="Texture2D" path="res://assets/maps/backgrounds/map_tutorial_background.png" id="10_tutorial_bg"]
 [ext_resource type="Texture2D" uid="uid://b8q6jmoqu5536" path="res://assets/maps/backgrounds/map_forest_background.png" id="10_forest_bg"]
 [ext_resource type="Texture2D" uid="uid://5jsfxoknpiu" path="res://assets/maps/backgrounds/map_desert_background.png" id="12_desert_bg"]
 [ext_resource type="Texture2D" uid="uid://bhwhm24nn1cnx" path="res://assets/maps/backgrounds/map_swamp_background.png" id="13_swamp_bg"]
@@ -33,6 +34,7 @@ map_icon_event = ExtResource("6_event")
 map_icon_boss = ExtResource("7_boss")
 map_icon_mystery = ExtResource("8_mystery")
 map_town_background = ExtResource("9_town_bg")
+map_tutorial_background = ExtResource("10_tutorial_bg")
 map_forest_background = ExtResource("10_forest_bg")
 map_ice_caves_background = SubResource("Resource_a4kn3")
 map_desert_background = ExtResource("12_desert_bg")
