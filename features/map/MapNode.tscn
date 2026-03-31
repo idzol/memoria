@@ -75,6 +75,13 @@ mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
+[node name="HexFill" type="Polygon2D" parent="."]
+unique_name_in_owner = true
+visible = false
+z_index = 1
+polygon = PackedVector2Array(90, 0, 180, 45, 180, 135, 90, 180, 0, 135, 0, 45)
+color = Color(0.08, 0.09, 0.1, 0.58)
+
 [node name="Border" type="Panel" parent="."]
 unique_name_in_owner = true
 z_index = 2
@@ -87,6 +94,17 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_node")
 
+[node name="HexBorder" type="Line2D" parent="."]
+unique_name_in_owner = true
+visible = false
+z_index = 2
+points = PackedVector2Array(90, 0, 180, 45, 180, 135, 90, 180, 0, 135, 0, 45, 90, 0)
+width = 3.0
+default_color = Color(0.58, 0.58, 0.62, 0.92)
+joint_mode = 1
+begin_cap_mode = 1
+end_cap_mode = 1
+
 [node name="Button" type="Button" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -94,6 +112,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+focus_mode = 0
 flat = true
 
 [node name="RoomNameLabel" type="Label" parent="."]

@@ -63,7 +63,7 @@ character_select.title,CHOOSE YOUR IDENTITY,ELIGE TU IDENTIDAD,CHOISISSEZ VOTRE 
 character_select.class.warrior,WARRIOR,GUERRERO,GUERRIER,KRIEGER
 character_select.class.scholar,SCHOLAR,ERUDITO,ERUDIT,GELEHRTER
 character_select.class.alchemist,ALCHEMIST,ALQUIMISTA,ALCHIMISTE,ALCHEMIST
-character_select.stats_title,LEVEL 1 STATS,ESTADISTICAS DE NIVEL 1,STATISTIQUES NIVEAU 1,WERTE AUF STUFE 1
+character_select.stats_title,IDENTITY,TODO,TODO,TODO
 character_select.health,HEALTH,SALUD,SANTE,GESUNDHEIT
 character_select.energy,ENERGY,ENERGIA,ENERGIE,ENERGIE
 character_select.attack,ATTACK,ATAQUE,ATTAQUE,ANGRIFF
@@ -98,6 +98,7 @@ character.toast.deck_full,Active deck is full ({count} cards).,El mazo activo es
 character.toast.no_item_copy,No unallocated copy of that item is available.,No hay una copia libre de ese objeto.,Aucune copie libre de cet objet n'est disponible.,Keine freie Kopie dieses Gegenstands ist verfugbar.
 character.toast.max_active_items,You may only have {count} active items.,Solo puedes tener {count} objetos activos.,Vous ne pouvez avoir que {count} objets actifs.,Du kannst nur {count} aktive Gegenstande haben.
 character.toast.min_deck_exit,You must have at least {count} unique cards in your active deck.,Debes tener al menos {count} cartas unicas en tu mazo activo.,Vous devez avoir au moins {count} cartes uniques dans votre paquet actif.,Du musst mindestens {count} einzigartige Karten in deinem aktiven Deck haben.
+character.toast.home_only_changes,You must be safe at home to make these changes.,Debes estar a salvo en casa para hacer estos cambios.,Vous devez etre en securite chez vous pour effectuer ces changements.,Du musst sicher zu Hause sein um diese Anderungen vorzunehmen.
 character.tutorial.memory_cards,Memory cards are how you interact with the world. You need at a minimum number (1) of unique cards,Las cartas de memoria son como interactuas con el mundo. Necesitas como minimo (1) cartas unicas,Les cartes memoire sont votre facon d'interagir avec le monde. Vous avez besoin d'au moins (1) carte unique,Speicherkarten sind deine Art mit der Welt zu interagieren. Du brauchst mindestens (1) einzigartige Karte
 character.tutorial.first_item_intro,"Select items, to manage your equipment","Selecciona objetos para gestionar tu equipo","Selectionnez des objets pour gerer votre equipement","Wahle Gegenstande um deine Ausrustung zu verwalten"
 character.tutorial.item_screen,"You can equip a maximum number of items (3) for the quest","Puedes equipar un numero maximo de objetos (3) para la mision","Vous pouvez equiper un nombre maximum d'objets (3) pour la quete","Du kannst fur die Quest maximal (3) Gegenstande ausrusten"

@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://dbrsx3v5qfpl3" path="res://features/map/WorldMapUI.gd" id="1_logic"]
 [ext_resource type="Texture2D" uid="uid://bfnulykm8fhss" path="res://assets/maps/backgrounds/map_battle_background.png" id="2_bg_tex"]
 [ext_resource type="Theme" path="res://assets/themes/Map.theme" id="3_map_theme"]
+[ext_resource type="Theme" path="res://assets/themes/Greek.theme" id="4_topbar_theme"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_topbar"]
 bg_color = Color(0.05, 0.05, 0.07, 0.95)
@@ -107,7 +108,7 @@ layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
 grow_horizontal = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_topbar")
+theme = ExtResource("4_topbar_theme")
 
 [node name="Margin" type="MarginContainer" parent="TopBar" unique_id=1573176411]
 layout_mode = 2
@@ -183,6 +184,31 @@ custom_minimum_size = Vector2(42, 34)
 layout_mode = 2
 size_flags_vertical = 4
 text = "☰"
+
+[node name="MapZoomControls" type="VBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -62.0
+offset_top = 112.0
+offset_right = -12.0
+offset_bottom = 208.0
+grow_horizontal = 0
+theme_override_constants/separation = 8
+
+[node name="ZoomInButton" type="Button" parent="MapZoomControls"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 42)
+layout_mode = 2
+text = "+"
+
+[node name="ZoomOutButton" type="Button" parent="MapZoomControls"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 42)
+layout_mode = 2
+text = "-"
 
 [node name="InfoToastBox" type="PanelContainer" parent="." unique_id=707777001]
 unique_name_in_owner = true

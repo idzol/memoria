@@ -11,6 +11,13 @@ extends Control
 @onready var background = %Background
 @onready var floor_rect = get_node_or_null("%FloorRect")
 @onready var room_title = %RoomTitle
+@onready var biome_label = get_node_or_null("%BiomeLabel")
+@onready var phase_label = get_node_or_null("%PhaseLabel")
+@onready var tracker_text = get_node_or_null("%TrackerText")
+@onready var avatar_button = get_node_or_null("%AvatarButton")
+@onready var story_button = get_node_or_null("%StoryButton")
+@onready var menu_icon_btn = get_node_or_null("%MenuIconBtn")
+@onready var energy_pips = get_node_or_null("%EnergyPips")
 @onready var battle_log_row = %BattleLogRow
 @onready var log_left_spacer = %LeftSpacer
 @onready var log_box = %LogBox
@@ -59,6 +66,15 @@ func _ready():
 		in_game_menu.hide()
 
 	exit_button.pressed.connect(_on_exit_pressed)
+	if dialog_panel and not dialog_panel.gui_input.is_connected(_on_dialog_panel_gui_input):
+		dialog_panel.gui_input.connect(_on_dialog_panel_gui_input)
+	if avatar_button:
+		avatar_button.pressed.connect(_open_character_screen)
+	if story_button:
+		story_button.pressed.connect(_open_story_line)
+	if menu_icon_btn:
+		menu_icon_btn.pressed.connect(_toggle_in_game_menu)
+	_configure_top_bar()
 	_setup_battle_log_ui()
 	if not SignalBus.run_log_updated.is_connected(_on_run_log_updated):
 		SignalBus.run_log_updated.connect(_on_run_log_updated)
@@ -68,22 +84,37 @@ func _ready():
 	get_viewport().size_changed.connect(_on_viewport_resized)
 
 func _input(event):
+	if get_viewport().is_input_handled():
+		return
 	if is_log_expanded and event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		if not _is_point_inside_log(event.position):
 			is_log_expanded = false
 			_refresh_log_view()
 			get_viewport().set_input_as_handled()
 			return
-	if _is_dialog_sequence_active() and (
-		event.is_action_pressed("ui_accept")
-		or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT)
-	):
+	if _is_dialog_sequence_active() and _is_narration_progress_input(event):
 		_advance_dialog_sequence()
+		get_viewport().set_input_as_handled()
+		return
+	if _is_narration_progress_input(event) and _can_collapse_dialog_panel():
+		_configure_dialog_panel(false)
+		get_viewport().set_input_as_handled()
 		return
 	if event.is_action_pressed("ui_cancel"):
 		if _handle_menu_cancel():
 			return
 		_on_exit_pressed()
+
+func _on_dialog_panel_gui_input(event: InputEvent):
+	if not _is_narration_progress_input(event):
+		return
+	if _is_dialog_sequence_active():
+		_advance_dialog_sequence()
+		get_viewport().set_input_as_handled()
+		return
+	if _can_collapse_dialog_panel():
+		_configure_dialog_panel(false)
+		get_viewport().set_input_as_handled()
 
 func _handle_menu_cancel() -> bool:
 	if not in_game_menu or not in_game_menu.visible:
@@ -92,6 +123,14 @@ func _handle_menu_cancel() -> bool:
 		return in_game_menu.handle_cancel()
 	in_game_menu.close()
 	return true
+
+func _toggle_in_game_menu():
+	if not in_game_menu:
+		return
+	if in_game_menu.visible:
+		in_game_menu.close()
+	else:
+		in_game_menu.open()
 
 func _load_encounter_data():
 	var node = GameManager.current_node
@@ -102,6 +141,12 @@ func _load_encounter_data():
 	
 	# 1. Visuals
 	room_title.text = current_room_res.room_name
+	if biome_label:
+		biome_label.text = str(current_room_res.biome).capitalize()
+	if phase_label:
+		phase_label.text = LocalizationManager.translate("worldmap.phase.event", "EVENT")
+	if tracker_text:
+		tracker_text.text = current_room_res.room_name
 	dialog_speaker.text = LocalizationManager.translate("dialog.speaker.narrator", "Narrator")
 	exit_button.text = LocalizationManager.translate("dialog.exit_overworld", "Exit to Overworld")
 	_apply_room_environment(current_room_res)
@@ -293,7 +338,15 @@ func _get_room_character_scale() -> Vector2:
 func _get_room_floor_texture(res: RoomData) -> Texture2D:
 	if not res:
 		return null
-	return res.floor
+	if res.floor:
+		return res.floor
+	var biome = str(res.biome).strip_edges()
+	if biome == "":
+		return null
+	var fallback_path = "res://assets/rooms/floor/%s_floor.png" % biome
+	if ResourceLoader.exists(fallback_path):
+		return load(fallback_path) as Texture2D
+	return null
 
 func _on_viewport_resized():
 	_fit_floor_to_container_width()
@@ -359,8 +412,33 @@ func _on_exit_pressed():
 	# 1. Branching return path
 	get_tree().change_scene_to_file(GameManager.get_active_biome_map_scene_path())
 
+func _open_character_screen():
+	GameManager.profile_return_scene = "res://features/encounters/EventScene.tscn"
+	get_tree().change_scene_to_file("res://features/ui/CharacterScreen.tscn")
+
+func _open_story_line():
+	SceneTransition.change_scene_to_file(GameManager.get_story_line_scene_path())
+
+func _configure_top_bar():
+	if energy_pips:
+		energy_pips.visible = false
+	if exit_button:
+		exit_button.text = LocalizationManager.translate("dialog.exit_overworld", "Exit to Overworld")
+
 func _get_narrator_name() -> String:
 	return LocalizationManager.translate("dialog.speaker.narrator", "Narrator")
+
+func _can_collapse_dialog_panel() -> bool:
+	if choice_container and choice_container.visible and choice_container.get_child_count() > 0:
+		return false
+	return dialog_panel != null and dialog_panel.custom_minimum_size.y > _dialog_panel_collapsed_height
+
+func _is_narration_progress_input(event: InputEvent) -> bool:
+	if event is InputEventKey:
+		return event.pressed and not event.is_echo()
+	if event is InputEventMouseButton:
+		return event.pressed
+	return false
 
 func _append_dialog_log(speaker: String, text: String):
 	GameManager.add_run_log("%s: %s" % [speaker, text])

@@ -121,6 +121,10 @@ func clear_run_log():
 	run_log.clear()
 	SignalBus.run_log_updated.emit()
 
+func reset_current_run_room_tracking():
+	current_run_visited_nodes = []
+	biome_run_paths = {}
+
 func randomize_world_map_skew_direction():
 	var directions = ["up", "down", "left", "right"]
 	world_map_skew_direction = directions[randi() % directions.size()]
@@ -599,7 +603,7 @@ func start_battle_mode():
 	world_state.biomes = {}
 	world_state.enemies = {}
 	pending_post_battle_scene = ""
-	current_run_visited_nodes = []
+	reset_current_run_room_tracking()
 	player_biome = "home"
 	selected_story_biome = "home"
 	randomize_world_map_skew_direction()
@@ -621,11 +625,10 @@ func start_actual_run():
 	level_up_return_scene = ""
 	pending_post_battle_scene = ""
 	completed_nodes = []
-	current_run_visited_nodes = []
+	reset_current_run_room_tracking()
 	player_grid_pos = Vector2i(-99, -99)
 	player_biome = "home"
 	selected_story_biome = "home"
-	biome_run_paths = {}
 	randomize_world_map_skew_direction()
 	active_deck = ["sword", "shield", "heart"]
 	recalculate_player_totals()
@@ -1046,7 +1049,7 @@ func begin_new_story_run(return_biome: String = ""):
 	pending_loot = []
 	run_loot = []
 	completed_nodes = []
-	current_run_visited_nodes = []
+	reset_current_run_room_tracking()
 	enter_story_biome(return_biome if return_biome != "" else (player_biome if player_biome != "" else "home"), true)
 
 func get_current_story_chapter_index() -> int:

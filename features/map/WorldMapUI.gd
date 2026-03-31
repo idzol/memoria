@@ -9,9 +9,12 @@ extends Control
 @onready var day_button = %DayButton
 @onready var tracker_text = %TrackerText
 @onready var scroll_area = %MapArea
+@onready var lines_container = %LinesContainer
 @onready var avatar_button = %AvatarButton
 @onready var story_button = %StoryButton
 @onready var menu_icon_btn = %MenuIconBtn
+@onready var zoom_out_button = %ZoomOutButton
+@onready var zoom_in_button = %ZoomInButton
 @onready var map_content = $MapArea/MapContent
 @onready var info_toast_box = %InfoToastBox
 @onready var info_toast_label = %InfoToastLabel
@@ -36,6 +39,7 @@ extends Control
 var node_scene = preload("res://features/map/MapNode.tscn")
 var in_game_menu_scene = preload("res://features/ui/InGameMenu.tscn")
 var map_assets: MapAssetData = preload("res://data/map/map_data.tres")
+var worldmap_tile_background_settings = preload("res://features/map/WorldMapTileBackgroundSettings.gd")
 
 var in_game_menu = null
 var _info_toast_tween: Tween
@@ -49,9 +53,7 @@ var visible_max_layer: int = 0
 var visible_min_column: int = 0
 var visible_max_column: int = 0
 
-const BASE_NODE_SIZE = Vector2(180, 180)
-const BASE_LAYER_SPACING = 135.0
-const BASE_ROW_SPACING = 180.0
+const BASE_NODE_SIZE = Vector2(160, 160)
 const BASE_TOP_PADDING = 120.0
 const BACKTRACK_PROMPT = "You have a feeling you have been here before. An intense pain fills your mind as memory floods back"
 const SETTINGS_PATH := "user://settings.cfg"
@@ -61,6 +63,17 @@ const RUN_LOG_KEY := "show_run_log"
 const TUTORIAL_FLAGS_SECTION := "tutorial_flags"
 const TUTORIAL_TOAST_DURATION := 10.0
 const TUTORIAL_TOAST_COLOR := Color(0.4, 0.7, 1.0, 1.0)
+const DIRECT_LAUNCH_BIOMES := ["home", "town", "forest", "ice_caves", "desert", "swamp", "abyss", "void", "the_core"]
+const MIN_MAP_ZOOM := 0.6
+const MAX_MAP_ZOOM := 1.6
+const MAP_ZOOM_STEP := 0.025
+const MAP_DRAG_DEADZONE := 4.0
+const MIN_HEX_HORIZONTAL_PADDING := 32.0
+const MIN_HEX_VERTICAL_PADDING := 20.0
+const MAP_BOTTOM_SAFE_PADDING := 140.0
+const FOG_OF_WAR_ICON_PATH := "res://assets/rooms/map/all_fog_of_war.png"
+const CURRENT_CONNECTION_COLOR := Color(0.84, 0.9, 1.0, 0.95)
+const CURRENT_CONNECTION_WIDTH := 10.0
 const CULT_DAY_NAMES := [
 	"Protodia",
 	"Hoplidia",
@@ -73,12 +86,20 @@ const CULT_DAY_NAMES := [
 ]
 
 var current_node_scale: float = 1.0
+var current_fit_scale: float = 1.0
+var current_zoom_factor: float = 1.0
 var current_node_size: Vector2 = BASE_NODE_SIZE
 var current_node_half_size: Vector2 = BASE_NODE_SIZE * 0.5
-var current_layer_spacing: float = BASE_LAYER_SPACING
-var current_row_spacing: float = BASE_ROW_SPACING
+var current_layer_spacing: float = BASE_NODE_SIZE.y
+var current_row_spacing: float = BASE_NODE_SIZE.x
+var current_horizontal_padding: float = 64.0
+var current_vertical_padding: float = 30.0
 var current_left_padding: float = 120.0
 var current_top_padding: float = BASE_TOP_PADDING
+@export_range(0.0, 128.0, 1.0) var map_container_padding_px: float = 48.0
+@export_range(0.0, 128.0, 1.0) var map_background_side_margin_px: float = 400.0
+@export_range(0.0, 96.0, 1.0) var tile_horizontal_padding_px: float = 72.0
+@export_range(0.0, 96.0, 1.0) var tile_vertical_padding_px: float = 36.0
 var _tutorial_active: bool = false
 var _tutorial_id: String = ""
 var _tutorial_target_mode: String = "node"
@@ -88,6 +109,16 @@ var _tutorial_hint_label: Label = null
 var is_log_expanded: bool = false
 var log_collapsed_global_rect: Rect2 = Rect2()
 var _backtrack_prompt_visible: bool = false
+var _direct_launch_picker_overlay: Control = null
+var _user_zoom_scale: float = 1.0
+var _is_drag_panning: bool = false
+var _drag_candidate_active: bool = false
+var _drag_button_index: int = -1
+var _drag_pan_origin: Vector2 = Vector2.ZERO
+var _drag_pan_scroll_origin: Vector2 = Vector2.ZERO
+var _suppress_click_after_drag: bool = false
+var _raw_content_size: Vector2 = Vector2.ZERO
+var _map_anchor_ratio: Vector2 = Vector2(0.5, 0.5)
 
 const LOG_COLLAPSED_HEIGHT = 32.0
 const LOG_EXPANDED_LINE_COUNT = 10
@@ -100,47 +131,45 @@ const LOG_COLOR_BAD = Color(1.0, 0.58, 0.58, 1.0)
 const LOG_COLOR_NEUTRAL = Color(0.86, 0.86, 0.86, 1.0)
 func _ready():
 	_ensure_tutorial_overlay()
+	_ensure_direct_launch_picker_overlay()
 	_setup_ui()
 	_setup_battle_log_ui()
 	if not SignalBus.run_log_updated.is_connected(_on_run_log_updated):
 		SignalBus.run_log_updated.connect(_on_run_log_updated)
-
-	if GameManager.run_map.is_empty():
-		if GameManager.is_battle_mode:
-			var battle_gen = preload("res://features/map/BattleMapGenerator.gd").new()
-			GameManager.run_map = await battle_gen.generate_battle_map()
-		else:
-			var story_gen = preload("res://features/map/MapGenerator.gd").new()
-			GameManager.run_map = await story_gen.generate_new_map()
-
-	if GameManager.player_grid_pos == Vector2i(-99, -99):
-		if GameManager.is_battle_mode:
-			GameManager.player_grid_pos = Vector2i(0, 0)
-		else:
-			GameManager.reset_to_home()
-
-	_sync_map_area_to_top_bar()
-	_draw_map()
 
 	if in_game_menu_scene:
 		in_game_menu = in_game_menu_scene.instantiate()
 		add_child(in_game_menu)
 		in_game_menu.hide()
 
-	var biome_track = AudioData.get_biome_track_id(_get_active_biome())
-	if biome_track != "":
-		SignalBus.music_change_requested.emit(biome_track, 1.5)
-	_scroll_to_player()
-	_begin_worldmap_tutorial_if_needed.call_deferred()
+	if _should_show_direct_launch_biome_picker():
+		await _ensure_run_map_ready()
+		_show_direct_launch_biome_picker()
+		return
+
+	await _finalize_map_ready_state()
 
 func _notification(what):
 	if what == NOTIFICATION_RESIZED and is_inside_tree() and node_container and map_content and scroll_area and not GameManager.run_map.is_empty():
 		_sync_map_area_to_top_bar()
+		_apply_background_zoom()
 		_draw_map()
 		_refresh_log_view()
 
 func _input(event):
 	if get_viewport().is_input_handled():
+		return
+
+	if _direct_launch_picker_overlay and _direct_launch_picker_overlay.visible:
+		return
+
+	if _handle_map_zoom_input(event):
+		get_viewport().set_input_as_handled()
+		return
+
+	if _handle_map_drag_input(event):
+		if _is_drag_panning:
+			get_viewport().set_input_as_handled()
 		return
 
 	if _tutorial_active:
@@ -203,6 +232,11 @@ func _input(event):
 func _setup_ui():
 	scroll_area.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll_area.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	if background_texture:
+		background_texture.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		background_texture.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+		background_texture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		background_texture.stretch_mode = TextureRect.STRETCH_TILE
 
 	if avatar_button:
 		avatar_button.pressed.connect(_on_avatar_pressed)
@@ -210,13 +244,25 @@ func _setup_ui():
 		story_button.pressed.connect(_open_story_map)
 	if menu_icon_btn:
 		menu_icon_btn.pressed.connect(_toggle_in_game_menu)
+	if zoom_out_button:
+		zoom_out_button.pressed.connect(_zoom_out)
+	if zoom_in_button:
+		zoom_in_button.pressed.connect(_zoom_in)
 	if day_button:
 		day_button.pressed.connect(_toggle_day_info_panel)
+	if scroll_area:
+		var h_scroll_bar = scroll_area.get_h_scroll_bar()
+		if h_scroll_bar and not h_scroll_bar.value_changed.is_connected(_on_map_scroll_changed):
+			h_scroll_bar.value_changed.connect(_on_map_scroll_changed)
+		var v_scroll_bar = scroll_area.get_v_scroll_bar()
+		if v_scroll_bar and not v_scroll_bar.value_changed.is_connected(_on_map_scroll_changed):
+			v_scroll_bar.value_changed.connect(_on_map_scroll_changed)
 
 	_hide_info_toast()
 	_hide_day_info_panel()
 	_hide_backtrack_dialog()
 	_configure_overlay_layers()
+	_apply_background_zoom()
 
 func _configure_overlay_layers():
 	if info_toast_box:
@@ -231,6 +277,9 @@ func _configure_overlay_layers():
 	if _tutorial_overlay:
 		_tutorial_overlay.z_index = 600
 		_tutorial_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	if _direct_launch_picker_overlay:
+		_direct_launch_picker_overlay.z_index = 650
+		_direct_launch_picker_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
 
 func _ensure_tutorial_overlay():
 	if _tutorial_overlay and is_instance_valid(_tutorial_overlay):
@@ -314,6 +363,8 @@ func _draw_map():
 		return
 	for n in node_container.get_children():
 		n.queue_free()
+	for l in lines_container.get_children():
+		l.queue_free()
 	node_widgets_by_id.clear()
 	node_positions_by_id.clear()
 
@@ -358,16 +409,20 @@ func _draw_map():
 			continue
 		var state = GameManager.world_state.rooms.get(node_id, {})
 		var is_cleared = state.get("cleared", false)
+		var visual_data = _apply_worldmap_tile_background_settings(data)
+		visual_data = _apply_story_room_visibility_art(visual_data, state, is_player_here)
 
 		var node_ui = node_scene.instantiate()
 		node_container.add_child(node_ui)
 		var node_pos = _get_node_position(int(data.get("layer", 0)), int(data.get("column", 0)))
+		node_ui.size = current_node_size
+		node_ui.custom_minimum_size = current_node_size
 		node_ui.position = node_pos
-		node_ui.scale = Vector2.ONE * current_node_scale
+		node_ui.scale = Vector2.ONE
 		node_ui.z_index = int(data.get("layer", 0)) * 10 + int(data.get("column", 0))
 		node_positions_by_id[node_id] = node_pos
 
-		node_ui.setup_biome_node(data, grid_tex, is_cleared, is_player_here, is_revealed, adjacent_node_ids.has(node_id))
+		node_ui.setup_biome_node(visual_data, grid_tex, is_cleared, is_player_here, is_revealed, adjacent_node_ids.has(node_id))
 		if node_ui.has_method("set_highlight_state"):
 			node_ui.set_highlight_state(is_player_here, is_selected)
 		node_widgets_by_id[node_id] = node_ui
@@ -375,9 +430,136 @@ func _draw_map():
 		if node_ui.has_signal("node_double_clicked"):
 			node_ui.node_double_clicked.connect(_on_node_double_clicked)
 
+	_draw_current_adjacency_lines(current_id, revealed_set)
 	_refresh_selection_highlight(current_id)
 	if not GameManager.is_battle_mode:
 		_begin_worldmap_tutorial_if_needed.call_deferred()
+
+func _ensure_run_map_ready():
+	if not GameManager.run_map.is_empty():
+		return
+	if GameManager.is_battle_mode:
+		var battle_gen = preload("res://features/map/BattleMapGenerator.gd").new()
+		GameManager.run_map = await battle_gen.generate_battle_map()
+	else:
+		var story_gen = preload("res://features/map/MapGenerator.gd").new()
+		GameManager.run_map = await story_gen.generate_new_map()
+
+func _finalize_map_ready_state():
+	await _ensure_run_map_ready()
+	if GameManager.player_grid_pos == Vector2i(-99, -99):
+		if GameManager.is_battle_mode:
+			GameManager.player_grid_pos = Vector2i(0, 0)
+		else:
+			GameManager.reset_to_home()
+	_sync_map_area_to_top_bar()
+	_draw_map()
+	var biome_track = AudioData.get_biome_track_id(_get_active_biome())
+	if biome_track != "":
+		SignalBus.music_change_requested.emit(biome_track, 1.5)
+	_scroll_to_player()
+	_begin_worldmap_tutorial_if_needed.call_deferred()
+
+func _apply_worldmap_tile_background_settings(data: Dictionary) -> Dictionary:
+	var visual_data = data.duplicate(true)
+	var icon_path = str(visual_data.get("custom_icon_path", ""))
+	if icon_path == "":
+		return visual_data
+	var room_path = str(visual_data.get("room_resource_path", ""))
+	var scale = worldmap_tile_background_settings.get_scale_for_room(room_path, icon_path)
+	var offset = worldmap_tile_background_settings.get_offset_for_room(room_path, icon_path)
+	visual_data["icon_scale_x"] = scale.x
+	visual_data["icon_scale_y"] = scale.y
+	visual_data["icon_offset_x"] = offset.x
+	visual_data["icon_offset_y"] = offset.y
+	return visual_data
+
+func _should_show_direct_launch_biome_picker() -> bool:
+	return (
+		OS.is_debug_build()
+		and not GameManager.is_battle_mode
+		and GameManager.run_map.is_empty()
+		and GameManager.current_node.is_empty()
+	)
+
+func _ensure_direct_launch_picker_overlay():
+	if _direct_launch_picker_overlay and is_instance_valid(_direct_launch_picker_overlay):
+		return
+	_direct_launch_picker_overlay = Control.new()
+	_direct_launch_picker_overlay.name = "DirectLaunchBiomePicker"
+	_direct_launch_picker_overlay.visible = false
+	_direct_launch_picker_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_direct_launch_picker_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	add_child(_direct_launch_picker_overlay)
+
+	var shade = ColorRect.new()
+	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	shade.color = Color(0.02, 0.02, 0.03, 0.84)
+	shade.mouse_filter = Control.MOUSE_FILTER_STOP
+	_direct_launch_picker_overlay.add_child(shade)
+
+	var center = CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_direct_launch_picker_overlay.add_child(center)
+
+	var panel = PanelContainer.new()
+	panel.custom_minimum_size = Vector2(440, 0)
+	center.add_child(panel)
+
+	var style = StyleBoxFlat.new()
+	style.bg_color = Color(0.07, 0.08, 0.1, 0.97)
+	style.border_width_left = 2
+	style.border_width_top = 2
+	style.border_width_right = 2
+	style.border_width_bottom = 2
+	style.border_color = Color(0.4, 0.7, 1.0, 0.8)
+	style.corner_radius_top_left = 14
+	style.corner_radius_top_right = 14
+	style.corner_radius_bottom_left = 14
+	style.corner_radius_bottom_right = 14
+	panel.add_theme_stylebox_override("panel", style)
+
+	var margin = MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 24)
+	margin.add_theme_constant_override("margin_top", 24)
+	margin.add_theme_constant_override("margin_right", 24)
+	margin.add_theme_constant_override("margin_bottom", 24)
+	panel.add_child(margin)
+
+	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 12)
+	margin.add_child(vbox)
+
+	var title = Label.new()
+	title.text = "Select Test Biome"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_font_size_override("font_size", 28)
+	vbox.add_child(title)
+
+	var body = Label.new()
+	body.text = "WorldMap was launched directly. Choose a biome to simulate."
+	body.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	vbox.add_child(body)
+
+	for biome in DIRECT_LAUNCH_BIOMES:
+		var button = Button.new()
+		button.custom_minimum_size = Vector2(0, 44)
+		button.text = biome.replace("_", " ").capitalize()
+		button.pressed.connect(_on_direct_launch_biome_selected.bind(biome))
+		vbox.add_child(button)
+
+func _show_direct_launch_biome_picker():
+	if _direct_launch_picker_overlay:
+		_direct_launch_picker_overlay.visible = true
+		_direct_launch_picker_overlay.move_to_front()
+
+func _on_direct_launch_biome_selected(biome: String):
+	if _direct_launch_picker_overlay:
+		_direct_launch_picker_overlay.visible = false
+	GameManager.enter_story_biome(biome, true)
+	await _finalize_map_ready_state()
 
 func _update_header_labels(current_data: Dictionary):
 	var biome_key = str(current_data.get("biome", "town"))
@@ -481,14 +663,17 @@ func _get_room_display_name(node_data: Dictionary) -> String:
 
 func _build_visible_node_set(current_id: String, biome: String) -> Dictionary:
 	var visible_set: Dictionary = {}
-	visible_set[current_id] = true
+	if GameManager.is_battle_mode:
+		visible_set[current_id] = true
+		for neighbor_id in _get_adjacent_node_ids(current_id, biome):
+			visible_set[neighbor_id] = true
+		return visible_set
 
+	visible_set[current_id] = true
 	for neighbor_id in _get_adjacent_node_ids(current_id, biome):
 		visible_set[neighbor_id] = true
 
-	if GameManager.is_battle_mode:
-		return visible_set
-
+	var completed_ids: Array[String] = []
 	for raw_id in GameManager.run_map.keys():
 		var node_id = str(raw_id)
 		var data = _get_map_entry_by_id(node_id)
@@ -497,10 +682,60 @@ func _build_visible_node_set(current_id: String, biome: String) -> Dictionary:
 		if str(data.get("biome", "")) != biome:
 			continue
 		var state = GameManager.world_state.rooms.get(node_id, {})
-		if state.get("completed", false):
+		if _is_story_room_visible_as_completed(data, state):
 			visible_set[node_id] = true
+			completed_ids.append(node_id)
+
+	for completed_id in completed_ids:
+		for neighbor_id in _get_adjacent_node_ids(completed_id, biome):
+			visible_set[neighbor_id] = true
 
 	return visible_set
+
+func _apply_story_room_visibility_art(data: Dictionary, state: Dictionary, is_player_here: bool) -> Dictionary:
+	if GameManager.is_battle_mode:
+		return data
+	var visual_data = data.duplicate(true)
+	var node_type = str(visual_data.get("type", ""))
+	var is_passable = bool(visual_data.get("passable", true))
+	if not is_passable or node_type == "background":
+		return visual_data
+	var is_completed = _is_story_room_visible_as_completed(visual_data, state)
+	if is_player_here or is_completed:
+		return visual_data
+	if ResourceLoader.exists(FOG_OF_WAR_ICON_PATH):
+		visual_data["custom_icon_path"] = FOG_OF_WAR_ICON_PATH
+		visual_data["force_custom_icon"] = true
+		visual_data["icon_scale_x"] = 1.0
+		visual_data["icon_scale_y"] = 1.0
+		visual_data["icon_offset_x"] = 0.0
+		visual_data["icon_offset_y"] = 0.0
+		visual_data["icon_alpha"] = 1.0
+	return visual_data
+
+func _is_story_room_visible_as_completed(node_data: Dictionary, state: Dictionary) -> bool:
+	if bool(node_data.get("is_home", false)) or str(node_data.get("type", "")) == "home":
+		return true
+	return bool(state.get("completed", false))
+
+func _draw_current_adjacency_lines(current_id: String, revealed_set: Dictionary):
+	if not lines_container or current_id == "" or not node_positions_by_id.has(current_id):
+		return
+	var current_center = node_positions_by_id[current_id] + current_node_half_size
+	for target_id in adjacent_node_ids:
+		if not revealed_set.has(target_id):
+			continue
+		if not node_positions_by_id.has(target_id):
+			continue
+		var target_center = node_positions_by_id[target_id] + current_node_half_size
+		var segment = Line2D.new()
+		segment.width = CURRENT_CONNECTION_WIDTH
+		segment.default_color = CURRENT_CONNECTION_COLOR
+		segment.begin_cap_mode = Line2D.LINE_CAP_ROUND
+		segment.end_cap_mode = Line2D.LINE_CAP_ROUND
+		segment.add_point(current_center)
+		segment.add_point(target_center)
+		lines_container.add_child(segment)
 
 func _recalculate_map_bounds(biome: String):
 	var first = true
@@ -592,6 +827,9 @@ func _activate_selected_node():
 	_attempt_travel(selected_node_id)
 
 func _on_node_clicked(data: Dictionary):
+	if _suppress_click_after_drag:
+		_suppress_click_after_drag = false
+		return
 	var node_id = str(data.get("id", ""))
 	if node_id == "":
 		return
@@ -615,6 +853,9 @@ func _on_node_clicked(data: Dictionary):
 		_refresh_selection_highlight(current_id)
 
 func _on_node_double_clicked(data: Dictionary):
+	if _suppress_click_after_drag:
+		_suppress_click_after_drag = false
+		return
 	var node_id = str(data.get("id", ""))
 	if node_id == "":
 		return
@@ -728,7 +969,7 @@ func _is_backtrack(target_id: String) -> bool:
 	var room_state = GameManager.world_state.rooms.get(target_id, {})
 	if bool(room_state.get("completed", false)):
 		return false
-	return GameManager.get_room_visit_count_this_run(target_id) >= 2
+	return GameManager.get_room_visit_count_this_run(target_id) >= 1
 
 func _is_home_node(node_data: Dictionary) -> bool:
 	return bool(node_data.get("is_home", false)) or str(node_data.get("type", "")) == "home"
@@ -873,38 +1114,40 @@ func _update_map_content_bounds():
 		var row_offset = _get_row_offset_for_layer(layer)
 		min_row_offset = min(min_row_offset, row_offset)
 		max_row_offset = max(max_row_offset, row_offset)
-	var content_width = float(max(0, column_count - 1)) * current_row_spacing + current_node_size.x + (max_row_offset - min_row_offset) + 48.0
-	var content_height = float(max(0, layer_count - 1)) * current_layer_spacing + current_node_size.y + 48.0
-	map_content.custom_minimum_size = Vector2(
-		max(scroll_area.size.x, content_width),
-		max(scroll_area.size.y, content_height)
+	var content_width = float(max(0, column_count - 1)) * current_row_spacing + current_node_size.x + (max_row_offset - min_row_offset) + (map_container_padding_px * 2.0)
+	var content_height = float(max(0, layer_count - 1)) * current_layer_spacing + current_node_size.y + map_container_padding_px + max(map_container_padding_px, MAP_BOTTOM_SAFE_PADDING)
+	_raw_content_size = Vector2(content_width, content_height)
+	var scaled_content_size = Vector2(
+		max(scroll_area.size.x, content_width * current_node_scale),
+		max(scroll_area.size.y, content_height * current_node_scale)
 	)
+	map_content.custom_minimum_size = scaled_content_size
 	if node_container:
-		node_container.custom_minimum_size = map_content.custom_minimum_size
+		node_container.custom_minimum_size = _raw_content_size
+		node_container.size = _raw_content_size
+		node_container.position = Vector2.ZERO
+		node_container.pivot_offset = Vector2.ZERO
+		node_container.scale = Vector2.ONE * current_node_scale
+	if lines_container:
+		lines_container.position = Vector2.ZERO
+		lines_container.scale = Vector2.ONE * current_node_scale
+	_apply_background_zoom()
 
 func _get_node_position(layer: int, column: int) -> Vector2:
-	var relative_layer = layer - visible_min_layer
-	var relative_column = column - visible_min_column
-	var content_width = max(scroll_area.size.x, map_content.custom_minimum_size.x)
-	var content_height = max(scroll_area.size.y, map_content.custom_minimum_size.y)
-	var min_row_offset = _get_row_offset_for_layer(visible_min_layer)
-	var max_row_offset = min_row_offset
-	for row_layer in range(visible_min_layer, visible_max_layer + 1):
-		var row_offset = _get_row_offset_for_layer(row_layer)
-		min_row_offset = min(min_row_offset, row_offset)
-		max_row_offset = max(max_row_offset, row_offset)
-	var nodes_span_x = float(max(0, visible_max_column - visible_min_column)) * current_row_spacing + (max_row_offset - min_row_offset)
-	var nodes_span_y = float(max(0, visible_max_layer - visible_min_layer)) * current_layer_spacing
-	var start_x = (content_width - nodes_span_x - current_node_size.x) * 0.5
-	var start_y = (content_height - nodes_span_y - current_node_size.y) * 0.5
-	var offset_x = _get_row_offset_for_layer(layer) - min_row_offset
+	var zoom = max(current_node_scale, 0.001)
+	var content_width = max((scroll_area.size.x / zoom) - (map_container_padding_px * 2.0), _raw_content_size.x - (map_container_padding_px * 2.0))
+	var content_height = max((scroll_area.size.y / zoom) - (map_container_padding_px * 2.0), _raw_content_size.y - (map_container_padding_px * 2.0))
+	var center_layer = (float(visible_min_layer) + float(visible_max_layer)) * 0.5
+	var center_column = (float(visible_min_column) + float(visible_max_column)) * 0.5
+	var center_layer_offset = _get_row_offset_for_layer(int(round(center_layer)))
+	var offset_x = _get_row_offset_for_layer(layer) - center_layer_offset
 	return Vector2(
-		relative_column * current_row_spacing + offset_x + start_x,
-		relative_layer * current_layer_spacing + start_y
+		map_container_padding_px + content_width * 0.5 - current_node_half_size.x + (float(column) - center_column) * current_row_spacing + offset_x,
+		map_container_padding_px + content_height * 0.5 - current_node_half_size.y + (float(layer) - center_layer) * current_layer_spacing
 	)
 
 func _get_row_offset_for_layer(layer: int) -> float:
-	return current_row_spacing * 0.5 if posmod(layer, 2) == 1 else 0.0
+	return (current_node_size.x * 0.5) + current_horizontal_padding if posmod(layer, 2) == 1 else 0.0
 
 func _get_selectable_node_ids(current_id: String) -> Array[String]:
 	var results: Array[String] = []
@@ -938,23 +1181,155 @@ func _scroll_to_player():
 		return
 	scroll_area.scroll_horizontal = 0
 	scroll_area.scroll_vertical = 0
+	_update_map_anchor_ratio()
+	_sync_background_pan_to_scroll()
 
 func _update_map_layout_scale():
 	var layer_count = max(1, visible_max_layer - visible_min_layer + 1)
 	var row_count = max(1, visible_max_column - visible_min_column + 1)
 	var available_width = max(scroll_area.size.x, get_viewport_rect().size.x) - 96.0
 	var available_height = max(scroll_area.size.y, get_viewport_rect().size.y) - 96.0
-	var base_width = float(max(0, row_count - 1)) * BASE_ROW_SPACING + BASE_NODE_SIZE.x + BASE_ROW_SPACING * 0.5
-	var base_height = float(max(0, layer_count - 1)) * BASE_LAYER_SPACING + BASE_NODE_SIZE.y
+	var base_row_spacing = BASE_NODE_SIZE.x + tile_horizontal_padding_px
+	var base_layer_spacing = BASE_NODE_SIZE.y + tile_vertical_padding_px
+	var base_stagger_offset = (BASE_NODE_SIZE.x * 0.5) + tile_horizontal_padding_px
+	var base_width = float(max(0, row_count - 1)) * base_row_spacing + BASE_NODE_SIZE.x + base_stagger_offset
+	var base_height = float(max(0, layer_count - 1)) * base_layer_spacing + BASE_NODE_SIZE.y
 	var width_scale = available_width / max(base_width, 1.0)
 	var height_scale = available_height / max(base_height, 1.0)
-	current_node_scale = clamp(min(width_scale, height_scale, 1.0), 0.42, 1.0)
-	current_node_size = BASE_NODE_SIZE * current_node_scale
+	current_fit_scale = clamp(min(width_scale, height_scale, 1.0), 0.42, 1.0)
+	current_zoom_factor = clamp(_user_zoom_scale, MIN_MAP_ZOOM, MAX_MAP_ZOOM)
+	current_node_scale = current_fit_scale * current_zoom_factor
+	current_node_size = BASE_NODE_SIZE
 	current_node_half_size = current_node_size * 0.5
-	current_layer_spacing = BASE_LAYER_SPACING * current_node_scale
-	current_row_spacing = BASE_ROW_SPACING * current_node_scale
+	current_horizontal_padding = max(MIN_HEX_HORIZONTAL_PADDING, tile_horizontal_padding_px)
+	current_vertical_padding = max(MIN_HEX_VERTICAL_PADDING, tile_vertical_padding_px)
+	current_layer_spacing = current_node_size.y + current_vertical_padding
+	current_row_spacing = current_node_size.x + current_horizontal_padding
 	current_left_padding = 0.0
 	current_top_padding = 0.0
+	_apply_background_zoom()
+
+func _handle_map_zoom_input(event: InputEvent) -> bool:
+	if not (event is InputEventMouseButton):
+		return false
+	if not event.pressed:
+		return false
+	if not _is_point_inside_map_area(event.position):
+		return false
+	if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+		_zoom_in()
+		return true
+	if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+		_zoom_out()
+		return true
+	return false
+
+func _handle_map_drag_input(event: InputEvent) -> bool:
+	if not scroll_area:
+		return false
+	if event is InputEventMouseButton and (event.button_index == MOUSE_BUTTON_LEFT or event.button_index == MOUSE_BUTTON_MIDDLE):
+		if event.pressed and _is_point_inside_map_area(event.position):
+			_begin_map_drag(event.position, event.button_index)
+			return event.button_index == MOUSE_BUTTON_MIDDLE
+		if not event.pressed and (_is_drag_panning or _drag_candidate_active):
+			var handled_drag = _is_drag_panning
+			_end_map_drag()
+			return handled_drag
+	if event is InputEventMouseMotion and (_is_drag_panning or _drag_candidate_active):
+		var delta = event.position - _drag_pan_origin
+		if not _is_drag_panning and delta.length() >= MAP_DRAG_DEADZONE:
+			_is_drag_panning = true
+			_suppress_click_after_drag = true
+		if _is_drag_panning:
+			_suppress_click_after_drag = true
+			scroll_area.scroll_horizontal = int(round(_drag_pan_scroll_origin.x - delta.x))
+			scroll_area.scroll_vertical = int(round(_drag_pan_scroll_origin.y - delta.y))
+			_update_map_anchor_ratio()
+			_sync_background_pan_to_scroll()
+			return true
+		return _drag_button_index == MOUSE_BUTTON_MIDDLE
+	return false
+
+func _begin_map_drag(position: Vector2, button_index: int):
+	_drag_candidate_active = true
+	_drag_button_index = button_index
+	_is_drag_panning = false
+	_suppress_click_after_drag = false
+	_drag_pan_origin = position
+	_drag_pan_scroll_origin = Vector2(scroll_area.scroll_horizontal, scroll_area.scroll_vertical)
+
+func _end_map_drag():
+	_is_drag_panning = false
+	_drag_candidate_active = false
+	_drag_button_index = -1
+
+func _zoom_in():
+	_set_map_zoom(_user_zoom_scale + MAP_ZOOM_STEP)
+
+func _zoom_out():
+	_set_map_zoom(_user_zoom_scale - MAP_ZOOM_STEP)
+
+func _set_map_zoom(target_zoom: float):
+	var clamped_zoom = clamp(target_zoom, MIN_MAP_ZOOM, MAX_MAP_ZOOM)
+	if is_equal_approx(clamped_zoom, _user_zoom_scale):
+		return
+	var viewport_size = scroll_area.size if scroll_area else Vector2.ZERO
+	_update_map_anchor_ratio()
+	_user_zoom_scale = clamped_zoom
+	_draw_map()
+	if not scroll_area or not map_content:
+		return
+	var new_content_size = map_content.custom_minimum_size
+	var target_center = Vector2(
+		new_content_size.x * _map_anchor_ratio.x,
+		new_content_size.y * _map_anchor_ratio.y
+	)
+	scroll_area.scroll_horizontal = int(round(max(0.0, target_center.x - viewport_size.x * 0.5)))
+	scroll_area.scroll_vertical = int(round(max(0.0, target_center.y - viewport_size.y * 0.5)))
+	_update_map_anchor_ratio()
+	_sync_background_pan_to_scroll()
+
+func _is_point_inside_map_area(global_point: Vector2) -> bool:
+	return scroll_area != null and scroll_area.get_global_rect().has_point(global_point)
+
+func _apply_background_zoom():
+	if not background_texture:
+		return
+	var content_size = map_content.custom_minimum_size if map_content else get_viewport_rect().size
+	var viewport_size = scroll_area.size if scroll_area else get_viewport_rect().size
+	var target_size = Vector2(
+		max(content_size.x, viewport_size.x),
+		max(content_size.y, viewport_size.y)
+	) + Vector2.ONE * (map_background_side_margin_px * 2.0)
+	var zoom = max(current_node_scale, 0.001)
+	background_texture.scale = Vector2.ONE * zoom
+	background_texture.size = target_size / zoom
+	background_texture.pivot_offset = Vector2.ZERO
+	_sync_background_pan_to_scroll()
+
+func _sync_background_pan_to_scroll():
+	if not background_texture or not scroll_area:
+		return
+	background_texture.position = scroll_area.global_position - Vector2(
+		float(scroll_area.scroll_horizontal) + map_background_side_margin_px,
+		float(scroll_area.scroll_vertical) + map_background_side_margin_px
+	)
+
+func _on_map_scroll_changed(_value: float):
+	_update_map_anchor_ratio()
+	_sync_background_pan_to_scroll()
+
+func _update_map_anchor_ratio():
+	if not scroll_area or not map_content:
+		_map_anchor_ratio = Vector2(0.5, 0.5)
+		return
+	var content_size = map_content.custom_minimum_size
+	var viewport_size = scroll_area.size
+	_map_anchor_ratio = Vector2(0.5, 0.5)
+	if content_size.x > 0.0:
+		_map_anchor_ratio.x = clamp((float(scroll_area.scroll_horizontal) + viewport_size.x * 0.5) / content_size.x, 0.0, 1.0)
+	if content_size.y > 0.0:
+		_map_anchor_ratio.y = clamp((float(scroll_area.scroll_vertical) + viewport_size.y * 0.5) / content_size.y, 0.0, 1.0)
 
 func _is_hex_adjacent(a: Vector2i, b: Vector2i) -> bool:
 	if a == b:
@@ -1022,10 +1397,11 @@ func _set_player_position_from_data(node_data: Dictionary):
 func _apply_biome_visuals(biome: String):
 	if not background_texture or not map_assets:
 		return
-	var normalized_biome = "town" if biome == "home" else biome
+	var normalized_biome = "tutorial" if biome == "home" else biome
 	var bg_prop = "map_%s_background" % normalized_biome
 	if bg_prop in map_assets:
 		background_texture.texture = map_assets.get(bg_prop)
+		_apply_background_zoom()
 
 func _get_biome_grid_texture(biome: String) -> Texture2D:
 	if not map_assets:

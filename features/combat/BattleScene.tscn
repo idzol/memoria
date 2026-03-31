@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://b77asnldqt0xe"]
 
 [ext_resource type="Script" uid="uid://t5ler8jigjuj" path="res://features/combat/BattleScene.gd" id="1_ltshs"]
+[ext_resource type="Theme" path="res://assets/themes/Greek.theme" id="2_theme"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_status"]
 bg_color = Color(0.05, 0.05, 0.07, 0.9)
@@ -85,9 +86,9 @@ grow_vertical = 2
 theme_override_constants/separation = 0
 
 [node name="StatusBar" type="PanelContainer" parent="UI/MainLayout" unique_id=374474713]
-custom_minimum_size = Vector2(0, 60)
+custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_status")
+theme = ExtResource("2_theme")
 
 [node name="Margin" type="MarginContainer" parent="UI/MainLayout/StatusBar" unique_id=1660956106]
 layout_mode = 2
@@ -98,34 +99,77 @@ theme_override_constants/margin_right = 30
 layout_mode = 2
 theme_override_constants/separation = 40
 
-[node name="BiomeRoomLabel" type="Label" parent="UI/MainLayout/StatusBar/Margin/HBox" unique_id=511446058]
+[node name="Left" type="VBoxContainer" parent="UI/MainLayout/StatusBar/Margin/HBox"]
+layout_mode = 2
+alignment = 1
+
+[node name="BiomeLabel" type="Label" parent="UI/MainLayout/StatusBar/Margin/HBox/Left"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.6, 0.7, 1, 1)
-text = "TOWN | VILLAGE GATE"
-vertical_alignment = 1
+theme_override_colors/font_color = Color(0.4, 0.7, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "BIOME"
 
-[node name="EnergyPips" type="HBoxContainer" parent="UI/MainLayout/StatusBar/Margin/HBox" unique_id=209627737]
+[node name="PhaseLabel" type="Label" parent="UI/MainLayout/StatusBar/Margin/HBox/Left"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "ROUND: 1"
+
+[node name="Center" type="CenterContainer" parent="UI/MainLayout/StatusBar/Margin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TrackerText" type="Label" parent="UI/MainLayout/StatusBar/Margin/HBox/Center"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.2, 1)
+theme_override_font_sizes/font_size = 32
+text = "Room Name"
+horizontal_alignment = 1
+
+[node name="Right" type="HBoxContainer" parent="UI/MainLayout/StatusBar/Margin/HBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 2
+
+[node name="EnergyPips" type="HBoxContainer" parent="UI/MainLayout/StatusBar/Margin/HBox/Right" unique_id=209627737]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="Spacer" type="Control" parent="UI/MainLayout/StatusBar/Margin/HBox" unique_id=1399739920]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="RoundLabel" type="Label" parent="UI/MainLayout/StatusBar/Margin/HBox" unique_id=1061727651]
+[node name="AvatarButton" type="Button" parent="UI/MainLayout/StatusBar/Margin/HBox/Right"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(70, 56)
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.9, 0.5, 1)
-text = "ROUND: 1"
-vertical_alignment = 1
+theme_override_font_sizes/font_size = 30
+text = "👤"
 
-[node name="MenuIconBtn" type="Button" parent="UI/MainLayout/StatusBar/Margin/HBox" unique_id=1777002211]
+[node name="StoryButton" type="Button" parent="UI/MainLayout/StatusBar/Margin/HBox/Right"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(70, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "📜"
+
+[node name="MenuIconBtn" type="Button" parent="UI/MainLayout/StatusBar/Margin/HBox/Right" unique_id=1777002211]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(42, 34)
 layout_mode = 2
 text = "☰"
+
+[node name="ExitButton" type="Button" parent="UI"]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -220.0
+offset_top = 120.0
+offset_right = -40.0
+offset_bottom = 170.0
+grow_horizontal = 0
+text = "Exit to Overworld"
 
 [node name="StageLayoutContainer" type="MarginContainer" parent="UI/MainLayout" unique_id=1788464385]
 unique_name_in_owner = true

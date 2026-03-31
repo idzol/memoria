@@ -79,6 +79,7 @@ func _apply_mode():
 		subtitle_label.add_theme_font_size_override("font_size", BODY_FONT_SIZE)
 		if status_label:
 			status_label.add_theme_font_size_override("font_size", BODY_FONT_SIZE)
+		remembered_scroll.custom_minimum_size = Vector2.ZERO
 		open_button.text = ""
 		_set_control_tree_mouse_filter(self, Control.MOUSE_FILTER_IGNORE)
 		_refresh_embedded_layout.call_deferred()
@@ -122,7 +123,9 @@ func _refresh_embedded_layout():
 		target_width = available_size.x
 		target_height = target_width / TABLET_ASPECT_RATIO
 	tablet.custom_minimum_size = Vector2(target_width, target_height)
-	remembered_scroll.custom_minimum_size = Vector2(0, target_height * 0.75)
+	# Let the scroll area consume only the remaining space inside the shared tablet height,
+	# so summary tiles do not exceed the story chapter tile height in the story line.
+	remembered_scroll.custom_minimum_size = Vector2(0, 0)
 	_refresh_content.call_deferred()
 
 func _get_biome() -> String:

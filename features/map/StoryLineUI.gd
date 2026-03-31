@@ -15,18 +15,34 @@ const STORYMAP_FINAL_TUTORIAL_ID := "storymap_intro_complete"
 const TUTORIAL_TOAST_DURATION := 10.0
 const TUTORIAL_TOAST_COLOR := Color(0.4, 0.7, 1.0, 1.0)
 const STORY_TILE_VIEWPORT_HEIGHT_RATIO := 0.78
+const STORYLINE_TITLE := "Story Chapters"
+const CULT_DAY_NAMES := [
+	"Protodia",
+	"Hoplidia",
+	"Tridia",
+	"Tetradia",
+	"Pemptidia",
+	"Hektidia",
+	"Hebdomia",
+	"Ogdoadia"
+]
 
 @onready var chapter_row = %ChapterRow
 @onready var scroll_container = %ScrollContainer
 @onready var avatar_button = %AvatarButton
 @onready var map_button = %MapButton
-@onready var header_label = %HeaderLabel
+@onready var phase_label = get_node_or_null("%PhaseLabel")
+@onready var day_button = get_node_or_null("%DayButton")
+@onready var tracker_text = get_node_or_null("%TrackerText")
+@onready var menu_icon_btn = get_node_or_null("%MenuIconBtn")
 @onready var background_rect = $BG
 @onready var info_toast_box = %InfoToastBox
 @onready var info_toast_label = %InfoToastLabel
 @onready var focus_overlay = %FocusOverlay
 @onready var focus_content = %FocusContent
 
+var in_game_menu_scene = preload("res://features/ui/InGameMenu.tscn")
+var in_game_menu = null
 var chapter_entries: Array[Dictionary] = []
 var selected_index: int = 0
 var _selected_style: StyleBoxFlat
@@ -46,14 +62,22 @@ func _ready():
 	_ensure_tutorial_overlay()
 	_create_styles()
 	SignalBus.music_change_requested.emit(AudioData.TRACKS["STORY_MENU"], 1.5)
+	if in_game_menu_scene:
+		in_game_menu = in_game_menu_scene.instantiate()
+		add_child(in_game_menu)
+		in_game_menu.hide()
 	if avatar_button:
 		avatar_button.pressed.connect(_open_character_screen)
 	if map_button:
 		map_button.pressed.connect(_open_selected_biome_map)
+	if menu_icon_btn:
+		menu_icon_btn.pressed.connect(_toggle_in_game_menu)
 	if focus_overlay:
 		focus_overlay.gui_input.connect(_on_focus_overlay_input)
 	if scroll_container:
 		scroll_container.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_configure_top_bar()
+	_refresh_day_ui()
 	_hide_info_toast()
 	_rebuild_chapters()
 	_begin_tutorial_if_needed.call_deferred()
@@ -81,6 +105,9 @@ func _input(event):
 			_mark_input_handled()
 		return
 	if event.is_action_pressed("ui_cancel"):
+		if _handle_menu_cancel():
+			_mark_input_handled()
+			return
 		_return_to_current_biome_map()
 		_mark_input_handled()
 		return
@@ -112,7 +139,8 @@ func _rebuild_chapters():
 	var padded_card_height = card_height + (ENTRY_TILE_PADDING * 2.0)
 	var chapter_width = padded_card_width * (2.0 if show_story else 1.0) + (ENTRY_GAP if show_story else 0.0)
 	var chapter_height = padded_card_height + 24.0
-	header_label.text = LocalizationManager.translate("storymap.header.story", "Story Chapters") if show_story else LocalizationManager.translate("storymap.header.biome", "Biome Chapters")
+	if phase_label:
+		phase_label.text = LocalizationManager.translate("storymap.header.story", STORYLINE_TITLE) if show_story else LocalizationManager.translate("storymap.header.biome", "Biome Chapters")
 	chapter_row.custom_minimum_size = Vector2(
 		(chapter_width * unlocked.size()) + (CHAPTER_GAP * max(0, unlocked.size() - 1)),
 		chapter_height
@@ -279,13 +307,14 @@ func _activate_selected_entry():
 func _handle_entry_action(biome: String, kind: String):
 	GameManager.set_selected_story_biome(biome)
 	if kind == "story":
-		GameManager.begin_story_sequence(biome, GameManager.get_story_line_scene_path(), false, false)
+		_open_selected_biome_map()
 		return
 	_open_selected_biome_map()
 
 func _on_story_tile_pressed(biome: String):
 	_select_entry(biome, "story")
-	GameManager.begin_story_sequence(biome, GameManager.get_story_line_scene_path(), false, false)
+	GameManager.set_selected_story_biome(biome)
+	_open_selected_biome_map()
 
 func _on_summary_tile_pressed(biome: String):
 	_select_entry(biome, "summary")
@@ -304,7 +333,7 @@ func _on_entry_wrapper_pressed(biome: String, kind: String):
 	_select_entry(biome, kind)
 	GameManager.set_selected_story_biome(biome)
 	if kind == "story":
-		GameManager.begin_story_sequence(biome, GameManager.get_story_line_scene_path(), false, false)
+		_open_selected_biome_map()
 		return
 	_open_selected_biome_map()
 
@@ -389,6 +418,52 @@ func _get_story_tile_title(biome: String) -> String:
 func _open_character_screen():
 	GameManager.profile_return_scene = GameManager.get_story_line_scene_path()
 	get_tree().change_scene_to_file("res://features/ui/CharacterScreen.tscn")
+
+func _toggle_in_game_menu():
+	if not in_game_menu:
+		return
+	if in_game_menu.visible:
+		in_game_menu.close()
+	else:
+		in_game_menu.open()
+
+func _handle_menu_cancel() -> bool:
+	if not in_game_menu or not in_game_menu.visible:
+		return false
+	if in_game_menu.has_method("handle_cancel"):
+		return in_game_menu.handle_cancel()
+	in_game_menu.close()
+	return true
+
+func _configure_top_bar():
+	if tracker_text:
+		tracker_text.visible = false
+	if phase_label:
+		phase_label.text = LocalizationManager.translate("storymap.header.story", STORYLINE_TITLE)
+
+func _refresh_day_ui():
+	if not day_button:
+		return
+	var day_number = _get_current_day_number()
+	var day_index = _get_day_cycle_index(day_number)
+	var day_name = _get_day_name(day_index)
+	day_button.text = LocalizationManager.format(
+		"worldmap.day.button",
+		{"day": day_number, "name": day_name},
+		"Day {day}. {name}"
+	)
+
+func _get_current_day_number() -> int:
+	return max(1, int(GameManager.world_state.global.get("current_day", 1)))
+
+func _get_day_cycle_index(day_number: int) -> int:
+	return posmod(day_number - 1, CULT_DAY_NAMES.size()) + 1
+
+func _get_day_name(day_index: int) -> String:
+	return LocalizationManager.translate(
+		"worldmap.day.%d.name" % day_index,
+		CULT_DAY_NAMES[clamp(day_index - 1, 0, CULT_DAY_NAMES.size() - 1)]
+	)
 
 func _return_to_current_biome_map():
 	var biome = GameManager.player_biome if GameManager.player_biome != "" else GameManager.selected_story_biome

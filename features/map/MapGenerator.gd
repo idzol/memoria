@@ -41,10 +41,19 @@ func expand_story_map(existing_map: Dictionary, target_biomes: Array) -> Diction
 		var biome_key = normalized_targets[target_index]
 		var progress = float(target_index) / max(1.0, float(normalized_targets.size()))
 		progress_updated.emit(progress, "Mapping the %s..." % biome_key.capitalize())
-		await get_tree().process_frame
+		var scene_tree = _get_scene_tree()
+		if scene_tree != null:
+			await scene_tree.process_frame
 	var map = expand_story_map_immediate(existing_map, target_biomes)
 	progress_updated.emit(1.0, "Synchronization complete.")
 	return map
+
+func _get_scene_tree() -> SceneTree:
+	var tree = get_tree()
+	if tree != null:
+		return tree
+	var main_loop = Engine.get_main_loop()
+	return main_loop as SceneTree
 
 func expand_story_map_immediate(existing_map: Dictionary, target_biomes: Array) -> Dictionary:
 	_node_visual_scale_rng.randomize()

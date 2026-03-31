@@ -13,6 +13,12 @@ border_color = Color(0.3, 0.3, 0.35, 1)
 corner_radius_all = 8
 shadow_size = 4
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_topbar"]
+bg_color = Color(0.05, 0.05, 0.07, 0.95)
+border_width_bottom = 2
+border_color = Color(0.2, 0.2, 0.25, 1)
+shadow_size = 4
+
 [node name="EventScene" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -63,6 +69,85 @@ position = Vector2(1160, 570)
 scale = Vector2(1, 1)
 hframes = 8
 
+[node name="TopBar" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+
+[node name="Margin" type="MarginContainer" parent="TopBar"]
+layout_mode = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_right = 30
+
+[node name="HBox" type="HBoxContainer" parent="TopBar/Margin"]
+layout_mode = 2
+
+[node name="Left" type="VBoxContainer" parent="TopBar/Margin/HBox"]
+layout_mode = 2
+alignment = 1
+
+[node name="BiomeLabel" type="Label" parent="TopBar/Margin/HBox/Left"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.7, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "BIOME"
+
+[node name="PhaseLabel" type="Label" parent="TopBar/Margin/HBox/Left"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "EVENT"
+
+[node name="Center" type="CenterContainer" parent="TopBar/Margin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TrackerText" type="Label" parent="TopBar/Margin/HBox/Center"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.2, 1)
+theme_override_font_sizes/font_size = 32
+text = "Room Name"
+horizontal_alignment = 1
+
+[node name="Right" type="HBoxContainer" parent="TopBar/Margin/HBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 2
+
+[node name="EnergyPips" type="HBoxContainer" parent="TopBar/Margin/HBox/Right"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="AvatarButton" type="Button" parent="TopBar/Margin/HBox/Right"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 36
+text = "👤"
+
+[node name="StoryButton" type="Button" parent="TopBar/Margin/HBox/Right"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 26
+text = "📜"
+
+[node name="MenuIconBtn" type="Button" parent="TopBar/Margin/HBox/Right"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(42, 34)
+layout_mode = 2
+size_flags_vertical = 4
+text = "☰"
+
 [node name="BattleLogRow" type="HBoxContainer" parent="."]
 unique_name_in_owner = true
 layout_mode = 1
@@ -106,7 +191,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/margin_left = 40
-theme_override_constants/margin_top = 40
+theme_override_constants/margin_top = 120
 theme_override_constants/margin_right = 40
 theme_override_constants/margin_bottom = 40
 
@@ -136,6 +221,7 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "LOCATION NAME"
 horizontal_alignment = 1
+visible = false
 
 [node name="DialogPanel" type="PanelContainer" parent="UI/SafeZone/StageLayout/NarrativeCenter"]
 custom_minimum_size = Vector2(0, 200)
@@ -196,8 +282,8 @@ anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
 offset_left = -220.0
-offset_top = 40.0
+offset_top = 120.0
 offset_right = -40.0
-offset_bottom = 90.0
+offset_bottom = 170.0
 grow_horizontal = 0
 text = "Exit to Overworld"

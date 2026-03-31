@@ -15,6 +15,7 @@ class_name MapAssetData
 
 @export_group("Biome Backgrounds")
 @export var map_town_background: Texture2D
+@export var map_tutorial_background: Texture2D
 @export var map_forest_background: Texture2D
 @export var map_ice_caves_background: Texture2D
 @export var map_desert_background: Texture2D
