@@ -70,6 +70,7 @@ const MAP_ZOOM_STEP := 0.025
 const MAP_DRAG_DEADZONE := 4.0
 const MIN_HEX_HORIZONTAL_PADDING := 32.0
 const MIN_HEX_VERTICAL_PADDING := 20.0
+const MAP_BOTTOM_SAFE_PADDING := 140.0
 const CULT_DAY_NAMES := [
 	"Protodia",
 	"Hoplidia",
@@ -1052,11 +1053,11 @@ func _update_map_content_bounds():
 		min_row_offset = min(min_row_offset, row_offset)
 		max_row_offset = max(max_row_offset, row_offset)
 	var content_width = float(max(0, column_count - 1)) * current_row_spacing + current_node_size.x + (max_row_offset - min_row_offset) + (map_container_padding_px * 2.0)
-	var content_height = float(max(0, layer_count - 1)) * current_layer_spacing + current_node_size.y + (map_container_padding_px * 2.0)
+	var content_height = float(max(0, layer_count - 1)) * current_layer_spacing + current_node_size.y + map_container_padding_px + max(map_container_padding_px, MAP_BOTTOM_SAFE_PADDING)
 	_raw_content_size = Vector2(content_width, content_height)
 	var scaled_content_size = Vector2(
-		max(scroll_area.size.x, content_width * current_zoom_factor),
-		max(scroll_area.size.y, content_height * current_zoom_factor)
+		max(scroll_area.size.x, content_width * current_node_scale),
+		max(scroll_area.size.y, content_height * current_node_scale)
 	)
 	map_content.custom_minimum_size = scaled_content_size
 	if node_container:
@@ -1064,14 +1065,14 @@ func _update_map_content_bounds():
 		node_container.size = _raw_content_size
 		node_container.position = Vector2.ZERO
 		node_container.pivot_offset = Vector2.ZERO
-		node_container.scale = Vector2.ONE * current_zoom_factor
+		node_container.scale = Vector2.ONE * current_node_scale
 	if lines_container:
 		lines_container.position = Vector2.ZERO
-		lines_container.scale = Vector2.ONE * current_zoom_factor
+		lines_container.scale = Vector2.ONE * current_node_scale
 	_apply_background_zoom()
 
 func _get_node_position(layer: int, column: int) -> Vector2:
-	var zoom = max(current_zoom_factor, 0.001)
+	var zoom = max(current_node_scale, 0.001)
 	var content_width = max((scroll_area.size.x / zoom) - (map_container_padding_px * 2.0), _raw_content_size.x - (map_container_padding_px * 2.0))
 	var content_height = max((scroll_area.size.y / zoom) - (map_container_padding_px * 2.0), _raw_content_size.y - (map_container_padding_px * 2.0))
 	var center_layer = (float(visible_min_layer) + float(visible_max_layer)) * 0.5
@@ -1135,11 +1136,11 @@ func _update_map_layout_scale():
 	var height_scale = available_height / max(base_height, 1.0)
 	current_fit_scale = clamp(min(width_scale, height_scale, 1.0), 0.42, 1.0)
 	current_zoom_factor = clamp(_user_zoom_scale, MIN_MAP_ZOOM, MAX_MAP_ZOOM)
-	current_node_scale = current_fit_scale
-	current_node_size = BASE_NODE_SIZE * current_node_scale
+	current_node_scale = current_fit_scale * current_zoom_factor
+	current_node_size = BASE_NODE_SIZE
 	current_node_half_size = current_node_size * 0.5
-	current_horizontal_padding = max(MIN_HEX_HORIZONTAL_PADDING, tile_horizontal_padding_px * current_node_scale)
-	current_vertical_padding = max(MIN_HEX_VERTICAL_PADDING, tile_vertical_padding_px * current_node_scale)
+	current_horizontal_padding = max(MIN_HEX_HORIZONTAL_PADDING, tile_horizontal_padding_px)
+	current_vertical_padding = max(MIN_HEX_VERTICAL_PADDING, tile_vertical_padding_px)
 	current_layer_spacing = current_node_size.y + current_vertical_padding
 	current_row_spacing = current_node_size.x + current_horizontal_padding
 	current_left_padding = 0.0
@@ -1238,8 +1239,9 @@ func _apply_background_zoom():
 		max(content_size.x, viewport_size.x),
 		max(content_size.y, viewport_size.y)
 	) + Vector2.ONE * (map_background_side_margin_px * 2.0)
-	background_texture.scale = Vector2.ONE
-	background_texture.size = target_size
+	var zoom = max(current_node_scale, 0.001)
+	background_texture.scale = Vector2.ONE * zoom
+	background_texture.size = target_size / zoom
 	background_texture.pivot_offset = Vector2.ZERO
 	_sync_background_pan_to_scroll()
 
