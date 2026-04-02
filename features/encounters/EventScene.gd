@@ -50,9 +50,10 @@ const LOG_LINE_HEIGHT = 22.0
 const LOG_EXPANDED_PADDING = 12.0
 const LOG_ROW_SEPARATION = 0
 const LOG_SIDE_SPACER_WIDTH = 0.0
-const LOG_COLOR_PLAYER = Color(0.62, 1.0, 0.62, 1.0)
-const LOG_COLOR_NPC = Color(0.6, 0.75, 1.0, 1.0)
-const LOG_COLOR_NEUTRAL = Color(0.86, 0.86, 0.86, 1.0)
+const LOG_COLOR_PLAYER = Color(0.45, 0.68, 1.0, 1.0)
+const LOG_COLOR_ENEMY = Color(1.0, 0.42, 0.42, 1.0)
+const LOG_COLOR_NPC = Color(0.46, 0.9, 0.52, 1.0)
+const LOG_COLOR_NEUTRAL = Color(0.96, 0.96, 0.96, 1.0)
 const SETTINGS_PATH := "user://settings.cfg"
 const SETTINGS_SECTION := "gameplay"
 const RUN_LOG_KEY := "show_run_log"
@@ -74,6 +75,7 @@ func _ready():
 		story_button.pressed.connect(_open_story_line)
 	if menu_icon_btn:
 		menu_icon_btn.pressed.connect(_toggle_in_game_menu)
+	_ensure_log_row_layering()
 	_configure_top_bar()
 	_setup_battle_log_ui()
 	if not SignalBus.run_log_updated.is_connected(_on_run_log_updated):
@@ -86,6 +88,8 @@ func _ready():
 func _input(event):
 	if get_viewport().is_input_handled():
 		return
+	if _is_log_mouse_input(event):
+		return
 	if is_log_expanded and event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		if not _is_point_inside_log(event.position):
 			is_log_expanded = false
@@ -93,11 +97,17 @@ func _input(event):
 			get_viewport().set_input_as_handled()
 			return
 	if _is_dialog_sequence_active() and _is_narration_progress_input(event):
+		if dialog_panel:
+			dialog_panel.visible = true
 		_advance_dialog_sequence()
 		get_viewport().set_input_as_handled()
 		return
 	if _is_narration_progress_input(event) and _can_collapse_dialog_panel():
 		_configure_dialog_panel(false)
+		get_viewport().set_input_as_handled()
+		return
+	if _is_narration_progress_input(event) and _can_hide_dialog_panel():
+		_hide_dialog_panel()
 		get_viewport().set_input_as_handled()
 		return
 	if event.is_action_pressed("ui_cancel"):
@@ -109,11 +119,17 @@ func _on_dialog_panel_gui_input(event: InputEvent):
 	if not _is_narration_progress_input(event):
 		return
 	if _is_dialog_sequence_active():
+		if dialog_panel:
+			dialog_panel.visible = true
 		_advance_dialog_sequence()
 		get_viewport().set_input_as_handled()
 		return
 	if _can_collapse_dialog_panel():
 		_configure_dialog_panel(false)
+		get_viewport().set_input_as_handled()
+		return
+	if _can_hide_dialog_panel():
+		_hide_dialog_panel()
 		get_viewport().set_input_as_handled()
 
 func _handle_menu_cancel() -> bool:
@@ -148,6 +164,8 @@ func _load_encounter_data():
 	if tracker_text:
 		tracker_text.text = current_room_res.room_name
 	dialog_speaker.text = LocalizationManager.translate("dialog.speaker.narrator", "Narrator")
+	dialog_speaker.add_theme_color_override("font_color", LOG_COLOR_NEUTRAL)
+	dialog_text.add_theme_color_override("font_color", LOG_COLOR_NEUTRAL)
 	exit_button.text = LocalizationManager.translate("dialog.exit_overworld", "Exit to Overworld")
 	_apply_room_environment(current_room_res)
 	_request_scene_music()
@@ -204,6 +222,8 @@ func _start_room_dialog():
 	_append_dialog_log(dialog_speaker.text, dialog_text.text)
 	choice_container.visible = false
 	exit_button.visible = true
+	if dialog_panel:
+		dialog_panel.visible = true
 	_configure_dialog_panel(false)
 
 func _begin_dialog_sequence(lines: Array[Dictionary]):
@@ -214,6 +234,8 @@ func _begin_dialog_sequence(lines: Array[Dictionary]):
 	choice_container.visible = false
 	for child in choice_container.get_children():
 		child.queue_free()
+	if dialog_panel:
+		dialog_panel.visible = true
 	_configure_dialog_panel(true)
 	_advance_dialog_sequence()
 
@@ -230,13 +252,17 @@ func _advance_dialog_sequence():
 	var line = _active_dialog_lines[_dialog_index]
 	dialog_speaker.text = str(line.get("speaker_name", _get_narrator_name()))
 	dialog_text.text = str(line.get("text", ""))
-	_append_dialog_log(dialog_speaker.text, dialog_text.text)
+	_apply_dialog_speaker_style(str(line.get("speaker_role", "narrator")), line.get("speaker_color", LOG_COLOR_NEUTRAL))
+	_append_dialog_log(dialog_speaker.text, dialog_text.text, str(line.get("speaker_role", "narrator")), line.get("speaker_color", LOG_COLOR_NEUTRAL))
 
 func _complete_dialog_sequence():
 	_dialog_sequence_complete = true
+	_active_dialog_lines.clear()
 	exit_button.visible = true
 	choice_container.visible = false
-	_configure_dialog_panel(false)
+	if dialog_panel:
+		dialog_panel.visible = true
+	_configure_dialog_panel(true)
 
 func _configure_dialog_panel(expanded: bool):
 	if not dialog_panel:
@@ -250,9 +276,12 @@ func _display_dialog_node(tree_id: String, node_id: String):
 	var node = tree[node_id]
 	dialog_speaker.text = current_npc_res.name if current_npc_res else _get_narrator_name()
 	dialog_text.text = node.text
-	_append_dialog_log(dialog_speaker.text, dialog_text.text)
+	_apply_dialog_speaker_style("npc", LOG_COLOR_NPC if current_npc_res else LOG_COLOR_NEUTRAL)
+	_append_dialog_log(dialog_speaker.text, dialog_text.text, "npc" if current_npc_res else "narrator", LOG_COLOR_NPC if current_npc_res else LOG_COLOR_NEUTRAL)
 	choice_container.visible = true
 	exit_button.visible = true
+	if dialog_panel:
+		dialog_panel.visible = true
 	_configure_dialog_panel(true)
 	
 	for child in choice_container.get_children(): child.queue_free()
@@ -263,12 +292,12 @@ func _display_dialog_node(tree_id: String, node_id: String):
 		btn.custom_minimum_size.y = 50
 		if opt.has("next_node"):
 			btn.pressed.connect(func():
-				_append_dialog_log(LocalizationManager.translate("dialog.speaker.player", "You"), opt.text)
+				_append_dialog_log(LocalizationManager.translate("dialog.speaker.player", "You"), opt.text, "player", LOG_COLOR_PLAYER)
 				_display_dialog_node(tree_id, opt.next_node)
 			)
 		else:
 			btn.pressed.connect(func():
-				_append_dialog_log(LocalizationManager.translate("dialog.speaker.player", "You"), opt.text)
+				_append_dialog_log(LocalizationManager.translate("dialog.speaker.player", "You"), opt.text, "player", LOG_COLOR_PLAYER)
 				_on_exit_pressed()
 			)
 		choice_container.add_child(btn)
@@ -428,10 +457,62 @@ func _configure_top_bar():
 func _get_narrator_name() -> String:
 	return LocalizationManager.translate("dialog.speaker.narrator", "Narrator")
 
+func _apply_dialog_speaker_style(speaker_role: String, speaker_color = LOG_COLOR_NEUTRAL):
+	var resolved_color: Color = speaker_color if speaker_color is Color else Color.from_string(str(speaker_color), _get_dialog_speaker_default_color(speaker_role))
+	if dialog_speaker:
+		dialog_speaker.add_theme_color_override("font_color", resolved_color)
+	if dialog_text:
+		dialog_text.add_theme_color_override("font_color", resolved_color)
+
+func _get_dialog_speaker_default_color(speaker_role: String) -> Color:
+	match speaker_role:
+		"player":
+			return LOG_COLOR_PLAYER
+		"npc":
+			return LOG_COLOR_NPC
+		"enemy":
+			return LOG_COLOR_ENEMY
+		_:
+			return LOG_COLOR_NEUTRAL
+
 func _can_collapse_dialog_panel() -> bool:
+	if dialog_panel and not dialog_panel.visible:
+		return false
 	if choice_container and choice_container.visible and choice_container.get_child_count() > 0:
 		return false
 	return dialog_panel != null and dialog_panel.custom_minimum_size.y > _dialog_panel_collapsed_height
+
+func _can_hide_dialog_panel() -> bool:
+	if dialog_panel == null or not dialog_panel.visible:
+		return false
+	if _is_dialog_sequence_active():
+		return false
+	if choice_container and choice_container.visible and choice_container.get_child_count() > 0:
+		return false
+	return dialog_panel.custom_minimum_size.y <= _dialog_panel_collapsed_height
+
+func _hide_dialog_panel():
+	if dialog_panel:
+		dialog_panel.visible = false
+
+func _ensure_log_row_layering():
+	if not battle_log_row:
+		return
+	var ui_layer := get_node_or_null("UI")
+	if ui_layer and battle_log_row.get_parent() != ui_layer:
+		battle_log_row.reparent(ui_layer)
+	battle_log_row.z_index = 420
+
+func _is_log_mouse_input(event: InputEvent) -> bool:
+	if not battle_log_row or not battle_log_row.visible:
+		return false
+	if not (event is InputEventMouseButton):
+		return false
+	if not event.pressed:
+		return false
+	if event.button_index != MOUSE_BUTTON_LEFT and event.button_index != MOUSE_BUTTON_WHEEL_UP and event.button_index != MOUSE_BUTTON_WHEEL_DOWN:
+		return false
+	return _is_point_inside_log(event.position) or battle_log_row.get_global_rect().has_point(event.position)
 
 func _is_narration_progress_input(event: InputEvent) -> bool:
 	if event is InputEventKey:
@@ -440,20 +521,37 @@ func _is_narration_progress_input(event: InputEvent) -> bool:
 		return event.pressed
 	return false
 
-func _append_dialog_log(speaker: String, text: String):
-	GameManager.add_run_log("%s: %s" % [speaker, text])
+func _append_dialog_log(speaker: String, text: String, speaker_role: String = "narrator", speaker_color = LOG_COLOR_NEUTRAL):
+	var resolved_color: Color = speaker_color if speaker_color is Color else Color.from_string(str(speaker_color), _get_dialog_speaker_default_color(speaker_role))
+	GameManager.add_run_log({
+		"text": "%s: %s" % [speaker, text],
+		"speaker": speaker,
+		"speaker_role": speaker_role,
+		"speaker_color": resolved_color.to_html()
+	})
 
 func _on_run_log_updated():
 	_apply_log_visibility()
 	_rebuild_log_entries()
 
-func _get_log_entry_color(text: String) -> Color:
-	var lower = text.to_lower()
+func _get_log_entry_color(entry_data) -> Color:
+	if entry_data is Dictionary:
+		var color_value = str((entry_data as Dictionary).get("speaker_color", ""))
+		if color_value != "":
+			return Color.from_string(color_value, LOG_COLOR_NEUTRAL)
+	var lower = _get_log_entry_text(entry_data).to_lower()
 	if lower.begins_with(LocalizationManager.translate("dialog.speaker.player", "You").to_lower() + ":"):
 		return LOG_COLOR_PLAYER
+	if lower.begins_with(LocalizationManager.translate("dialog.speaker.enemy", "Enemy").to_lower() + ":"):
+		return LOG_COLOR_ENEMY
 	if lower.begins_with(LocalizationManager.translate("dialog.speaker.npc", "NPC").to_lower() + ":") or (current_npc_res and lower.begins_with(current_npc_res.name.to_lower() + ":")):
 		return LOG_COLOR_NPC
 	return LOG_COLOR_NEUTRAL
+
+func _get_log_entry_text(entry_data) -> String:
+	if entry_data is Dictionary:
+		return str((entry_data as Dictionary).get("text", ""))
+	return str(entry_data)
 
 func _setup_battle_log_ui():
 	if not log_display or not battle_log_row:
@@ -463,6 +561,8 @@ func _setup_battle_log_ui():
 	battle_log_row.custom_minimum_size.y = LOG_COLLAPSED_HEIGHT
 	if not battle_log_row.gui_input.is_connected(_on_battle_log_row_gui_input):
 		battle_log_row.gui_input.connect(_on_battle_log_row_gui_input)
+	if not log_display.gui_input.is_connected(_on_log_display_gui_input):
+		log_display.gui_input.connect(_on_log_display_gui_input)
 	log_display.visible = true
 	log_display.z_index = 120
 	log_display.mouse_filter = Control.MOUSE_FILTER_PASS
@@ -487,6 +587,16 @@ func _setup_battle_log_ui():
 	_rebuild_log_entries()
 	_refresh_log_view()
 
+func _debug_log_ui_event(source: String, event: InputEvent, response: String):
+	var event_name := event.get_class() if event else "UnknownEvent"
+	print("[InfoLog][EventScene] %s received %s -> %s | expanded=%s scroll=%d" % [
+		source,
+		event_name,
+		response,
+		str(is_log_expanded),
+		int(log_display.scroll_vertical) if log_display else 0
+	])
+
 func _rebuild_log_entries():
 	if not log_box:
 		return
@@ -494,7 +604,7 @@ func _rebuild_log_entries():
 		child.queue_free()
 	for entry in GameManager.get_run_log():
 		var lbl = Label.new()
-		lbl.text = "> " + entry
+		lbl.text = "> " + _get_log_entry_text(entry)
 		lbl.clip_text = true
 		lbl.autowrap_mode = TextServer.AUTOWRAP_OFF
 		lbl.add_theme_color_override("font_color", _get_log_entry_color(entry))
@@ -506,7 +616,27 @@ func _on_battle_log_row_gui_input(event: InputEvent):
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		is_log_expanded = not is_log_expanded
 		_refresh_log_view()
+		_debug_log_ui_event("BattleLogRow", event, "toggle_expand")
 		get_viewport().set_input_as_handled()
+
+func _on_log_display_gui_input(event: InputEvent):
+	if event is InputEventMouseButton and event.pressed:
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			is_log_expanded = not is_log_expanded
+			_refresh_log_view()
+			_debug_log_ui_event("LogDisplay", event, "toggle_expand")
+			get_viewport().set_input_as_handled()
+			return
+		if is_log_expanded and event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			log_display.scroll_vertical = max(0, log_display.scroll_vertical - int(LOG_LINE_HEIGHT * 2.0))
+			_debug_log_ui_event("LogDisplay", event, "scroll_up")
+			get_viewport().set_input_as_handled()
+			return
+		if is_log_expanded and event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			var max_vscroll = max(0, int(log_box.size.y - log_display.size.y))
+			log_display.scroll_vertical = min(max_vscroll, log_display.scroll_vertical + int(LOG_LINE_HEIGHT * 2.0))
+			_debug_log_ui_event("LogDisplay", event, "scroll_down")
+			get_viewport().set_input_as_handled()
 
 func _refresh_log_view():
 	if not log_display:

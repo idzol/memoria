@@ -15,6 +15,7 @@ var run_summary_exit_to_main_menu: bool = false
 var pending_post_battle_scene: String = ""
 var pending_story_sequence_biome: String = ""
 var pending_story_sequence_return_scene: String = ""
+var pending_storyline_fade_in: bool = false
 var player_biome: String = "home"
 var selected_story_biome: String = "home"
 var profile_return_scene: String = ""
@@ -102,19 +103,27 @@ func hide_loading():
 		active_loading_overlay.close()
 		active_loading_overlay = null
 
-func add_run_log(text: String):
-	var entry = text.strip_edges()
-	if entry == "":
+func add_run_log(entry_data):
+	var entry = {}
+	if entry_data is Dictionary:
+		entry = (entry_data as Dictionary).duplicate(true)
+		entry["text"] = str(entry.get("text", "")).strip_edges()
+	else:
+		entry = {"text": str(entry_data).strip_edges()}
+	if str(entry.get("text", "")) == "":
 		return
 	run_log.append(entry)
 	while run_log.size() > MAX_RUN_LOG_ENTRIES:
 		run_log.remove_at(0)
 	SignalBus.run_log_updated.emit()
 
-func get_run_log() -> Array[String]:
-	var entries: Array[String] = []
+func get_run_log() -> Array:
+	var entries: Array = []
 	for entry in run_log:
-		entries.append(str(entry))
+		if entry is Dictionary:
+			entries.append((entry as Dictionary).duplicate(true))
+		else:
+			entries.append({"text": str(entry)})
 	return entries
 
 func clear_run_log():
@@ -355,6 +364,14 @@ func set_selected_story_biome(biome: String):
 func get_story_line_scene_path() -> String:
 	return "res://features/map/StoryLine.tscn"
 
+func request_storyline_fade_in():
+	pending_storyline_fade_in = true
+
+func consume_storyline_fade_in_request() -> bool:
+	var should_fade := pending_storyline_fade_in
+	pending_storyline_fade_in = false
+	return should_fade
+
 func get_story_cutscene_scene_path() -> String:
 	return "res://features/ui/StoryCutscene.tscn"
 
@@ -398,6 +415,21 @@ func add_player_xp(amount: int) -> Dictionary:
 		"leveled_up": leveled_up,
 		"new_level": player_level
 	}
+
+func award_player_xp(amount: int, return_scene: String = "") -> Dictionary:
+	var result = add_player_xp(amount)
+	if bool(result.get("leveled_up", false)) and return_scene != "":
+		level_up_return_scene = return_scene
+	return result
+
+func show_level_up_scene_if_needed(return_scene: String = "") -> bool:
+	if pending_level_up.is_empty():
+		return false
+	level_up_return_scene = return_scene if return_scene != "" else level_up_return_scene
+	if level_up_return_scene == "":
+		level_up_return_scene = get_active_biome_map_scene_path()
+	SceneTransition.change_scene_to_file("res://features/ui/CharacterLevelUp.tscn")
+	return true
 
 func is_room_cleared(room_id: String) -> bool:
 	if room_id == "":
@@ -450,6 +482,8 @@ func _ensure_world_state_shape():
 		world_state.global.current_day = 1
 	if not world_state.global.has("days_passed"):
 		world_state.global.days_passed = 0
+	if not world_state.global.has("selected_story_biome_this_run"):
+		world_state.global.selected_story_biome_this_run = ""
 	if not world_state.has("biomes"):
 		world_state.biomes = {}
 	if not world_state.has("rooms"):
@@ -505,15 +539,21 @@ func register_room_interaction_complete(node_data: Dictionary, mark_cleared: boo
 	var node_id = str(node_data.get("id", ""))
 	if node_id == "":
 		return
+	var has_explicit_complete_condition := false
+	var room_path = str(node_data.get("room_resource_path", ""))
+	if room_path != "" and ResourceLoader.exists(room_path):
+		var room_res = load(room_path) as RoomData
+		has_explicit_complete_condition = room_res != null and not room_res.complete_condition.is_empty()
 	_ensure_room_state(node_id)
 	world_state.rooms[node_id].visited = true
 	if mark_cleared:
 		world_state.rooms[node_id].cleared = true
-		world_state.rooms[node_id].completed = true
-		if not completed_nodes.has(node_id):
-			completed_nodes.append(node_id)
 		_consume_room_object(node_id)
-		SignalBus.map_node_completed.emit(node_id)
+		if not has_explicit_complete_condition:
+			world_state.rooms[node_id].completed = true
+			if not completed_nodes.has(node_id):
+				completed_nodes.append(node_id)
+			SignalBus.map_node_completed.emit(node_id)
 	refresh_story_room_completions()
 	SaveManager.save_mid_run_state()
 
@@ -663,6 +703,7 @@ func start_actual_run():
 	
 	# 3. Cleanup
 	hide_loading()
+	request_storyline_fade_in()
 
 	begin_story_sequence("home", get_story_line_scene_path(), false, true)
 
@@ -991,6 +1032,13 @@ func _apply_home_type_to_node(node_id: String):
 	node["is_home"] = true
 	node["type"] = "home"
 	run_map[node_id] = node
+	_ensure_room_state(node_id)
+	var room_state = world_state.rooms[node_id]
+	var was_completed = bool(room_state.get("completed", false))
+	room_state["completed"] = true
+	world_state.rooms[node_id] = room_state
+	if not was_completed:
+		SignalBus.map_node_completed.emit(node_id)
 
 func is_story_room_completed(node_id: String) -> bool:
 	if node_id == "":
@@ -1032,7 +1080,8 @@ func _reroll_incomplete_story_rooms_for_new_run():
 		_ensure_room_state(node_id)
 		if world_state.rooms[node_id].get("completed", false):
 			continue
-		world_state.rooms[node_id] = {"visited": false, "cleared": false, "completed": false, "visit_count": 0}
+		var visit_count = int(world_state.rooms[node_id].get("visit_count", 0))
+		world_state.rooms[node_id] = {"visited": false, "cleared": false, "completed": false, "visit_count": visit_count}
 	refresh_story_room_completions()
 
 func begin_new_story_run(return_biome: String = ""):
@@ -1050,7 +1099,9 @@ func begin_new_story_run(return_biome: String = ""):
 	run_loot = []
 	completed_nodes = []
 	reset_current_run_room_tracking()
+	world_state.global.selected_story_biome_this_run = ""
 	enter_story_biome(return_biome if return_biome != "" else (player_biome if player_biome != "" else "home"), true)
+	request_storyline_fade_in()
 
 func get_current_story_chapter_index() -> int:
 	return max(0, STORY_BIOME_ORDER.find(selected_story_biome))
@@ -1308,6 +1359,8 @@ func register_room_victory(node_data: Dictionary, remaining_hp: int):
 		_ensure_room_state(node_id)
 		world_state.rooms[node_id].cleared = true
 		world_state.rooms[node_id].visited = true
+		if _is_boss_room(node_data):
+			world_state.rooms[node_id].completed = true
 		var room_path = str(node_data.get("room_resource_path", ""))
 		if room_path != "" and ResourceLoader.exists(room_path):
 			var room_res = load(room_path) as RoomData
@@ -1316,6 +1369,8 @@ func register_room_victory(node_data: Dictionary, remaining_hp: int):
 				enemy_defeat_count_before = int(world_state.enemies[room_res.enemy_id].get("defeated", 0))
 				world_state.enemies[room_res.enemy_id].defeated += 1
 		refresh_story_room_completions()
+		if _is_boss_room(node_data):
+			SignalBus.map_node_completed.emit(node_id)
 
 	prepare_victory_loot(node_data, enemy_defeat_count_before)
 

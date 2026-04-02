@@ -166,7 +166,13 @@ func _update_save_button_state():
 	%SaveExitBtn.modulate = Color(1, 1, 1, 0.5) if disable_save else Color(1, 1, 1, 1)
 
 func _update_story_mode_buttons():
-	%EndDayBtn.visible = not GameManager.is_battle_mode
+	%EndDayBtn.visible = not GameManager.is_battle_mode and _is_player_at_story_home()
+
+func _is_player_at_story_home() -> bool:
+	var current_node = GameManager.current_node
+	if current_node.is_empty():
+		return false
+	return bool(current_node.get("is_home", false)) or str(current_node.get("type", "")) == "home"
 
 func _is_save_disabled_in_current_scene() -> bool:
 	var current_scene = get_tree().current_scene

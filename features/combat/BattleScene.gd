@@ -34,6 +34,7 @@ extends Node2D
 @onready var enemy_atk_val = %EnemyAtkVal
 @onready var enemy_def_val = %EnemyDefVal
 @onready var stage_layout_container = %StageLayoutContainer
+@onready var stage_layout = get_node_or_null("UI/MainLayout/StageLayoutContainer/StageLayout")
 @onready var arena_center = %ArenaCenter
 @onready var player_column_ui = get_node_or_null("UI/MainLayout/StageLayoutContainer/StageLayout/PlayerColumnUI")
 @onready var player_stats_hud = get_node_or_null("UI/MainLayout/StageLayoutContainer/StageLayout/PlayerColumnUI/StatsHUD")
@@ -120,8 +121,8 @@ var _active_room_dialog_lines: Array[Dictionary] = []
 var _room_dialog_index: int = -1
 var _room_dialog_complete: bool = false
 var _room_dialog_on_complete: Callable
-var _dialog_box_expanded_height := 400.0
-var _dialog_box_collapsed_height := 220.0
+var _dialog_box_expanded_height := 200.0
+var _dialog_box_collapsed_height := 88.0
 var tutorial_overlay_layer: CanvasLayer = null
 var tutorial_overlay_root: Control = null
 var tutorial_message_label: Label = null
@@ -154,6 +155,10 @@ const PREVIEW_AFTER_FLIP_GUARD_MS = 160
 const LOG_COLOR_GOOD = Color(0.62, 1.0, 0.62, 1.0)
 const LOG_COLOR_BAD = Color(1.0, 0.58, 0.58, 1.0)
 const LOG_COLOR_NEUTRAL = Color(0.86, 0.86, 0.86, 1.0)
+const DIALOG_COLOR_PLAYER = Color(0.45, 0.68, 1.0, 1.0)
+const DIALOG_COLOR_ENEMY = Color(1.0, 0.42, 0.42, 1.0)
+const DIALOG_COLOR_NPC = Color(0.46, 0.9, 0.52, 1.0)
+const DIALOG_COLOR_NARRATOR = Color(0.96, 0.96, 0.96, 1.0)
 const DEFAULT_UNIT_HFRAMES = 8
 const DEFAULT_UNIT_VFRAMES = 1
 const DEFAULT_UNIT_TOTAL_FRAMES = 8
@@ -215,6 +220,9 @@ func _ready():
 	_configure_top_bar()
 	if dialog_speaker:
 		dialog_speaker.text = LocalizationManager.translate("dialog.speaker.narrator", "Narrator")
+		dialog_speaker.add_theme_color_override("font_color", DIALOG_COLOR_NARRATOR)
+	if dialog_text:
+		dialog_text.add_theme_color_override("font_color", DIALOG_COLOR_NARRATOR)
 
 	# Debug win / lose connections
 	# if has_node("%DebugWinBtn"): %DebugWinBtn.pressed.connect(_debug_win)
@@ -598,6 +606,7 @@ func _configure_top_bar():
 	if story_button:
 		story_button.disabled = true
 		story_button.modulate = Color(0.6, 0.6, 0.6, 1.0)
+		story_button.mouse_filter = Control.MOUSE_FILTER_STOP
 	if energy_pips:
 		energy_pips.visible = true
 	if exit_button:
@@ -610,9 +619,13 @@ func _set_combat_ui_visibility(show_stage: bool, show_log: bool = true):
 	if status_bar:
 		status_bar.visible = true
 	if stage_layout_container:
-		stage_layout_container.visible = show_stage
+		stage_layout_container.visible = true
+		stage_layout_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if stage_layout:
+		stage_layout.modulate.a = 1.0 if show_stage else 0.0
 	if battle_log_row:
 		battle_log_row.visible = show_log
+	_pin_log_to_bottom_row()
 
 # --- INPUT & FLOW ---
 func _on_card_flipped(card):
@@ -1335,9 +1348,9 @@ func _setup_cleared_room_view():
 	_show_exit_cleared_room_button()
 
 func _exit_cleared_room():
-	SceneTransition.change_scene_to_file(
-		GameManager.consume_pending_post_battle_scene(GameManager.get_active_biome_map_scene_path())
-	)
+	# Cleared-room "Exit to Overworld" should always return to the world map view.
+	GameManager.consume_pending_post_battle_scene(GameManager.get_active_biome_map_scene_path())
+	SceneTransition.change_scene_to_file(GameManager.get_active_biome_map_scene_path())
 
 func _begin_room_dialog(lines: Array[Dictionary], on_complete: Callable):
 	_active_room_dialog_lines = lines
@@ -1367,7 +1380,26 @@ func _advance_room_dialog():
 	var line = _active_room_dialog_lines[_room_dialog_index]
 	dialog_speaker.text = str(line.get("speaker_name", LocalizationManager.translate("dialog.speaker.narrator", "Narrator")))
 	dialog_text.text = str(line.get("text", ""))
-	_append_dialog_log(dialog_speaker.text, dialog_text.text)
+	_apply_dialog_speaker_style(str(line.get("speaker_role", "narrator")), line.get("speaker_color", DIALOG_COLOR_NARRATOR))
+	_append_dialog_log(dialog_speaker.text, dialog_text.text, str(line.get("speaker_role", "narrator")), line.get("speaker_color", DIALOG_COLOR_NARRATOR))
+
+func _apply_dialog_speaker_style(speaker_role: String, speaker_color = DIALOG_COLOR_NARRATOR):
+	var resolved_color: Color = speaker_color if speaker_color is Color else Color.from_string(str(speaker_color), _get_dialog_speaker_default_color(speaker_role))
+	if dialog_speaker:
+		dialog_speaker.add_theme_color_override("font_color", resolved_color)
+	if dialog_text:
+		dialog_text.add_theme_color_override("font_color", resolved_color)
+
+func _get_dialog_speaker_default_color(speaker_role: String) -> Color:
+	match speaker_role:
+		"player":
+			return DIALOG_COLOR_PLAYER
+		"npc":
+			return DIALOG_COLOR_NPC
+		"enemy":
+			return DIALOG_COLOR_ENEMY
+		_:
+			return DIALOG_COLOR_NARRATOR
 
 func _configure_dialog_box(expanded: bool):
 	if not dialog_box:
@@ -1399,6 +1431,7 @@ func _show_exit_cleared_room_button():
 		child.queue_free()
 	_configure_dialog_box(false)
 	_set_combat_ui_visibility(false, false)
+	_pin_log_to_bottom_row()
 	if exit_button:
 		exit_button.visible = true
 
@@ -1406,8 +1439,14 @@ func _hide_exit_button():
 	if exit_button:
 		exit_button.visible = false
 
-func _append_dialog_log(speaker: String, text: String):
-	GameManager.add_run_log("%s: %s" % [speaker, text])
+func _append_dialog_log(speaker: String, text: String, speaker_role: String = "narrator", speaker_color = DIALOG_COLOR_NARRATOR):
+	var resolved_color: Color = speaker_color if speaker_color is Color else Color.from_string(str(speaker_color), _get_dialog_speaker_default_color(speaker_role))
+	GameManager.add_run_log({
+		"text": "%s: %s" % [speaker, text],
+		"speaker": speaker,
+		"speaker_role": speaker_role,
+		"speaker_color": resolved_color.to_html()
+	})
 
 func _check_win_loss():
 	if is_battle_over: return
@@ -1418,7 +1457,8 @@ func _check_win_loss():
 			SignalBus.music_change_requested.emit("", 1.0)
 		GameManager.register_room_victory(GameManager.current_node, p_hp)
 		var xp_reward = current_enemy_res.xp_reward if current_enemy_res else 0
-		GameManager.add_player_xp(xp_reward)
+		var return_scene = get_tree().current_scene.scene_file_path if get_tree() and get_tree().current_scene else ""
+		GameManager.award_player_xp(xp_reward, return_scene)
 		GameManager.add_run_log(
 			LocalizationManager.format(
 				"log.battle.victory",
@@ -1481,13 +1521,22 @@ func _on_run_log_updated():
 	_apply_log_visibility()
 	_rebuild_log_entries()
 
-func _get_log_entry_color(text: String) -> Color:
-	var t = text.to_lower()
+func _get_log_entry_color(entry_data) -> Color:
+	if entry_data is Dictionary:
+		var color_value = str((entry_data as Dictionary).get("speaker_color", ""))
+		if color_value != "":
+			return Color.from_string(color_value, LOG_COLOR_NEUTRAL)
+	var t = _get_log_entry_text(entry_data).to_lower()
 	if "you deal" in t or "card matched" in t:
 		return LOG_COLOR_GOOD
 	if "trap deals" in t or "enemy deals" in t or "you receive" in t:
 		return LOG_COLOR_BAD
 	return LOG_COLOR_NEUTRAL
+
+func _get_log_entry_text(entry_data) -> String:
+	if entry_data is Dictionary:
+		return str((entry_data as Dictionary).get("text", ""))
+	return str(entry_data)
 
 func _setup_battle_log_ui():
 	if not log_display or not battle_log_row:
@@ -1497,6 +1546,8 @@ func _setup_battle_log_ui():
 	battle_log_row.custom_minimum_size.y = LOG_COLLAPSED_HEIGHT
 	if not battle_log_row.gui_input.is_connected(_on_battle_log_row_gui_input):
 		battle_log_row.gui_input.connect(_on_battle_log_row_gui_input)
+	if not log_display.gui_input.is_connected(_on_log_display_gui_input):
+		log_display.gui_input.connect(_on_log_display_gui_input)
 	log_display.visible = true
 	log_display.z_index = 120
 	log_display.mouse_filter = Control.MOUSE_FILTER_PASS
@@ -1521,6 +1572,16 @@ func _setup_battle_log_ui():
 	_rebuild_log_entries()
 	_refresh_log_view()
 
+func _debug_log_ui_event(source: String, event: InputEvent, response: String):
+	var event_name := event.get_class() if event else "UnknownEvent"
+	print("[InfoLog][BattleScene] %s received %s -> %s | expanded=%s scroll=%d" % [
+		source,
+		event_name,
+		response,
+		str(is_log_expanded),
+		int(log_display.scroll_vertical) if log_display else 0
+	])
+
 func _rebuild_log_entries():
 	if not log_box:
 		return
@@ -1528,7 +1589,7 @@ func _rebuild_log_entries():
 		child.queue_free()
 	for entry in GameManager.get_run_log():
 		var lbl = Label.new()
-		lbl.text = "> " + entry
+		lbl.text = "> " + _get_log_entry_text(entry)
 		lbl.clip_text = true
 		lbl.autowrap_mode = TextServer.AUTOWRAP_OFF
 		lbl.add_theme_color_override("font_color", _get_log_entry_color(entry))
@@ -1540,7 +1601,27 @@ func _on_battle_log_row_gui_input(event: InputEvent):
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		is_log_expanded = not is_log_expanded
 		_refresh_log_view()
+		_debug_log_ui_event("BattleLogRow", event, "toggle_expand")
 		get_viewport().set_input_as_handled()
+
+func _on_log_display_gui_input(event: InputEvent):
+	if event is InputEventMouseButton and event.pressed:
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			is_log_expanded = not is_log_expanded
+			_refresh_log_view()
+			_debug_log_ui_event("LogDisplay", event, "toggle_expand")
+			get_viewport().set_input_as_handled()
+			return
+		if is_log_expanded and event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			log_display.scroll_vertical = max(0, log_display.scroll_vertical - int(LOG_LINE_HEIGHT * 2.0))
+			_debug_log_ui_event("LogDisplay", event, "scroll_up")
+			get_viewport().set_input_as_handled()
+			return
+		if is_log_expanded and event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			var max_vscroll = max(0, int(log_box.size.y - log_display.size.y))
+			log_display.scroll_vertical = min(max_vscroll, log_display.scroll_vertical + int(LOG_LINE_HEIGHT * 2.0))
+			_debug_log_ui_event("LogDisplay", event, "scroll_down")
+			get_viewport().set_input_as_handled()
 
 func _refresh_log_view():
 	if not log_display:
@@ -1582,6 +1663,19 @@ func _restore_log_to_collapsed_row():
 	log_display.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	log_display.position = Vector2.ZERO
 	log_display.custom_minimum_size = Vector2(0.0, LOG_COLLAPSED_HEIGHT)
+
+func _pin_log_to_bottom_row():
+	is_log_expanded = false
+	_restore_log_to_collapsed_row()
+	if battle_log_row:
+		battle_log_row.visible = _is_run_log_enabled()
+		if battle_log_row.get_parent():
+			battle_log_row.get_parent().move_child(battle_log_row, battle_log_row.get_parent().get_child_count() - 1)
+	if log_display:
+		log_display.visible = true
+		log_display.mouse_filter = Control.MOUSE_FILTER_PASS
+		log_display.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		log_display.scroll_vertical = 0
 
 func _apply_log_horizontal_constants():
 	if battle_log_row:
@@ -2392,6 +2486,9 @@ func _on_victory_overlay_continue():
 	if victory_overlay_layer != null and is_instance_valid(victory_overlay_layer):
 		victory_overlay_layer.queue_free()
 		victory_overlay_layer = null
+	var current_scene_path = get_tree().current_scene.scene_file_path if get_tree() and get_tree().current_scene else ""
+	if GameManager.show_level_up_scene_if_needed(current_scene_path):
+		return
 	if not GameManager.is_battle_mode and GameManager._is_boss_room(GameManager.current_node):
 		var cleared_biome = str(GameManager.current_node.get("biome", ""))
 		GameManager.mark_biome_cleared(cleared_biome)

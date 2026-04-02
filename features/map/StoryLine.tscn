@@ -15,6 +15,9 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_storyline_fade"]
+bg_color = Color(0.02, 0.02, 0.03, 1)
+
 [node name="StoryLine" type="Control" unique_id=151049399]
 layout_mode = 3
 anchors_preset = 15
@@ -196,3 +199,15 @@ theme_override_constants/margin_left = 28
 theme_override_constants/margin_top = 28
 theme_override_constants/margin_right = 28
 theme_override_constants/margin_bottom = 28
+
+[node name="IntroFadeOverlay" type="PanelContainer" parent="." unique_id=917245113]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_storyline_fade")

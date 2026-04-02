@@ -6,6 +6,9 @@ const STORY_ORDER = ["home", "town", "forest", "ice_caves", "desert", "swamp", "
 const SCROLL_CONTENT_PADDING := 24.0
 const ENTRY_GAP := 18.0
 const CHAPTER_GAP := 28.0
+const CHAPTER_DIVIDER_WIDTH := 3.0
+const CHAPTER_DIVIDER_HEIGHT_RATIO := 0.82
+const CHAPTER_DIVIDER_COLOR := Color(0.9, 0.85, 0.7, 0.34)
 const ENTRY_TILE_PADDING := 14.0
 const SETTINGS_PATH := "user://settings.cfg"
 const SETTINGS_SECTION := "gameplay"
@@ -16,6 +19,8 @@ const TUTORIAL_TOAST_DURATION := 10.0
 const TUTORIAL_TOAST_COLOR := Color(0.4, 0.7, 1.0, 1.0)
 const STORY_TILE_VIEWPORT_HEIGHT_RATIO := 0.78
 const STORYLINE_TITLE := "Story Chapters"
+const LOCKED_CHAPTER_BORDER_COLOR := Color(0.55, 0.92, 0.58, 1.0)
+const STORYLINE_FADE_DURATION := 0.45
 const CULT_DAY_NAMES := [
 	"Protodia",
 	"Hoplidia",
@@ -40,6 +45,7 @@ const CULT_DAY_NAMES := [
 @onready var info_toast_label = %InfoToastLabel
 @onready var focus_overlay = %FocusOverlay
 @onready var focus_content = %FocusContent
+@onready var intro_fade_overlay = %IntroFadeOverlay
 
 var in_game_menu_scene = preload("res://features/ui/InGameMenu.tscn")
 var in_game_menu = null
@@ -47,6 +53,8 @@ var chapter_entries: Array[Dictionary] = []
 var selected_index: int = 0
 var _selected_style: StyleBoxFlat
 var _default_style: StyleBoxFlat
+var _run_locked_style: StyleBoxFlat
+var _selected_run_locked_style: StyleBoxFlat
 var _info_toast_tween: Tween
 var _tutorial_step: int = -1
 var _tutorial_completed: bool = false
@@ -80,6 +88,7 @@ func _ready():
 	_refresh_day_ui()
 	_hide_info_toast()
 	_rebuild_chapters()
+	_play_storyline_intro_fade_if_needed()
 	_begin_tutorial_if_needed.call_deferred()
 
 func _notification(what):
@@ -133,19 +142,23 @@ func _rebuild_chapters():
 
 	var unlocked = GameManager.get_unlocked_story_biomes()
 	var show_story = not GameManager.is_battle_mode
+	var unlocked_count = unlocked.size()
 	var card_height = _get_story_tile_height()
 	var card_width = card_height * (640.0 / 905.0)
 	var padded_card_width = card_width + (ENTRY_TILE_PADDING * 2.0)
 	var padded_card_height = card_height + (ENTRY_TILE_PADDING * 2.0)
 	var chapter_width = padded_card_width * (2.0 if show_story else 1.0) + (ENTRY_GAP if show_story else 0.0)
 	var chapter_height = padded_card_height + 24.0
+	var divider_count = max(0, unlocked_count - 1)
+	var total_divider_width = CHAPTER_DIVIDER_WIDTH * divider_count
 	if phase_label:
 		phase_label.text = LocalizationManager.translate("storymap.header.story", STORYLINE_TITLE) if show_story else LocalizationManager.translate("storymap.header.biome", "Biome Chapters")
 	chapter_row.custom_minimum_size = Vector2(
-		(chapter_width * unlocked.size()) + (CHAPTER_GAP * max(0, unlocked.size() - 1)),
+		(chapter_width * unlocked_count) + (CHAPTER_GAP * divider_count) + total_divider_width,
 		chapter_height
 	)
 
+	var unlocked_index := 0
 	for biome in STORY_ORDER:
 		if not unlocked.has(biome):
 			continue
@@ -164,6 +177,10 @@ func _rebuild_chapters():
 		if show_story:
 			content_row.add_child(_build_story_tile(biome))
 		content_row.add_child(_build_summary_tile(biome))
+
+		if unlocked_index < unlocked_count - 1:
+			chapter_row.add_child(_build_chapter_divider(chapter_height))
+		unlocked_index += 1
 
 	if chapter_entries.is_empty():
 		return
@@ -246,6 +263,17 @@ func _build_entry_wrapper(biome: String, kind: String) -> Button:
 	chapter_entries.append({"button": wrapper, "biome": biome, "kind": kind})
 	return wrapper
 
+func _build_chapter_divider(chapter_height: float) -> Control:
+	var center = CenterContainer.new()
+	center.custom_minimum_size = Vector2(CHAPTER_DIVIDER_WIDTH, chapter_height)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var line = ColorRect.new()
+	line.custom_minimum_size = Vector2(CHAPTER_DIVIDER_WIDTH, chapter_height * CHAPTER_DIVIDER_HEIGHT_RATIO)
+	line.color = CHAPTER_DIVIDER_COLOR
+	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	center.add_child(line)
+	return center
+
 func _create_styles():
 	_default_style = StyleBoxFlat.new()
 	_default_style.bg_color = Color(0.16, 0.16, 0.18, 0.96)
@@ -262,6 +290,18 @@ func _create_styles():
 	_selected_style = _default_style.duplicate()
 	_selected_style.bg_color = Color(0.72, 0.88, 0.74, 0.95)
 	_selected_style.border_color = Color(0.88, 0.96, 0.88, 1.0)
+	_run_locked_style = _default_style.duplicate()
+	_run_locked_style.border_width_left = 4
+	_run_locked_style.border_width_top = 4
+	_run_locked_style.border_width_right = 4
+	_run_locked_style.border_width_bottom = 4
+	_run_locked_style.border_color = LOCKED_CHAPTER_BORDER_COLOR
+	_selected_run_locked_style = _selected_style.duplicate()
+	_selected_run_locked_style.border_width_left = 4
+	_selected_run_locked_style.border_width_top = 4
+	_selected_run_locked_style.border_width_right = 4
+	_selected_run_locked_style.border_width_bottom = 4
+	_selected_run_locked_style.border_color = LOCKED_CHAPTER_BORDER_COLOR
 
 func _move_selection(dx: int, dy: int):
 	if chapter_entries.is_empty():
@@ -289,10 +329,20 @@ func _move_selection(dx: int, dy: int):
 			return
 
 func _refresh_entry_styles():
+	var locked_biome = _get_selected_biome_this_run()
 	for i in range(chapter_entries.size()):
 		var entry = chapter_entries[i]
 		var button: Button = entry["button"]
-		var style = _selected_style if i == selected_index else _default_style
+		var biome = str(entry["biome"])
+		var is_selected = i == selected_index
+		var is_run_locked = locked_biome != "" and biome == locked_biome
+		var style = _default_style
+		if is_selected and is_run_locked:
+			style = _selected_run_locked_style
+		elif is_selected:
+			style = _selected_style
+		elif is_run_locked:
+			style = _run_locked_style
 		button.add_theme_stylebox_override("normal", style)
 		button.add_theme_stylebox_override("hover", style)
 		button.add_theme_stylebox_override("pressed", style)
@@ -305,7 +355,10 @@ func _activate_selected_entry():
 	_handle_entry_action(str(entry["biome"]), str(entry["kind"]))
 
 func _handle_entry_action(biome: String, kind: String):
+	if not _can_open_story_biome(biome):
+		return
 	GameManager.set_selected_story_biome(biome)
+	_set_selected_biome_this_run(biome)
 	if kind == "story":
 		_open_selected_biome_map()
 		return
@@ -313,11 +366,18 @@ func _handle_entry_action(biome: String, kind: String):
 
 func _on_story_tile_pressed(biome: String):
 	_select_entry(biome, "story")
+	if not _can_open_story_biome(biome):
+		return
 	GameManager.set_selected_story_biome(biome)
+	_set_selected_biome_this_run(biome)
 	_open_selected_biome_map()
 
 func _on_summary_tile_pressed(biome: String):
 	_select_entry(biome, "summary")
+	if not _can_open_story_biome(biome):
+		return
+	GameManager.set_selected_story_biome(biome)
+	_set_selected_biome_this_run(biome)
 	_open_selected_biome_map()
 
 func _select_entry(biome: String, kind: String):
@@ -331,7 +391,10 @@ func _select_entry(biome: String, kind: String):
 
 func _on_entry_wrapper_pressed(biome: String, kind: String):
 	_select_entry(biome, kind)
+	if not _can_open_story_biome(biome):
+		return
 	GameManager.set_selected_story_biome(biome)
+	_set_selected_biome_this_run(biome)
 	if kind == "story":
 		_open_selected_biome_map()
 		return
@@ -383,7 +446,10 @@ func _open_selected_biome_map():
 		if unlocked.is_empty():
 			return
 		biome = unlocked[0]
+	if not _can_open_story_biome(biome):
+		return
 	GameManager.set_selected_story_biome(biome)
+	_set_selected_biome_this_run(biome)
 	if GameManager.is_battle_mode:
 		var biome_nodes = GameManager.get_nodes_for_biome(biome)
 		if biome_nodes.is_empty():
@@ -413,7 +479,7 @@ func _scroll_selected_into_view():
 func _get_story_tile_title(biome: String) -> String:
 	if biome == "home":
 		return LocalizationManager.translate("story.title.home", "Introduction")
-	return LocalizationManager.format("storymap.chapter_number", {"number": STORY_ORDER.find(biome) + 1}, "Chapter {number}")
+	return LocalizationManager.format("storymap.chapter_number", {"number": STORY_ORDER.find(biome)}, "Chapter {number}")
 
 func _open_character_screen():
 	GameManager.profile_return_scene = GameManager.get_story_line_scene_path()
@@ -488,6 +554,70 @@ func _hide_info_toast():
 		info_toast_box.modulate = Color(1, 1, 1, 0)
 	if info_toast_label:
 		info_toast_label.text = ""
+
+func _play_storyline_intro_fade_if_needed():
+	if not intro_fade_overlay:
+		return
+	var should_fade := GameManager.consume_storyline_fade_in_request()
+	intro_fade_overlay.visible = should_fade
+	intro_fade_overlay.modulate = Color(1, 1, 1, 1) if should_fade else Color(1, 1, 1, 0)
+	if not should_fade:
+		return
+	var tween = create_tween()
+	tween.tween_property(intro_fade_overlay, "modulate:a", 0.0, STORYLINE_FADE_DURATION)
+	tween.finished.connect(func():
+		if intro_fade_overlay:
+			intro_fade_overlay.visible = false
+	)
+
+func _show_info_toast(message: String, duration: float = 2.5):
+	if not info_toast_box or not info_toast_label:
+		return
+	if _info_toast_tween:
+		_info_toast_tween.kill()
+	info_toast_label.text = message
+	info_toast_box.visible = true
+	info_toast_box.modulate = Color(1, 1, 1, 0)
+	_info_toast_tween = create_tween()
+	_info_toast_tween.tween_property(info_toast_box, "modulate:a", 1.0, 0.12)
+	_info_toast_tween.tween_interval(duration)
+	_info_toast_tween.tween_property(info_toast_box, "modulate:a", 0.0, 0.35)
+	_info_toast_tween.finished.connect(_hide_info_toast)
+
+func _get_selected_biome_this_run() -> String:
+	if not GameManager.world_state.has("global"):
+		return ""
+	return str(GameManager.world_state.global.get("selected_story_biome_this_run", ""))
+
+func _set_selected_biome_this_run(biome: String):
+	if not GameManager.world_state.has("global"):
+		GameManager.world_state.global = {}
+	GameManager.world_state.global.selected_story_biome_this_run = biome
+	_refresh_entry_styles()
+
+func _is_player_at_story_home() -> bool:
+	var current_biome = GameManager.player_biome if GameManager.player_biome != "" else GameManager.selected_story_biome
+	if current_biome == "":
+		return true
+	var home_node_id = GameManager.get_biome_home_node_id(current_biome)
+	if home_node_id == "":
+		return false
+	if not GameManager.current_node.is_empty() and str(GameManager.current_node.get("id", "")) == home_node_id:
+		return true
+	var home_node = GameManager.get_story_biome_home_node(current_biome)
+	if home_node.is_empty():
+		return false
+	var home_pos = Vector2i(int(home_node.get("column", 0)), int(home_node.get("layer", 0)))
+	return GameManager.player_grid_pos == home_pos
+
+func _can_open_story_biome(biome: String) -> bool:
+	var selected_biome_this_run = _get_selected_biome_this_run()
+	if selected_biome_this_run == "" or biome == selected_biome_this_run:
+		return true
+	if _is_player_at_story_home():
+		return true
+	_show_info_toast(LocalizationManager.translate("storymap.toast.home_only_chapter_change", "You cannot move to another chapter, unless you are home"))
+	return false
 
 func _ensure_tutorial_overlay():
 	if _tutorial_overlay and is_instance_valid(_tutorial_overlay):

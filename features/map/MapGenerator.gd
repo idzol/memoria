@@ -122,7 +122,7 @@ func _generate_biome_into_map(map: Dictionary, biome_key: String, biome_index: i
 	var active_room_count = _get_active_room_count_for_biome_index(biome_index)
 	var layout = _build_biome_hex_layout(active_room_count)
 	var home_coord: Vector2i = layout.get("home", Vector2i(5, 5))
-	var exit_coord: Vector2i = layout.get("exit", home_coord)
+	var boss_coord: Vector2i = layout.get("boss", home_coord)
 	var home_room_res = _load_story_home_room_for_biome(biome_key)
 	var boss_room_res = _load_story_boss_room_for_biome(biome_key)
 	var active_coords: Array = layout.get("active", [])
@@ -131,14 +131,13 @@ func _generate_biome_into_map(map: Dictionary, biome_key: String, biome_index: i
 		var coord: Vector2i = coord_variant
 		var node_id = _build_node_id(biome_key, coord.x, coord.y)
 		var is_home = coord == home_coord
-		var is_exit = coord == exit_coord and not is_home
-		var room_res = home_room_res if is_home else (boss_room_res if is_exit else _pick_room_for_biome(biome_key))
+		var room_res = home_room_res if is_home else _pick_room_for_biome(biome_key)
 		var fallback_type = _default_room_type_for_coord(coord, active_room_count)
 		var data = {
 			"id": node_id,
 			"name": room_res.room_name if room_res else "%s %d,%d" % [biome_key.capitalize(), coord.x + 1, coord.y + 1],
-			"type": "home" if is_home else ("boss" if is_exit else (room_res.type if room_res else fallback_type)),
-			"base_type": "home" if is_home else ("boss" if is_exit else (room_res.type if room_res else fallback_type)),
+			"type": "home" if is_home else (room_res.type if room_res else fallback_type),
+			"base_type": "home" if is_home else (room_res.type if room_res else fallback_type),
 			"biome": biome_key,
 			"biome_index": biome_index,
 			"layer": coord.x,
@@ -155,6 +154,30 @@ func _generate_biome_into_map(map: Dictionary, biome_key: String, biome_index: i
 		if room_res and room_res.map_icon:
 			data["custom_icon_path"] = room_res.map_icon.resource_path
 		map[node_id] = data
+
+	if boss_coord != home_coord:
+		var boss_node_id = _build_node_id(biome_key, boss_coord.x, boss_coord.y)
+		var boss_data = {
+			"id": boss_node_id,
+			"name": boss_room_res.room_name if boss_room_res else "%s Boss" % biome_key.capitalize(),
+			"type": "boss",
+			"base_type": "boss",
+			"biome": biome_key,
+			"biome_index": biome_index,
+			"layer": boss_coord.x,
+			"column": boss_coord.y,
+			"difficulty": int(ceil(sqrt(active_room_count + 1))),
+			"room_resource_path": boss_room_res.resource_path if boss_room_res else _get_default_room_path_for_biome(biome_key),
+			"initial_dialog": boss_room_res.initial_dialog if boss_room_res else "",
+			"connections": [],
+			"is_home": false,
+			"node_visual_scale": _get_random_node_visual_scale(),
+			"node_shape": "hex",
+			"passable": true
+		}
+		if boss_room_res and boss_room_res.map_icon:
+			boss_data["custom_icon_path"] = boss_room_res.map_icon.resource_path
+		map[boss_node_id] = boss_data
 
 	var background_icon_path = _get_biome_background_icon_path(biome_key)
 	for coord_variant in background_coords:
@@ -332,7 +355,12 @@ func _build_biome_hex_layout(active_room_count: int) -> Dictionary:
 			if randf() <= 0.34:
 				_add_connection_pair(connections, coord, neighbor)
 
-	var exit_coord = _find_farthest_coord(center, active.values())
+	var farthest_coord = _find_farthest_coord(center, active.values())
+	var boss_layout = _find_boss_leaf_layout(center, active, farthest_coord)
+	var boss_coord: Vector2i = boss_layout.get("coord", farthest_coord)
+	var boss_parent: Vector2i = boss_layout.get("parent", farthest_coord)
+	if boss_coord != boss_parent:
+		_add_connection_pair(connections, boss_parent, boss_coord)
 	var background: Dictionary = {}
 	for coord_variant in active.values():
 		var coord: Vector2i = coord_variant
@@ -341,10 +369,16 @@ func _build_biome_hex_layout(active_room_count: int) -> Dictionary:
 			if not _is_coord_on_board(neighbor) or active.has(neighbor_key):
 				continue
 			background[neighbor_key] = neighbor
+	for neighbor in _get_hex_neighbors(boss_coord):
+		var neighbor_key = _coord_key(neighbor)
+		if not _is_coord_on_board(neighbor) or active.has(neighbor_key) or neighbor == boss_coord:
+			continue
+		background[neighbor_key] = neighbor
+	background.erase(_coord_key(boss_coord))
 
 	return {
 		"home": center,
-		"exit": exit_coord,
+		"boss": boss_coord,
 		"active": active.values(),
 		"background": background.values(),
 		"connections": connections.keys()
@@ -370,6 +404,46 @@ func _find_farthest_coord(origin: Vector2i, coords: Array) -> Vector2i:
 			best_distance = distance
 			best_coord = coord
 	return best_coord
+
+func _find_boss_leaf_layout(origin: Vector2i, active: Dictionary, preferred_parent: Vector2i) -> Dictionary:
+	var candidate_parents: Array[Vector2i] = []
+	if preferred_parent != Vector2i.ZERO:
+		candidate_parents.append(preferred_parent)
+	var active_coords: Array = active.values()
+	active_coords.sort_custom(func(a: Vector2i, b: Vector2i) -> bool:
+		return origin.distance_squared_to(a) > origin.distance_squared_to(b)
+	)
+	for coord_variant in active_coords:
+		var coord: Vector2i = coord_variant
+		if not candidate_parents.has(coord):
+			candidate_parents.append(coord)
+	for parent_coord in candidate_parents:
+		var leaf_neighbors: Array[Vector2i] = []
+		var free_neighbors: Array[Vector2i] = []
+		for neighbor in _get_hex_neighbors(parent_coord):
+			if not _is_coord_on_board(neighbor):
+				continue
+			if active.has(_coord_key(neighbor)):
+				continue
+			free_neighbors.append(neighbor)
+			var adjacent_active_count := 0
+			for adjacent in _get_hex_neighbors(neighbor):
+				if active.has(_coord_key(adjacent)):
+					adjacent_active_count += 1
+			if adjacent_active_count == 1:
+				leaf_neighbors.append(neighbor)
+		if not leaf_neighbors.is_empty():
+			leaf_neighbors.sort_custom(func(a: Vector2i, b: Vector2i) -> bool:
+				return origin.distance_squared_to(a) > origin.distance_squared_to(b)
+			)
+			return {"coord": leaf_neighbors[0], "parent": parent_coord}
+		if free_neighbors.is_empty():
+			continue
+		free_neighbors.sort_custom(func(a: Vector2i, b: Vector2i) -> bool:
+			return origin.distance_squared_to(a) > origin.distance_squared_to(b)
+		)
+		return {"coord": free_neighbors[0], "parent": parent_coord}
+	return {"coord": preferred_parent, "parent": preferred_parent}
 
 func _get_hex_neighbors(coord: Vector2i) -> Array[Vector2i]:
 	var offsets_even = [

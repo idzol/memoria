@@ -1,0 +1,53 @@
+[gd_resource type="Resource" script_class="RoomDialogue" load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://data/resources/RoomDialogue.gd" id="1_dialogue"]
+[ext_resource type="Script" path="res://data/resources/RoomDialogSequence.gd" id="2_sequence"]
+[ext_resource type="Script" path="res://data/resources/RoomDialogLine.gd" id="3_line"]
+
+[sub_resource type="Resource" id="RoomDialogLine_intro_1"]
+script = ExtResource("3_line")
+speaker_role = "narrator"
+text_key = "dialog.tutorial.home.first_visit.1"
+text = "Dictys had become like a father, and the small village had become like home.\nAnd home became a refuge from the world, to keep the memories at bay.\nHe struggled to remember most things, most days, and when he did remember it was painful."
+
+[sub_resource type="Resource" id="RoomDialogLine_intro_2"]
+script = ExtResource("3_line")
+speaker_role = "player"
+speaker_name_key = "dialog.speaker.lethos"
+speaker_name = "Lethos"
+text_key = "dialog.tutorial.home.first_visit.2"
+text = "I remember I had two things to do today.\nCollect my fishing net from the wharf.\nSpeak to Dictys at the village square."
+
+[sub_resource type="Resource" id="RoomDialogLine_intro_3"]
+script = ExtResource("3_line")
+speaker_role = "narrator"
+text_key = "dialog.tutorial.home.first_visit.3"
+text = "It is time to leave the hut in search of Dictys and the fishing wharf."
+
+[sub_resource type="Resource" id="RoomDialogSequence_first_visit"]
+script = ExtResource("2_sequence")
+id = "first_visit"
+condition = {
+"equals": 1,
+"type": "room_visit_count"
+}
+lines = [SubResource("RoomDialogLine_intro_1"), SubResource("RoomDialogLine_intro_2"), SubResource("RoomDialogLine_intro_3")]
+
+[sub_resource type="Resource" id="RoomDialogLine_return_1"]
+script = ExtResource("3_line")
+speaker_role = "narrator"
+text_key = "dialog.tutorial.home.return_visit.1"
+text = "The hut still holds the warmth of a borrowed home, but the day is already moving beyond its walls."
+
+[sub_resource type="Resource" id="RoomDialogSequence_return_visit"]
+script = ExtResource("2_sequence")
+id = "return_visit"
+condition = {
+"min": 2,
+"type": "room_visit_count"
+}
+lines = [SubResource("RoomDialogLine_return_1")]
+
+[resource]
+script = ExtResource("1_dialogue")
+sequences = [SubResource("RoomDialogSequence_first_visit"), SubResource("RoomDialogSequence_return_visit")]
