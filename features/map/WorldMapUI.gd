@@ -240,7 +240,7 @@ func _input(event):
 		_activate_selected_node()
 
 func _setup_ui():
-	scroll_area.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll_area.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	scroll_area.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	if background_texture:
 		background_texture.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -486,9 +486,9 @@ func _redirect_to_daily_home_event_if_needed() -> bool:
 	if home_node.is_empty():
 		return false
 	_set_player_position_from_data(home_node)
-	GameManager.current_node = home_node.duplicate(true)
-	SaveManager.save_mid_run_state()
-	get_tree().change_scene_to_file("res://features/encounters/EventScene.tscn")
+	GameManager.player_biome = str(home_node.get("biome", GameManager.player_biome))
+	GameManager.set_selected_story_biome(GameManager.player_biome)
+	_enter_room(home_node)
 	return true
 
 func _ensure_story_player_starts_at_biome_home():
@@ -1292,15 +1292,20 @@ func _update_map_content_bounds():
 		max(scroll_area.size.x, content_width * current_node_scale),
 		max(scroll_area.size.y, content_height * current_node_scale)
 	)
+	var rendered_map_size = _raw_content_size * current_node_scale
+	var centered_offset = Vector2(
+		max(0.0, (scaled_content_size.x - rendered_map_size.x) * 0.5),
+		max(0.0, (scaled_content_size.y - rendered_map_size.y) * 0.5)
+	)
 	map_content.custom_minimum_size = scaled_content_size
 	if node_container:
 		node_container.custom_minimum_size = _raw_content_size
 		node_container.size = _raw_content_size
-		node_container.position = Vector2.ZERO
+		node_container.position = centered_offset
 		node_container.pivot_offset = Vector2.ZERO
 		node_container.scale = Vector2.ONE * current_node_scale
 	if lines_container:
-		lines_container.position = Vector2.ZERO
+		lines_container.position = centered_offset
 		lines_container.scale = Vector2.ONE
 	_apply_background_zoom()
 
@@ -1418,10 +1423,13 @@ func _scroll_map_vertical_with_wheel(wheel_direction: int, wheel_factor: float =
 		return
 	var step_scale = max(1.0, abs(wheel_factor))
 	var delta = MAP_WHEEL_SCROLL_STEP * step_scale * float(wheel_direction)
-	var v_scroll_bar = scroll_area.get_v_scroll_bar()
-	var max_vertical = float(v_scroll_bar.max_value) if v_scroll_bar else 0.0
-	var target_vertical = clamp(float(scroll_area.scroll_vertical) + delta, 0.0, max_vertical)
+	var target_vertical = float(scroll_area.scroll_vertical) + delta
+	var scroll_limits = _get_scroll_limits()
+	var max_vertical = scroll_limits.y
+	target_vertical = clamp(target_vertical, 0.0, max_vertical)
 	scroll_area.scroll_vertical = int(round(target_vertical))
+	_update_map_anchor_ratio()
+	_sync_background_pan_to_scroll()
 
 func _handle_map_drag_input(event: InputEvent) -> bool:
 	if not scroll_area:
@@ -1441,8 +1449,11 @@ func _handle_map_drag_input(event: InputEvent) -> bool:
 			_suppress_click_after_drag = true
 		if _is_drag_panning:
 			_suppress_click_after_drag = true
-			scroll_area.scroll_horizontal = int(round(_drag_pan_scroll_origin.x - delta.x))
-			scroll_area.scroll_vertical = int(round(_drag_pan_scroll_origin.y - delta.y))
+			var scroll_limits = _get_scroll_limits()
+			var target_scroll_x = clamp(_drag_pan_scroll_origin.x - delta.x, 0.0, scroll_limits.x)
+			var target_scroll_y = clamp(_drag_pan_scroll_origin.y - delta.y, 0.0, scroll_limits.y)
+			scroll_area.scroll_horizontal = int(round(target_scroll_x))
+			scroll_area.scroll_vertical = int(round(target_scroll_y))
 			_update_map_anchor_ratio()
 			_sync_background_pan_to_scroll()
 			return true
@@ -1472,9 +1483,20 @@ func _set_map_zoom(target_zoom: float):
 	var clamped_zoom = clamp(target_zoom, MIN_MAP_ZOOM, MAX_MAP_ZOOM)
 	if is_equal_approx(clamped_zoom, _user_zoom_scale):
 		return
-	_update_map_anchor_ratio()
-	_zoom_anchor_ratio = _map_anchor_ratio
-	_zoom_anchor_viewport_size = scroll_area.size if scroll_area else Vector2.ZERO
+	if scroll_area and map_content:
+		var before_content_size = map_content.custom_minimum_size
+		_zoom_anchor_viewport_size = scroll_area.size
+		var before_center = Vector2(
+			float(scroll_area.scroll_horizontal),
+			float(scroll_area.scroll_vertical)
+		) + (_zoom_anchor_viewport_size * 0.5)
+		_zoom_anchor_ratio = Vector2(
+			clamp(before_center.x / max(before_content_size.x, 1.0), 0.0, 1.0),
+			clamp(before_center.y / max(before_content_size.y, 1.0), 0.0, 1.0)
+		)
+	else:
+		_zoom_anchor_ratio = Vector2(0.5, 0.5)
+		_zoom_anchor_viewport_size = scroll_area.size if scroll_area else Vector2.ZERO
 	_user_zoom_scale = clamped_zoom
 	_draw_map()
 	if not scroll_area or not map_content:
@@ -1484,8 +1506,12 @@ func _set_map_zoom(target_zoom: float):
 		new_content_size.x * _zoom_anchor_ratio.x,
 		new_content_size.y * _zoom_anchor_ratio.y
 	)
-	scroll_area.scroll_horizontal = int(round(max(0.0, target_center.x - _zoom_anchor_viewport_size.x * 0.5)))
-	scroll_area.scroll_vertical = int(round(max(0.0, target_center.y - _zoom_anchor_viewport_size.y * 0.5)))
+	var scroll_limits = _get_scroll_limits()
+	var target_scroll_x = clamp(target_center.x - _zoom_anchor_viewport_size.x * 0.5, 0.0, scroll_limits.x)
+	var target_scroll_y = clamp(target_center.y - _zoom_anchor_viewport_size.y * 0.5, 0.0, scroll_limits.y)
+	scroll_area.scroll_horizontal = int(round(target_scroll_x))
+	scroll_area.scroll_vertical = int(round(target_scroll_y))
+	_redraw_current_adjacency_lines_for_current_state()
 	_update_map_anchor_ratio()
 	_sync_background_pan_to_scroll()
 
@@ -1524,25 +1550,37 @@ func _update_map_anchor_ratio():
 		_map_anchor_ratio = Vector2(0.5, 0.5)
 		return
 	var content_size = map_content.custom_minimum_size
-	var current_id = _find_current_node_id()
-	if current_id != "" and node_positions_by_id.has(current_id):
-		var node_center = (node_positions_by_id[current_id] + current_node_half_size) * current_node_scale
-		var node_widget = node_widgets_by_id.get(current_id, null)
-		if node_widget is Control:
-			var widget_position: Vector2 = node_widget.position * current_node_scale
-			var widget_size: Vector2 = node_widget.size * current_node_scale
-			node_center = widget_position + (widget_size * 0.5)
-		_map_anchor_ratio = Vector2(
-			clamp(node_center.x / max(content_size.x, 1.0), 0.0, 1.0),
-			clamp(node_center.y / max(content_size.y, 1.0), 0.0, 1.0)
-		)
-		return
 	var viewport_size = scroll_area.size
 	_map_anchor_ratio = Vector2(0.5, 0.5)
+	var stage_center = Vector2(
+		float(scroll_area.scroll_horizontal),
+		float(scroll_area.scroll_vertical)
+	) + (viewport_size * 0.5)
 	if content_size.x > 0.0:
-		_map_anchor_ratio.x = clamp((float(scroll_area.scroll_horizontal) + viewport_size.x * 0.5) / content_size.x, 0.0, 1.0)
+		_map_anchor_ratio.x = clamp(stage_center.x / content_size.x, 0.0, 1.0)
 	if content_size.y > 0.0:
-		_map_anchor_ratio.y = clamp((float(scroll_area.scroll_vertical) + viewport_size.y * 0.5) / content_size.y, 0.0, 1.0)
+		_map_anchor_ratio.y = clamp(stage_center.y / content_size.y, 0.0, 1.0)
+
+func _get_scroll_limits() -> Vector2:
+	if not scroll_area or not map_content:
+		return Vector2.ZERO
+	var content_size = map_content.custom_minimum_size
+	return Vector2(
+		max(0.0, content_size.x - scroll_area.size.x),
+		max(0.0, content_size.y - scroll_area.size.y)
+	)
+
+func _redraw_current_adjacency_lines_for_current_state():
+	if lines_container == null:
+		return
+	for child in lines_container.get_children():
+		child.queue_free()
+	var current_id = _find_current_node_id()
+	if current_id == "":
+		return
+	var biome = _get_active_biome()
+	var revealed_set = _build_visible_node_set(current_id, biome)
+	_draw_current_adjacency_lines(current_id, revealed_set)
 
 func _is_hex_adjacent(a: Vector2i, b: Vector2i) -> bool:
 	if a == b:
