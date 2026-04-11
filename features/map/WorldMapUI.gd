@@ -64,10 +64,11 @@ const RUN_LOG_KEY := "show_run_log"
 const TUTORIAL_FLAGS_SECTION := "tutorial_flags"
 const TUTORIAL_TOAST_DURATION := 10.0
 const TUTORIAL_TOAST_COLOR := Color(0.4, 0.7, 1.0, 1.0)
-const DIRECT_LAUNCH_BIOMES := ["home", "town", "forest", "ice_caves", "desert", "swamp", "abyss", "void", "the_core"]
+const DIRECT_LAUNCH_BIOMES := ["tutorial", "town", "forest", "ice_caves", "desert", "swamp", "abyss", "void", "the_core"]
 const MIN_MAP_ZOOM := 0.6
 const MAX_MAP_ZOOM := 2.2
 const MAP_ZOOM_STEP := 0.2
+const MAP_WHEEL_SCROLL_STEP := 120.0
 const MAP_DRAG_DEADZONE := 4.0
 const MIN_HEX_HORIZONTAL_PADDING := 60.0
 const MIN_HEX_VERTICAL_PADDING := 0
@@ -133,6 +134,8 @@ const LOG_SIDE_SPACER_WIDTH = 0.0
 const LOG_COLOR_GOOD = Color(0.62, 1.0, 0.62, 1.0)
 const LOG_COLOR_BAD = Color(1.0, 0.58, 0.58, 1.0)
 const LOG_COLOR_NEUTRAL = Color(0.86, 0.86, 0.86, 1.0)
+const BOSS_BACKTRACK_TRIGGERED_KEY_PREFIX := "boss_backtrack_triggered_"
+const BOSS_BACKTRACK_ROOM_ID_KEY_PREFIX := "boss_backtrack_room_id_"
 func _ready():
 	_ensure_tutorial_overlay()
 	_ensure_direct_launch_picker_overlay()
@@ -158,6 +161,7 @@ func _notification(what):
 		_sync_map_area_to_top_bar()
 		_apply_background_zoom()
 		_draw_map()
+		_scroll_to_player.call_deferred()
 		_refresh_log_view()
 
 func _input(event):
@@ -453,6 +457,8 @@ func _ensure_run_map_ready():
 
 func _finalize_map_ready_state():
 	await _ensure_run_map_ready()
+	if _redirect_to_daily_home_event_if_needed():
+		return
 	if GameManager.player_grid_pos == Vector2i(-99, -99):
 		if GameManager.is_battle_mode:
 			GameManager.player_grid_pos = Vector2i(0, 0)
@@ -466,6 +472,24 @@ func _finalize_map_ready_state():
 		SignalBus.music_change_requested.emit(biome_track, 1.5)
 	_scroll_to_player()
 	_begin_worldmap_tutorial_if_needed.call_deferred()
+
+func _redirect_to_daily_home_event_if_needed() -> bool:
+	if GameManager.is_battle_mode:
+		return false
+	if not GameManager.consume_first_worldmap_load_for_day():
+		return false
+	var active_biome = _get_active_biome()
+	if active_biome == "":
+		active_biome = "tutorial"
+	GameManager.enter_story_biome(active_biome, true)
+	var home_node = GameManager.get_story_biome_home_node(active_biome)
+	if home_node.is_empty():
+		return false
+	_set_player_position_from_data(home_node)
+	GameManager.current_node = home_node.duplicate(true)
+	SaveManager.save_mid_run_state()
+	get_tree().change_scene_to_file("res://features/encounters/EventScene.tscn")
+	return true
 
 func _ensure_story_player_starts_at_biome_home():
 	if GameManager.is_battle_mode or GameManager.run_map.is_empty():
@@ -719,11 +743,17 @@ func _build_visible_node_set(current_id: String, biome: String) -> Dictionary:
 	if GameManager.is_battle_mode:
 		visible_set[current_id] = true
 		for neighbor_id in _get_adjacent_node_ids(current_id, biome):
+			var neighbor_data = _get_map_entry_by_id(neighbor_id)
+			if _is_boss_node_hidden(neighbor_data):
+				continue
 			visible_set[neighbor_id] = true
 		return visible_set
 
 	visible_set[current_id] = true
 	for neighbor_id in _get_adjacent_node_ids(current_id, biome):
+		var neighbor_data = _get_map_entry_by_id(neighbor_id)
+		if _is_boss_node_hidden(neighbor_data):
+			continue
 		visible_set[neighbor_id] = true
 
 	var completed_ids: Array[String] = []
@@ -741,6 +771,9 @@ func _build_visible_node_set(current_id: String, biome: String) -> Dictionary:
 
 	for completed_id in completed_ids:
 		for neighbor_id in _get_adjacent_node_ids(completed_id, biome):
+			var neighbor_data = _get_map_entry_by_id(neighbor_id)
+			if _is_boss_node_hidden(neighbor_data):
+				continue
 			visible_set[neighbor_id] = true
 
 	return visible_set
@@ -975,6 +1008,7 @@ func _show_backtrack_dialog():
 		backtrack_dialog_hint.text = LocalizationManager.translate("tutorial.continue_any_input", "Click or press any key to continue")
 
 func _travel_to_boss_node(target_data: Dictionary):
+	_mark_boss_backtrack_triggered(target_data)
 	_pending_backtrack_target = target_data.duplicate(true)
 	_show_backtrack_dialog()
  
@@ -1030,7 +1064,7 @@ func _show_info_toast(message: String, duration: float, font_color: Color):
 func _build_boss_node(base_data: Dictionary) -> Dictionary:
 	var out = base_data.duplicate(true)
 	var biome_key = str(base_data.get("biome", "town"))
-	var source_biome = "town" if biome_key == "home" else biome_key
+	var source_biome = "town" if biome_key == "tutorial" else biome_key
 	var boss_path = "res://data/rooms/%s/%s_boss.tres" % [source_biome, source_biome]
 	if not ResourceLoader.exists(boss_path):
 		var default_path = "res://data/rooms/%s/%s_default.tres" % [source_biome, source_biome]
@@ -1052,6 +1086,9 @@ func _is_backtrack(target_id: String) -> bool:
 	var target_data = _get_map_entry_by_id(target_id)
 	if target_data.is_empty():
 		return false
+	var target_biome = str(target_data.get("biome", ""))
+	if target_biome != "" and GameManager.is_biome_cleared(target_biome):
+		return false
 	if _is_home_node(target_data):
 		return false
 	if str(target_data.get("type", "")) == "boss":
@@ -1060,6 +1097,48 @@ func _is_backtrack(target_id: String) -> bool:
 	if bool(room_state.get("completed", false)):
 		return false
 	return GameManager.get_room_visit_count_this_run(target_id) >= 1
+
+func _mark_boss_backtrack_triggered(target_data: Dictionary):
+	if target_data.is_empty():
+		return
+	var biome = str(target_data.get("biome", ""))
+	if biome == "":
+		return
+	var target_id = str(target_data.get("id", ""))
+	if target_id == "":
+		return
+	if not GameManager.world_state.has("global"):
+		GameManager.world_state["global"] = {}
+	GameManager.world_state.global[BOSS_BACKTRACK_TRIGGERED_KEY_PREFIX + biome] = true
+	GameManager.world_state.global[BOSS_BACKTRACK_ROOM_ID_KEY_PREFIX + biome] = "%s_boss" % target_id
+	SaveManager.save_mid_run_state()
+
+func _is_boss_node_hidden(node_data: Dictionary) -> bool:
+	if node_data.is_empty():
+		return false
+	if str(node_data.get("type", "")) != "boss":
+		return false
+	var biome = str(node_data.get("biome", ""))
+	return not _is_boss_connection_revealed_for_biome(biome)
+
+func _is_boss_connection_revealed_for_biome(biome: String) -> bool:
+	if biome == "":
+		return false
+	if not GameManager.world_state.has("global"):
+		return false
+	var global_state: Dictionary = GameManager.world_state.global
+	if not bool(global_state.get(BOSS_BACKTRACK_TRIGGERED_KEY_PREFIX + biome, false)):
+		return false
+	var boss_room_id = str(global_state.get(BOSS_BACKTRACK_ROOM_ID_KEY_PREFIX + biome, ""))
+	if boss_room_id == "":
+		return false
+	var boss_state: Dictionary = GameManager.world_state.rooms.get(boss_room_id, {})
+	return (
+		bool(boss_state.get("visited", false))
+		or bool(boss_state.get("cleared", false))
+		or bool(boss_state.get("completed", false))
+		or int(boss_state.get("visit_count", 0)) > 0
+	)
 
 func _is_home_node(node_data: Dictionary) -> bool:
 	return bool(node_data.get("is_home", false)) or str(node_data.get("type", "")) == "home"
@@ -1184,6 +1263,8 @@ func _get_accessible_adjacent_node_ids(node_id: String, biome: String) -> Array[
 	for target_id in _get_adjacent_node_ids(node_id, biome):
 		var target_data = _get_map_entry_by_id(target_id)
 		if target_data.is_empty():
+			continue
+		if _is_boss_node_hidden(target_data):
 			continue
 		if not bool(target_data.get("passable", true)):
 			continue
@@ -1314,15 +1395,33 @@ func _handle_map_zoom_input(event: InputEvent) -> bool:
 		return false
 	if not event.pressed:
 		return false
+	var wheel_direction := 0
+	if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+		wheel_direction = -1
+	elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+		wheel_direction = 1
+	if wheel_direction == 0:
+		return false
 	if not _is_point_inside_map_area(event.position):
 		return false
-	if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-		_zoom_in()
+	if event.ctrl_pressed:
+		if wheel_direction < 0:
+			_zoom_in()
+		else:
+			_zoom_out()
 		return true
-	if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-		_zoom_out()
-		return true
-	return false
+	_scroll_map_vertical_with_wheel(wheel_direction, event.factor)
+	return true
+
+func _scroll_map_vertical_with_wheel(wheel_direction: int, wheel_factor: float = 1.0):
+	if scroll_area == null:
+		return
+	var step_scale = max(1.0, abs(wheel_factor))
+	var delta = MAP_WHEEL_SCROLL_STEP * step_scale * float(wheel_direction)
+	var v_scroll_bar = scroll_area.get_v_scroll_bar()
+	var max_vertical = float(v_scroll_bar.max_value) if v_scroll_bar else 0.0
+	var target_vertical = clamp(float(scroll_area.scroll_vertical) + delta, 0.0, max_vertical)
+	scroll_area.scroll_vertical = int(round(target_vertical))
 
 func _handle_map_drag_input(event: InputEvent) -> bool:
 	if not scroll_area:
@@ -1425,6 +1524,19 @@ func _update_map_anchor_ratio():
 		_map_anchor_ratio = Vector2(0.5, 0.5)
 		return
 	var content_size = map_content.custom_minimum_size
+	var current_id = _find_current_node_id()
+	if current_id != "" and node_positions_by_id.has(current_id):
+		var node_center = (node_positions_by_id[current_id] + current_node_half_size) * current_node_scale
+		var node_widget = node_widgets_by_id.get(current_id, null)
+		if node_widget is Control:
+			var widget_position: Vector2 = node_widget.position * current_node_scale
+			var widget_size: Vector2 = node_widget.size * current_node_scale
+			node_center = widget_position + (widget_size * 0.5)
+		_map_anchor_ratio = Vector2(
+			clamp(node_center.x / max(content_size.x, 1.0), 0.0, 1.0),
+			clamp(node_center.y / max(content_size.y, 1.0), 0.0, 1.0)
+		)
+		return
 	var viewport_size = scroll_area.size
 	_map_anchor_ratio = Vector2(0.5, 0.5)
 	if content_size.x > 0.0:
@@ -1477,8 +1589,8 @@ func _get_active_biome() -> String:
 		if current_id != "":
 			var current_data = _get_map_entry_by_id(current_id)
 			if not current_data.is_empty():
-				return str(current_data.get("biome", "home"))
-		return "home"
+				return str(current_data.get("biome", "tutorial"))
+		return "tutorial"
 	return GameManager.selected_story_biome if GameManager.selected_story_biome != "" else GameManager.player_biome
 
 func _get_player_layer() -> int:
@@ -1507,7 +1619,7 @@ func _apply_biome_visuals(biome: String):
 func _get_biome_grid_texture(biome: String) -> Texture2D:
 	if not map_assets:
 		return null
-	var normalized_biome = "town" if biome == "home" else biome
+	var normalized_biome = "town" if biome == "tutorial" else biome
 	var grid_prop = "map_%s_grid" % normalized_biome
 	if grid_prop in map_assets:
 		return map_assets.get(grid_prop)
@@ -1516,7 +1628,7 @@ func _get_biome_grid_texture(biome: String) -> Texture2D:
 func _begin_worldmap_tutorial_if_needed():
 	if _tutorial_active or GameManager.is_battle_mode or not _are_tutorial_tips_enabled():
 		return
-	if _get_active_biome() == "home" and not _has_seen_tutorial("worldmap_home_intro"):
+	if _get_active_biome() == "tutorial" and not _has_seen_tutorial("worldmap_home_intro"):
 		if adjacent_node_ids.is_empty():
 			return
 		selected_node_id = adjacent_node_ids[0]

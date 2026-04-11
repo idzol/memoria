@@ -5,9 +5,9 @@ extends Node
 
 signal progress_updated(percent: float, description: String)
 
-const BIOME_ORDER = ["home", "town", "forest", "ice_caves", "desert", "swamp", "abyss", "void", "the_core"]
+const BIOME_ORDER = ["tutorial", "town", "forest", "ice_caves", "desert", "swamp", "abyss", "void", "the_core"]
 const BIOME_ROOM_SOURCE = {
-	"home": "tutorial",
+	"tutorial": "tutorial",
 	"town": "town",
 	"forest": "forest",
 	"ice_caves": "ice_caves",
@@ -19,7 +19,7 @@ const BIOME_ROOM_SOURCE = {
 }
 const ROOM_ROOT = "res://data/rooms/"
 const GLOBAL_DEFAULT_ROOM_PATH = "res://data/rooms/default_battle.tres"
-const INITIAL_STORY_BIOMES = ["home", "town"]
+const INITIAL_STORY_BIOMES = ["tutorial", "town"]
 const MAX_BIOME_MAP_SIZE = 11
 const MAX_ACTIVE_ROOM_COUNT = 64
 
@@ -567,7 +567,7 @@ func _load_story_boss_room_for_biome(biome: String) -> RoomData:
 func _get_biome_background_icon_path(biome: String) -> String:
 	if not _map_assets:
 		return ""
-	var normalized_biome = "town" if biome == "home" else biome
+	var normalized_biome = "town" if biome == "tutorial" else biome
 	var prop = "map_%s_background" % normalized_biome
 	if prop in _map_assets:
 		var texture = _map_assets.get(prop) as Texture2D

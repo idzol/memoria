@@ -2,7 +2,7 @@ extends Control
 
 const STORY_CHAPTER_SCENE = preload("res://features/map/StoryChapter.tscn")
 const STORY_MAP_SCENE = preload("res://features/map/StoryMap.tscn")
-const STORY_ORDER = ["home", "town", "forest", "ice_caves", "desert", "swamp", "abyss", "void", "the_core"]
+const STORY_ORDER = ["tutorial", "town", "forest", "ice_caves", "desert", "swamp", "abyss", "void", "the_core"]
 const SCROLL_CONTENT_PADDING := 24.0
 const ENTRY_GAP := 18.0
 const CHAPTER_GAP := 28.0
@@ -185,8 +185,13 @@ func _rebuild_chapters():
 	if chapter_entries.is_empty():
 		return
 
-	var start_biome = GameManager.selected_story_biome if GameManager.selected_story_biome != "" else unlocked[0]
-	var preferred_kind = "summary"
+	var focus_request = GameManager.consume_storyline_return_focus()
+	var requested_biome = str(focus_request.get("biome", ""))
+	var requested_kind = str(focus_request.get("kind", ""))
+	var start_biome = requested_biome if requested_biome != "" else (GameManager.selected_story_biome if GameManager.selected_story_biome != "" else unlocked[0])
+	var preferred_kind = requested_kind if requested_kind != "" else "summary"
+	if GameManager.is_battle_mode and preferred_kind == "story":
+		preferred_kind = "summary"
 	selected_index = 0
 	for i in range(chapter_entries.size()):
 		var entry = chapter_entries[i]
@@ -355,22 +360,18 @@ func _activate_selected_entry():
 	_handle_entry_action(str(entry["biome"]), str(entry["kind"]))
 
 func _handle_entry_action(biome: String, kind: String):
+	if kind == "story":
+		_open_story_chapter_sequence(biome)
+		return
 	if not _can_open_story_biome(biome):
 		return
 	GameManager.set_selected_story_biome(biome)
 	_set_selected_biome_this_run(biome)
-	if kind == "story":
-		_open_selected_biome_map()
-		return
 	_open_selected_biome_map()
 
 func _on_story_tile_pressed(biome: String):
 	_select_entry(biome, "story")
-	if not _can_open_story_biome(biome):
-		return
-	GameManager.set_selected_story_biome(biome)
-	_set_selected_biome_this_run(biome)
-	_open_selected_biome_map()
+	_open_story_chapter_sequence(biome)
 
 func _on_summary_tile_pressed(biome: String):
 	_select_entry(biome, "summary")
@@ -391,14 +392,24 @@ func _select_entry(biome: String, kind: String):
 
 func _on_entry_wrapper_pressed(biome: String, kind: String):
 	_select_entry(biome, kind)
+	if kind == "story":
+		_open_story_chapter_sequence(biome)
+		return
 	if not _can_open_story_biome(biome):
 		return
 	GameManager.set_selected_story_biome(biome)
 	_set_selected_biome_this_run(biome)
-	if kind == "story":
-		_open_selected_biome_map()
-		return
 	_open_selected_biome_map()
+
+func _open_story_chapter_sequence(biome: String):
+	if biome == "":
+		return
+	GameManager.set_storyline_return_focus(biome, "story")
+	GameManager.set_selected_story_biome(biome)
+	GameManager.queue_story_sequence(biome, GameManager.get_story_line_scene_path())
+	SignalBus.music_change_requested.emit("", 0.7)
+	SaveManager.save_mid_run_state()
+	SceneTransition.change_scene_to_file(GameManager.get_story_chapter_sequence_scene_path())
 
 func _open_story_focus(biome: String):
 	if not focus_overlay or not focus_content:
@@ -414,6 +425,23 @@ func _open_story_focus(biome: String):
 	chapter_scene.set_biome(biome)
 	chapter_scene.chapter_pressed.connect(_close_focus_overlay)
 	focus_content.add_child(chapter_scene)
+	focus_overlay.visible = true
+
+func _open_summary_focus(biome: String):
+	if not focus_overlay or not focus_content:
+		return
+	for child in focus_content.get_children():
+		child.queue_free()
+	_apply_focus_content_size()
+	GameManager.set_selected_story_biome(biome)
+	var summary_scene = STORY_MAP_SCENE.instantiate()
+	summary_scene.embedded_mode = false
+	summary_scene.show_background = false
+	summary_scene.allow_navigation = false
+	summary_scene.set_biome(biome)
+	if summary_scene.has_signal("summary_pressed"):
+		summary_scene.summary_pressed.connect(_close_focus_overlay)
+	focus_content.add_child(summary_scene)
 	focus_overlay.visible = true
 
 func _apply_focus_content_size():
@@ -477,7 +505,7 @@ func _scroll_selected_into_view():
 	scroll_container.scroll_horizontal = int(target)
 
 func _get_story_tile_title(biome: String) -> String:
-	if biome == "home":
+	if biome == "tutorial":
 		return LocalizationManager.translate("story.title.home", "Introduction")
 	return LocalizationManager.format("storymap.chapter_number", {"number": STORY_ORDER.find(biome)}, "Chapter {number}")
 
@@ -827,7 +855,7 @@ func _should_show_final_tutorial() -> bool:
 	var unlocked = GameManager.get_unlocked_story_biomes()
 	if unlocked.size() < 2:
 		return false
-	if not GameManager.is_biome_cleared("home"):
+	if not GameManager.is_biome_cleared("tutorial"):
 		return false
 	return not _has_seen_tutorial(STORYMAP_FINAL_TUTORIAL_ID)
 

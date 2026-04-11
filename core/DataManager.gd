@@ -16,7 +16,7 @@ const PATHS = {
 }
 const MAP_DATA_PATH = "res://data/map/map_data.tres"
 const GLOBAL_DEFAULT_ROOM_PATH = "res://data/rooms/default_battle.tres"
-const BIOME_ORDER = ["home", "town", "forest", "ice_caves", "desert", "swamp", "abyss", "void", "the_core"]
+const BIOME_ORDER = ["tutorial", "town", "forest", "ice_caves", "desert", "swamp", "abyss", "void", "the_core"]
 const PERFORMANCE_SENSITIVE_SCENE_NAMES = {
 	"IntroCinematic": true,
 	"StoryCutscene": true,
@@ -28,7 +28,7 @@ const PERFORMANCE_SENSITIVE_SCENE_PATHS = {
 	"res://features/map/StoryChapterSequence.tscn": true
 }
 const BIOME_ROOM_SOURCE = {
-	"home": "tutorial",
+	"tutorial": "tutorial",
 	"town": "town",
 	"forest": "forest",
 	"ice_caves": "ice_caves",

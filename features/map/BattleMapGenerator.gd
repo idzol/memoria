@@ -5,9 +5,9 @@ extends Node
 
 signal progress_updated(percent: float, description: String)
 
-const BIOME_ORDER = ["home", "town", "forest", "ice_caves", "desert", "swamp", "abyss", "void", "the_core"]
+const BIOME_ORDER = ["tutorial", "town", "forest", "ice_caves", "desert", "swamp", "abyss", "void", "the_core"]
 const BIOME_ROOM_SOURCE = {
-	"home": "town",
+	"tutorial": "town",
 	"town": "town",
 	"forest": "forest",
 	"ice_caves": "ice_caves",

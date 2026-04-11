@@ -87,9 +87,10 @@ func _apply_mode():
 
 func _refresh_content():
 	var biome = _get_biome()
+	var localization_biome = _get_localization_biome_key(biome)
 	title_label.text = _get_title_for_biome(biome)
 	body_label.text = LocalizationManager.translate(
-		"story.body.%s" % biome,
+		"story.body.%s" % localization_biome,
 		LocalizationManager.translate("story.body.fallback", "The stone remembers more than the traveler does.")
 	)
 
@@ -99,10 +100,13 @@ func _get_biome() -> String:
 func _get_title_for_biome(biome: String) -> String:
 	if title_override != "":
 		return title_override
-	if biome == "home":
+	if biome == "tutorial":
 		return LocalizationManager.translate("story.title.home", "Introduction")
 	var template = LocalizationManager.translate("story.title.default", "{biome} Chronicle")
 	return template.replace("{biome}", biome.replace("_", " ").capitalize())
+
+func _get_localization_biome_key(biome: String) -> String:
+	return "home" if biome == "tutorial" else biome
 
 func _get_embedded_height() -> float:
 	return max(320.0, get_viewport_rect().size.y * 0.9)

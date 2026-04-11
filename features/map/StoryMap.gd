@@ -132,15 +132,16 @@ func _get_biome() -> String:
 	return display_biome if display_biome != "" else GameManager.selected_story_biome
 
 func _get_title_for_biome(biome: String) -> String:
-	if biome == "home":
+	if biome == "tutorial":
 		return LocalizationManager.translate("mapsummary.title.home", "Home Map Summary")
 	return LocalizationManager.format("mapsummary.title.default", {"biome": biome.replace("_", " ").capitalize()}, "{biome} Map Summary")
 
 func _get_subtitle_for_biome(biome: String) -> String:
 	if GameManager.is_battle_mode:
 		return LocalizationManager.translate("mapsummary.subtitle.battle", "Remembered rooms from this biome are listed here.")
+	var localization_biome = "home" if biome == "tutorial" else biome
 	return LocalizationManager.translate(
-		"mapsummary.subtitle.%s" % biome,
+		"mapsummary.subtitle.%s" % localization_biome,
 		LocalizationManager.translate("mapsummary.subtitle.story", "Home and completed rooms remain remembered here. Select to enter the biome map.")
 	)
 

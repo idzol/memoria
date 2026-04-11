@@ -23,6 +23,8 @@ controls.confirm,Confirm / Select,Confirmar / Seleccionar,Confirmer / Selectionn
 controls.cancel,Cancel / Back,Cancelar / Atras,Annuler / Retour,Abbrechen / Zuruck
 controls.menu,Menu,Menu,Menu,Menu
 controls.story_map,Story Map,Cronica,Carte de l'histoire,Story-Karte
+controls.map_scroll,Map Scroll (Vertical),Desplazar mapa (vertical),Defilement de la carte (vertical),Karte scrollen (vertikal)
+controls.map_zoom,Map Zoom In / Out,Zoom del mapa (+/-),Zoom de la carte (+/-),Kartenzoom (+/-)
 controls.cancel_hint,[ESC] to Close,[ESC] para cerrar,[ESC] pour fermer,[ESC] zum Schliessen
 menu.credits,CREDITS,CREDITOS,CREDITS,CREDITS
 menu.exit,EXIT,SALIR,QUITTER,BEENDEN

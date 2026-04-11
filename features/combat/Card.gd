@@ -34,19 +34,22 @@ const TYPE_FILE_ALIASES := {
 	"utility": "prepare",
 	"charge": "spell"
 }
-const TITLE_ORIGINAL_RECT := Rect2(18.0, 15.0, 124.0, 14.0)
-const DESCRIPTION_ORIGINAL_RECT := Rect2(18.0, 166.0, 124.0, 52.0)
 const CARD_IMAGE_ORIGINAL_OFFSETS := Vector4(18.0, 30.0, -18.0, -70.0)
 const CENTER_ICON_ORIGINAL_SIZE := Vector2(28.0, 28.0)
 const CENTER_ICON_ORIGINAL_OFFSETS := Vector4(-14.0, -13.920013, 14.0, 14.079987)
-const TITLE_BASE_FONT_SIZE := 14
-const DESCRIPTION_BASE_FONT_SIZE := 11
 const TITLE_MIN_FONT_SIZE := 8
 const DESCRIPTION_MIN_FONT_SIZE := 7
+
+var _text_layout_cached: bool = false
+var _title_initial_rect: Rect2 = Rect2()
+var _description_initial_rect: Rect2 = Rect2()
+var _title_base_font_size: int = 14
+var _description_base_font_size: int = 11
 
 func _ready():
 	pressed.connect(_on_pressed)
 	resized.connect(_on_card_resized)
+	_ensure_text_layout_cache()
 	_on_card_resized()
 	mouse_entered.connect(_on_hover.bind(true))
 	mouse_exited.connect(_on_hover.bind(false))
@@ -230,13 +233,10 @@ func _apply_forced_back_texture():
 		back_icon_rect.visible = false
 
 func _apply_scaled_front_layout():
+	_ensure_text_layout_cache()
 	var ratio = _get_card_layout_ratio()
-	_lock_label_rect(title_label, _scaled_rect(TITLE_ORIGINAL_RECT, ratio))
-	_lock_label_rect(description_label, _scaled_rect(DESCRIPTION_ORIGINAL_RECT, ratio))
-	if title_label:
-		title_label.add_theme_font_size_override("font_size", max(TITLE_MIN_FONT_SIZE, roundi(float(TITLE_BASE_FONT_SIZE) * ratio)))
-	if description_label:
-		description_label.add_theme_font_size_override("font_size", max(DESCRIPTION_MIN_FONT_SIZE, roundi(float(DESCRIPTION_BASE_FONT_SIZE) * ratio)))
+	_apply_scaled_label_layout(title_label, _title_initial_rect, _title_base_font_size, ratio, TITLE_MIN_FONT_SIZE)
+	_apply_scaled_label_layout(description_label, _description_initial_rect, _description_base_font_size, ratio, DESCRIPTION_MIN_FONT_SIZE)
 	if card_image_rect:
 		card_image_rect.offset_left = CARD_IMAGE_ORIGINAL_OFFSETS.x * ratio
 		card_image_rect.offset_top = CARD_IMAGE_ORIGINAL_OFFSETS.y * ratio
@@ -255,21 +255,36 @@ func _get_card_layout_ratio() -> float:
 	var height_ratio = size.y / CARD_BASE_SIZE.y if CARD_BASE_SIZE.y > 0.0 else 1.0
 	return clamp(min(width_ratio, height_ratio), 0.45, 2.6)
 
-func _scaled_rect(rect: Rect2, ratio: float) -> Rect2:
-	return Rect2(rect.position * ratio, rect.size * ratio)
-
-func _lock_label_rect(label: Label, rect: Rect2):
-	if not label:
+func _ensure_text_layout_cache():
+	if _text_layout_cached:
 		return
-	label.set("layout_mode", 1)
-	label.anchor_left = 0.0
-	label.anchor_top = 0.0
-	label.anchor_right = 0.0
-	label.anchor_bottom = 0.0
-	label.offset_left = rect.position.x
-	label.offset_top = rect.position.y
-	label.offset_right = rect.position.x + rect.size.x
-	label.offset_bottom = rect.position.y + rect.size.y
+	_cache_label_layout_baseline()
+
+func _cache_label_layout_baseline():
+	if title_label:
+		_title_initial_rect = _get_label_rect(title_label)
+		_title_base_font_size = title_label.get_theme_font_size("font_size")
+	if description_label:
+		_description_initial_rect = _get_label_rect(description_label)
+		_description_base_font_size = description_label.get_theme_font_size("font_size")
+	_text_layout_cached = true
+
+func _apply_scaled_label_layout(label: Label, base_rect: Rect2, base_font_size: int, ratio: float, min_font_size: int):
+	if label == null:
+		return
+	label.offset_left = base_rect.position.x * ratio
+	label.offset_top = base_rect.position.y * ratio
+	label.offset_right = (base_rect.position.x + base_rect.size.x) * ratio
+	label.offset_bottom = (base_rect.position.y + base_rect.size.y) * ratio
+	label.add_theme_font_size_override("font_size", max(min_font_size, int(round(float(base_font_size) * ratio))))
+
+func _get_label_rect(label: Label) -> Rect2:
+	if label == null:
+		return Rect2()
+	return Rect2(
+		Vector2(label.offset_left, label.offset_top),
+		Vector2(label.offset_right - label.offset_left, label.offset_bottom - label.offset_top)
+	)
 
 func _on_hover(is_hovering: bool):
 	if is_matched or is_face_up: 

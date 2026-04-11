@@ -2,20 +2,8 @@
 
 [ext_resource type="Script" uid="uid://csn80tiagf37g" path="res://features/combat/Card.gd" id="1_k81y5"]
 [ext_resource type="Texture2D" uid="uid://cmyeha26b6ndv" path="res://assets/cards/back/card_back_common.png" id="2_back"]
-[ext_resource type="Theme" uid="uid://djn7txycnus44" path="res://assets/themes/Card.theme" id="3_74jmb"]
-[ext_resource type="Texture2D" path="res://assets/cards/front/card_front.png" id="4_front"]
-[ext_resource type="FontFile" uid="uid://c7g5lygp6h6k8" path="res://assets/fonts/Almendra-Bold.ttf" id="5_o35ix"]
-[ext_resource type="FontFile" uid="uid://d6vga6j4rrsy" path="res://assets/fonts/Metamorphous-Regular.ttf" id="5_w8c5q"]
-
-[sub_resource type="LabelSettings" id="LabelSettings_otqfn"]
-font = ExtResource("5_o35ix")
-font_size = 10
-font_color = Color(0, 0, 0, 1)
-
-[sub_resource type="LabelSettings" id="LabelSettings_o35ix"]
-font = ExtResource("5_w8c5q")
-font_size = 8
-font_color = Color(0, 0, 0, 1)
+[ext_resource type="Theme" uid="uid://bffow74pf5qk4" path="res://assets/themes/Card.theme" id="3_74jmb"]
+[ext_resource type="Texture2D" uid="uid://celd3t8dgsch8" path="res://assets/cards/front/card_front.png" id="4_front"]
 
 [node name="Card" type="TextureButton" unique_id=1976348525]
 custom_minimum_size = Vector2(160, 240)
@@ -107,9 +95,9 @@ custom_minimum_size = Vector2(28, 28)
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.5
-anchor_top = 0.65800005
+anchor_top = 0.683
 anchor_right = 0.5
-anchor_bottom = 0.65800005
+anchor_bottom = 0.683
 offset_left = -14.0
 offset_top = -13.920013
 offset_right = 14.0
@@ -134,14 +122,12 @@ mouse_filter = 2
 unique_name_in_owner = true
 layout_mode = 0
 offset_left = 18.0
-offset_top = 15.0
+offset_top = 6.0
 offset_right = 142.0
-offset_bottom = 29.0
+offset_bottom = 24.0
 theme = ExtResource("3_74jmb")
-theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 14
-text = "BATTLE AXE"
-label_settings = SubResource("LabelSettings_otqfn")
+text = "CARD TITLE"
 horizontal_alignment = 1
 vertical_alignment = 1
 clip_text = true
@@ -151,14 +137,12 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 0
 offset_left = 18.0
-offset_top = 166.0
+offset_top = 179.0
 offset_right = 142.0
-offset_bottom = 218.0
+offset_bottom = 231.0
 theme = ExtResource("3_74jmb")
-theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 11
 text = "Card description goes here..."
-label_settings = SubResource("LabelSettings_o35ix")
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 3
