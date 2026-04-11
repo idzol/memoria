@@ -28,6 +28,8 @@ const CardScene = preload("res://features/combat/Card.tscn")
 @onready var player_deck_title: Label = $Margin/HBox/RightPanel/DECK/Scroll/DeckSections/PlayerDeckLabelPadding/PlayerDeckLabel
 @onready var active_items_title: Label = $Margin/HBox/RightPanel/INVENTORY/Header/InventoryTitlePadding/Title
 @onready var player_items_title: Label = $Margin/HBox/RightPanel/INVENTORY/Scroll/ItemSections/PlayerItemsLabelPadding/PlayerItemsLabel
+@onready var active_deck_section: Control = $Margin/HBox/RightPanel/DECK/Scroll/DeckSections/ActiveDeckGridPadding
+@onready var active_item_section: Control = $Margin/HBox/RightPanel/INVENTORY/Scroll/ItemSections/ActiveItemGridPadding
 @onready var info_toast_box = %InfoToastBox
 @onready var info_toast_label = %InfoToastLabel
 @onready var inventory_info_toast_box = %InventoryInfoToastBox
@@ -55,6 +57,9 @@ const HOVER_SCALE := Vector2(1.08, 1.08)
 const PREVIEW_SCALE := Vector2(1.7, 1.7)
 const PREVIEW_Z_INDEX := 200
 const LONG_HOLD_SECONDS := 0.35
+const ACTIVE_SECTION_MIN_HEIGHT := 274.0
+const ACTIVE_SECTION_SURFACE_COLOR := Color(0.18, 0.2, 0.24, 0.72)
+const ACTIVE_SECTION_BORDER_COLOR := Color(0.82, 0.86, 0.94, 0.16)
 
 var _info_toast_tween: Tween
 var _expanded_preview_card: Control
@@ -78,6 +83,7 @@ func _ready():
 	player_deck_grid.add_theme_constant_override("h_separation", 8)
 	active_item_grid.add_theme_constant_override("h_separation", 8)
 	player_item_grid.add_theme_constant_override("h_separation", 8)
+	_configure_active_sections()
 	
 	_refresh_static_labels()
 	_update_stats_ui()
@@ -95,6 +101,35 @@ func _ready():
 
 func _notification(_what):
 	pass
+
+func _configure_active_sections():
+	_configure_active_section(active_deck_section)
+	_configure_active_section(active_item_section)
+
+func _configure_active_section(section: Control):
+	if not section:
+		return
+	section.custom_minimum_size = Vector2(section.custom_minimum_size.x, ACTIVE_SECTION_MIN_HEIGHT)
+	var panel := section.get_node_or_null("SectionSurface") as Panel
+	if panel == null:
+		panel = Panel.new()
+		panel.name = "SectionSurface"
+		panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		section.add_child(panel)
+		section.move_child(panel, 0)
+	var style := StyleBoxFlat.new()
+	style.bg_color = ACTIVE_SECTION_SURFACE_COLOR
+	style.border_width_left = 1
+	style.border_width_top = 1
+	style.border_width_right = 1
+	style.border_width_bottom = 1
+	style.border_color = ACTIVE_SECTION_BORDER_COLOR
+	style.corner_radius_top_left = 12
+	style.corner_radius_top_right = 12
+	style.corner_radius_bottom_left = 12
+	style.corner_radius_bottom_right = 12
+	panel.add_theme_stylebox_override("panel", style)
 
 func _setup_hold_timer():
 	_hold_timer = Timer.new()

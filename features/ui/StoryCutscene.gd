@@ -7,7 +7,7 @@ extends Control
 var _is_continuing := false
 
 const CUTSCENE_PLACEHOLDERS := {
-	"home": {
+	"tutorial": {
 		"title": "Chapter 1: The First Memory",
 		"body": "Placeholder cutscene.\nA splinter of memory drifts across the dark, and the first path opens."
 	},

@@ -27,6 +27,7 @@ extends Control
 @onready var day_info_purpose_heading = %DayInfoPurposeHeading
 @onready var day_info_purpose = %DayInfoPurpose
 @onready var backtrack_dialog = %BacktrackDialog
+@onready var backtrack_dialog_speaker = %BacktrackDialogSpeaker
 @onready var backtrack_dialog_text = %BacktrackDialogText
 @onready var backtrack_dialog_hint = %BacktrackDialogHint
 @onready var top_bar = %TopBar
@@ -63,13 +64,14 @@ const RUN_LOG_KEY := "show_run_log"
 const TUTORIAL_FLAGS_SECTION := "tutorial_flags"
 const TUTORIAL_TOAST_DURATION := 10.0
 const TUTORIAL_TOAST_COLOR := Color(0.4, 0.7, 1.0, 1.0)
-const DIRECT_LAUNCH_BIOMES := ["home", "town", "forest", "ice_caves", "desert", "swamp", "abyss", "void", "the_core"]
+const DIRECT_LAUNCH_BIOMES := ["tutorial", "town", "forest", "ice_caves", "desert", "swamp", "abyss", "void", "the_core"]
 const MIN_MAP_ZOOM := 0.6
-const MAX_MAP_ZOOM := 1.6
-const MAP_ZOOM_STEP := 0.025
+const MAX_MAP_ZOOM := 2.2
+const MAP_ZOOM_STEP := 0.2
+const MAP_WHEEL_SCROLL_STEP := 120.0
 const MAP_DRAG_DEADZONE := 4.0
-const MIN_HEX_HORIZONTAL_PADDING := 32.0
-const MIN_HEX_VERTICAL_PADDING := 20.0
+const MIN_HEX_HORIZONTAL_PADDING := 60.0
+const MIN_HEX_VERTICAL_PADDING := 0
 const MAP_BOTTOM_SAFE_PADDING := 140.0
 const FOG_OF_WAR_ICON_PATH := "res://assets/rooms/map/all_fog_of_war.png"
 const CURRENT_CONNECTION_COLOR := Color(0.84, 0.9, 1.0, 0.95)
@@ -98,8 +100,8 @@ var current_left_padding: float = 120.0
 var current_top_padding: float = BASE_TOP_PADDING
 @export_range(0.0, 128.0, 1.0) var map_container_padding_px: float = 48.0
 @export_range(0.0, 128.0, 1.0) var map_background_side_margin_px: float = 400.0
-@export_range(0.0, 96.0, 1.0) var tile_horizontal_padding_px: float = 72.0
-@export_range(0.0, 96.0, 1.0) var tile_vertical_padding_px: float = 36.0
+@export_range(0.0, 96.0, 1.0) var tile_horizontal_padding_px: float = 0
+@export_range(0.0, 96.0, 1.0) var tile_vertical_padding_px: float = 18.0
 var _tutorial_active: bool = false
 var _tutorial_id: String = ""
 var _tutorial_target_mode: String = "node"
@@ -109,8 +111,11 @@ var _tutorial_hint_label: Label = null
 var is_log_expanded: bool = false
 var log_collapsed_global_rect: Rect2 = Rect2()
 var _backtrack_prompt_visible: bool = false
+var _pending_backtrack_target: Dictionary = {}
 var _direct_launch_picker_overlay: Control = null
-var _user_zoom_scale: float = 1.0
+var _user_zoom_scale: float = MAX_MAP_ZOOM
+var _zoom_anchor_ratio: Vector2 = Vector2(0.5, 0.5)
+var _zoom_anchor_viewport_size: Vector2 = Vector2.ZERO
 var _is_drag_panning: bool = false
 var _drag_candidate_active: bool = false
 var _drag_button_index: int = -1
@@ -129,6 +134,8 @@ const LOG_SIDE_SPACER_WIDTH = 0.0
 const LOG_COLOR_GOOD = Color(0.62, 1.0, 0.62, 1.0)
 const LOG_COLOR_BAD = Color(1.0, 0.58, 0.58, 1.0)
 const LOG_COLOR_NEUTRAL = Color(0.86, 0.86, 0.86, 1.0)
+const BOSS_BACKTRACK_TRIGGERED_KEY_PREFIX := "boss_backtrack_triggered_"
+const BOSS_BACKTRACK_ROOM_ID_KEY_PREFIX := "boss_backtrack_room_id_"
 func _ready():
 	_ensure_tutorial_overlay()
 	_ensure_direct_launch_picker_overlay()
@@ -154,6 +161,7 @@ func _notification(what):
 		_sync_map_area_to_top_bar()
 		_apply_background_zoom()
 		_draw_map()
+		_scroll_to_player.call_deferred()
 		_refresh_log_view()
 
 func _input(event):
@@ -194,9 +202,11 @@ func _input(event):
 		return
 
 	if _backtrack_prompt_visible:
-		if event.is_action_pressed("ui_accept") or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
-			_hide_backtrack_dialog()
-			get_viewport().set_input_as_handled()
+		if _is_backtrack_progress_input(event):
+			_confirm_backtrack_travel()
+			var viewport := get_viewport()
+			if viewport:
+				viewport.set_input_as_handled()
 		return
 
 	if event.is_action_pressed("ui_cancel"):
@@ -230,7 +240,7 @@ func _input(event):
 		_activate_selected_node()
 
 func _setup_ui():
-	scroll_area.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll_area.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	scroll_area.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	if background_texture:
 		background_texture.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -447,11 +457,14 @@ func _ensure_run_map_ready():
 
 func _finalize_map_ready_state():
 	await _ensure_run_map_ready()
+	if _redirect_to_daily_home_event_if_needed():
+		return
 	if GameManager.player_grid_pos == Vector2i(-99, -99):
 		if GameManager.is_battle_mode:
 			GameManager.player_grid_pos = Vector2i(0, 0)
 		else:
 			GameManager.reset_to_home()
+	_ensure_story_player_starts_at_biome_home()
 	_sync_map_area_to_top_bar()
 	_draw_map()
 	var biome_track = AudioData.get_biome_track_id(_get_active_biome())
@@ -459,6 +472,46 @@ func _finalize_map_ready_state():
 		SignalBus.music_change_requested.emit(biome_track, 1.5)
 	_scroll_to_player()
 	_begin_worldmap_tutorial_if_needed.call_deferred()
+
+func _redirect_to_daily_home_event_if_needed() -> bool:
+	if GameManager.is_battle_mode:
+		return false
+	if not GameManager.consume_first_worldmap_load_for_day():
+		return false
+	var active_biome = _get_active_biome()
+	if active_biome == "":
+		active_biome = "tutorial"
+	GameManager.enter_story_biome(active_biome, true)
+	var home_node = GameManager.get_story_biome_home_node(active_biome)
+	if home_node.is_empty():
+		return false
+	_set_player_position_from_data(home_node)
+	GameManager.player_biome = str(home_node.get("biome", GameManager.player_biome))
+	GameManager.set_selected_story_biome(GameManager.player_biome)
+	_enter_room(home_node)
+	return true
+
+func _ensure_story_player_starts_at_biome_home():
+	if GameManager.is_battle_mode or GameManager.run_map.is_empty():
+		return
+	var active_biome = _get_active_biome()
+	if active_biome == "":
+		return
+	var current_id = _find_current_node_id()
+	if current_id != "":
+		var current_data = _get_map_entry_by_id(current_id)
+		if not current_data.is_empty() and str(current_data.get("biome", "")) == active_biome:
+			return
+	var home_node = GameManager.get_story_biome_home_node(active_biome)
+	if home_node.is_empty():
+		var home_node_id = _find_biome_entry_node_id(active_biome)
+		home_node = _get_map_entry_by_id(home_node_id)
+	if home_node.is_empty():
+		return
+	_set_player_position_from_data(home_node)
+	GameManager.player_biome = active_biome
+	GameManager.set_selected_story_biome(active_biome)
+	GameManager.current_node = home_node.duplicate(true)
 
 func _apply_worldmap_tile_background_settings(data: Dictionary) -> Dictionary:
 	var visual_data = data.duplicate(true)
@@ -558,6 +611,9 @@ func _show_direct_launch_biome_picker():
 func _on_direct_launch_biome_selected(biome: String):
 	if _direct_launch_picker_overlay:
 		_direct_launch_picker_overlay.visible = false
+	GameManager.unlock_biome(biome)
+	if GameManager.get_nodes_for_biome(biome).is_empty() and GameManager.has_method("_ensure_story_biomes_generated"):
+		GameManager._ensure_story_biomes_generated([biome])
 	GameManager.enter_story_biome(biome, true)
 	await _finalize_map_ready_state()
 
@@ -574,7 +630,7 @@ func _update_header_labels(current_data: Dictionary):
 		phase_label.text = LocalizationManager.translate("worldmap.phase.story", "STORY MAP")
 	_refresh_day_ui()
 
-	tracker_text.text = _get_room_display_name(current_data)
+	tracker_text.text = _get_tracker_room_display_name(current_data)
 
 func _refresh_day_ui():
 	if not day_button:
@@ -661,16 +717,43 @@ func _get_room_display_name(node_data: Dictionary) -> String:
 	var node_type = str(node_data.get("type", "room"))
 	return node_type.replace("_", " ").capitalize()
 
+func _get_tracker_room_display_name(node_data: Dictionary) -> String:
+	if node_data.is_empty():
+		return ""
+	if not GameManager.is_battle_mode and _is_story_room_in_fog_of_war(node_data):
+		return LocalizationManager.translate("worldmap.room.unknown", "Unknown")
+	return _get_room_display_name(node_data)
+
+func _is_story_room_in_fog_of_war(node_data: Dictionary) -> bool:
+	if GameManager.is_battle_mode:
+		return false
+	if node_data.is_empty():
+		return false
+	if not bool(node_data.get("passable", true)) or str(node_data.get("type", "")) == "background":
+		return false
+	var node_id = str(node_data.get("id", ""))
+	var current_id = _find_current_node_id()
+	if node_id != "" and node_id == current_id:
+		return false
+	var state: Dictionary = GameManager.world_state.rooms.get(node_id, {})
+	return not _is_story_room_visible_as_completed(node_data, state)
+
 func _build_visible_node_set(current_id: String, biome: String) -> Dictionary:
 	var visible_set: Dictionary = {}
 	if GameManager.is_battle_mode:
 		visible_set[current_id] = true
 		for neighbor_id in _get_adjacent_node_ids(current_id, biome):
+			var neighbor_data = _get_map_entry_by_id(neighbor_id)
+			if _is_boss_node_hidden(neighbor_data):
+				continue
 			visible_set[neighbor_id] = true
 		return visible_set
 
 	visible_set[current_id] = true
 	for neighbor_id in _get_adjacent_node_ids(current_id, biome):
+		var neighbor_data = _get_map_entry_by_id(neighbor_id)
+		if _is_boss_node_hidden(neighbor_data):
+			continue
 		visible_set[neighbor_id] = true
 
 	var completed_ids: Array[String] = []
@@ -688,6 +771,9 @@ func _build_visible_node_set(current_id: String, biome: String) -> Dictionary:
 
 	for completed_id in completed_ids:
 		for neighbor_id in _get_adjacent_node_ids(completed_id, biome):
+			var neighbor_data = _get_map_entry_by_id(neighbor_id)
+			if _is_boss_node_hidden(neighbor_data):
+				continue
 			visible_set[neighbor_id] = true
 
 	return visible_set
@@ -702,6 +788,9 @@ func _apply_story_room_visibility_art(data: Dictionary, state: Dictionary, is_pl
 		return visual_data
 	var is_completed = _is_story_room_visible_as_completed(visual_data, state)
 	if is_player_here or is_completed:
+		return visual_data
+	if node_type == "boss":
+		visual_data["visual_impassable"] = true
 		return visual_data
 	if ResourceLoader.exists(FOG_OF_WAR_ICON_PATH):
 		visual_data["custom_icon_path"] = FOG_OF_WAR_ICON_PATH
@@ -721,13 +810,13 @@ func _is_story_room_visible_as_completed(node_data: Dictionary, state: Dictionar
 func _draw_current_adjacency_lines(current_id: String, revealed_set: Dictionary):
 	if not lines_container or current_id == "" or not node_positions_by_id.has(current_id):
 		return
-	var current_center = node_positions_by_id[current_id] + current_node_half_size
+	var current_center = _get_rendered_node_center(current_id)
 	for target_id in adjacent_node_ids:
 		if not revealed_set.has(target_id):
 			continue
 		if not node_positions_by_id.has(target_id):
 			continue
-		var target_center = node_positions_by_id[target_id] + current_node_half_size
+		var target_center = _get_rendered_node_center(target_id)
 		var segment = Line2D.new()
 		segment.width = CURRENT_CONNECTION_WIDTH
 		segment.default_color = CURRENT_CONNECTION_COLOR
@@ -736,6 +825,14 @@ func _draw_current_adjacency_lines(current_id: String, revealed_set: Dictionary)
 		segment.add_point(current_center)
 		segment.add_point(target_center)
 		lines_container.add_child(segment)
+
+func _get_rendered_node_center(node_id: String) -> Vector2:
+	if node_widgets_by_id.has(node_id):
+		var node_widget = node_widgets_by_id[node_id]
+		if node_widget is Control:
+			var widget := node_widget as Control
+			return (widget.position + (widget.size * 0.5)) * current_node_scale
+	return (node_positions_by_id.get(node_id, Vector2.ZERO) + current_node_half_size) * current_node_scale
 
 func _recalculate_map_bounds(biome: String):
 	var first = true
@@ -887,6 +984,12 @@ func _travel_to_node(target_data: Dictionary):
 	GameManager.set_selected_story_biome(GameManager.player_biome)
 	_draw_map()
 	_scroll_to_player()
+	var node_id := str(target_data.get("id", ""))
+	var room_state: Dictionary = GameManager.world_state.rooms.get(node_id, {})
+	if bool(room_state.get("completed", false)):
+		selected_node_id = node_id
+		_refresh_selection_highlight(node_id)
+		return
 	_enter_room(target_data)
 
 func _show_backtrack_dialog():
@@ -895,15 +998,26 @@ func _show_backtrack_dialog():
 	_backtrack_prompt_visible = true
 	backtrack_dialog.move_to_front()
 	backtrack_dialog.visible = true
+	if backtrack_dialog_speaker:
+		backtrack_dialog_speaker.text = LocalizationManager.translate("dialog.speaker.narrator", "Narrator")
+		backtrack_dialog_speaker.add_theme_color_override("font_color", LOG_COLOR_BAD)
 	if backtrack_dialog_text:
 		backtrack_dialog_text.text = LocalizationManager.translate("worldmap.backtrack_prompt", BACKTRACK_PROMPT)
+		backtrack_dialog_text.add_theme_color_override("font_color", LOG_COLOR_BAD)
 	if backtrack_dialog_hint:
-		backtrack_dialog_hint.text = LocalizationManager.translate("dialog.click_continue", "Click to continue")
+		backtrack_dialog_hint.text = LocalizationManager.translate("tutorial.continue_any_input", "Click or press any key to continue")
 
 func _travel_to_boss_node(target_data: Dictionary):
+	_mark_boss_backtrack_triggered(target_data)
+	_pending_backtrack_target = target_data.duplicate(true)
 	_show_backtrack_dialog()
-	while _backtrack_prompt_visible and is_inside_tree():
-		await get_tree().process_frame
+ 
+func _confirm_backtrack_travel():
+	if _pending_backtrack_target.is_empty():
+		_hide_backtrack_dialog()
+		return
+	var target_data = _pending_backtrack_target.duplicate(true)
+	_hide_backtrack_dialog()
 	_set_player_position_from_data(target_data)
 	GameManager.player_biome = str(target_data.get("biome", GameManager.player_biome))
 	GameManager.set_selected_story_biome(GameManager.player_biome)
@@ -913,8 +1027,16 @@ func _travel_to_boss_node(target_data: Dictionary):
 
 func _hide_backtrack_dialog():
 	_backtrack_prompt_visible = false
+	_pending_backtrack_target = {}
 	if backtrack_dialog:
 		backtrack_dialog.visible = false
+
+func _is_backtrack_progress_input(event: InputEvent) -> bool:
+	if event is InputEventKey:
+		return event.pressed and not event.is_echo()
+	if event is InputEventMouseButton:
+		return event.pressed
+	return false
 
 func _hide_info_toast():
 	if info_toast_box:
@@ -942,7 +1064,7 @@ func _show_info_toast(message: String, duration: float, font_color: Color):
 func _build_boss_node(base_data: Dictionary) -> Dictionary:
 	var out = base_data.duplicate(true)
 	var biome_key = str(base_data.get("biome", "town"))
-	var source_biome = "town" if biome_key == "home" else biome_key
+	var source_biome = "town" if biome_key == "tutorial" else biome_key
 	var boss_path = "res://data/rooms/%s/%s_boss.tres" % [source_biome, source_biome]
 	if not ResourceLoader.exists(boss_path):
 		var default_path = "res://data/rooms/%s/%s_default.tres" % [source_biome, source_biome]
@@ -964,12 +1086,59 @@ func _is_backtrack(target_id: String) -> bool:
 	var target_data = _get_map_entry_by_id(target_id)
 	if target_data.is_empty():
 		return false
+	var target_biome = str(target_data.get("biome", ""))
+	if target_biome != "" and GameManager.is_biome_cleared(target_biome):
+		return false
 	if _is_home_node(target_data):
+		return false
+	if str(target_data.get("type", "")) == "boss":
 		return false
 	var room_state = GameManager.world_state.rooms.get(target_id, {})
 	if bool(room_state.get("completed", false)):
 		return false
 	return GameManager.get_room_visit_count_this_run(target_id) >= 1
+
+func _mark_boss_backtrack_triggered(target_data: Dictionary):
+	if target_data.is_empty():
+		return
+	var biome = str(target_data.get("biome", ""))
+	if biome == "":
+		return
+	var target_id = str(target_data.get("id", ""))
+	if target_id == "":
+		return
+	if not GameManager.world_state.has("global"):
+		GameManager.world_state["global"] = {}
+	GameManager.world_state.global[BOSS_BACKTRACK_TRIGGERED_KEY_PREFIX + biome] = true
+	GameManager.world_state.global[BOSS_BACKTRACK_ROOM_ID_KEY_PREFIX + biome] = "%s_boss" % target_id
+	SaveManager.save_mid_run_state()
+
+func _is_boss_node_hidden(node_data: Dictionary) -> bool:
+	if node_data.is_empty():
+		return false
+	if str(node_data.get("type", "")) != "boss":
+		return false
+	var biome = str(node_data.get("biome", ""))
+	return not _is_boss_connection_revealed_for_biome(biome)
+
+func _is_boss_connection_revealed_for_biome(biome: String) -> bool:
+	if biome == "":
+		return false
+	if not GameManager.world_state.has("global"):
+		return false
+	var global_state: Dictionary = GameManager.world_state.global
+	if not bool(global_state.get(BOSS_BACKTRACK_TRIGGERED_KEY_PREFIX + biome, false)):
+		return false
+	var boss_room_id = str(global_state.get(BOSS_BACKTRACK_ROOM_ID_KEY_PREFIX + biome, ""))
+	if boss_room_id == "":
+		return false
+	var boss_state: Dictionary = GameManager.world_state.rooms.get(boss_room_id, {})
+	return (
+		bool(boss_state.get("visited", false))
+		or bool(boss_state.get("cleared", false))
+		or bool(boss_state.get("completed", false))
+		or int(boss_state.get("visit_count", 0)) > 0
+	)
 
 func _is_home_node(node_data: Dictionary) -> bool:
 	return bool(node_data.get("is_home", false)) or str(node_data.get("type", "")) == "home"
@@ -1095,6 +1264,8 @@ func _get_accessible_adjacent_node_ids(node_id: String, biome: String) -> Array[
 		var target_data = _get_map_entry_by_id(target_id)
 		if target_data.is_empty():
 			continue
+		if _is_boss_node_hidden(target_data):
+			continue
 		if not bool(target_data.get("passable", true)):
 			continue
 		var target_type = str(target_data.get("type", "room"))
@@ -1121,22 +1292,26 @@ func _update_map_content_bounds():
 		max(scroll_area.size.x, content_width * current_node_scale),
 		max(scroll_area.size.y, content_height * current_node_scale)
 	)
+	var rendered_map_size = _raw_content_size * current_node_scale
+	var centered_offset = Vector2(
+		max(0.0, (scaled_content_size.x - rendered_map_size.x) * 0.5),
+		max(0.0, (scaled_content_size.y - rendered_map_size.y) * 0.5)
+	)
 	map_content.custom_minimum_size = scaled_content_size
 	if node_container:
 		node_container.custom_minimum_size = _raw_content_size
 		node_container.size = _raw_content_size
-		node_container.position = Vector2.ZERO
+		node_container.position = centered_offset
 		node_container.pivot_offset = Vector2.ZERO
 		node_container.scale = Vector2.ONE * current_node_scale
 	if lines_container:
-		lines_container.position = Vector2.ZERO
-		lines_container.scale = Vector2.ONE * current_node_scale
+		lines_container.position = centered_offset
+		lines_container.scale = Vector2.ONE
 	_apply_background_zoom()
 
 func _get_node_position(layer: int, column: int) -> Vector2:
-	var zoom = max(current_node_scale, 0.001)
-	var content_width = max((scroll_area.size.x / zoom) - (map_container_padding_px * 2.0), _raw_content_size.x - (map_container_padding_px * 2.0))
-	var content_height = max((scroll_area.size.y / zoom) - (map_container_padding_px * 2.0), _raw_content_size.y - (map_container_padding_px * 2.0))
+	var content_width = max(0.0, _raw_content_size.x - (map_container_padding_px * 2.0))
+	var content_height = max(0.0, _raw_content_size.y - (map_container_padding_px * 2.0))
 	var center_layer = (float(visible_min_layer) + float(visible_max_layer)) * 0.5
 	var center_column = (float(visible_min_column) + float(visible_max_column)) * 0.5
 	var center_layer_offset = _get_row_offset_for_layer(int(round(center_layer)))
@@ -1168,7 +1343,7 @@ func _update_selected_room_title():
 	if display_data.is_empty():
 		tracker_text.text = ""
 		return
-	tracker_text.text = _get_room_display_name(display_data)
+	tracker_text.text = _get_tracker_room_display_name(display_data)
 
 func _scroll_to_player():
 	if not is_inside_tree():
@@ -1179,8 +1354,19 @@ func _scroll_to_player():
 	await tree.process_frame
 	if not is_inside_tree() or scroll_area == null:
 		return
-	scroll_area.scroll_horizontal = 0
-	scroll_area.scroll_vertical = 0
+	var current_id = _find_current_node_id()
+	if current_id == "" or not node_positions_by_id.has(current_id):
+		return
+	var content_size = map_content.custom_minimum_size if map_content else Vector2.ZERO
+	var node_center = (node_positions_by_id[current_id] + current_node_half_size) * current_node_scale
+	var node_widget = node_widgets_by_id.get(current_id, null)
+	if node_widget is Control:
+		var widget_position: Vector2 = node_widget.position * current_node_scale
+		var widget_size: Vector2 = node_widget.size * current_node_scale
+		node_center = widget_position + (widget_size * 0.5)
+	var target_scroll = node_center - (scroll_area.size * 0.5)
+	scroll_area.scroll_horizontal = int(round(clamp(target_scroll.x, 0.0, max(0.0, content_size.x - scroll_area.size.x))))
+	scroll_area.scroll_vertical = int(round(clamp(target_scroll.y, 0.0, max(0.0, content_size.y - scroll_area.size.y))))
 	_update_map_anchor_ratio()
 	_sync_background_pan_to_scroll()
 
@@ -1214,15 +1400,36 @@ func _handle_map_zoom_input(event: InputEvent) -> bool:
 		return false
 	if not event.pressed:
 		return false
+	var wheel_direction := 0
+	if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+		wheel_direction = -1
+	elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+		wheel_direction = 1
+	if wheel_direction == 0:
+		return false
 	if not _is_point_inside_map_area(event.position):
 		return false
-	if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-		_zoom_in()
+	if event.ctrl_pressed:
+		if wheel_direction < 0:
+			_zoom_in()
+		else:
+			_zoom_out()
 		return true
-	if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-		_zoom_out()
-		return true
-	return false
+	_scroll_map_vertical_with_wheel(wheel_direction, event.factor)
+	return true
+
+func _scroll_map_vertical_with_wheel(wheel_direction: int, wheel_factor: float = 1.0):
+	if scroll_area == null:
+		return
+	var step_scale = max(1.0, abs(wheel_factor))
+	var delta = MAP_WHEEL_SCROLL_STEP * step_scale * float(wheel_direction)
+	var target_vertical = float(scroll_area.scroll_vertical) + delta
+	var scroll_limits = _get_scroll_limits()
+	var max_vertical = scroll_limits.y
+	target_vertical = clamp(target_vertical, 0.0, max_vertical)
+	scroll_area.scroll_vertical = int(round(target_vertical))
+	_update_map_anchor_ratio()
+	_sync_background_pan_to_scroll()
 
 func _handle_map_drag_input(event: InputEvent) -> bool:
 	if not scroll_area:
@@ -1242,8 +1449,11 @@ func _handle_map_drag_input(event: InputEvent) -> bool:
 			_suppress_click_after_drag = true
 		if _is_drag_panning:
 			_suppress_click_after_drag = true
-			scroll_area.scroll_horizontal = int(round(_drag_pan_scroll_origin.x - delta.x))
-			scroll_area.scroll_vertical = int(round(_drag_pan_scroll_origin.y - delta.y))
+			var scroll_limits = _get_scroll_limits()
+			var target_scroll_x = clamp(_drag_pan_scroll_origin.x - delta.x, 0.0, scroll_limits.x)
+			var target_scroll_y = clamp(_drag_pan_scroll_origin.y - delta.y, 0.0, scroll_limits.y)
+			scroll_area.scroll_horizontal = int(round(target_scroll_x))
+			scroll_area.scroll_vertical = int(round(target_scroll_y))
 			_update_map_anchor_ratio()
 			_sync_background_pan_to_scroll()
 			return true
@@ -1273,19 +1483,35 @@ func _set_map_zoom(target_zoom: float):
 	var clamped_zoom = clamp(target_zoom, MIN_MAP_ZOOM, MAX_MAP_ZOOM)
 	if is_equal_approx(clamped_zoom, _user_zoom_scale):
 		return
-	var viewport_size = scroll_area.size if scroll_area else Vector2.ZERO
-	_update_map_anchor_ratio()
+	if scroll_area and map_content:
+		var before_content_size = map_content.custom_minimum_size
+		_zoom_anchor_viewport_size = scroll_area.size
+		var before_center = Vector2(
+			float(scroll_area.scroll_horizontal),
+			float(scroll_area.scroll_vertical)
+		) + (_zoom_anchor_viewport_size * 0.5)
+		_zoom_anchor_ratio = Vector2(
+			clamp(before_center.x / max(before_content_size.x, 1.0), 0.0, 1.0),
+			clamp(before_center.y / max(before_content_size.y, 1.0), 0.0, 1.0)
+		)
+	else:
+		_zoom_anchor_ratio = Vector2(0.5, 0.5)
+		_zoom_anchor_viewport_size = scroll_area.size if scroll_area else Vector2.ZERO
 	_user_zoom_scale = clamped_zoom
 	_draw_map()
 	if not scroll_area or not map_content:
 		return
 	var new_content_size = map_content.custom_minimum_size
 	var target_center = Vector2(
-		new_content_size.x * _map_anchor_ratio.x,
-		new_content_size.y * _map_anchor_ratio.y
+		new_content_size.x * _zoom_anchor_ratio.x,
+		new_content_size.y * _zoom_anchor_ratio.y
 	)
-	scroll_area.scroll_horizontal = int(round(max(0.0, target_center.x - viewport_size.x * 0.5)))
-	scroll_area.scroll_vertical = int(round(max(0.0, target_center.y - viewport_size.y * 0.5)))
+	var scroll_limits = _get_scroll_limits()
+	var target_scroll_x = clamp(target_center.x - _zoom_anchor_viewport_size.x * 0.5, 0.0, scroll_limits.x)
+	var target_scroll_y = clamp(target_center.y - _zoom_anchor_viewport_size.y * 0.5, 0.0, scroll_limits.y)
+	scroll_area.scroll_horizontal = int(round(target_scroll_x))
+	scroll_area.scroll_vertical = int(round(target_scroll_y))
+	_redraw_current_adjacency_lines_for_current_state()
 	_update_map_anchor_ratio()
 	_sync_background_pan_to_scroll()
 
@@ -1326,10 +1552,35 @@ func _update_map_anchor_ratio():
 	var content_size = map_content.custom_minimum_size
 	var viewport_size = scroll_area.size
 	_map_anchor_ratio = Vector2(0.5, 0.5)
+	var stage_center = Vector2(
+		float(scroll_area.scroll_horizontal),
+		float(scroll_area.scroll_vertical)
+	) + (viewport_size * 0.5)
 	if content_size.x > 0.0:
-		_map_anchor_ratio.x = clamp((float(scroll_area.scroll_horizontal) + viewport_size.x * 0.5) / content_size.x, 0.0, 1.0)
+		_map_anchor_ratio.x = clamp(stage_center.x / content_size.x, 0.0, 1.0)
 	if content_size.y > 0.0:
-		_map_anchor_ratio.y = clamp((float(scroll_area.scroll_vertical) + viewport_size.y * 0.5) / content_size.y, 0.0, 1.0)
+		_map_anchor_ratio.y = clamp(stage_center.y / content_size.y, 0.0, 1.0)
+
+func _get_scroll_limits() -> Vector2:
+	if not scroll_area or not map_content:
+		return Vector2.ZERO
+	var content_size = map_content.custom_minimum_size
+	return Vector2(
+		max(0.0, content_size.x - scroll_area.size.x),
+		max(0.0, content_size.y - scroll_area.size.y)
+	)
+
+func _redraw_current_adjacency_lines_for_current_state():
+	if lines_container == null:
+		return
+	for child in lines_container.get_children():
+		child.queue_free()
+	var current_id = _find_current_node_id()
+	if current_id == "":
+		return
+	var biome = _get_active_biome()
+	var revealed_set = _build_visible_node_set(current_id, biome)
+	_draw_current_adjacency_lines(current_id, revealed_set)
 
 func _is_hex_adjacent(a: Vector2i, b: Vector2i) -> bool:
 	if a == b:
@@ -1376,8 +1627,8 @@ func _get_active_biome() -> String:
 		if current_id != "":
 			var current_data = _get_map_entry_by_id(current_id)
 			if not current_data.is_empty():
-				return str(current_data.get("biome", "home"))
-		return "home"
+				return str(current_data.get("biome", "tutorial"))
+		return "tutorial"
 	return GameManager.selected_story_biome if GameManager.selected_story_biome != "" else GameManager.player_biome
 
 func _get_player_layer() -> int:
@@ -1406,7 +1657,7 @@ func _apply_biome_visuals(biome: String):
 func _get_biome_grid_texture(biome: String) -> Texture2D:
 	if not map_assets:
 		return null
-	var normalized_biome = "town" if biome == "home" else biome
+	var normalized_biome = "town" if biome == "tutorial" else biome
 	var grid_prop = "map_%s_grid" % normalized_biome
 	if grid_prop in map_assets:
 		return map_assets.get(grid_prop)
@@ -1415,7 +1666,7 @@ func _get_biome_grid_texture(biome: String) -> Texture2D:
 func _begin_worldmap_tutorial_if_needed():
 	if _tutorial_active or GameManager.is_battle_mode or not _are_tutorial_tips_enabled():
 		return
-	if _get_active_biome() == "home" and not _has_seen_tutorial("worldmap_home_intro"):
+	if _get_active_biome() == "tutorial" and not _has_seen_tutorial("worldmap_home_intro"):
 		if adjacent_node_ids.is_empty():
 			return
 		selected_node_id = adjacent_node_ids[0]
@@ -1538,8 +1789,17 @@ func _on_run_log_updated():
 	_apply_log_visibility()
 	_rebuild_log_entries()
 
-func _get_log_entry_color(text: String) -> Color:
-	var lower = text.to_lower()
+func _get_log_entry_text(entry_data) -> String:
+	if entry_data is Dictionary:
+		return str((entry_data as Dictionary).get("text", ""))
+	return str(entry_data)
+
+func _get_log_entry_color(entry_data) -> Color:
+	if entry_data is Dictionary:
+		var entry_dict := entry_data as Dictionary
+		if entry_dict.has("speaker_color"):
+			return entry_dict["speaker_color"]
+	var lower = _get_log_entry_text(entry_data).to_lower()
 	if "victory" in lower or "leveled up" in lower:
 		return LOG_COLOR_GOOD
 	if "trap" in lower or "receive" in lower or "damage" in lower:
@@ -1554,6 +1814,8 @@ func _setup_battle_log_ui():
 	battle_log_row.custom_minimum_size.y = LOG_COLLAPSED_HEIGHT
 	if not battle_log_row.gui_input.is_connected(_on_battle_log_row_gui_input):
 		battle_log_row.gui_input.connect(_on_battle_log_row_gui_input)
+	if not log_display.gui_input.is_connected(_on_log_display_gui_input):
+		log_display.gui_input.connect(_on_log_display_gui_input)
 	log_display.visible = true
 	log_display.z_index = 120
 	log_display.mouse_filter = Control.MOUSE_FILTER_PASS
@@ -1578,6 +1840,16 @@ func _setup_battle_log_ui():
 	_rebuild_log_entries()
 	_refresh_log_view()
 
+func _debug_log_ui_event(source: String, event: InputEvent, response: String):
+	var event_name := event.get_class() if event else "UnknownEvent"
+	print("[InfoLog][WorldMapUI] %s received %s -> %s | expanded=%s scroll=%d" % [
+		source,
+		event_name,
+		response,
+		str(is_log_expanded),
+		int(log_display.scroll_vertical) if log_display else 0
+	])
+
 func _rebuild_log_entries():
 	if not log_box:
 		return
@@ -1585,7 +1857,7 @@ func _rebuild_log_entries():
 		child.queue_free()
 	for entry in GameManager.get_run_log():
 		var lbl = Label.new()
-		lbl.text = "> " + entry
+		lbl.text = "> " + _get_log_entry_text(entry)
 		lbl.clip_text = true
 		lbl.autowrap_mode = TextServer.AUTOWRAP_OFF
 		lbl.add_theme_color_override("font_color", _get_log_entry_color(entry))
@@ -1597,7 +1869,27 @@ func _on_battle_log_row_gui_input(event: InputEvent):
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		is_log_expanded = not is_log_expanded
 		_refresh_log_view()
+		_debug_log_ui_event("BattleLogRow", event, "toggle_expand")
 		get_viewport().set_input_as_handled()
+
+func _on_log_display_gui_input(event: InputEvent):
+	if event is InputEventMouseButton and event.pressed:
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			is_log_expanded = not is_log_expanded
+			_refresh_log_view()
+			_debug_log_ui_event("LogDisplay", event, "toggle_expand")
+			get_viewport().set_input_as_handled()
+			return
+		if is_log_expanded and event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			log_display.scroll_vertical = max(0, log_display.scroll_vertical - int(LOG_LINE_HEIGHT * 2.0))
+			_debug_log_ui_event("LogDisplay", event, "scroll_up")
+			get_viewport().set_input_as_handled()
+			return
+		if is_log_expanded and event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			var max_vscroll = max(0, int(log_box.size.y - log_display.size.y))
+			log_display.scroll_vertical = min(max_vscroll, log_display.scroll_vertical + int(LOG_LINE_HEIGHT * 2.0))
+			_debug_log_ui_event("LogDisplay", event, "scroll_down")
+			get_viewport().set_input_as_handled()
 
 func _refresh_log_view():
 	if not log_display:

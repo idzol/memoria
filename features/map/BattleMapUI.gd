@@ -136,7 +136,7 @@ func _draw_map():
 	if current_data.is_empty():
 		return
 
-	var current_biome = str(current_data.get("biome", "home"))
+	var current_biome = str(current_data.get("biome", "tutorial"))
 	_rebuild_adjacent_targets(current_id, current_biome)
 	_update_header_labels(current_data)
 	var revealed_set = _build_visible_node_set(current_id, current_biome)
@@ -195,7 +195,7 @@ func _draw_map():
 	_refresh_selection_highlight(current_id)
 
 func _update_header_labels(current_data: Dictionary):
-	var biome_key = str(current_data.get("biome", "home"))
+	var biome_key = str(current_data.get("biome", "tutorial"))
 	var biome_index = int(current_data.get("biome_index", 0))
 	var grid_size = biome_index + 2
 	var biome_name = biome_key.replace("_", " ").capitalize()
@@ -370,7 +370,7 @@ func _hide_info_toast():
 func _build_boss_node(base_data: Dictionary) -> Dictionary:
 	var out = base_data.duplicate(true)
 	var biome_key = str(base_data.get("biome", "town"))
-	var source_biome = "town" if biome_key == "home" else biome_key
+	var source_biome = "town" if biome_key == "tutorial" else biome_key
 	var boss_path = "res://data/rooms/%s/%s_boss.tres" % [source_biome, source_biome]
 	if not ResourceLoader.exists(boss_path):
 		var default_path = "res://data/rooms/%s/%s_default.tres" % [source_biome, source_biome]
@@ -541,5 +541,5 @@ func _open_story_map():
 		var current_data = _get_map_entry_by_id(current_id)
 		if not current_data.is_empty():
 			var biome = str(current_data.get("biome", GameManager.selected_story_biome))
-			GameManager.set_selected_story_biome("town" if biome == "home" else biome)
+			GameManager.set_selected_story_biome("town" if biome == "tutorial" else biome)
 	get_tree().change_scene_to_file(GameManager.get_story_line_scene_path())

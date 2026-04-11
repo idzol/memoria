@@ -61,7 +61,7 @@ func setup_biome_node(data: Dictionary, grid_tex: Texture2D, _is_cleared: bool, 
 	_is_player_here = is_player_here
 	_is_selected = false
 	_is_revealed = is_revealed
-	_is_background_node = str(data.get("type", "")) == "background" or not bool(data.get("passable", true))
+	_is_background_node = str(data.get("type", "")) == "background" or not bool(data.get("passable", true)) or bool(data.get("visual_impassable", false))
 	
 	if grid_texture_rect:
 		grid_texture_rect.texture = grid_tex
@@ -129,7 +129,7 @@ func _ensure_hex_mask_pipeline():
 
 	_hex_viewport_root = Control.new()
 	_hex_viewport_root.name = "HexViewportRoot"
-	_hex_viewport_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_hex_viewport_root.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 	_hex_viewport.add_child(_hex_viewport_root)
 
 	_hex_viewport_icon = TextureRect.new()
@@ -142,7 +142,7 @@ func _ensure_hex_mask_pipeline():
 
 	_hex_output_rect = TextureRect.new()
 	_hex_output_rect.name = "HexOutput"
-	_hex_output_rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_hex_output_rect.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 	_hex_output_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_hex_output_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_hex_output_rect.stretch_mode = TextureRect.STRETCH_SCALE
@@ -275,8 +275,10 @@ func _update_hex_mask_params():
 	if _hex_viewport:
 		_hex_viewport.size = Vector2i(int(roundi(width)), int(roundi(height)))
 	if _hex_viewport_root:
+		_hex_viewport_root.position = Vector2.ZERO
 		_hex_viewport_root.size = Vector2(width, height)
 	if _hex_output_rect:
+		_hex_output_rect.position = Vector2.ZERO
 		_hex_output_rect.size = Vector2(width, height)
 
 func _apply_visual_scale(scale_factor: float):

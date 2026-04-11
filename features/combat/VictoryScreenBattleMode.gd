@@ -81,8 +81,6 @@ func _on_reward_selected(id: String):
 		
 	SaveManager.save_mid_run_state()
 	var fallback_scene = GameManager.get_active_biome_map_scene_path()
-	if not GameManager.pending_level_up.is_empty():
-		GameManager.level_up_return_scene = GameManager.consume_pending_post_battle_scene(fallback_scene)
-		SceneTransition.change_scene_to_file("res://features/ui/CharacterLevelUp.tscn")
+	if GameManager.show_level_up_scene_if_needed(GameManager.consume_pending_post_battle_scene(fallback_scene)):
 		return
 	SceneTransition.change_scene_to_file(GameManager.consume_pending_post_battle_scene(fallback_scene))

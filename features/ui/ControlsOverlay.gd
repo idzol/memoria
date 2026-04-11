@@ -15,7 +15,9 @@ var default_controls := [
 	{"label_key": "controls.confirm", "default_label": "Confirm / Select", "key": KEY_ENTER},
 	{"label_key": "controls.cancel", "default_label": "Cancel / Back", "key": KEY_ESCAPE},
 	{"label_key": "controls.menu", "default_label": "Menu", "key": KEY_ESCAPE},
-	{"label_key": "controls.story_map", "default_label": "Story Map", "key": KEY_W}
+	{"label_key": "controls.story_map", "default_label": "Story Map", "key": KEY_W},
+	{"label_key": "controls.map_scroll", "default_label": "Map Scroll (Vertical)", "display": "Mouse Wheel"},
+	{"label_key": "controls.map_zoom", "default_label": "Map Zoom In / Out", "display": "Ctrl + Mouse Wheel"}
 ]
 
 func _ready():
@@ -48,7 +50,10 @@ func _rebuild_controls():
 		key_button.disabled = true
 		key_button.focus_mode = Control.FOCUS_NONE
 		key_button.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		key_button.text = OS.get_keycode_string(control_data.key)
+		var display_text = str(control_data.get("display", ""))
+		if display_text == "":
+			display_text = OS.get_keycode_string(int(control_data.get("key", KEY_NONE)))
+		key_button.text = display_text
 		key_button.custom_minimum_size.x = 170
 
 		h_box.add_child(label)

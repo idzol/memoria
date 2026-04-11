@@ -23,6 +23,8 @@ controls.confirm,Confirm / Select,Confirmar / Seleccionar,Confirmer / Selectionn
 controls.cancel,Cancel / Back,Cancelar / Atras,Annuler / Retour,Abbrechen / Zuruck
 controls.menu,Menu,Menu,Menu,Menu
 controls.story_map,Story Map,Cronica,Carte de l'histoire,Story-Karte
+controls.map_scroll,Map Scroll (Vertical),Desplazar mapa (vertical),Defilement de la carte (vertical),Karte scrollen (vertikal)
+controls.map_zoom,Map Zoom In / Out,Zoom del mapa (+/-),Zoom de la carte (+/-),Kartenzoom (+/-)
 controls.cancel_hint,[ESC] to Close,[ESC] para cerrar,[ESC] pour fermer,[ESC] zum Schliessen
 menu.credits,CREDITS,CREDITOS,CREDITS,CREDITS
 menu.exit,EXIT,SALIR,QUITTER,BEENDEN
@@ -42,8 +44,36 @@ common.back,Back,Atras,Retour,Zuruck
 dialog.click_continue,Click to continue,Haz clic para continuar,Cliquez pour continuer,Klicken zum Fortfahren
 tutorial.continue_any_input,Click or press any key to continue,Haz clic o pulsa cualquier tecla para continuar,Cliquez ou appuyez sur une touche pour continuer,Klicken Sie oder drucken Sie eine beliebige Taste um fortzufahren
 dialog.speaker.player,You,Tu,Vous,Du
+dialog.speaker.lethos,Lethos,Lethos,Lethos,Lethos
 dialog.speaker.npc,NPC,NPC,PNJ,NSC
+dialog.speaker.enemy,Enemy,Enemigo,Ennemi,Feind
 dialog.speaker.narrator,Narrator,Narrador,Narrateur,Erzahler
+dialog.tutorial.home.first_visit.1,"Dictys had become like a father, and the small village had become like home.
+And home became a refuge from the world, to keep the memories at bay.
+He struggled to remember most things, most days, and when he did remember it was painful.","Dictys se habia vuelto como un padre, y la pequena aldea se habia vuelto como un hogar.
+Y el hogar se convirtio en un refugio del mundo, para mantener los recuerdos a raya.
+Le costaba recordar la mayoria de las cosas, la mayoria de los dias, y cuando recordaba era doloroso.","Dictys etait devenu comme un pere, et le petit village etait devenu comme un foyer.
+Et ce foyer etait devenu un refuge contre le monde, pour tenir les souvenirs a distance.
+Il peinait a se souvenir de la plupart des choses, la plupart des jours, et quand il se souvenait, c'etait douloureux.","Dictys war wie ein Vater geworden und das kleine Dorf wie ein Zuhause.
+Und dieses Zuhause wurde zu einem Zufluchtsort vor der Welt, um die Erinnerungen fernzuhalten.
+Es fiel ihm schwer, sich an die meisten Dinge zu erinnern, an den meisten Tagen, und wenn er sich erinnerte, war es schmerzhaft."
+dialog.tutorial.home.first_visit.2,"I remember I had two things to do today.
+Collect my fishing net from the wharf.
+Speak to Dictys at the village square.","Ich erinnere mich, dass ich heute zwei Dinge zu tun hatte.
+Mein Fischernetz vom Kai holen.
+Mit Dictys auf dem Dorfplatz sprechen.","Je me souviens que j'avais deux choses a faire aujourd'hui.
+Recuperer mon filet de peche au quai.
+Parler a Dictys sur la place du village.","Ich erinnere mich, dass ich heute zwei Dinge zu erledigen hatte.
+Mein Fischernetz vom Kai holen.
+Mit Dictys auf dem Dorfplatz sprechen."
+dialog.tutorial.home.first_visit.3,It is time to leave the hut in search of Dictys and the fishing wharf.,Es hora de salir de la choza en busca de Dictys y del muelle de pesca.,Il est temps de quitter la hutte a la recherche de Dictys et du quai de peche.,Es ist Zeit die Hutte zu verlassen und nach Dictys und dem Fischerkai zu suchen.
+dialog.tutorial.home.return_visit.1,The hut still holds the warmth of a borrowed home, but the day is already moving beyond its walls.,La choza aun conserva la calidez de un hogar prestado, pero el dia ya avanza mas alla de sus paredes.,La hutte conserve encore la chaleur d'un foyer emprunte, mais la journee avance deja au-dela de ses murs.,Die Hutte bewahrt noch die Warme eines geliehenen Zuhauses, doch der Tag zieht bereits weiter als ihre Wande.
+dialog.tutorial.wharf.first_visit.1,The wharf creaks beneath the tide, each board singing the same tired note.,El muelle cruje bajo la marea, cada tabla canta la misma nota cansada.,Le quai grince sous la maree, chaque planche chantant la meme note fatiguee.,Der Kai knarrt unter der Flut und jedes Brett singt denselben muden Ton.
+dialog.tutorial.wharf.first_visit.2,My net should still be here. If the sea has not claimed it already.,Mi red aun deberia estar aqui. Si el mar no se la ha llevado ya.,Mon filet devrait encore etre ici. Si la mer ne l'a pas deja reclame.,Mein Netz sollte noch hier sein. Wenn das Meer es nicht schon geholt hat.
+dialog.tutorial.wharf.cleared.1,The net is already in hand. Only the smell of salt and old timber remains.,La red ya esta en mis manos. Solo queda el olor a sal y madera vieja.,Le filet est deja en main. Seules demeurent l'odeur du sel et du vieux bois.,Das Netz ist bereits in der Hand. Nur der Geruch von Salz und altem Holz bleibt.
+dialog.tutorial.hut.first_visit.1,"A weathered hut leans against the shoreline wind, its door half-open and its quiet invitation impossible to ignore.","Una choza desgastada se inclina ante el viento de la orilla; su puerta entreabierta y su silenciosa invitacion son imposibles de ignorar.","Une hutte usee se penche contre le vent du rivage, sa porte a demi ouverte et son invitation silencieuse impossibles a ignorer.","Eine verwitterte Hutte lehnt sich gegen den Wind der Kuste; ihre halb offene Tur und ihre stille Einladung sind nicht zu ubersehen."
+dialog.tutorial.hut.first_visit.2,If there is anything useful inside, I should take it before the road calls me onward.,Si hay algo util dentro, deberia tomarlo antes de que el camino me reclame.,S'il y a quelque chose d'utile a l'interieur, je devrais le prendre avant que la route ne me rappelle.,Wenn drinnen etwas Nutliches ist, sollte ich es nehmen bevor der Weg mich weiterruft.
+dialog.tutorial.hut.cleared.1,Whatever could be salvaged here has already been taken. The hut offers only shelter from the wind now.,Todo lo que podia rescatarse aqui ya ha sido tomado. La choza solo ofrece refugio del viento ahora.,Tout ce qui pouvait etre recupere ici l'a deja ete. La hutte n'offre plus qu'un abri contre le vent.,Alles was hier noch brauchbar war wurde bereits mitgenommen. Die Hutte bietet jetzt nur noch Schutz vor dem Wind.
 dialog.enter_combat,Enter Combat,Entrar en combate,Entrer en combat,Kampf beginnen
 dialog.exit_overworld,Exit to Overworld,Salir al mapa,Quitter vers la carte,Zur Karte zuruckkehren
 dialog.room.cleared,You see nothing further of note here.,TODO,TODO,TODO
@@ -106,6 +136,7 @@ storymap.header.story,Story Chapters,Capitulos de historia,Chapitres d'histoire,
 storymap.header.biome,Biome Chapters,Capitulos de bioma,Chapitres de biome,Biomkapitel
 storymap.chapter_number,Chapter {number},Capitulo {number},Chapitre {number},Kapitel {number}
 storymap.tutorial.progress,The story map is where we track your progress,El mapa de historia es donde seguimos tu progreso,La carte d'histoire est l'endroit ou nous suivons votre progression,Auf der Story-Karte verfolgen wir deinen Fortschritt
+storymap.toast.home_only_chapter_change,"You cannot move to another chapter, unless you are home","No puedes moverte a otro capitulo a menos que estes en casa","Vous ne pouvez pas passer a un autre chapitre sauf si vous etes chez vous","Du kannst nicht zu einem anderen Kapitel wechseln, es sei denn, du bist zu Hause"
 storymap.tutorial.start,"To start your journey, click on your first memory","Para comenzar tu viaje, haz clic en el primer recuerdo","Pour commencer votre voyage, cliquez sur le premier souvenir","Um deine Reise zu beginnen, klicke auf die erste Erinnerung"
 storymap.tutorial.complete,"Continue to explore the world. Tutorial tips have now been turned off, you can turn them back on in settings. Good luck","Sigue explorando el mundo. Los consejos del tutorial se han desactivado, puedes volver a activarlos en ajustes. Buena suerte","Continuez a explorer le monde. Les astuces du didacticiel ont maintenant ete desactivees, vous pouvez les reactiver dans les parametres. Bonne chance","Erkunde die Welt weiter. Die Tutorialhinweise wurden jetzt ausgeschaltet, du kannst sie in den Einstellungen wieder aktivieren. Viel Gluck"
 storymap.click_continue,Click to continue,Haz clic para continuar,Cliquez pour continuer,Klicken zum Fortfahren
@@ -169,6 +200,7 @@ worldmap.tutorial.first_card,"As you regain memory, you can strengthen your reso
 worldmap.tutorial.first_item,"As you gain items, you can better equip yourself for the adventure",A medida que consigues objetos puedes equiparte mejor para la aventura,A mesure que vous gagnez des objets vous pouvez mieux vous equiper pour l'aventure,Wenn du Gegenstande findest kannst du dich fur das Abenteuer besser ausrusten
 worldmap.tutorial.explore,Continue to discover the world. Be careful returning to a place you have already been,Sigue descubriendo el mundo. Ten cuidado al volver a un lugar en el que ya has estado,Continuez a decouvrir le monde. Faites attention en revenant dans un lieu ou vous etes deja passe,Setze deine Entdeckung der Welt fort. Sei vorsichtig wenn du an einen Ort zuruckkehrst den du bereits besucht hast
 worldmap.backtrack_prompt,"You have a feeling you have been here before. An intense pain fills your mind as memory floods back","Sientes que ya has estado aqui antes. Un dolor intenso invade tu mente mientras los recuerdos regresan","Vous avez l'impression d'etre deja venu ici. Une douleur intense envahit votre esprit tandis que les souvenirs reviennent","Du hast das Gefuhl, schon einmal hier gewesen zu sein. Ein intensiver Schmerz durchzuckt deinen Geist, als die Erinnerungen zuruckkehren"
+worldmap.room.unknown,Unknown,Desconocido,Inconnu,Unbekannt
 tutorial.room.hut_intro,"You may find items along the way. Match the same card to keep it.","Puede que encuentres objetos en el camino. Empareja la misma carta para conservarlo.","Vous pourriez trouver des objets en chemin. Associez la meme carte pour le conserver.","Du kannst unterwegs Gegenstande finden. Ordne dieselbe Karte zu, um ihn zu behalten."
 tutorial.room.wharf_intro,"You will need to fight to regain your memory. Match card to card to keep it.","Tendras que luchar para recuperar tu memoria. Empareja carta con carta para conservarla.","Vous devrez combattre pour retrouver votre memoire. Associez carte a carte pour la conserver.","Du musst kampfen, um deine Erinnerung zuruckzugewinnen. Ordne Karte zu Karte zu, um sie zu behalten."
 story.title.home,Introduction,Introduccion,Introduction,Einfuhrung

@@ -163,6 +163,9 @@ func _on_music_change_requested(track_id: String, fade_time: float = 2.0):
 		return
 	_play_music_track(track_id, fade_time, false)
 
+func fade_out_current_music(fade_time: float = 2.0) -> void:
+	await _fade_out_to_silence(fade_time)
+
 func _fade_out_to_silence(fade_time: float = 2.0):
 	_ambient_overlap_request_id += 1
 	queued_followup_track_id = ""

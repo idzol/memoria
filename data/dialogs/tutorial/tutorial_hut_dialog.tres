@@ -1,0 +1,46 @@
+[gd_resource type="Resource" script_class="RoomDialogue" load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://data/resources/RoomDialogue.gd" id="1_dialogue"]
+[ext_resource type="Script" path="res://data/resources/RoomDialogSequence.gd" id="2_sequence"]
+[ext_resource type="Script" path="res://data/resources/RoomDialogLine.gd" id="3_line"]
+
+[sub_resource type="Resource" id="RoomDialogLine_first_1"]
+script = ExtResource("3_line")
+speaker_role = "narrator"
+text_key = "dialog.tutorial.hut.first_visit.1"
+text = "A weathered hut leans against the shoreline wind, its door half-open and its quiet invitation impossible to ignore."
+
+[sub_resource type="Resource" id="RoomDialogLine_first_2"]
+script = ExtResource("3_line")
+speaker_role = "player"
+speaker_name_key = "dialog.speaker.lethos"
+speaker_name = "Lethos"
+text_key = "dialog.tutorial.hut.first_visit.2"
+text = "If there is anything useful inside, I should take it before the road calls me onward."
+
+[sub_resource type="Resource" id="RoomDialogSequence_first_visit"]
+script = ExtResource("2_sequence")
+id = "first_visit"
+condition = {
+"equals": 1,
+"type": "room_visit_count"
+}
+lines = [SubResource("RoomDialogLine_first_1"), SubResource("RoomDialogLine_first_2")]
+
+[sub_resource type="Resource" id="RoomDialogLine_cleared_1"]
+script = ExtResource("3_line")
+speaker_role = "narrator"
+text_key = "dialog.tutorial.hut.cleared.1"
+text = "Whatever could be salvaged here has already been taken. The hut offers only shelter from the wind now."
+
+[sub_resource type="Resource" id="RoomDialogSequence_cleared"]
+script = ExtResource("2_sequence")
+id = "cleared"
+condition = {
+"type": "room_cleared"
+}
+lines = [SubResource("RoomDialogLine_cleared_1")]
+
+[resource]
+script = ExtResource("1_dialogue")
+sequences = [SubResource("RoomDialogSequence_cleared"), SubResource("RoomDialogSequence_first_visit")]

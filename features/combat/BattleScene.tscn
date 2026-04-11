@@ -9,6 +9,18 @@ border_width_bottom = 2
 border_color = Color(0.2, 0.2, 0.25, 1)
 shadow_size = 4
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dialog"]
+bg_color = Color(0.1, 0.1, 0.12, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.3, 0.35, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_bg"]
 bg_color = Color(0.1, 0.05, 0.05, 1)
 
@@ -373,28 +385,39 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.05, 0.05, 0.07, 0.9)
 
-[node name="VBox" type="VBoxContainer" parent="DialogOverlay" unique_id=1116097977]
+[node name="VBox" type="PanelContainer" parent="DialogOverlay" unique_id=1116097977]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -300.0
-offset_top = -200.0
+offset_top = -100.0
 offset_right = 300.0
-offset_bottom = 200.0
+offset_bottom = 100.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 20
+theme_override_styles/panel = SubResource("StyleBoxFlat_dialog")
 
-[node name="RoomTitle" type="Label" parent="DialogOverlay/VBox" unique_id=1238640503]
+[node name="Margin" type="MarginContainer" parent="DialogOverlay/VBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="DialogVBox" type="VBoxContainer" parent="DialogOverlay/VBox/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="RoomTitle" type="Label" parent="DialogOverlay/VBox/Margin/DialogVBox" unique_id=1238640503]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "Room Name"
 horizontal_alignment = 1
 
-[node name="DialogSpeaker" type="Label" parent="DialogOverlay/VBox" unique_id=11030021]
+[node name="DialogSpeaker" type="Label" parent="DialogOverlay/VBox/Margin/DialogVBox" unique_id=11030021]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.82, 0.45, 1)
@@ -402,15 +425,16 @@ theme_override_font_sizes/font_size = 18
 text = "Narrator"
 horizontal_alignment = 1
 
-[node name="DialogText" type="Label" parent="DialogOverlay/VBox" unique_id=934671793]
+[node name="DialogText" type="Label" parent="DialogOverlay/VBox/Margin/DialogVBox" unique_id=934671793]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/line_spacing = 5
+theme_override_font_sizes/font_size = 22
 text = "Encounter Text..."
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="OptionContainer" type="VBoxContainer" parent="DialogOverlay/VBox" unique_id=529039171]
+[node name="OptionContainer" type="VBoxContainer" parent="DialogOverlay/VBox/Margin/DialogVBox" unique_id=529039171]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 10

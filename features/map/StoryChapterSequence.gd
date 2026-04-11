@@ -5,10 +5,19 @@ extends Control
 @onready var text_viewport = %TextViewport
 @onready var story_block = %StoryBlock
 @onready var continue_hint = %ContinueHint
+@onready var video_player: VideoStreamPlayer = %VideoPlayer
+@onready var cutscene_music_player: AudioStreamPlayer = %CutsceneMusicPlayer
 
 const SCROLL_SPEED := 30.0
+const MUSIC_FADE_OUT_SECONDS := 0.45
+const PRE_CHAPTER_MUSIC_FADE_OUT_SECONDS := 0.8
+const DEFAULT_VIDEO_ASPECT_RATIO := 16.0 / 9.0
+const VIDEO_ROOT_DIRS := [
+	"res://assets/video/",
+	"res://asset/video/"
+]
 const STORY_PLACEHOLDERS := {
-	"home": {
+	"tutorial": {
 		"title": "Introduction",
 		"body": "
 Upon the desolate heights of the crags,
@@ -67,22 +76,45 @@ Who has traded myth for the simple hunger of the sea."
 	}
 }
 
+enum SequencePhase {
+	VIDEO,
+	TEXT,
+	FINISHING
+}
+
 var _scroll_complete: bool = false
+var _phase: SequencePhase = SequencePhase.VIDEO
+var _is_finishing: bool = false
+var _active_biome: String = ""
+
+@export_range(0.1, 4.0, 0.001) var video_aspect_ratio: float = DEFAULT_VIDEO_ASPECT_RATIO
 
 func _ready():
-	continue_hint.text = "Press Space / Enter to continue"
+	if DataManager and DataManager.has_method("pause_for_cutscene"):
+		DataManager.pause_for_cutscene()
+	continue_hint.text = "Press any key or click to continue"
 	if not resized.is_connected(_layout_story_block):
 		resized.connect(_layout_story_block)
-	var biome = GameManager.get_pending_story_sequence_biome()
-	var content = STORY_PLACEHOLDERS.get(biome, {
-		"title": biome.replace("_", " ").capitalize(),
+	_active_biome = GameManager.get_pending_story_sequence_biome()
+	var content = STORY_PLACEHOLDERS.get(_active_biome, {
+		"title": _active_biome.replace("_", " ").capitalize(),
 		"body": "Placeholder chapter text."
 	})
 	title_label.text = str(content.get("title", "Story Chapter"))
 	body_label.text = str(content.get("body", "Placeholder chapter text."))
-	_layout_story_block.call_deferred()
+	await _start_cutscene_video_and_music()
+
+func _notification(what):
+	if what == NOTIFICATION_RESIZED:
+		_fit_video_player()
+
+func _exit_tree():
+	if DataManager and DataManager.has_method("resume_after_cutscene"):
+		DataManager.resume_after_cutscene()
 
 func _process(delta: float):
+	if _phase != SequencePhase.TEXT:
+		return
 	if _scroll_complete or not story_block or not text_viewport:
 		return
 	story_block.position.y -= SCROLL_SPEED * delta
@@ -93,8 +125,15 @@ func _process(delta: float):
 func _input(event):
 	var is_key_press = event is InputEventKey and event.pressed and not event.is_echo()
 	var is_mouse_press = event is InputEventMouseButton and event.pressed
-	if is_key_press or is_mouse_press:
-		_finish_sequence()
+	if not (is_key_press or is_mouse_press):
+		return
+	match _phase:
+		SequencePhase.VIDEO:
+			_show_text_phase()
+		SequencePhase.TEXT:
+			_finish_sequence()
+		_:
+			return
 
 func _layout_story_block():
 	if not story_block or not text_viewport or not body_label:
@@ -112,7 +151,121 @@ func _layout_story_block():
 	_scroll_complete = false
 	continue_hint.modulate.a = 0.72
 
-func _finish_sequence():
-	if not is_inside_tree():
+func _start_cutscene_video_and_music():
+	if text_viewport:
+		text_viewport.visible = false
+	await _fade_out_existing_music_before_cutscene()
+	if _try_play_cutscene_music():
+		pass
+	if not _try_play_cutscene_video():
+		_show_text_phase()
+
+func _fade_out_existing_music_before_cutscene() -> void:
+	if AudioManager == null or not AudioManager.has_method("fade_out_current_music"):
 		return
+	await AudioManager.fade_out_current_music(PRE_CHAPTER_MUSIC_FADE_OUT_SECONDS)
+
+func _show_text_phase():
+	if _phase != SequencePhase.VIDEO:
+		return
+	_phase = SequencePhase.TEXT
+	if video_player and video_player.is_playing():
+		video_player.stop()
+	if video_player:
+		video_player.visible = false
+	if text_viewport:
+		text_viewport.visible = true
+	continue_hint.text = "Press any key or click to return"
+	_layout_story_block.call_deferred()
+
+func _finish_sequence():
+	if _is_finishing or not is_inside_tree():
+		return
+	_is_finishing = true
+	_phase = SequencePhase.FINISHING
+	await _fade_out_music()
 	GameManager.finish_story_sequence()
+
+func _fade_out_music() -> void:
+	if cutscene_music_player == null or not cutscene_music_player.playing:
+		return
+	var start_volume = cutscene_music_player.volume_db
+	var tween = create_tween()
+	tween.tween_property(cutscene_music_player, "volume_db", -40.0, MUSIC_FADE_OUT_SECONDS)
+	await tween.finished
+	cutscene_music_player.stop()
+	cutscene_music_player.volume_db = start_volume
+
+func _resolve_cutscene_media_path(extension: String) -> String:
+	if _active_biome == "":
+		return ""
+	for root in VIDEO_ROOT_DIRS:
+		var candidate = "%s%s_cutscene.%s" % [root, _active_biome, extension]
+		if ResourceLoader.exists(candidate):
+			return candidate
+	return ""
+
+func _try_play_cutscene_music() -> bool:
+	if cutscene_music_player == null:
+		return false
+	var music_path = _resolve_cutscene_media_path("mp3")
+	if music_path == "":
+		return false
+	var music_stream = load(music_path) as AudioStream
+	if music_stream == null:
+		return false
+	cutscene_music_player.stream = music_stream
+	cutscene_music_player.play()
+	return true
+
+func _try_play_cutscene_video() -> bool:
+	if video_player == null:
+		return false
+	var video_path = _resolve_cutscene_media_path("ogv")
+	if video_path == "":
+		return false
+	var video_stream = load(video_path) as VideoStream
+	if video_stream == null:
+		return false
+	video_player.stream = video_stream
+	if not video_player.finished.is_connected(_on_video_finished):
+		video_player.finished.connect(_on_video_finished)
+	video_player.visible = true
+	video_player.play()
+	_fit_video_player()
+	_fit_video_player.call_deferred()
+	return true
+
+func _on_video_finished():
+	_show_text_phase()
+
+func _fit_video_player():
+	if video_player == null:
+		return
+	var safe_aspect_ratio = _get_video_aspect_ratio()
+	var scene_size = size
+	if scene_size.x <= 0.0 or scene_size.y <= 0.0:
+		scene_size = get_viewport_rect().size
+	if scene_size.x <= 0.0 or scene_size.y <= 0.0:
+		return
+	var target_size = scene_size
+	var scene_aspect_ratio = scene_size.x / scene_size.y
+	if scene_aspect_ratio > safe_aspect_ratio:
+		target_size.x = scene_size.y * safe_aspect_ratio
+	else:
+		target_size.y = scene_size.x / safe_aspect_ratio
+	video_player.expand = true
+	video_player.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	video_player.position = (scene_size - target_size) * 0.5
+	video_player.size = target_size
+
+func _get_video_aspect_ratio() -> float:
+	var fallback_ratio = video_aspect_ratio if video_aspect_ratio > 0.0 else DEFAULT_VIDEO_ASPECT_RATIO
+	if video_player == null:
+		return fallback_ratio
+	var texture := video_player.get_video_texture()
+	if texture:
+		var size = texture.get_size()
+		if size.x > 0.0 and size.y > 0.0:
+			return size.x / size.y
+	return fallback_ratio
